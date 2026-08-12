@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const EXPERIENCE_TITLES: Record<ExperienceId, { name: string; tag: string }> = {
     astro: { name: 'Astro', tag: 'Astrofísica 3D' },
-    languages: { name: 'Idiomas', tag: 'AstroLingo' },
+    languages: { name: 'Idiomas', tag: 'Práctica de Voz' },
     school: { name: 'Escolar', tag: 'Tutor IA' },
     verify: { name: 'Verifica', tag: 'Investigación' },
     galaxy: { name: 'Galaxy', tag: 'Exploración' }

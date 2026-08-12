@@ -46,18 +46,18 @@ export const VerifyView: React.FC = () => {
                   IA Real Conectada 🟢
                 </span>
               </div>
-              <p className="text-xs text-amber-200">Investigación, Contraste de Noticias & Auditoría en Tiempo Real con LLM</p>
+              <p className="text-xs text-amber-200">Educación Crítica para Estudiantes: Aprende a Verificar Noticias, Rumores y Detectar Bulos en Redes</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Formulario de Consulta deNoticia */}
+      {/* Formulario de Consulta de Noticia */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
         <form onSubmit={handleVerifyHeadline} className="space-y-3">
           <div>
             <label className="block text-xs font-bold text-slate-300 mb-1.5">
-              Titular, Afirmación o Noticia a Verificar:
+              Introduce cualquier Titular, Rumor o Noticia a Verificar:
             </label>
             <div className="relative">
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
@@ -66,7 +66,7 @@ export const VerifyView: React.FC = () => {
                 required
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
-                placeholder="Ej. 'El Telescopio Webb descubrió agua en Europa moon en 2026'"
+                placeholder="Ej. 'He visto un vídeo que dice que cancelan los exámenes la semana que viene...'"
                 className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-amber-500 transition-all outline-none"
               />
             </div>
@@ -80,12 +80,12 @@ export const VerifyView: React.FC = () => {
             {isVerifying ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Analizando con IA y Contrastando Fuentes...</span>
+                <span>Analizando Noticia y Buscando Evidencias...</span>
               </>
             ) : (
               <>
                 <ShieldCheck className="w-4 h-4" />
-                <span>Auditando y Verificar con IA Real</span>
+                <span>Verificar Noticia con Detector IA</span>
               </>
             )}
           </button>
@@ -102,14 +102,14 @@ export const VerifyView: React.FC = () => {
               }`}>
                 {auditResult.verdict}
               </span>
-              <span className="text-xs font-extrabold text-amber-400">Nivel de Confianza: {auditResult.trustScore}</span>
+              <span className="text-xs font-extrabold text-amber-400">Nivel de Veracidad: {auditResult.trustScore}</span>
             </div>
 
             <p className="text-xs text-slate-200 leading-relaxed font-sans">{auditResult.summary}</p>
 
             {auditResult.sources && auditResult.sources.length > 0 && (
               <div className="pt-2 border-t border-slate-800 space-y-1">
-                <p className="text-[10px] font-bold uppercase text-slate-400">Fuentes y Consenso de IA:</p>
+                <p className="text-[10px] font-bold uppercase text-slate-400">Evidencias y Fuentes Oficiales:</p>
                 {auditResult.sources.map((src: string, idx: number) => (
                   <div key={idx} className="flex items-center gap-1.5 text-xs text-amber-300">
                     <CheckCircle2 className="w-3.5 h-3.5" />
@@ -126,7 +126,7 @@ export const VerifyView: React.FC = () => {
       <div className="fixed bottom-3 inset-x-3 max-w-md mx-auto z-40 bg-slate-950/95 backdrop-blur-xl border border-amber-500/30 p-1.5 rounded-2xl flex justify-around shadow-2xl">
         <button
           onClick={() => {}}
-          className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold bg-amber-500 text-slate-950 shadow-md"
+          className="flex flex-col items-center gap-0.5 px-3.5 py-1.5 rounded-xl text-[10px] font-extrabold bg-amber-500 text-slate-950 shadow-md"
         >
           <Search className="w-4 h-4" />
           <span>Verificar</span>
@@ -134,18 +134,18 @@ export const VerifyView: React.FC = () => {
 
         <button
           onClick={() => {}}
-          className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold text-slate-400 hover:text-white"
+          className="flex flex-col items-center gap-0.5 px-3.5 py-1.5 rounded-xl text-[10px] font-extrabold text-slate-400 hover:text-white"
         >
-          <ShieldCheck className="w-4 h-4" />
-          <span>Fuentes ESA/NASA</span>
+          <AlertTriangle className="w-4 h-4" />
+          <span>Caza-Bulos</span>
         </button>
 
         <button
           onClick={() => {}}
-          className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold text-slate-400 hover:text-white"
+          className="flex flex-col items-center gap-0.5 px-3.5 py-1.5 rounded-xl text-[10px] font-extrabold text-slate-400 hover:text-white"
         >
           <FileCheck className="w-4 h-4" />
-          <span>Rigor IA</span>
+          <span>Guía Detector</span>
         </button>
       </div>
 

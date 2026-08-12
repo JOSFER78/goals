@@ -18,6 +18,7 @@ import { VerifyView } from './experiences/verify/VerifyView';
 import { AstroExperience } from './experiences/astro/AstroExperience';
 import { PendingApprovalView } from './core/views/PendingApprovalView';
 import { CookieBanner } from './core/components/CookieBanner';
+import { ApkDownloadGuideModal } from './core/components/ApkDownloadGuideModal';
 
 const StarField: React.FC = () => {
   useEffect(() => {
@@ -52,6 +53,7 @@ const MainContent: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState<boolean>(false);
   const [isPendingDismissed, setIsPendingDismissed] = useState<boolean>(false);
+  const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
 
   // Configuración de Gráficos de Astro 3D
   const [graphicsConfig, setGraphicsConfig] = useState({
@@ -99,6 +101,7 @@ const MainContent: React.FC = () => {
               initialMode={authViewMode}
               onBackToLanding={() => setIsAuthViewOpen(false)}
               onSuccess={() => setIsAuthViewOpen(false)}
+              onOpenDownloadGuide={() => setIsGuideOpen(true)}
             />
           ) : isAuthenticated && !isApproved && !isPendingDismissed ? (
             /* Pantalla de Espera de Autorización (con botón 'X' para cerrar y continuar) */
@@ -159,6 +162,12 @@ const MainContent: React.FC = () => {
         onClose={() => setIsAdminDashboardOpen(false)}
         graphicsConfig={graphicsConfig}
         onUpdateGraphicsConfig={handleUpdateGraphicsConfig}
+      />
+
+      {/* Modal Explicativo de Instalación en Android */}
+      <ApkDownloadGuideModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
       />
 
       {/* Componente Global Toast */}

@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Globe, Lock, Mail, User, Sparkles, KeyRound, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Lock, Mail, User, Sparkles, KeyRound } from 'lucide-react';
 
 interface AuthViewProps {
   initialMode?: 'login' | 'signup';
   onBackToLanding: () => void;
   onSuccess: () => void;
+  onOpenDownloadGuide?: () => void;
 }
 
-export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBackToLanding, onSuccess }) => {
+export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBackToLanding, onSuccess, onOpenDownloadGuide }) => {
   const { signInWithGoogle, signInWithEmail, signUpWithEmail, authError, setAuthError } = useAuth();
   
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
@@ -285,23 +286,23 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
           </button>
         </div>
 
-        {/* Aviso de App Nativa para Android con Icono Oficial */}
+        {/* Aviso de App Nativa para Android con Icono Oficial (Abre la Guia de Descarga) */}
         <div className="bg-gradient-to-r from-emerald-950/40 via-slate-950 to-slate-950 border border-emerald-500/30 rounded-xl p-3 flex items-center gap-3">
           <img src="/android-logo.png" alt="Android Official Logo" className="w-8 h-8 object-contain shrink-0" />
           <div className="text-left flex-1 min-w-0">
             <p className="text-[11px] font-bold text-white flex items-center gap-1">
               <span>App Nativa para Android</span>
-              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-extrabold border border-emerald-400/30">v2.0 APK</span>
+              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-extrabold border border-emerald-400/30">v2.0 ZIP</span>
             </p>
             <p className="text-[10px] text-slate-400">Instala GOALS directamente en tu dispositivo móvil.</p>
           </div>
-          <a
-            href="./astrolingo-v2.zip"
-            download="astrolingo-v2.zip"
-            className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shrink-0 transition-all shadow"
+          <button
+            type="button"
+            onClick={onOpenDownloadGuide}
+            className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shrink-0 transition-all shadow active:scale-95 cursor-pointer"
           >
-            APK
-          </a>
+            Descargar
+          </button>
         </div>
       </div>
 

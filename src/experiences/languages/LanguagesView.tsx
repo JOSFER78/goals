@@ -38,7 +38,7 @@ export const LanguagesView: React.FC = () => {
             <span className="text-3xl p-2 rounded-xl bg-slate-900 border border-cyan-500/30">🌐</span>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-display font-extrabold text-xl text-white">AstroLingo Idiomas</h2>
+                <h2 className="font-display font-extrabold text-xl text-white">Idiomas GOALS</h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
                   IA Real Conectada 🟢
                 </span>
