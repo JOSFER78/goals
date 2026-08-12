@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { defaultFirebaseConfig, getStoredFirebaseConfig, db, collection, getDocs, doc, setDoc } from '../config/firebase';
-import { X, Shield, Sliders, Users, BarChart3, Key, CheckCircle2, AlertTriangle, Check, UserX, Clock, RefreshCw } from 'lucide-react';
+import { defaultFirebaseConfig, getStoredFirebaseConfig, db, collection, getDocs, doc, setDoc, deleteDoc, onSnapshot } from '../config/firebase';
+import { X, Shield, Sliders, Users, BarChart3, Key, CheckCircle2, AlertTriangle, Check, UserX, Clock, RefreshCw, Trash2 } from 'lucide-react';
 import { UserData } from '../types';
 
 interface AdminDashboardProps {
@@ -56,29 +56,28 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [customProjectId, setCustomProjectId] = useState(() => getStoredFirebaseConfig().projectId || '');
   const [customAuthDomain, setCustomAuthDomain] = useState(() => getStoredFirebaseConfig().authDomain || '');
 
-  const fetchUsersFromFirestore = async () => {
+  useEffect(() => {
+    if (!isOpen || !isAdmin || !db) return;
     setLoadingUsers(true);
-    try {
+
+    const unsub = onSnapshot(collection(db, 'users'), (snap) => {
       const records: UserRecord[] = [];
-      if (db) {
-        const snap = await getDocs(collection(db, 'users'));
-        snap.forEach((docSnap) => {
-          const data = docSnap.data() as UserData & { email?: string; displayName?: string };
-          const uid = docSnap.id;
-          const userEmail = data.email || (uid === user?.uid ? user?.email : `${uid.slice(0, 6)}@estudiante.com`);
-          const name = data.displayName || (uid === user?.uid ? user?.displayName : 'Estudiante registrado');
-          const isAdminUser = userEmail === 'josferestudio@gmail.com';
-          
-          records.push({
-            uid,
-            email: userEmail || 'estudiante@email.com',
-            displayName: name || 'Estudiante',
-            isApproved: isAdminUser || data.isApproved === true,
-            xp: data.xp || 0,
-            streak: data.streak || 1
-          });
+      snap.forEach((docSnap) => {
+        const data = docSnap.data() as UserData & { email?: string; displayName?: string; isApproved?: boolean };
+        const uid = docSnap.id;
+        const userEmail = data.email || (uid === user?.uid ? user?.email : `${uid.slice(0, 6)}@estudiante.com`);
+        const name = data.displayName || (uid === user?.uid ? user?.displayName : 'Estudiante registrado');
+        const isAdminUser = userEmail === 'josferestudio@gmail.com';
+
+        records.push({
+          uid,
+          email: userEmail || 'estudiante@email.com',
+          displayName: name || 'Estudiante',
+          isApproved: isAdminUser || data.isApproved === true,
+          xp: data.xp || 0,
+          streak: data.streak || 1
         });
-      }
+      });
 
       if (records.length === 0 && user) {
         records.push({
@@ -92,18 +91,29 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       }
 
       setUsersList(records);
-    } catch (e) {
-      console.warn("Error cargando lista de usuarios de Firestore", e);
-    } finally {
       setLoadingUsers(false);
+    }, (err) => {
+      console.warn("Error escuchando usuarios en tiempo real:", err);
+      setLoadingUsers(false);
+    });
+
+    return () => unsub();
+  }, [isOpen, isAdmin, user, userData]);
+
+  const handleApproveAllPending = async () => {
+    const pendingUsers = usersList.filter(u => !u.isApproved && u.email !== 'josferestudio@gmail.com');
+    if (pendingUsers.length === 0) return;
+    try {
+      if (db) {
+        for (const u of pendingUsers) {
+          await setDoc(doc(db, 'users', u.uid), { isApproved: true, status: 'approved' }, { merge: true });
+        }
+      }
+      showToast(`🟢 ¡Aprobados los ${pendingUsers.length} usuarios pendientes!`);
+    } catch (e) {
+      showToast("Error al aprobar usuarios");
     }
   };
-
-  useEffect(() => {
-    if (isOpen && isAdmin) {
-      fetchUsersFromFirestore();
-    }
-  }, [isOpen, isAdmin]);
 
   if (!isOpen) return null;
 
@@ -132,6 +142,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       showToast(nextApproved ? "🟢 Usuario APROBADO correctamente" : "🔴 Autorización revocada");
     } catch (e) {
       showToast("Error al actualizar estado en Firestore");
+    }
+  };
+
+  const handleDeleteUserDoc = async (targetUid: string, userEmail: string) => {
+    if (!window.confirm(`¿Seguro que deseas eliminar la cuenta ${userEmail} de la base de datos?`)) return;
+    try {
+      if (db) {
+        await deleteDoc(doc(db, 'users', targetUid));
+      }
+      setUsersList((prev) => prev.filter((u) => u.uid !== targetUid));
+      showToast("🗑️ Registro de usuario eliminado de la base de datos");
+    } catch (e) {
+      showToast("Error al eliminar el registro en Firestore");
+    }
+  };
+
+  const handlePurgeAllTestUsers = async () => {
+    if (!window.confirm("⚠️ ATENCIÓN: ¿Seguro que deseas BORRAR TODOS los registros de prueba de la base de datos Firestore excepto el Super Admin?")) return;
+    try {
+      if (db) {
+        const toDelete = usersList.filter(u => u.email !== 'josferestudio@gmail.com');
+        for (const u of toDelete) {
+          await deleteDoc(doc(db, 'users', u.uid));
+        }
+      }
+      setUsersList((prev) => prev.filter(u => u.email === 'josferestudio@gmail.com'));
+      showToast("🧹 Base de datos purgada. Se han eliminado todos los usuarios de prueba.");
+    } catch (e) {
+      showToast("Error al purgar registros de la base de datos");
     }
   };
 
@@ -179,6 +218,23 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Banner Alerta de Solicitudes Pendientes */}
+        {pendingCount > 0 && (
+          <div className="bg-amber-500/15 border-b border-amber-500/30 p-3 px-5 flex items-center justify-between animate-pulse">
+            <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
+              <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>🔔 Hay <b>{pendingCount}</b> {pendingCount === 1 ? 'solicitud de usuario esperando' : 'solicitudes de usuarios esperando'} autorización.</span>
+            </div>
+            <button
+              onClick={handleApproveAllPending}
+              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition-all shadow-md active:scale-95 flex items-center gap-1 shrink-0"
+            >
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Aprobar a Todos ({pendingCount})</span>
+            </button>
+          </div>
+        )}
 
         {/* Pestañas de Administración */}
         <div className="flex border-b border-slate-800 bg-slate-950/60 text-xs font-bold">
@@ -239,14 +295,24 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <h3 className="font-bold text-xs text-white">Solicitudes de Registro & Control de Acceso</h3>
                   <p className="text-[10px] text-slate-400">Los usuarios registrados deben ser autorizados por ti para poder entrar.</p>
                 </div>
-                <button
-                  onClick={fetchUsersFromFirestore}
-                  disabled={loadingUsers}
-                  className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin' : ''}`} />
-                  <span>Refrescar</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePurgeAllTestUsers}
+                    className="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95"
+                    title="Borrar todos los usuarios de prueba excepto el Admin"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-rose-400" />
+                    <span>Limpiar BD Pruebas</span>
+                  </button>
+                  <button
+                    onClick={fetchUsersFromFirestore}
+                    disabled={loadingUsers}
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin' : ''}`} />
+                    <span>Refrescar</span>
+                  </button>
+                </div>
               </div>
 
               <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/80 shadow-inner">
@@ -291,26 +357,35 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                             {isSuperAdmin ? (
                               <span className="text-[10px] text-slate-500 italic">Autorizado siempre</span>
                             ) : (
-                              <button
-                                onClick={() => handleToggleUserApproval(u.uid, u.isApproved)}
-                                className={`px-3 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1 ml-auto active:scale-95 ${
-                                  u.isApproved
-                                    ? 'bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400'
-                                    : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/30 font-black'
-                                }`}
-                              >
-                                {u.isApproved ? (
-                                  <>
-                                    <UserX className="w-3.5 h-3.5" />
-                                    <span>Revocar</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Check className="w-3.5 h-3.5" />
-                                    <span>Aprobar Acceso</span>
-                                  </>
-                                )}
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => handleToggleUserApproval(u.uid, u.isApproved)}
+                                  className={`px-2.5 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95 ${
+                                    u.isApproved
+                                      ? 'bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300'
+                                      : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/30 font-black'
+                                  }`}
+                                >
+                                  {u.isApproved ? (
+                                    <>
+                                      <UserX className="w-3.5 h-3.5" />
+                                      <span>Revocar</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Check className="w-3.5 h-3.5" />
+                                      <span>Aprobar</span>
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteUserDoc(u.uid, u.email)}
+                                  className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 transition-all active:scale-95"
+                                  title="Eliminar registro de usuario de Firestore"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             )}
                           </td>
                         </tr>

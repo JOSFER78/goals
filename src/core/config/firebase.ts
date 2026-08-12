@@ -12,7 +12,7 @@ import {
   User,
   Auth
 } from 'firebase/auth';
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, Firestore } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, onSnapshot, Firestore } from 'firebase/firestore';
 
 export const defaultFirebaseConfig = {
   apiKey: "AIzaSyBgEZaM-qNSHKcNr6ZJmQlo8kzpg1qpfAA",
@@ -80,6 +80,8 @@ export {
   setDoc,
   getDoc,
   collection,
-  getDocs
+  getDocs,
+  deleteDoc,
+  onSnapshot
 };
 export type { User };

@@ -80,7 +80,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             email: u.email,
             displayName: profile.displayName,
             photoURL: u.photoURL,
-            ...(isAdminEmail ? { isApproved: true } : {})
+            isApproved: isAdminEmail ? true : (profile.isApproved === true ? true : false),
+            requestedAt: new Date().toISOString(),
+            status: isAdminEmail ? 'approved' : 'pending'
           }, { merge: true }).catch(err => console.warn("Error guardando ficha en Firestore:", err));
         }
       } else {

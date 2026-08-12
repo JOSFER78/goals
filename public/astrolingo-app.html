@@ -2182,17 +2182,7 @@ const INFO={
  edge:{icon:'📡',name:'El borde del tiempo',tagline:'Las galaxias más lejanas',desc:'Galaxias cuya luz viajó +13.000 millones de años: las vemos recién nacidas. JWST confirmó en 2026 a MoM-z14, visible solo 280 millones de años después del Big Bang.',stats:[['Viaje de la luz','>13.000 M años'],['Récord 2026','MoM-z14']],facts:['En noviembre de 2026, Voyager 1 estará a 1 día-luz de la Tierra.','Mirar lejos = mirar al pasado.']}
 };
 
-/* ================= NIVELES EXPLORAR ================= */
-const LEVELS=[
- {name:"La Tierra",badge:"12.742 km",desc:"Roca cubierta de océanos que gira alrededor de una estrella común. Toca la Tierra para consultar la astrofísica del país seleccionado o consulta la Luna y satélites en órbita.",fact:"En abril de 2026, desde este planeta, 4 humanos rodearon la Luna con Artemis II.",stats:[["Diámetro","12.742 km"],["Edad","4.540 M años"]],build:buildEarth},
- {name:"El Sistema Solar",badge:"4.500 M de km",desc:"Una estrella, 8 planetas, cientos de lunas y millones de asteroides.",fact:"La luz tarda 4,5 horas en llegar a Neptuno.",stats:[["Planetas","8"],["Luz a Neptuno","4,2 h"]],build:buildSolarSystem},
- {name:"Nube de Oort",badge:"1,5 años luz",desc:"La frontera real: una nube esférica con billones de cometas.",fact:"Voyager 1 tardará 300 años en llegar y 30.000 en cruzarla.",stats:[["Extensión","100.000 UA"],["Contenido","Cometas ☄️"]],build:buildOortCloud},
- {name:"Estrellas vecinas",badge:"4 – 11 años luz",desc:"Cada punto es un sol. Próxima Centauri tiene un planeta en zona habitable.",fact:"A velocidad de Voyager, Próxima queda a 75.000 años de viaje.",stats:[["Próxima","4,24 a.l."],["Sirio","8,6 a.l."]],build:buildNearbyStars},
- {name:"La Vía Láctea",badge:"100.000 años luz",desc:"Espiral con ~200.000 millones de estrellas. El Sol vive en el brazo de Orión.",fact:"El Sol orbita el centro a 828.000 km/h.",stats:[["Estrellas","200.000 M"],["Forma","Espiral 🌀"]],build:buildMilkyWay},
- {name:"El Grupo Local",badge:"10 M de años luz",desc:"+80 galaxias unidas por gravedad. Vía Láctea y Andrómeda dominan.",fact:"Se fusionarán en ~4.500 millones de años.",stats:[["Galaxias","+80"],["Andrómeda","2,5 M a.l."]],build:buildLocalGroup},
- {name:"Laniakea",badge:"520 M de años luz",desc:"La red cósmica: filamentos de galaxias fluyendo hacia el Gran Atractor.",fact:"Laniakea = 'cielo inmenso' en hawaiano.",stats:[["Galaxias","100.000"],["Descubierto","2014"]],build:buildCosmicWeb},
- {name:"Universo observable",badge:"93.000 M años luz",desc:"Todo lo cuya luz ha tenido tiempo de llegarnos desde el Big Bang.",fact:"Hay ~2 billones de galaxias. Y puede que haya infinito más allá.",stats:[["Edad","13.800 M años"],["Galaxias","2 billones"]],build:buildObservable}
-];
+/* ================= NIVELES EXPLORAR (DECLARADOS MÁS ABAJO) ================= */
 
 /* ================= PANTALLA 1: LA TIERRA Y LA LUNA (HIPERREALISTA NASA) ================= */
 function buildEarth(){

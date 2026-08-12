@@ -64,7 +64,7 @@ const MainContent: React.FC = () => {
   });
 
   const isAuthenticated = isCloud && user && !user.isAnonymous;
-  const isApproved = isAdmin || (userData?.isApproved !== false && user?.isApproved !== false);
+  const isApproved = isAdmin || userData?.isApproved === true || user?.isApproved === true;
 
   // Comprobar automáticamente si hay actualización al iniciar la App
   useEffect(() => {
