@@ -16,7 +16,7 @@ import { getFirestore, doc, setDoc, getDoc, collection, getDocs, Firestore } fro
 
 export const defaultFirebaseConfig = {
   apiKey: "AIzaSyBgEZaM-qNSHKcNr6ZJmQlo8kzpg1qpfAA",
-  authDomain: "goalskid.web.app",
+  authDomain: "astrolingo-96820.firebaseapp.com",
   projectId: "astrolingo-96820",
   storageBucket: "astrolingo-96820.firebasestorage.app",
   messagingSenderId: "882204482981",
