@@ -18,6 +18,7 @@ interface ProgressContextType {
   getRetosList: () => RetoItem[];
   toastMsg: string | null;
   showToast: (msg: string) => void;
+  hideToast: () => void;
   resetProgress: () => void;
 }
 
@@ -49,7 +50,7 @@ export const getRankInfo = (xp: number): RankInfo => {
 
 export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isCloud } = useAuth();
-  const [userData, setUserData] = useState<UserData>(DEFAULT_USER_DATA);
+  const { userData, setUserData } = useState<UserData>(DEFAULT_USER_DATA);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const dataKey = useCallback(() => {
@@ -64,14 +65,17 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     setToastMsg(msg);
     setTimeout(() => {
       setToastMsg((prev) => (prev === msg ? null : prev));
-    }, 2800);
+    }, 4500);
+  };
+
+  const hideToast = () => {
+    setToastMsg(null);
   };
 
   const persistData = useCallback(async (data: UserData) => {
     const key = dataKey();
     try {
       localStorage.setItem(key, JSON.stringify(data));
-      // También guardar en legacyKey para astrolingo iframe
       localStorage.setItem(legacyKey(), JSON.stringify({
         xp: data.xp,
         streak: data.streak,
@@ -121,12 +125,11 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         loadedData = JSON.parse(JSON.stringify(DEFAULT_USER_DATA));
       }
 
-      // Normalizar estructuras y permisos
       const isAdminUser = user?.email === 'josferestudio@gmail.com';
       if (isAdminUser) {
         loadedData.isApproved = true;
       } else if (loadedData.isApproved === undefined) {
-        loadedData.isApproved = false; // Pendiente por defecto
+        loadedData.isApproved = false;
       }
 
       loadedData.lessons = loadedData.lessons || {};
@@ -141,7 +144,6 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         };
       }
 
-      // Sincronizar racha
       const streakResult = checkStreak(loadedData.lastDay, loadedData.streak);
       loadedData.streak = streakResult.streak;
       loadedData.lastDay = streakResult.lastDay;
@@ -397,6 +399,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       getRetosList,
       toastMsg,
       showToast,
+      hideToast,
       resetProgress
     }}>
       {children}
