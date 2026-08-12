@@ -10,7 +10,7 @@ import { GoalsLanding } from './core/views/GoalsLanding';
 import { AuthView } from './core/views/AuthView';
 import { GoalsHome } from './core/views/GoalsHome';
 import { ExperienceId } from './core/types';
-import { checkForApkUpdate } from './core/services/updateService';
+import { checkForApkUpdate, markUpdateDismissed } from './core/services/updateService';
 import { ApkUpdateModal } from './core/components/ApkUpdateBanner';
 
 // Mini Apps Integradas
@@ -73,9 +73,9 @@ const MainContent: React.FC = () => {
   // Comprobar automáticamente si hay actualización al iniciar la App
   useEffect(() => {
     checkForApkUpdate().then((info) => {
-      if (info.hasUpdate) {
+      // Solo mostrar automáticamente si hay actualización Y NO se ha descartado antes
+      if (info.hasUpdate && !info.isDismissed) {
         if (info.isNative) {
-          // En móvil nativo, mostrar la ventana emergente directa de actualización
           setIsUpdateModalOpen(true);
           showToast(`📱 ¡Nueva actualización APK v${info.latestVersion} disponible en tu Móvil!`);
         } else {

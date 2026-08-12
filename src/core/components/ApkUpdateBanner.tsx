@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Download, RefreshCw, Sparkles, CheckCircle2, X } from 'lucide-react';
-import { checkForApkUpdate, triggerApkInstall, UpdateInfo } from '../services/updateService';
+import { checkForApkUpdate, triggerApkInstall, markUpdateDismissed, UpdateInfo } from '../services/updateService';
 
 interface ApkUpdateModalProps {
   isOpen: boolean;
@@ -29,16 +29,24 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
     }
   }, [isOpen]);
 
+  const handleDismissAndClose = () => {
+    if (updateInfo?.latestVersion) {
+      markUpdateDismissed(updateInfo.latestVersion);
+    }
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
       <div className="bg-[#0b0f19] border border-slate-800 w-full max-w-xs rounded-2xl p-4 space-y-4 shadow-2xl text-center font-display relative">
         
-        {/* Botón Cerrar */}
+        {/* Botón Cerrar (Guarda memoria de descarte en localStorage) */}
         <button 
-          onClick={onClose}
-          className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors"
+          onClick={handleDismissAndClose}
+          className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors p-1"
+          title="Cerrar y recordar descarte"
         >
           <X className="w-4 h-4" />
         </button>
