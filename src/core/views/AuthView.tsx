@@ -19,9 +19,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Pantalla previa de bloqueo por Código de Invitación (3333)
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
-    return localStorage.getItem('goals_invite_unlocked') === 'true';
-  });
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
   const [enteredCode, setEnteredCode] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
 
