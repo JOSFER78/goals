@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
+import { db, collection, onSnapshot } from '../config/firebase';
 import { Zap, Flame, ArrowLeft, Shield, LogIn, UserPlus } from 'lucide-react';
 import { ExperienceId } from '../types';
 
@@ -21,9 +22,25 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { user, isCloud } = useAuth();
   const { userData } = useProgress();
+  const [pendingCount, setPendingCount] = useState<number>(0);
 
   const isAdmin = user?.email === 'josferestudio@gmail.com';
   const isAuthenticated = isCloud && user && !user.isAnonymous;
+
+  useEffect(() => {
+    if (!isAdmin || !db) return;
+    const unsub = onSnapshot(collection(db, 'users'), (snap) => {
+      let count = 0;
+      snap.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.email !== 'josferestudio@gmail.com' && data.isApproved !== true) {
+          count++;
+        }
+      });
+      setPendingCount(count);
+    });
+    return () => unsub();
+  }, [isAdmin]);
 
   const initial = user?.displayName ? user.displayName[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : 'E');
 
@@ -85,11 +102,16 @@ export const Header: React.FC<HeaderProps> = ({
         {isAdmin && onOpenAdmin && (
           <button
             onClick={onOpenAdmin}
-            className="px-2 py-1 rounded-lg text-xs font-semibold bg-slate-900 border border-amber-500/30 text-amber-300 hover:bg-slate-800 transition-all flex items-center gap-1"
+            className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 border border-amber-500/40 text-amber-300 hover:bg-slate-800 transition-all flex items-center gap-1.5 relative shadow-sm"
             title="Panel de Administración"
           >
-            <Shield className="w-3.5 h-3.5 text-amber-400" />
+            <Shield className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             <span className="hidden sm:inline">Admin</span>
+            {pendingCount > 0 && (
+              <span className="px-1.5 py-0.2 bg-rose-500 text-white font-black text-[10px] rounded-full animate-bounce shadow-sm">
+                {pendingCount}
+              </span>
+            )}
           </button>
         )}
 
