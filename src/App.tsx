@@ -139,6 +139,7 @@ const MainContent: React.FC = () => {
             <AstroExperience
               onBackToGoals={handleNavigateHome}
               onOpenProfile={() => setIsProfileOpen(true)}
+              onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }}
             />
           ) : null}
         </div>
