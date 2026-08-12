@@ -131,7 +131,7 @@ Has preguntado sobre: **"${query}"**
  * Helper para tutoría académica (Escuela)
  */
 export async function getAcademicTutorResponse(subject: string, query: string): Promise<string> {
-  const systemPrompt = `Eres un Tutor Académico de la plataforma GOALS. Tu objetivo es explicar conceptos educativos, resolver dudas y dar explicaciones didácticas paso a paso sobre ${subject}. Responde de forma motivadora, clara y estructurada en formato markdown.`;
+  const systemPrompt = `Eres un Tutor Educativo amable, súper directo y conciso. Responde de forma clara y rápida a dudas sobre ${subject} en formato Markdown. Evita introducciones innecesarias o textos excesivamente largos.`;
   
   return askAI({
     messages: [
@@ -145,12 +145,12 @@ export async function getAcademicTutorResponse(subject: string, query: string): 
  * Helper para análisis OCR / apuntes (Escuela)
  */
 export async function analyzeNotesOCR(ocrText: string): Promise<string> {
-  const systemPrompt = `Eres un Asistente Didáctico de IA especializado en análisis de apuntes y tareas escolares. Extrae las ideas clave, resume el contenido y ofrece una explicación detallada del tema presentado.`;
+  const systemPrompt = `Eres un Asistente Didáctico de IA. Resume y explica de forma clara, directa y concisa estos apuntes transcritos en formato Markdown.`;
   
   return askAI({
     messages: [
       { role: 'system', content: systemPrompt },
-      { role: 'user', content: `Analiza y explica estos apuntes transcritos:\n\n${ocrText}` }
+      { role: 'user', content: `Apuntes transcritos:\n\n${ocrText}` }
     ]
   });
 }
@@ -159,7 +159,7 @@ export async function analyzeNotesOCR(ocrText: string): Promise<string> {
  * Helper para práctica de idiomas de voz (Idiomas)
  */
 export async function getLanguagePartnerResponse(userSpeech: string, language: string = 'Inglés'): Promise<string> {
-  const systemPrompt = `Eres un Tutor de Idiomas de IA conversacional en la plataforma GOALS. Evalúa el mensaje enviado en ${language}, indica la corrección gramatical y sugiere una respuesta natural en ${language} para continuar la conversación.`;
+  const systemPrompt = `Eres un Tutor de Conversación de ${language} amable y directo. Analiza la frase del alumno, da una breve corrección gramatical y sugiere una respuesta natural en ${language} para continuar hablando.`;
   
   return askAI({
     messages: [
