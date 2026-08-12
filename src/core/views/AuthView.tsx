@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Globe, Lock, Mail, User, Sparkles } from 'lucide-react';
+import { ArrowLeft, Globe, Lock, Mail, User, Sparkles, KeyRound, CheckCircle2 } from 'lucide-react';
 
 interface AuthViewProps {
   initialMode?: 'login' | 'signup';
@@ -15,15 +15,29 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [inviteCode, setInviteCode] = useState('3333');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Pantalla previa de bloqueo por Código de Invitación (3333)
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [enteredCode, setEnteredCode] = useState('');
+  const [codeError, setCodeError] = useState<string | null>(null);
+
+  const handleVerifyCode = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (enteredCode.trim() === '3333') {
+      setIsUnlocked(true);
+      setCodeError(null);
+    } else {
+      setCodeError('🔑 Código de invitación incorrecto. El código requerido es 3333.');
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
 
-    if (inviteCode.trim() !== '3333') {
-      setAuthError('🔑 Código de acceso incorrecto. Introduce el código de invitación 3333 para registrarte o iniciar sesión.');
+    if (!isUnlocked && enteredCode.trim() !== '3333') {
+      setCodeError('🔑 Debes verificar primero el código de acceso 3333.');
       return;
     }
 
@@ -46,14 +60,9 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
 
   const handleGoogleAuth = async () => {
     setAuthError(null);
-    let code = inviteCode.trim();
-    if (code !== '3333') {
-      const input = window.prompt('Introduce el código de acceso (3333):', '3333');
-      if (!input || input.trim() !== '3333') {
-        setAuthError('🔑 Código de acceso incorrecto. Se requiere el código 3333.');
-        return;
-      }
-      setInviteCode('3333');
+    if (!isUnlocked && enteredCode.trim() !== '3333') {
+      setCodeError('🔑 Debes introducir primero el código de acceso 3333 antes de continuar con Google.');
+      return;
     }
 
     setIsSubmitting(true);
@@ -66,6 +75,79 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
       setIsSubmitting(false);
     }
   };
+
+  // 🔒 PANTALLA PREVIA OBLIGATORIA: CÓDIGO DE INVITACIÓN 3333
+  if (!isUnlocked) {
+    return (
+      <div className="py-12 max-w-md mx-auto px-4 animate-fadeIn font-display">
+        <button
+          onClick={onBackToLanding}
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-all mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Volver a la Presentación GOALS</span>
+        </button>
+
+        <div className="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(245,158,11,0.15)] space-y-6 text-center relative overflow-hidden">
+          
+          <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto shadow-inner animate-pulse">
+            <KeyRound className="w-7 h-7" />
+          </div>
+
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-widest">
+              <Lock className="w-3 h-3" />
+              <span>Control de Acceso Requerido</span>
+            </div>
+
+            <h2 className="text-2xl font-black text-white leading-tight">
+              Introduce el Código de Invitación
+            </h2>
+
+            <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
+              Para poder registrarte o iniciar sesión (vía Email o con Google), primero debes introducir el código de acceso de 4 dígitos.
+            </p>
+          </div>
+
+          {codeError && (
+            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold animate-fadeIn">
+              {codeError}
+            </div>
+          )}
+
+          <form onSubmit={handleVerifyCode} className="space-y-4">
+            <div>
+              <input
+                type="text"
+                maxLength={4}
+                required
+                autoFocus
+                value={enteredCode}
+                onChange={(e) => { setEnteredCode(e.target.value); setCodeError(null); }}
+                placeholder="3333"
+                className="w-full text-center tracking-[0.4em] text-2xl font-black py-3.5 rounded-2xl bg-slate-950 border-2 border-amber-500/50 text-amber-300 placeholder-slate-600 focus:border-amber-400 transition-all outline-none shadow-inner"
+              />
+              <p className="text-[10px] text-slate-500 mt-2 font-semibold">Código de acceso requerido: <span className="text-amber-400 font-bold">3333</span></p>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/25 active:scale-95 flex items-center justify-center gap-2"
+            >
+              <KeyRound className="w-4 h-4" />
+              <span>Verificar Código y Desbloquear</span>
+            </button>
+          </form>
+
+          <p className="text-[10px] text-slate-500 font-medium">
+            🔒 Acceso protegido por código de invitación.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="py-8 max-w-md mx-auto px-4 animate-fadeIn">

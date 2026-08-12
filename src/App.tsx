@@ -10,8 +10,6 @@ import { GoalsLanding } from './core/views/GoalsLanding';
 import { AuthView } from './core/views/AuthView';
 import { GoalsHome } from './core/views/GoalsHome';
 import { ExperienceId } from './core/types';
-import { checkForApkUpdate, markUpdateDismissed } from './core/services/updateService';
-import { ApkUpdateModal } from './core/components/ApkUpdateBanner';
 
 // Mini Apps Integradas
 import { SchoolView } from './experiences/school/SchoolView';
@@ -43,7 +41,7 @@ const StarField: React.FC = () => {
 
 const MainContent: React.FC = () => {
   const { user, isCloud, isAdmin } = useAuth();
-  const { userData, showToast } = useProgress();
+  const { userData } = useProgress();
 
   // Modo de Vista Global
   const [authViewMode, setAuthViewMode] = useState<'login' | 'signup'>('login');
@@ -54,7 +52,6 @@ const MainContent: React.FC = () => {
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState<boolean>(false);
   const [isPendingDismissed, setIsPendingDismissed] = useState<boolean>(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
 
   // Configuración de Gráficos de Astro 3D
   const [graphicsConfig, setGraphicsConfig] = useState({
@@ -69,21 +66,6 @@ const MainContent: React.FC = () => {
 
   const isAuthenticated = isCloud && user && !user.isAnonymous;
   const isApproved = isAdmin || userData?.isApproved === true || user?.isApproved === true;
-
-  // Comprobar automáticamente si hay actualización al iniciar la App
-  useEffect(() => {
-    checkForApkUpdate().then((info) => {
-      // Solo mostrar automáticamente si hay actualización Y NO se ha descartado antes
-      if (info.hasUpdate && !info.isDismissed) {
-        if (info.isNative) {
-          setIsUpdateModalOpen(true);
-          showToast(`📱 ¡Nueva actualización APK v${info.latestVersion} disponible en tu Móvil!`);
-        } else {
-          showToast(`🔔 ¡Nueva actualización APK v${info.latestVersion} disponible!`);
-        }
-      }
-    }).catch(() => {});
-  }, [showToast]);
 
   const handleUpdateGraphicsConfig = (newCfg: Partial<typeof graphicsConfig>) => {
     setGraphicsConfig((prev) => ({ ...prev, ...newCfg }));
@@ -183,12 +165,6 @@ const MainContent: React.FC = () => {
         onClose={() => setIsAdminDashboardOpen(false)}
         graphicsConfig={graphicsConfig}
         onUpdateGraphicsConfig={handleUpdateGraphicsConfig}
-      />
-
-      {/* Modal Emergente de Actualización en Móvil/Web */}
-      <ApkUpdateModal
-        isOpen={isUpdateModalOpen}
-        onClose={() => setIsUpdateModalOpen(false)}
       />
 
       {/* Componente Global Toast */}

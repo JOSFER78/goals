@@ -10,33 +10,12 @@ export interface UpdateInfo {
   releaseNotes: string;
   publishedAt: string;
   isNative: boolean;
-  isDismissed: boolean;
 }
 
 const CURRENT_APP_VERSION = '1.0.0';
 const VERSION_ENDPOINT = 'https://goalskid.web.app/version.json';
 
 export const isNativeApp = (): boolean => Capacitor.isNativePlatform();
-
-/**
- * Marca una versión como descartada en el dispositivo para no volver a molestar automáticamente
- */
-export function markUpdateDismissed(version: string): void {
-  try {
-    localStorage.setItem(`goals_dismissed_update_${version}`, 'true');
-  } catch (e) {}
-}
-
-/**
- * Comprueba si el usuario ya descartó el aviso de una versión específica
- */
-export function isUpdateDismissed(version: string): boolean {
-  try {
-    return localStorage.getItem(`goals_dismissed_update_${version}`) === 'true';
-  } catch (e) {
-    return false;
-  }
-}
 
 /**
  * Obtener versión actual instalada en el dispositivo
@@ -90,9 +69,8 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
 
     const data = await response.json();
     const latestVersion = data.version || CURRENT_APP_VERSION;
-    const downloadUrl = data.apkUrl || 'https://goalskid.web.app/downloads/app-release.apk';
+    const downloadUrl = data.apkUrl || 'https://goalskid.web.app/downloads/goalskid.apk';
     const hasUpdate = isVersionNewer(latestVersion, currentVersion);
-    const dismissed = isUpdateDismissed(latestVersion);
 
     return {
       hasUpdate,
@@ -101,8 +79,7 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
       downloadUrl,
       releaseNotes: data.changelog || 'Novedades y optimizaciones de rendimiento.',
       publishedAt: new Date().toISOString(),
-      isNative,
-      isDismissed: dismissed
+      isNative
     };
   } catch (error: any) {
     console.warn('Verificación de actualización:', error.message);
@@ -110,18 +87,27 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
       hasUpdate: false,
       currentVersion,
       latestVersion: currentVersion,
-      downloadUrl: 'https://goalskid.web.app/downloads/app-release.apk',
+      downloadUrl: 'https://goalskid.web.app/downloads/goalskid.apk',
       releaseNotes: 'Servidor de actualizaciones en mantenimiento.',
       publishedAt: new Date().toISOString(),
-      isNative,
-      isDismissed: false
+      isNative
     };
   }
 }
 
 /**
- * Descargar e iniciar la instalación del archivo APK sin mostrar URLs ni repositorios
+ * Descarga directa y 100% garantizada del archivo goalskid.apk usando elemento <a download>
  */
-export function triggerApkInstall(downloadUrl: string): void {
-  window.open(downloadUrl, '_system') || window.open(downloadUrl, '_blank');
+export function triggerApkInstall(downloadUrl?: string): void {
+  const url = downloadUrl || 'https://goalskid.web.app/downloads/goalskid.apk';
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'goalskid.apk';
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+  }, 100);
 }

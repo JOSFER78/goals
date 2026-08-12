@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { X, Rocket, Award, Shield, BookOpen, Globe, Star, Zap, Flame, CheckCircle, Brain, Check, Gift, Download, RefreshCw, Sparkles, Info, ExternalLink, AlertCircle } from 'lucide-react';
+import { X, Zap, Check, Gift, Download, RefreshCw, Brain } from 'lucide-react';
 import { checkForApkUpdate, triggerApkInstall, UpdateInfo } from '../services/updateService';
 
 interface ProfileModalProps {
@@ -21,7 +21,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const { user, isCloud, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut, updateUserProfileData, authError, setAuthError } = useAuth();
   const { userData, totalStars, maxStars, claimReto, getRankInfo, getRetosList, showToast } = useProgress();
 
-  const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'cuenta' | 'astro' | 'about' | 'admin'>('retos');
+  const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'cuenta' | 'about' | 'admin'>('retos');
 
   // Editing Profile State
   const [newDisplayName, setNewDisplayName] = useState(user?.displayName || '');
@@ -143,7 +143,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 onClick={() => setActiveTab('about')}
                 className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'about' ? 'bg-emerald-600 text-white shadow' : 'text-emerald-400 hover:text-white'}`}
               >
-                📲 Acerca de & Actualizar
+                📲 Descargar APK
               </button>
               <button 
                 onClick={() => { setActiveTab('admin'); onOpenAdminDashboard(); }}
@@ -436,11 +436,11 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 </div>
               )}
 
-              {/* TAB 📲 ACERCA DE & ACTUALIZACIÓN DE LA APLICACIÓN */}
+              {/* TAB 📲 DESCARGA DIRECTA DE APK GOALSKID */}
               {activeTab === 'about' && (
                 <div className="space-y-3 animate-fadeIn">
                   
-                  {/* Tarjeta Versión Actual */}
+                  {/* Tarjeta Descarga Directa */}
                   <div className="bg-gradient-to-r from-emerald-950/60 via-slate-900 to-teal-950/60 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
@@ -448,56 +448,27 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           <Download className="w-5 h-5" />
                         </div>
                         <div>
-                          <h4 className="font-extrabold text-sm text-white">GOALS App v1.0.0</h4>
-                          <p className="text-[10px] text-emerald-300 font-mono">Actualizador Directo In-App</p>
+                          <h4 className="font-extrabold text-sm text-white">Descarga goalskid.apk</h4>
+                          <p className="text-[10px] text-emerald-300 font-mono">Versión v1.0.1 Compilada</p>
                         </div>
                       </div>
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        Producción
+                        Nativa Android
                       </span>
                     </div>
 
-                    <button
-                      onClick={handleCheckForUpdates}
-                      disabled={isCheckingUpdate}
-                      className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
+                    {/* Botón de Enlace Directo HTML semántico */}
+                    <a
+                      href="https://goalskid.web.app/downloads/goalskid.apk"
+                      download="goalskid.apk"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 active:scale-95"
                     >
-                      <RefreshCw className={`w-4 h-4 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
-                      <span>{isCheckingUpdate ? 'Comprobando en el servidor...' : 'Comprobar Actualizaciones'}</span>
-                    </button>
+                      <Download className="w-4 h-4" />
+                      <span>Descargar goalskid.apk</span>
+                    </a>
                   </div>
-
-                  {/* Estado de la Actualización */}
-                  {updateInfo && (
-                    <div className={`p-3.5 rounded-2xl border ${
-                      updateInfo.hasUpdate 
-                        ? 'bg-emerald-950/50 border-emerald-500/40' 
-                        : 'bg-slate-900/60 border-slate-800'
-                    } space-y-2`}>
-                      <div className="flex items-center justify-between text-xs font-bold text-white">
-                        <span>
-                          {updateInfo.hasUpdate 
-                            ? '🔔 ¡Hay una actualización disponible!' 
-                            : '✅ Tu aplicación está en la versión más reciente'}
-                        </span>
-                        <span className="text-emerald-400 font-mono">v{updateInfo.latestVersion}</span>
-                      </div>
-
-                      <div className="text-[11px] text-slate-300 leading-relaxed font-sans bg-slate-950 p-2.5 rounded-xl border border-slate-800 whitespace-pre-wrap">
-                        {updateInfo.releaseNotes}
-                      </div>
-
-                      {updateInfo.hasUpdate && (
-                        <button
-                          onClick={() => triggerApkInstall(updateInfo.downloadUrl)}
-                          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2"
-                        >
-                          <Download className="w-4 h-4" />
-                          <span>Descargar e Instalar APK v{updateInfo.latestVersion}</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
 
                   {/* Estado del Servidor de IA */}
                   <div className="bg-slate-900/60 border border-indigo-500/30 rounded-2xl p-3.5 space-y-2 text-xs">
