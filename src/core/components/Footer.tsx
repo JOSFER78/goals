@@ -55,7 +55,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                 <h4 className="font-bold text-xs uppercase tracking-wider text-slate-300">Descarga APK / ZIP</h4>
                 <div className="flex items-center sm:justify-end gap-1.5 mt-1 text-[11px]">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span className="text-slate-300 font-medium">Versión v2.0</span>
+                  <span className="text-slate-300 font-medium">Versión v2.1.0</span>
                 </div>
               </div>
 
@@ -67,7 +67,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                   className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all flex items-center gap-1.5 active:scale-95 sm:ml-auto shadow-md w-fit cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Descargar goalskid.zip (v2.0)</span>
+                  <span>Descargar goalskid.zip (v2.1.0)</span>
                 </button>
               </div>
             </div>

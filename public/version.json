@@ -1,5 +1,5 @@
 {
-  "version": "2.0",
+  "version": "2.1.0",
   "apkUrl": "https://goalskid.web.app/downloads/goalskid.zip",
-  "changelog": "🚀 Versión v2.0 comprimida en goalskid.zip para Android con guía explicativa de instalación."
+  "changelog": "🚀 Versión v2.1.0 con persistencia nativa HTTPS, soporte de autenticación OAuth en Android y comprobador interactivo en la nube."
 }

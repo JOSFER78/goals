@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, ShieldAlert, Package, X, FolderArchive, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Download, ShieldAlert, Package, X } from 'lucide-react';
 
 interface ApkDownloadGuideModalProps {
   isOpen: boolean;
@@ -34,7 +34,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
           </div>
           <div>
             <h3 className="font-extrabold text-base text-white leading-tight">Guía de Instalación en Móvil</h3>
-            <p className="text-[11px] text-emerald-400 font-mono">goalskid.zip (v2.0 Native APK)</p>
+            <p className="text-[11px] text-emerald-400 font-mono">goalskid.zip (v2.1.0 Native APK)</p>
           </div>
         </div>
 
