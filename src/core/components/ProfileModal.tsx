@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { X, Zap, Check, Gift, Download, Brain } from 'lucide-react';
+import { X, Zap, Check, Gift, Download, Brain, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
+import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -24,6 +25,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'cuenta' | 'about' | 'admin'>('retos');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
+  // Update checking state
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
+
   // Editing Profile State
   const [newDisplayName, setNewDisplayName] = useState(user?.displayName || '');
   const [selectedAvatar, setSelectedAvatar] = useState('👽');
@@ -34,6 +39,30 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [password, setPassword] = useState('');
   const [signupName, setSignupName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleCheckForUpdates = async () => {
+    setIsCheckingUpdate(true);
+    try {
+      const info = await checkForApkUpdate();
+      setUpdateInfo(info);
+      if (info.hasUpdate) {
+        showToast(`🔔 ¡Nueva versión v${info.latestVersion} lista para descargar!`);
+        setIsGuideOpen(true);
+      } else {
+        showToast(`✅ Tu aplicación está en la versión más reciente (v${info.currentVersion})`);
+      }
+    } catch (e: any) {
+      showToast("Error al conectar con el servidor de actualizaciones");
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && activeTab === 'about' && !updateInfo) {
+      handleCheckForUpdates();
+    }
+  }, [isOpen, activeTab]);
 
   if (!isOpen) return null;
 
@@ -118,7 +147,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   onClick={() => setActiveTab('about')}
                   className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'about' ? 'bg-emerald-600 text-white shadow' : 'text-emerald-400 hover:text-white'}`}
                 >
-                  📲 Descargar APK
+                  📲 Actualizaciones
                 </button>
                 <button 
                   onClick={() => { setActiveTab('admin'); onOpenAdminDashboard(); }}
@@ -411,11 +440,11 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   </div>
                 )}
 
-                {/* TAB 📲 DESCARGA DIRECTA DE APK/ZIP GOALSKID CON GUÍA */}
+                {/* TAB 📲 BUSCADOR Y DESCARGA DINÁMICA DE ACTUALIZACIONES */}
                 {activeTab === 'about' && (
                   <div className="space-y-3 animate-fadeIn">
                     
-                    {/* Tarjeta Descarga Directa */}
+                    {/* Tarjeta de Verificación Dinámica */}
                     <div className="bg-gradient-to-r from-emerald-950/60 via-slate-900 to-teal-950/60 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2.5">
@@ -423,8 +452,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                             <Download className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="font-extrabold text-sm text-white">Descarga goalskid.zip</h4>
-                            <p className="text-[10px] text-emerald-300 font-mono">Versión v2.0 Compilada</p>
+                            <h4 className="font-extrabold text-sm text-white">GOALS App v2.0</h4>
+                            <p className="text-[10px] text-emerald-300 font-mono">Comprobador Remoto In-App</p>
                           </div>
                         </div>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -432,16 +461,51 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         </span>
                       </div>
 
-                      {/* Botón que abre la guía de instalación previa */}
+                      {/* Botón dinámico de Comprobar Actualización en la Nube */}
                       <button
                         type="button"
-                        onClick={() => setIsGuideOpen(true)}
-                        className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                        onClick={handleCheckForUpdates}
+                        disabled={isCheckingUpdate}
+                        className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 cursor-pointer"
                       >
-                        <Download className="w-4 h-4" />
-                        <span>Descargar goalskid.zip (v2.0)</span>
+                        <RefreshCw className={`w-4 h-4 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
+                        <span>{isCheckingUpdate ? 'Consultando Servidor de Actualizaciones...' : 'Buscar Actualización en la Nube'}</span>
                       </button>
                     </div>
+
+                    {/* Resultado Dinámico de la Comprobación */}
+                    {updateInfo && (
+                      <div className={`p-3.5 rounded-2xl border ${
+                        updateInfo.hasUpdate 
+                          ? 'bg-emerald-950/50 border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
+                          : 'bg-slate-900/60 border-slate-800'
+                      } space-y-2.5`}>
+                        <div className="flex items-center justify-between text-xs font-bold text-white">
+                          <span className="flex items-center gap-1.5">
+                            {updateInfo.hasUpdate ? (
+                              <span className="text-amber-400">🔔 ¡Nueva versión v{updateInfo.latestVersion} disponible!</span>
+                            ) : (
+                              <span className="text-emerald-400 flex items-center gap-1">
+                                <CheckCircle2 className="w-4 h-4" /> Tu app está en la versión más reciente (v{updateInfo.currentVersion})
+                              </span>
+                            )}
+                          </span>
+                        </div>
+
+                        <p className="text-[11px] text-slate-300 leading-relaxed font-sans bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                          {updateInfo.releaseNotes}
+                        </p>
+
+                        <button
+                          type="button"
+                          onClick={() => setIsGuideOpen(true)}
+                          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 hover:from-emerald-500 hover:to-teal-300 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
+                        >
+                          <Download className="w-4 h-4" />
+                          <span>Descargar goalskid.zip (v{updateInfo.latestVersion})</span>
+                        </button>
+                      </div>
+                    )}
 
                     {/* Estado del Servidor de IA */}
                     <div className="bg-slate-900/60 border border-indigo-500/30 rounded-2xl p-3.5 space-y-2 text-xs">
