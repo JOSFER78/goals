@@ -11,6 +11,13 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    proxy: {
+      '/v1': {
+        target: 'https://143-47-35-167.sslip.io',
+        changeOrigin: true,
+        secure: false
+      }
+    }
   }
 });

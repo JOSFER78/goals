@@ -2,7 +2,9 @@
 // Endpoint: https://143-47-35-167.sslip.io/v1
 // API Key: freellmapi-bc5d56dc6a1548c6c11a0d409008b1ed0273e4105cd64784
 
-const AI_BASE_URL = 'https://143-47-35-167.sslip.io/v1';
+const AI_BASE_URL = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
+  ? '/v1'
+  : 'https://143-47-35-167.sslip.io/v1';
 const AI_API_KEY = 'freellmapi-bc5d56dc6a1548c6c11a0d409008b1ed0273e4105cd64784';
 
 export interface ChatMessage {
@@ -25,7 +27,7 @@ export async function askAI(options: AICompletionOptions): Promise<string> {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout para razonamiento profundo
 
     const response = await fetch(`${AI_BASE_URL}/chat/completions`, {
       method: 'POST',
@@ -59,7 +61,7 @@ export async function askAI(options: AICompletionOptions): Promise<string> {
   } catch (error: any) {
     console.warn('AI Primary Fetch Error (fallback activado):', error?.message || error);
     
-    // Fallback Educativo Inteligente según temática de la consulta (Trigonometría, Matemáticas, Idiomas, etc.)
+    // Fallback Educativo Inteligente solo si falla la conexión de red
     return generateSmartEducationalFallback(userQuery);
   }
 }

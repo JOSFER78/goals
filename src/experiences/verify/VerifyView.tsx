@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { ShieldCheck, Search, FileCheck, CheckCircle2, AlertTriangle, ExternalLink, Loader2, Lock } from 'lucide-react';
 import { useProgress } from '../../core/context/ProgressContext';
 import { useAuth } from '../../core/context/AuthContext';

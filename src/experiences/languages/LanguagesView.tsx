@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Mic, Volume2, Globe, Sparkles, CheckCircle, ArrowRight, Play, RefreshCw, Send, Loader2, Lock } from 'lucide-react';
 import { useProgress } from '../../core/context/ProgressContext';
 import { useAuth } from '../../core/context/AuthContext';
