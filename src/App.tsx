@@ -1,0 +1,190 @@
+import React, { useState, useEffect } from 'react';
+import { AuthProvider, useAuth } from './core/context/AuthContext';
+import { ProgressProvider, useProgress } from './core/context/ProgressContext';
+import { Header } from './core/components/Header';
+import { ProfileModal } from './core/components/ProfileModal';
+import { AdminDashboard } from './core/views/AdminDashboard';
+import { Toast } from './core/components/Toast';
+import { GoalsLanding } from './core/views/GoalsLanding';
+import { AuthView } from './core/views/AuthView';
+import { GoalsHome } from './core/views/GoalsHome';
+import { ExperienceId } from './core/types';
+import { checkForApkUpdate } from './core/services/updateService';
+
+// Mini Apps Integradas
+import { SchoolView } from './experiences/school/SchoolView';
+import { LanguagesView } from './experiences/languages/LanguagesView';
+import { VerifyView } from './experiences/verify/VerifyView';
+import { AstroExperience } from './experiences/astro/AstroExperience';
+import { PendingApprovalView } from './core/views/PendingApprovalView';
+
+const StarField: React.FC = () => {
+  useEffect(() => {
+    const container = document.getElementById('star-container');
+    if (!container || container.childElementCount > 0) return;
+    for (let i = 0; i < 70; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      const w = Math.random() * 2.2 + 'px';
+      s.style.width = w;
+      s.style.height = w;
+      s.style.animationDelay = Math.random() * 3 + 's';
+      container.appendChild(s);
+    }
+  }, []);
+
+  return <div id="star-container" className="fixed inset-0 z-0 pointer-events-none" />;
+};
+
+const MainContent: React.FC = () => {
+  const { user, isCloud, isAdmin } = useAuth();
+  const { userData, showToast } = useProgress();
+
+  // Modo de Vista Global
+  const [authViewMode, setAuthViewMode] = useState<'login' | 'signup'>('login');
+  const [isAuthViewOpen, setIsAuthViewOpen] = useState<boolean>(false);
+  const [activeExperience, setActiveExperience] = useState<ExperienceId | null>(null);
+
+  // Modales
+  const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
+  const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState<boolean>(false);
+
+  // Configuración de Gráficos de Astro 3D
+  const [graphicsConfig, setGraphicsConfig] = useState({
+    sunIntensity: 2.2,
+    ambientIntensity: 0.7,
+    rotationSpeed: 1.0,
+    atmosphereGlow: true,
+    highResTextures: true,
+    shadowsEnabled: true,
+    xpMultiplier: 1
+  });
+
+  const isAuthenticated = isCloud && user && !user.isAnonymous;
+  const isApproved = isAdmin || (userData?.isApproved !== false && user?.isApproved !== false);
+
+  // Comprobar automáticamente si hay actualización en GitHub Releases al iniciar la App
+  useEffect(() => {
+    checkForApkUpdate().then((info) => {
+      if (info.hasUpdate) {
+        showToast(`🔔 ¡Nueva actualización APK v${info.latestVersion} disponible en GitHub!`);
+      }
+    }).catch(() => {});
+  }, [showToast]);
+
+  const handleUpdateGraphicsConfig = (newCfg: Partial<typeof graphicsConfig>) => {
+    setGraphicsConfig((prev) => ({ ...prev, ...newCfg }));
+  };
+
+  const handleNavigateHome = () => {
+    setActiveExperience(null);
+  };
+
+  return (
+    <div className={`relative z-10 flex flex-col h-screen w-full mx-auto overflow-hidden ${
+      activeExperience === 'astro' 
+        ? 'max-w-none bg-transparent shadow-none border-none' 
+        : 'max-w-4xl bg-slate-950/90 backdrop-blur-xl shadow-2xl border-x border-slate-800/80'
+    }`}>
+      
+      {/* Sticky Header Estandarizado de GOALS */}
+      {activeExperience !== 'astro' && (
+        <Header
+          activeExperience={activeExperience}
+          onNavigateHome={handleNavigateHome}
+          onOpenProfile={() => setIsProfileOpen(true)}
+          onOpenAdmin={() => setIsAdminDashboardOpen(true)}
+          onOpenAuth={(mode) => {
+            setAuthViewMode(mode);
+            setIsAuthViewOpen(true);
+          }}
+        />
+      )}
+
+      {/* Área Principal de Contenido */}
+      <main className={activeExperience === 'astro' ? 'flex-1 relative p-0 overflow-hidden h-full w-full' : 'flex-1 overflow-y-auto p-3 relative'}>
+        {isAuthViewOpen ? (
+          /* Pantalla Estándar de Autenticación de Firebase */
+          <AuthView
+            initialMode={authViewMode}
+            onBackToLanding={() => setIsAuthViewOpen(false)}
+            onSuccess={() => setIsAuthViewOpen(false)}
+          />
+        ) : isAuthenticated && !isApproved ? (
+          /* Pantalla de Espera de Autorización de Administrador */
+          <PendingApprovalView />
+        ) : !isAuthenticated && !activeExperience ? (
+          /* Landing Page Pública Scrollable con Escuela #1 y Flechas */
+          <GoalsLanding
+            onOpenAuth={(mode) => {
+              setAuthViewMode(mode);
+              setIsAuthViewOpen(true);
+            }}
+            onSelectExperience={(expId) => {
+              setActiveExperience(expId);
+            }}
+          />
+        ) : !activeExperience ? (
+          /* Dashboard Principal para Usuario Registrado */
+          <GoalsHome
+            onSelectExperience={(expId) => {
+              setActiveExperience(expId);
+            }}
+            onOpenProfile={() => setIsProfileOpen(true)}
+          />
+        ) : activeExperience === 'school' ? (
+          /* Mini App Escuela Integradora */
+          <SchoolView />
+        ) : activeExperience === 'languages' ? (
+          /* Mini App Idiomas Integradora */
+          <LanguagesView />
+        ) : activeExperience === 'verify' ? (
+          /* Mini App Verifica Integradora */
+          <VerifyView />
+        ) : activeExperience === 'astro' ? (
+          /* Mini App AstroLingo 100% IDÉNTICA A LA APP ORIGINAL */
+          <AstroExperience
+            onBackToGoals={handleNavigateHome}
+            onOpenProfile={() => setIsProfileOpen(true)}
+          />
+        ) : null}
+      </main>
+
+      {/* Modal de Perfil del Estudiante */}
+      <ProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
+        onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
+      />
+
+      {/* Dashboard Completo de Super Administración */}
+      <AdminDashboard
+        isOpen={isAdminDashboardOpen}
+        onClose={() => setIsAdminDashboardOpen(false)}
+        graphicsConfig={graphicsConfig}
+        onUpdateGraphicsConfig={handleUpdateGraphicsConfig}
+      />
+
+      {/* Componente Global Toast */}
+      <Toast />
+
+    </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <AuthProvider>
+      <ProgressProvider>
+        <div className="h-screen w-screen relative bg-[#030509] overflow-hidden">
+          <StarField />
+          <MainContent />
+        </div>
+      </ProgressProvider>
+    </AuthProvider>
+  );
+};
+
+export default App;

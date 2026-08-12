@@ -1,0 +1,17 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Production build
+dist
+build
+
+# Firebase & Local config
+.firebase
+.DS_Store
+*.log
+.env
+.env.local
+
+# Gemini / Antigravity local files
+.gemini
