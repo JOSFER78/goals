@@ -93,8 +93,8 @@ const MainContent: React.FC = () => {
       />
 
       {/* Área Principal de Contenido */}
-      <main className={activeExperience === 'astro' ? 'flex-1 relative p-0 overflow-hidden h-full w-full flex flex-col' : 'flex-1 overflow-y-auto relative flex flex-col justify-between'}>
-        <div className={activeExperience === 'astro' ? 'flex-1 w-full h-full relative p-0' : 'p-3 flex-1'}>
+      <main className={activeExperience === 'astro' ? 'flex-1 relative p-0 overflow-hidden h-full w-full flex flex-col' : 'flex-1 overflow-y-auto snap-y snap-mandatory scroll-smooth relative flex flex-col justify-between'}>
+        <div className={activeExperience === 'astro' ? 'flex-1 w-full h-full relative p-0' : 'p-0 sm:p-2 flex-1'}>
           {isAuthViewOpen ? (
             /* Pantalla Estándar de Autenticación de Firebase */
             <AuthView

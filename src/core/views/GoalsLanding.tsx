@@ -142,7 +142,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
   };
 
   return (
-    <div className="relative w-full h-full overflow-y-auto snap-y snap-mandatory scroll-smooth hide-scrollbar text-slate-100 font-display">
+    <div className="relative w-full text-slate-100 font-display">
 
       {/* CONTROLES NAVEGACIÓN FLOTANTE LATERAL (Fijo en pantalla) */}
       <div className="fixed right-3 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-2 bg-slate-950/90 border border-slate-800/90 p-2 rounded-full backdrop-blur-md shadow-2xl">

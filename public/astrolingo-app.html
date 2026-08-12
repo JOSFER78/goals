@@ -1157,6 +1157,7 @@ function finishLessonReading(){
   const prog=lessonProg(currentLesson.id);
   prog.read=true;
   persist();
+  try { window.parent.postMessage({ type: 'STEP_COMPLETED', lessonId: currentLesson.id }, '*'); } catch(e) {}
   toast(`📖 ¡Lección ${currentLesson.id} leída! Test desbloqueado en la pestaña Tests 🎯`);
 
   mainContent.innerHTML=`
@@ -1308,6 +1309,7 @@ function finishTest(){
   prog.testDone=true;
   if(stars>(prog.stars||0))prog.stars=stars;
   persist();updateHeader();
+  try { window.parent.postMessage({ type: 'TEST_COMPLETED', lessonId: currentLesson.id, score: testScore, total: quiz.length }, '*'); } catch(e) {}
 
   const nextLessonAvailable = LESSONS.find(l => l.id === currentLesson.id + 1);
 
