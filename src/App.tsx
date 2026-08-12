@@ -18,6 +18,7 @@ import { LanguagesView } from './experiences/languages/LanguagesView';
 import { VerifyView } from './experiences/verify/VerifyView';
 import { AstroExperience } from './experiences/astro/AstroExperience';
 import { PendingApprovalView } from './core/views/PendingApprovalView';
+import { CookieBanner } from './core/components/CookieBanner';
 
 const StarField: React.FC = () => {
   useEffect(() => {
@@ -177,6 +178,9 @@ const MainContent: React.FC = () => {
 
       {/* Componente Global Toast */}
       <Toast />
+
+      {/* Banner Global de Consentimiento de Cookies */}
+      <CookieBanner />
 
     </div>
   );

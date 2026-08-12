@@ -3047,7 +3047,7 @@ window.goHome = function() {
 };
 
 window.checkCookieConsent = function() {
-  const consent = localStorage.getItem('al_cookie_consent');
+  const consent = localStorage.getItem('goals_cookie_consent') || localStorage.getItem('al_cookie_consent');
   const banner = document.getElementById('cookie-banner');
   if (!consent && banner) {
     setTimeout(() => {

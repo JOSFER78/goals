@@ -83,7 +83,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
             <span>Acceso Exclusivo por Invitación</span>
           </div>
           <p className="text-[10px] text-slate-300 leading-normal">
-            Al registrarte (vía Email o con Google), tu cuenta pasará a la lista de solicitudes. El administrador (<span className="text-amber-300 font-semibold">josferestudio@gmail.com</span>) la autorizará para darte acceso completo.
+            Al registrarte (vía Email o con Google), tu cuenta pasará a la lista de solicitudes. El administrador la autorizará para darte acceso completo.
           </p>
         </div>
 

@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { db, doc, setDoc, onSnapshot } from '../config/firebase';
-import { ShieldAlert, Clock, RefreshCw, LogOut, Mail, User, Send, CheckCircle2 } from 'lucide-react';
+import { db, doc, onSnapshot } from '../config/firebase';
+import { Clock, LogOut, Mail, User, CheckCircle2 } from 'lucide-react';
 
 export const PendingApprovalView: React.FC = () => {
   const { user, signOut } = useAuth();
   const { showToast } = useProgress();
-  const [checking, setChecking] = useState(false);
-  const [requestSent, setRequestSent] = useState(false);
 
-  // Escuchar en tiempo real cambios en el documento del usuario en Firestore
-  // Si el Admin pulsa "Aprobar", la app desbloquea al instante sin recargar
+  // Escuchar en tiempo real si el Admin aprueba la cuenta en Firestore
   useEffect(() => {
     if (!db || !user?.uid) return;
 
@@ -19,7 +16,7 @@ export const PendingApprovalView: React.FC = () => {
       if (docSnap.exists()) {
         const data = docSnap.data();
         if (data.isApproved === true) {
-          showToast('🎉 ¡Tu acceso a GOALS ha sido APROBADO por el Administrador!');
+          showToast('🎉 ¡Tu acceso a GOALS ha sido APROBADO!');
           setTimeout(() => {
             window.location.reload();
           }, 800);
@@ -30,36 +27,8 @@ export const PendingApprovalView: React.FC = () => {
     return () => unsub();
   }, [user?.uid, showToast]);
 
-  const handleSendRequest = async () => {
-    setChecking(true);
-    try {
-      if (db && user?.uid) {
-        await setDoc(doc(db, 'users', user.uid), {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName || 'Estudiante GOALS',
-          photoURL: user.photoURL || null,
-          isApproved: false,
-          status: 'pending',
-          requestedAt: new Date().toISOString(),
-          lastRequestedAt: new Date().toISOString()
-        }, { merge: true });
-
-        setRequestSent(true);
-        showToast('📩 ¡Solicitud de autorización enviada en tiempo real al Administrador!');
-      } else {
-        showToast('⚠ Modo local: Tu solicitud ha sido registrada');
-      }
-    } catch (e) {
-      console.error("Error al enviar solicitud:", e);
-      showToast('Error al enviar la solicitud al servidor');
-    } finally {
-      setChecking(false);
-    }
-  };
-
   return (
-    <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center p-4 text-center font-display">
+    <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center p-4 text-center font-display animate-fadeIn">
       <div className="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 sm:p-10 max-w-lg w-full shadow-[0_0_50px_rgba(245,158,11,0.15)] space-y-6 relative overflow-hidden">
         
         {/* Glow de fondo */}
@@ -74,16 +43,16 @@ export const PendingApprovalView: React.FC = () => {
         {/* Título & Mensaje Principal */}
         <div className="space-y-2">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-widest">
-            <ShieldAlert className="w-3.5 h-3.5" />
-            <span>Acceso Pendiente de Autorización</span>
+            <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
+            <span>Solicitud de Acceso Registrada</span>
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-            Solicitud Registrada en la Red
+            Tu Solicitud Ha Sido Recibida
           </h2>
 
           <p className="text-xs text-slate-300 leading-relaxed max-w-md mx-auto">
-            Tu cuenta ha sido registrada correctamente, pero requiere autorización del Administrador para acceder al ecosistema unificado de <span className="text-white font-bold">GOALS</span>.
+            Tu cuenta se ha creado correctamente. La solicitud ya ha sido enviada y se encuentra en revisión. Accederás automáticamente una vez sea autorizada.
           </p>
         </div>
 
@@ -98,39 +67,26 @@ export const PendingApprovalView: React.FC = () => {
             <span className="truncate">{user?.email}</span>
           </div>
           <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400 font-semibold">Administrador Principal:</span>
-            <span className="text-amber-400 font-bold">josferestudio@gmail.com</span>
+            <span className="text-slate-400 font-semibold">Estado de la Cuenta:</span>
+            <span className="text-amber-400 font-bold flex items-center gap-1">
+              <Clock className="w-3 h-3 animate-spin" /> En Revisión
+            </span>
           </div>
         </div>
 
-        {/* Acciones */}
-        <div className="space-y-3 pt-2">
-          <button
-            onClick={handleSendRequest}
-            disabled={checking}
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/25 active:scale-95 flex items-center justify-center gap-2"
-          >
-            {checking ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : requestSent ? (
-              <CheckCircle2 className="w-4 h-4 text-slate-950" />
-            ) : (
-              <Send className="w-4 h-4 text-slate-950" />
-            )}
-            <span>{checking ? 'Enviando Solicitud al Admin...' : requestSent ? ' Reenviar Notificación al Admin' : '📩 Notificar / Solicitar Autorización al Admin'}</span>
-          </button>
-
+        {/* Botón Salir / Entendido */}
+        <div className="pt-2">
           <button
             onClick={signOut}
-            className="w-full py-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-95"
+            className="w-full py-3 rounded-xl bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-95 shadow-md"
           >
-            <LogOut className="w-3.5 h-3.5" />
-            <span>Cerrar Sesión / Cambiar de Cuenta</span>
+            <LogOut className="w-4 h-4 text-amber-400" />
+            <span>Entendido / Volver al Inicio</span>
           </button>
         </div>
 
         <p className="text-[10px] text-slate-500 font-medium">
-          📡 Escuchando en tiempo real: En cuanto el administrador autorice tu correo, entrarás automáticamente.
+          📡 En cuanto la solicitud sea aceptada, la plataforma dará paso automáticamente.
         </p>
 
       </div>
