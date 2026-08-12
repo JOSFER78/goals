@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { 
   auth, 
   db,
@@ -6,6 +7,8 @@ import {
   setDoc,
   onAuthStateChanged, 
   signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   googleProvider, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
@@ -57,6 +60,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    // Comprobar si proviene de una redirección de autenticación
+    if (Capacitor.isNativePlatform() || window.location.href.includes('goalskid.web.app')) {
+      getRedirectResult(auth).then((result) => {
+        if (result?.user) {
+          setIsCloud(true);
+        }
+      }).catch(err => console.warn("Error en resultado de redirección:", err));
+    }
+
     const unsubscribe = onAuthStateChanged(auth, (u) => {
       setFbUser(u);
       if (u) {
@@ -106,13 +118,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error("Firebase no está configurado correctamente.");
     }
     try {
-      const res = await signInWithPopup(auth, googleProvider);
-      if (res.user) {
-        setIsCloud(true);
+      if (Capacitor.isNativePlatform()) {
+        try {
+          const res = await signInWithPopup(auth, googleProvider);
+          if (res.user) setIsCloud(true);
+        } catch (popupErr: any) {
+          console.warn("Popup en WebView falló, usando signInWithRedirect...", popupErr);
+          await signInWithRedirect(auth, googleProvider);
+        }
+      } else {
+        const res = await signInWithPopup(auth, googleProvider);
+        if (res.user) {
+          setIsCloud(true);
+        }
       }
     } catch (err: any) {
       console.error("Google Auth Error:", err);
-      const msg = err.code === 'auth/popup-closed-by-user' ? 'Cancelado por el usuario.' : err.message || 'Error al conectar con Google.';
+      const msg = err.code === 'auth/popup-closed-by-user' 
+        ? 'Cancelado por el usuario.' 
+        : 'Sugerencia: En la App Nativa Móvil, usa tu Correo y Contraseña para Iniciar Sesión de forma nativa e instantánea sin salir de la App.';
       setAuthError(msg);
       throw err;
     }

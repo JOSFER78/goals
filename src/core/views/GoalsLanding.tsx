@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   ArrowRight, Sparkles, ChevronLeft, ChevronRight, CheckCircle2, 
   Cpu, Zap, Flame, Shield, Globe, Orbit, ArrowUp, ArrowDown, 
-  Layers, Brain, Check, Star, Terminal, Radio, Activity, Atom
+  Layers, Brain, Check, Star, Terminal, Radio, Activity, Atom, Lock
 } from 'lucide-react';
 import { ExperienceId } from '../types';
 
@@ -379,9 +379,10 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
 
               <button
                 onClick={() => onSelectExperience(currentSlide.id)}
-                className={`w-full py-2 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 ${currentSlide.btnBg}`}
+                className={`w-full py-2.5 rounded-xl font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 ${currentSlide.btnBg}`}
               >
-                <span>Entrar a la Mini App {currentSlide.name}</span>
+                <Lock className="w-3.5 h-3.5" />
+                <span>🔒 Desbloquear Mini App {currentSlide.name} (Requiere Acceso)</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

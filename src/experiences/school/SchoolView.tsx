@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { BookOpen, Camera, CheckCircle, Sparkles, HelpCircle, ArrowRight, FileText, Cpu, Award, Zap, Loader2 } from 'lucide-react';
+import { BookOpen, Camera, CheckCircle, Sparkles, HelpCircle, ArrowRight, FileText, Cpu, Award, Zap, Loader2, Lock } from 'lucide-react';
 import { useProgress } from '../../core/context/ProgressContext';
 import { useAuth } from '../../core/context/AuthContext';
 import { getAcademicTutorResponse, analyzeNotesOCR } from '../../core/services/aiService';
 
-export const SchoolView: React.FC = () => {
+interface SchoolViewProps {
+  onOpenAuth?: (mode: 'login' | 'signup') => void;
+}
+
+export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
   const { addXP } = useProgress();
-  const { user } = useAuth();
+  const { user, isCloud } = useAuth();
+  const isAuthenticated = isCloud && user && !user.isAnonymous;
+
   const [activeTab, setActiveTab] = useState<'tutor' | 'ocr' | 'step' | 'map'>('tutor');
   const [userQuery, setUserQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('Matemáticas');
@@ -25,6 +31,10 @@ export const SchoolView: React.FC = () => {
 
   const handleAskTutor = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      onOpenAuth?.('signup');
+      return;
+    }
     if (!userQuery.trim() || isAskingAI) return;
     setIsAskingAI(true);
     setAiResponse(null);
@@ -41,6 +51,10 @@ export const SchoolView: React.FC = () => {
   };
 
   const handleRunOCR = async () => {
+    if (!isAuthenticated) {
+      onOpenAuth?.('signup');
+      return;
+    }
     if (isAskingAI) return;
     setIsAskingAI(true);
     setAiResponse(null);
@@ -57,8 +71,24 @@ export const SchoolView: React.FC = () => {
   };
 
   return (
-    <div className="py-4 space-y-5 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-20">
-      
+    <div className="w-full space-y-4">
+      {/* Banner de Modo Exploración Libre si no ha iniciado sesión */}
+      {!isAuthenticated && (
+        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-3 text-amber-300 text-xs">
+          <div className="flex items-center gap-2 font-medium">
+            <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Navegación Libre: Puedes explorar la Mini App Escuela. Inicia sesión para usar el Tutor IA Real y acumular XP.</span>
+          </div>
+          <button
+            onClick={() => onOpenAuth?.('signup')}
+            className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shrink-0 transition-all text-xs flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.3)] active:scale-95"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Desbloquear Todo</span>
+          </button>
+        </div>
+      )}
+
       {/* Header de la Mini App Escuela */}
       <div className="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-teal-950/80 border border-emerald-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-2">
         <div className="flex items-center justify-between">

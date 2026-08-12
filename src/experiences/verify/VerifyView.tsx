@@ -1,16 +1,27 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Search, FileCheck, CheckCircle2, AlertTriangle, ExternalLink, Loader2 } from 'lucide-react';
+import { ShieldCheck, Search, FileCheck, CheckCircle2, AlertTriangle, ExternalLink, Loader2, Lock } from 'lucide-react';
 import { useProgress } from '../../core/context/ProgressContext';
+import { useAuth } from '../../core/context/AuthContext';
 import { verifyFactOrHeadline } from '../../core/services/aiService';
 
-export const VerifyView: React.FC = () => {
+interface VerifyViewProps {
+  onOpenAuth?: (mode: 'login' | 'signup') => void;
+}
+
+export const VerifyView: React.FC<VerifyViewProps> = ({ onOpenAuth }) => {
   const { addXP } = useProgress();
+  const { user, isCloud } = useAuth();
+  const isAuthenticated = isCloud && user && !user.isAnonymous;
+
   const [headline, setHeadline] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [auditResult, setAuditResult] = useState<any | null>(null);
 
   const handleVerifyHeadline = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      onOpenAuth?.('signup');
+      return;
+    }
     if (!headline.trim() || isVerifying) return;
     setIsVerifying(true);
     setAuditResult(null);
@@ -34,6 +45,23 @@ export const VerifyView: React.FC = () => {
   return (
     <div className="py-4 space-y-5 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-20">
       
+      {/* Banner de Modo Exploración Libre si no ha iniciado sesión */}
+      {!isAuthenticated && (
+        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-3 text-amber-300 text-xs">
+          <div className="flex items-center gap-2 font-medium">
+            <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Navegación Libre: Explora la Mini App Verifica. Inicia sesión para auditar noticias con la IA.</span>
+          </div>
+          <button
+            onClick={() => onOpenAuth?.('signup')}
+            className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shrink-0 transition-all text-xs flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.3)] active:scale-95"
+          >
+            <Lock className="w-3.5 h-3.5" />
+            <span>Desbloquear Todo</span>
+          </button>
+        </div>
+      )}
+
       {/* Header de la Mini App Verifica */}
       <div className="bg-gradient-to-r from-amber-950/80 via-slate-900 to-yellow-950/80 border border-amber-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-2">
         <div className="flex items-center justify-between">

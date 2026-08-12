@@ -107,7 +107,7 @@ const MainContent: React.FC = () => {
             /* Pantalla de Espera de Autorización (con botón 'X' para cerrar y continuar) */
             <PendingApprovalView onClose={() => setIsPendingDismissed(true)} />
           ) : !isAuthenticated && !activeExperience ? (
-            /* Landing Page Pública Scrollable con Escuela #1 y Flechas */
+            /* Landing Page Pública Scrollable con Navegación Libre */
             <GoalsLanding
               onOpenAuth={(mode) => {
                 setAuthViewMode(mode);
@@ -127,13 +127,13 @@ const MainContent: React.FC = () => {
             />
           ) : activeExperience === 'school' ? (
             /* Mini App Escuela Integradora */
-            <SchoolView />
+            <SchoolView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
           ) : activeExperience === 'languages' ? (
             /* Mini App Idiomas Integradora */
-            <LanguagesView />
+            <LanguagesView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
           ) : activeExperience === 'verify' ? (
             /* Mini App Verifica Integradora */
-            <VerifyView />
+            <VerifyView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
           ) : activeExperience === 'astro' ? (
             /* Mini App AstroLingo 100% IDÉNTICA A LA APP ORIGINAL */
             <AstroExperience

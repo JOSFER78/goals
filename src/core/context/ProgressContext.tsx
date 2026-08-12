@@ -16,6 +16,7 @@ interface ProgressContextType {
   claimReto: (id: string, xpReward: number) => void;
   getRankInfo: (xp: number) => RankInfo;
   getRetosList: () => RetoItem[];
+  addXP: (amount: number, expId?: string, reason?: string) => void;
   toastMsg: string | null;
   showToast: (msg: string) => void;
   hideToast: () => void;
@@ -378,6 +379,19 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   };
 
+  const addXP = useCallback((amount: number, _expId: string = 'general', reason?: string) => {
+    setUserData((prev) => {
+      const newXp = prev.xp + amount;
+      const updated: UserData = {
+        ...prev,
+        xp: newXp
+      };
+      persistData(updated);
+      if (reason) showToast(`+${amount} XP: ${reason}`);
+      return updated;
+    });
+  }, [showToast]);
+
   const resetProgress = () => {
     const empty: UserData = JSON.parse(JSON.stringify(DEFAULT_USER_DATA));
     setUserData(empty);
@@ -397,6 +411,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       claimReto,
       getRankInfo,
       getRetosList,
+      addXP,
       toastMsg,
       showToast,
       hideToast,
