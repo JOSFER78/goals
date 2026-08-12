@@ -132,7 +132,7 @@
     </div>
 
     <!-- BARRA INFERIOR DE CONTROLES DE TIEMPO (TIME SCRUBBING HUD) -->
-    <div id="celestial-time-hud" class="absolute bottom-4 inset-x-3 sm:inset-x-6 z-20 hidden pointer-events-auto max-w-xl mx-auto glass p-3 rounded-2xl border border-indigo-500/30 bg-slate-950/95 backdrop-blur-xl shadow-2xl flex flex-col gap-2">
+    <div id="celestial-time-hud" class="absolute bottom-20 sm:bottom-20 inset-x-3 sm:inset-x-6 z-20 hidden pointer-events-auto max-w-xl mx-auto glass p-3 rounded-2xl border border-indigo-500/30 bg-slate-950/95 backdrop-blur-xl shadow-2xl flex flex-col gap-2">
       <div class="flex items-center justify-between gap-3">
         <button id="sim-play-btn" onclick="toggleSimPlay()" class="w-9 h-9 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold flex items-center justify-center text-xs shadow-md shrink-0">
           ⏸️
@@ -164,11 +164,11 @@
         <button onclick="showTab('learn')" class="px-3 py-2 rounded-xl glass text-xs font-extrabold text-white hover:bg-white/10">← Lecciones</button>
       </div>
     </div>
-    <div class="absolute bottom-0 inset-x-0 z-10 p-2 sm:p-3 pt-12 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none space-y-2">
-      <div class="pointer-events-auto flex items-center gap-2 glass rounded-2xl p-2">
-        <button id="prev-btn" class="px-3 py-2 rounded-xl bg-slate-800 border-b-4 border-slate-950 font-extrabold text-sm disabled:opacity-40">◀</button>
+    <div class="absolute bottom-0 inset-x-0 z-25 p-2 sm:p-3 pt-12 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none space-y-2">
+      <div class="pointer-events-auto flex items-center gap-2 glass rounded-2xl p-2 shadow-2xl">
+        <button id="prev-btn" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border-b-4 border-slate-950 font-extrabold text-sm text-white disabled:opacity-40 transition-all active:scale-95 shadow-md">◀</button>
         <div id="level-dots" class="flex-1 flex justify-center gap-1.5"></div>
-        <button id="next-btn" class="px-3 py-2 rounded-xl bg-indigo-500 border-b-4 border-indigo-900 hover:bg-indigo-400 font-extrabold text-sm disabled:opacity-40">Saltar ▶</button>
+        <button id="next-btn" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 border-b-4 border-indigo-900 text-white font-extrabold text-sm disabled:opacity-40 transition-all active:scale-95 shadow-md">Saltar ▶</button>
       </div>
     </div>
     <div id="obj-panel" class="absolute inset-x-0 bottom-0 z-30 hidden"></div>

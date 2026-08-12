@@ -11,6 +11,7 @@ import { AuthView } from './core/views/AuthView';
 import { GoalsHome } from './core/views/GoalsHome';
 import { ExperienceId } from './core/types';
 import { checkForApkUpdate } from './core/services/updateService';
+import { ApkUpdateModal } from './core/components/ApkUpdateBanner';
 
 // Mini Apps Integradas
 import { SchoolView } from './experiences/school/SchoolView';
@@ -52,6 +53,8 @@ const MainContent: React.FC = () => {
   // Modales
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState<boolean>(false);
+  const [isPendingDismissed, setIsPendingDismissed] = useState<boolean>(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
 
   // Configuración de Gráficos de Astro 3D
   const [graphicsConfig, setGraphicsConfig] = useState({
@@ -71,7 +74,13 @@ const MainContent: React.FC = () => {
   useEffect(() => {
     checkForApkUpdate().then((info) => {
       if (info.hasUpdate) {
-        showToast(`🔔 ¡Nueva actualización APK v${info.latestVersion} disponible!`);
+        if (info.isNative) {
+          // En móvil nativo, mostrar la ventana emergente directa de actualización
+          setIsUpdateModalOpen(true);
+          showToast(`📱 ¡Nueva actualización APK v${info.latestVersion} disponible en tu Móvil!`);
+        } else {
+          showToast(`🔔 ¡Nueva actualización APK v${info.latestVersion} disponible!`);
+        }
       }
     }).catch(() => {});
   }, [showToast]);
@@ -115,9 +124,9 @@ const MainContent: React.FC = () => {
               onBackToLanding={() => setIsAuthViewOpen(false)}
               onSuccess={() => setIsAuthViewOpen(false)}
             />
-          ) : isAuthenticated && !isApproved ? (
-            /* Pantalla de Espera de Autorización de Administrador */
-            <PendingApprovalView />
+          ) : isAuthenticated && !isApproved && !isPendingDismissed ? (
+            /* Pantalla de Espera de Autorización (con botón 'X' para cerrar y continuar) */
+            <PendingApprovalView onClose={() => setIsPendingDismissed(true)} />
           ) : !isAuthenticated && !activeExperience ? (
             /* Landing Page Pública Scrollable con Escuela #1 y Flechas */
             <GoalsLanding
@@ -174,6 +183,12 @@ const MainContent: React.FC = () => {
         onClose={() => setIsAdminDashboardOpen(false)}
         graphicsConfig={graphicsConfig}
         onUpdateGraphicsConfig={handleUpdateGraphicsConfig}
+      />
+
+      {/* Modal Emergente de Actualización en Móvil/Web */}
+      <ApkUpdateModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
       />
 
       {/* Componente Global Toast */}

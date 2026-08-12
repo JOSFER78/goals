@@ -1,5 +1,6 @@
 // Servicio Transparente de Verificación y Auto-Actualización de APK In-App
 import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 
 export interface UpdateInfo {
   hasUpdate: boolean;
@@ -8,10 +9,13 @@ export interface UpdateInfo {
   downloadUrl: string;
   releaseNotes: string;
   publishedAt: string;
+  isNative: boolean;
 }
 
 const CURRENT_APP_VERSION = '1.0.0';
-const VERSION_ENDPOINT = '/version.json';
+const VERSION_ENDPOINT = 'https://goalskid.web.app/version.json';
+
+export const isNativeApp = (): boolean => Capacitor.isNativePlatform();
 
 /**
  * Obtener versión actual instalada en el dispositivo
@@ -45,13 +49,14 @@ export function isVersionNewer(latest: string, current: string): boolean {
 }
 
 /**
- * Consulta de forma limpia y transparente si hay una actualización de APK en el servidor de producción
+ * Consulta si hay una actualización de APK en el servidor de producción
  */
 export async function checkForApkUpdate(): Promise<UpdateInfo> {
   const currentVersion = await getAppVersion();
+  const isNative = isNativeApp();
 
   try {
-    // Intentar cargar el manifest de versión desde la web de producción o local
+    // Cargar manifest absoluto desde el servidor de producción
     const response = await fetch(VERSION_ENDPOINT, {
       headers: {
         'Cache-Control': 'no-cache',
@@ -65,7 +70,7 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
 
     const data = await response.json();
     const latestVersion = data.version || CURRENT_APP_VERSION;
-    const downloadUrl = data.apkUrl || '/downloads/app-release.apk';
+    const downloadUrl = data.apkUrl || 'https://goalskid.web.app/downloads/app-release.apk';
     const hasUpdate = isVersionNewer(latestVersion, currentVersion);
 
     return {
@@ -74,7 +79,8 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
       latestVersion,
       downloadUrl,
       releaseNotes: data.changelog || 'Novedades y optimizaciones de rendimiento.',
-      publishedAt: new Date().toISOString()
+      publishedAt: new Date().toISOString(),
+      isNative
     };
   } catch (error: any) {
     console.warn('Verificación de actualización:', error.message);
@@ -82,9 +88,10 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
       hasUpdate: false,
       currentVersion,
       latestVersion: currentVersion,
-      downloadUrl: '/downloads/app-release.apk',
+      downloadUrl: 'https://goalskid.web.app/downloads/app-release.apk',
       releaseNotes: 'Servidor de actualizaciones en mantenimiento.',
-      publishedAt: new Date().toISOString()
+      publishedAt: new Date().toISOString(),
+      isNative
     };
   }
 }
@@ -93,5 +100,5 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
  * Descargar e iniciar la instalación del archivo APK sin mostrar URLs ni repositorios
  */
 export function triggerApkInstall(downloadUrl: string): void {
-  window.open(downloadUrl, '_blank');
+  window.open(downloadUrl, '_system') || window.open(downloadUrl, '_blank');
 }
