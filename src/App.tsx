@@ -76,25 +76,19 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className={`relative z-10 flex flex-col h-screen w-full mx-auto overflow-hidden ${
-      activeExperience === 'astro' 
-        ? 'max-w-none w-full h-full bg-transparent shadow-none border-none p-0' 
-        : 'max-w-4xl bg-slate-950/90 backdrop-blur-xl shadow-2xl border-x border-slate-800/80'
-    }`}>
+    <div className="relative z-10 flex flex-col h-screen w-full mx-auto overflow-hidden bg-slate-950/95 backdrop-blur-xl">
       
-      {/* Sticky Header Estandarizado de GOALS */}
-      {activeExperience !== 'astro' && (
-        <Header
-          activeExperience={activeExperience}
-          onNavigateHome={handleNavigateHome}
-          onOpenProfile={() => setIsProfileOpen(true)}
-          onOpenAdmin={() => setIsAdminDashboardOpen(true)}
-          onOpenAuth={(mode) => {
-            setAuthViewMode(mode);
-            setIsAuthViewOpen(true);
-          }}
-        />
-      )}
+      {/* Sticky Header Estandarizado de GOALS (Unificado para todas las páginas) */}
+      <Header
+        activeExperience={activeExperience}
+        onNavigateHome={handleNavigateHome}
+        onOpenProfile={() => setIsProfileOpen(true)}
+        onOpenAdmin={() => setIsAdminDashboardOpen(true)}
+        onOpenAuth={(mode) => {
+          setAuthViewMode(mode);
+          setIsAuthViewOpen(true);
+        }}
+      />
 
       {/* Área Principal de Contenido */}
       <main className={activeExperience === 'astro' ? 'flex-1 relative p-0 overflow-hidden h-full w-full flex flex-col' : 'flex-1 overflow-y-auto relative flex flex-col justify-between'}>

@@ -50,7 +50,7 @@ export const getRankInfo = (xp: number): RankInfo => {
 
 export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isCloud } = useAuth();
-  const { userData, setUserData } = useState<UserData>(DEFAULT_USER_DATA);
+  const [userData, setUserData] = useState<UserData>(DEFAULT_USER_DATA);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const dataKey = useCallback(() => {

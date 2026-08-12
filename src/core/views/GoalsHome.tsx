@@ -102,7 +102,7 @@ export const GoalsHome: React.FC<GoalsHomeProps> = ({ onSelectExperience, onOpen
 
   return (
     <div className="w-full h-full overflow-y-auto snap-y snap-mandatory scroll-smooth hide-scrollbar text-slate-100 font-display">
-      <div className="max-w-4xl mx-auto px-2 sm:px-4 space-y-3 pb-6">
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-4 pb-16">
 
         {/* BLOQUE 1: DASHBOARD DE NAVEGACIÓN Y RESUMEN GAMIFICADO */}
         <section 

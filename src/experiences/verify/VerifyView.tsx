@@ -32,7 +32,7 @@ export const VerifyView: React.FC = () => {
   };
 
   return (
-    <div className="py-4 space-y-5 max-w-4xl mx-auto px-3">
+    <div className="py-4 space-y-5 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-20">
       
       {/* Header de la Mini App Verifica */}
       <div className="bg-gradient-to-r from-amber-950/80 via-slate-900 to-yellow-950/80 border border-amber-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-2">
@@ -52,46 +52,52 @@ export const VerifyView: React.FC = () => {
         </div>
       </div>
 
-      {/* Buscador de Verificación */}
+      {/* Formulario de Consulta deNoticia */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-xl">
-        <div className="space-y-1">
-          <h3 className="font-display font-bold text-sm text-white flex items-center gap-2">
-            <Search className="w-4 h-4 text-amber-400" />
-            <span>Contraste Real de Noticias y Afirmaciones Científicas</span>
-          </h3>
-          <p className="text-xs text-slate-400">Pega un titular de prensa o afirmación para auditar su veracidad con la IA y fuentes oficiales.</p>
-        </div>
+        <form onSubmit={handleVerifyHeadline} className="space-y-3">
+          <div>
+            <label className="block text-xs font-bold text-slate-300 mb-1.5">
+              Titular, Afirmación o Noticia a Verificar:
+            </label>
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-3" />
+              <input
+                type="text"
+                required
+                value={headline}
+                onChange={(e) => setHeadline(e.target.value)}
+                placeholder="Ej. 'El Telescopio Webb descubrió agua en Europa moon en 2026'"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-amber-500 transition-all outline-none"
+              />
+            </div>
+          </div>
 
-        <form onSubmit={handleVerifyHeadline} className="flex gap-2">
-          <input
-            type="text"
-            value={headline}
-            onChange={(e) => setHeadline(e.target.value)}
-            placeholder="Ej: ¿La nave Artemis II de la NASA amerizó en el océano Pacífico?"
-            className="flex-1 px-4 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-white placeholder-slate-500 text-xs focus:outline-none focus:border-amber-500"
-          />
           <button
             type="submit"
-            disabled={isVerifying || !headline.trim()}
-            className="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-semibold text-xs transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
+            disabled={isVerifying}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-600 via-amber-500 to-yellow-500 hover:from-amber-500 hover:to-yellow-400 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95"
           >
             {isVerifying ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Auditando IA...</span>
+                <span>Analizando con IA y Contrastando Fuentes...</span>
               </>
             ) : (
-              <span>Verificar Noticia</span>
+              <>
+                <ShieldCheck className="w-4 h-4" />
+                <span>Auditando y Verificar con IA Real</span>
+              </>
             )}
           </button>
         </form>
 
+        {/* Resultado del Dictamen */}
         {auditResult && (
-          <div className="bg-slate-950 border border-amber-500/30 rounded-xl p-5 space-y-3 animate-in fade-in duration-200">
+          <div className="mt-4 p-4 rounded-xl bg-slate-950 border border-slate-800 space-y-3 animate-fadeIn">
             <div className="flex items-center justify-between">
-              <span className={`px-2.5 py-0.5 rounded text-[10px] font-bold border ${
-                auditResult.trustScore && parseInt(auditResult.trustScore) > 70 
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
+              <span className={`px-2.5 py-1 rounded-lg text-xs font-extrabold border ${
+                auditResult.trustScore && parseInt(auditResult.trustScore) > 70
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
                   : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
               }`}>
                 {auditResult.verdict}
@@ -114,6 +120,33 @@ export const VerifyView: React.FC = () => {
             )}
           </div>
         )}
+      </div>
+
+      {/* BARRA INFERIOR DE MENÚ RESPONSIVA (Estilo AstroLingo) */}
+      <div className="fixed bottom-3 inset-x-3 max-w-md mx-auto z-40 bg-slate-950/95 backdrop-blur-xl border border-amber-500/30 p-1.5 rounded-2xl flex justify-around shadow-2xl">
+        <button
+          onClick={() => {}}
+          className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold bg-amber-500 text-slate-950 shadow-md"
+        >
+          <Search className="w-4 h-4" />
+          <span>Verificar</span>
+        </button>
+
+        <button
+          onClick={() => {}}
+          className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold text-slate-400 hover:text-white"
+        >
+          <ShieldCheck className="w-4 h-4" />
+          <span>Fuentes ESA/NASA</span>
+        </button>
+
+        <button
+          onClick={() => {}}
+          className="flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold text-slate-400 hover:text-white"
+        >
+          <FileCheck className="w-4 h-4" />
+          <span>Rigor IA</span>
+        </button>
       </div>
 
     </div>

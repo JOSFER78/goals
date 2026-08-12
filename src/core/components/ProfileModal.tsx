@@ -411,7 +411,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   </div>
                 )}
 
-                {/* TAB 📲 DESCARGA DIRECTA DE APK GOALSKID CON GUÍA */}
+                {/* TAB 📲 DESCARGA DIRECTA DE APK/ZIP GOALSKID CON GUÍA */}
                 {activeTab === 'about' && (
                   <div className="space-y-3 animate-fadeIn">
                     
@@ -423,8 +423,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                             <Download className="w-5 h-5" />
                           </div>
                           <div>
-                            <h4 className="font-extrabold text-sm text-white">Descarga goalskid.apk</h4>
-                            <p className="text-[10px] text-emerald-300 font-mono">Versión v1.0.1 Compilada</p>
+                            <h4 className="font-extrabold text-sm text-white">Descarga goalskid.zip</h4>
+                            <p className="text-[10px] text-emerald-300 font-mono">Versión v2.0 Compilada</p>
                           </div>
                         </div>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -439,7 +439,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                       >
                         <Download className="w-4 h-4" />
-                        <span>Descargar goalskid.apk</span>
+                        <span>Descargar goalskid.zip (v2.0)</span>
                       </button>
                     </div>
 

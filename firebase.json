@@ -6,12 +6,13 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "**/downloads/**",
-      "**/*.apk"
+      "**/*.apk",
+      "**/*.exe",
+      "**/downloads/*.apk"
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "!/downloads/**",
         "destination": "/index.html"
       }
     ]

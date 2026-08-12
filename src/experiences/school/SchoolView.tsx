@@ -57,7 +57,7 @@ export const SchoolView: React.FC = () => {
   };
 
   return (
-    <div className="py-4 space-y-5 max-w-4xl mx-auto px-3">
+    <div className="py-4 space-y-5 w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pb-20">
       
       {/* Header de la Mini App Escuela */}
       <div className="bg-gradient-to-r from-emerald-950/80 via-slate-900 to-teal-950/80 border border-emerald-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-2">
@@ -262,6 +262,39 @@ export const SchoolView: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* BARRA INFERIOR DE MENÚ RESPONSIVA (Estilo AstroLingo) */}
+      <div className="fixed bottom-3 inset-x-3 max-w-md mx-auto z-40 bg-slate-950/95 backdrop-blur-xl border border-emerald-500/30 p-1.5 rounded-2xl flex justify-around shadow-2xl">
+        <button
+          onClick={() => setActiveTab('tutor')}
+          className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold transition-all ${
+            activeTab === 'tutor' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Sparkles className="w-4 h-4" />
+          <span>Tutor IA</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('ocr')}
+          className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold transition-all ${
+            activeTab === 'ocr' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Camera className="w-4 h-4" />
+          <span>OCR Apuntes</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('map')}
+          className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl text-[10px] font-extrabold transition-all ${
+            activeTab === 'map' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <BookOpen className="w-4 h-4" />
+          <span>Mapas</span>
+        </button>
+      </div>
 
     </div>
   );

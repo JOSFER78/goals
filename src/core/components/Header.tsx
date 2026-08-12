@@ -140,22 +140,14 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </>
         ) : (
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => onOpenAuth?.('login')}
-              className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-all flex items-center gap-1 active:scale-95"
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              <span>Iniciar Sesión</span>
-            </button>
-            <button
-              onClick={() => onOpenAuth?.('signup')}
-              className="hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold transition-all active:scale-95"
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              <span>Registrarse</span>
-            </button>
-          </div>
+          <button
+            onClick={() => onOpenAuth?.('login')}
+            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-extrabold shadow-md shadow-indigo-600/30 transition-all flex items-center gap-1.5 active:scale-95"
+            title="Acceso o Registro de Usuario"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Acceso / Registro</span>
+          </button>
         )}
       </div>
     </header>

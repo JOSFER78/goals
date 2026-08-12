@@ -160,7 +160,8 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
         ))}
       </div>
 
-      <div className="w-full max-w-4xl mx-auto px-2 sm:px-4">
+      {/* Contenedor Responsivo Full-Width (Estilo Unificado AstroLingo) */}
+      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
 
         {/* ========================================================================= */}
         {/* BLOQUE 1: HERO FUTURISTA 3D CON INFOGRAFÍA VECTORIAL CIBERNÉTICA */}
