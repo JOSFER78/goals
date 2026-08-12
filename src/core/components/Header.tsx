@@ -39,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="p-2.5 px-3 sm:px-5 flex justify-between items-center border-b border-slate-800 bg-slate-950/95 backdrop-blur-md z-30 sticky top-0 shadow-md">
+      <header className="p-2 px-3 sm:px-5 flex justify-between items-center border-b border-slate-800 bg-slate-950/95 backdrop-blur-md z-30 sticky top-0 shadow-md">
         
         {/* Sección Izquierda: Logotipo o Migas de Pan */}
         <div className="flex items-center gap-2">
@@ -82,20 +82,17 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Sección Derecha: Botón de Actualizar APK, Métricas, Perfil o Iniciar Sesión */}
+        {/* Sección Derecha: Icono Minimalista de Actualización, Métricas, Perfil o Autenticación */}
         <div className="flex items-center gap-2">
           
-          {/* Botón de Comprobar Actualización APK (GitHub) */}
+          {/* Icono Ultra-Minimalista de Actualización (sin texto para no saturar la barra) */}
           <button
             onClick={() => setIsUpdateModalOpen(true)}
-            className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/60 transition-all flex items-center gap-1.5 shadow-sm active:scale-95"
-            title="Verificar actualizaciones del APK en GitHub"
+            className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500/40 text-emerald-400 flex items-center justify-center transition-all active:scale-95 relative"
+            title="Comprobar Actualizaciones de la App"
           >
-            <Download className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-            <span className="hidden sm:inline">Actualizar APK</span>
-            <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-[9px] font-bold text-emerald-400">
-              v1.0.0
-            </span>
+            <Download className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
           </button>
 
           {isAdmin && onOpenAdmin && (
@@ -154,7 +151,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </header>
 
-      {/* Modal de Comprobación y Descarga de APK */}
+      {/* Modal Ultra-Compacto de Comprobación y Descarga */}
       <ApkUpdateModal
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}

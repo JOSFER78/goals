@@ -301,12 +301,44 @@ export const SPACE_INFO: Record<string, SpaceObjectInfo> = {
 
 export const LEVELS_CONFIG: LevelConfig[] = [
   {
-    name: "La Tierra",
+    name: "La Tierra y Satélites NASA",
     badge: "12.742 km",
-    desc: "Nuestro punto de partida: una roca cubierta de océanos que gira alrededor de una estrella común.",
+    desc: "Nuestro punto de partida: una esfera con océanos PBR, capas de nubes dinámicas y satélites reales en órbita (ISS, Hubble, JWST).",
     fact: "En abril de 2026, desde este planeta, 4 humanos rodearon la Luna con Artemis II.",
     stats: [["Diámetro", "12.742 km"], ["Edad", "4.540 M años"]],
     buildKey: "earth"
+  },
+  {
+    name: "Eclipses Solares y Lunares",
+    badge: "Inclinación 5.14°",
+    desc: "Efemérides 100% reales de la NASA: calcula la sombra de umbra proyectada en la Tierra (como el Gran Eclipse Solar Total de España del 12 de agosto de 2026).",
+    fact: "El eclipse solar total cruzará España hoy (12 de agosto de 2026) desde Coruña hasta las Islas Baleares.",
+    stats: [["Inclinación Lunar", "5.14°"], ["Eclipses/Año", "2 a 5"]],
+    buildKey: "eclipses"
+  },
+  {
+    name: "Rotación 24h & Ciclo Día/Noche",
+    badge: "1.670 km/h en Ecuador",
+    desc: "Simulador de rotación diurna en tiempo real con calculador de punto subsolar exacto, terminador crepuscular Rayleigh y horas de luz por latitud.",
+    fact: "La atmósfera gira solidariamente con la corteza terrestre, evitando vientos de 1.670 km/h.",
+    stats: [["Velocidad Ecuador", "1.670 km/h"], ["Periodo Sidéreo", "23h 56m 4s"]],
+    buildKey: "daynight"
+  },
+  {
+    name: "Traslación y Duración del Año",
+    badge: "365,2422 días",
+    desc: "Órbita elíptica kepleriana real con foco desfasado en el Sol. Distancia real Tierra-Sol en km, velocímetro de Perihelio/Afelio y años bisiestos.",
+    fact: "El desfasaje de 0.2422 días por año exige añadir el 29 de febrero cada 4 años.",
+    stats: [["Velocidad Media", "107.000 km/h"], ["Perihelio", "147,1 M km"]],
+    buildKey: "orbit"
+  },
+  {
+    name: "Estaciones del Año y Oblicuidad",
+    badge: "Eje inclinado 23.44°",
+    desc: "Demostración de que la inclinación del eje de 23.44° (fija en el espacio inercial) altera la densidad de radiación solar (W/m²) en cada hemisferio.",
+    fact: "En el Perihelio (enero) estamos más cerca del Sol que en julio, demostrando que la distancia NO causa las estaciones.",
+    stats: [["Inclinación Axial", "23.44°"], ["Solsticio Verano", "21 de Junio"]],
+    buildKey: "seasons"
   },
   {
     name: "El Sistema Solar",
@@ -365,3 +397,4 @@ export const LEVELS_CONFIG: LevelConfig[] = [
     buildKey: "observable"
   }
 ];
+

@@ -20,11 +20,13 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = displayName.trim();
     try {
       if (mode === 'login') {
-        await signInWithEmail(email, password);
+        await signInWithEmail(cleanEmail, password);
       } else {
-        await signUpWithEmail(displayName, email, password);
+        await signUpWithEmail(cleanName, cleanEmail, password);
       }
       onSuccess();
     } catch (err) {

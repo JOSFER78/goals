@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './core/context/AuthContext';
 import { ProgressProvider, useProgress } from './core/context/ProgressContext';
 import { Header } from './core/components/Header';
+import { Footer } from './core/components/Footer';
 import { ProfileModal } from './core/components/ProfileModal';
 import { AdminDashboard } from './core/views/AdminDashboard';
 import { Toast } from './core/components/Toast';
@@ -65,11 +66,11 @@ const MainContent: React.FC = () => {
   const isAuthenticated = isCloud && user && !user.isAnonymous;
   const isApproved = isAdmin || (userData?.isApproved !== false && user?.isApproved !== false);
 
-  // Comprobar automáticamente si hay actualización en GitHub Releases al iniciar la App
+  // Comprobar automáticamente si hay actualización al iniciar la App
   useEffect(() => {
     checkForApkUpdate().then((info) => {
       if (info.hasUpdate) {
-        showToast(`🔔 ¡Nueva actualización APK v${info.latestVersion} disponible en GitHub!`);
+        showToast(`🔔 ¡Nueva actualización APK v${info.latestVersion} disponible!`);
       }
     }).catch(() => {});
   }, [showToast]);
@@ -104,52 +105,59 @@ const MainContent: React.FC = () => {
       )}
 
       {/* Área Principal de Contenido */}
-      <main className={activeExperience === 'astro' ? 'flex-1 relative p-0 overflow-hidden h-full w-full' : 'flex-1 overflow-y-auto p-3 relative'}>
-        {isAuthViewOpen ? (
-          /* Pantalla Estándar de Autenticación de Firebase */
-          <AuthView
-            initialMode={authViewMode}
-            onBackToLanding={() => setIsAuthViewOpen(false)}
-            onSuccess={() => setIsAuthViewOpen(false)}
-          />
-        ) : isAuthenticated && !isApproved ? (
-          /* Pantalla de Espera de Autorización de Administrador */
-          <PendingApprovalView />
-        ) : !isAuthenticated && !activeExperience ? (
-          /* Landing Page Pública Scrollable con Escuela #1 y Flechas */
-          <GoalsLanding
-            onOpenAuth={(mode) => {
-              setAuthViewMode(mode);
-              setIsAuthViewOpen(true);
-            }}
-            onSelectExperience={(expId) => {
-              setActiveExperience(expId);
-            }}
-          />
-        ) : !activeExperience ? (
-          /* Dashboard Principal para Usuario Registrado */
-          <GoalsHome
-            onSelectExperience={(expId) => {
-              setActiveExperience(expId);
-            }}
-            onOpenProfile={() => setIsProfileOpen(true)}
-          />
-        ) : activeExperience === 'school' ? (
-          /* Mini App Escuela Integradora */
-          <SchoolView />
-        ) : activeExperience === 'languages' ? (
-          /* Mini App Idiomas Integradora */
-          <LanguagesView />
-        ) : activeExperience === 'verify' ? (
-          /* Mini App Verifica Integradora */
-          <VerifyView />
-        ) : activeExperience === 'astro' ? (
-          /* Mini App AstroLingo 100% IDÉNTICA A LA APP ORIGINAL */
-          <AstroExperience
-            onBackToGoals={handleNavigateHome}
-            onOpenProfile={() => setIsProfileOpen(true)}
-          />
-        ) : null}
+      <main className={activeExperience === 'astro' ? 'flex-1 relative p-0 overflow-hidden h-full w-full flex flex-col' : 'flex-1 overflow-y-auto relative flex flex-col justify-between'}>
+        <div className="p-3 flex-1">
+          {isAuthViewOpen ? (
+            /* Pantalla Estándar de Autenticación de Firebase */
+            <AuthView
+              initialMode={authViewMode}
+              onBackToLanding={() => setIsAuthViewOpen(false)}
+              onSuccess={() => setIsAuthViewOpen(false)}
+            />
+          ) : isAuthenticated && !isApproved ? (
+            /* Pantalla de Espera de Autorización de Administrador */
+            <PendingApprovalView />
+          ) : !isAuthenticated && !activeExperience ? (
+            /* Landing Page Pública Scrollable con Escuela #1 y Flechas */
+            <GoalsLanding
+              onOpenAuth={(mode) => {
+                setAuthViewMode(mode);
+                setIsAuthViewOpen(true);
+              }}
+              onSelectExperience={(expId) => {
+                setActiveExperience(expId);
+              }}
+            />
+          ) : !activeExperience ? (
+            /* Dashboard Principal para Usuario Registrado */
+            <GoalsHome
+              onSelectExperience={(expId) => {
+                setActiveExperience(expId);
+              }}
+              onOpenProfile={() => setIsProfileOpen(true)}
+            />
+          ) : activeExperience === 'school' ? (
+            /* Mini App Escuela Integradora */
+            <SchoolView />
+          ) : activeExperience === 'languages' ? (
+            /* Mini App Idiomas Integradora */
+            <LanguagesView />
+          ) : activeExperience === 'verify' ? (
+            /* Mini App Verifica Integradora */
+            <VerifyView />
+          ) : activeExperience === 'astro' ? (
+            /* Mini App AstroLingo 100% IDÉNTICA A LA APP ORIGINAL */
+            <AstroExperience
+              onBackToGoals={handleNavigateHome}
+              onOpenProfile={() => setIsProfileOpen(true)}
+            />
+          ) : null}
+        </div>
+
+        {/* Footer elegante para navegación estándar */}
+        {activeExperience !== 'astro' && (
+          <Footer onSelectExperience={(expId) => setActiveExperience(expId)} />
+        )}
       </main>
 
       {/* Modal de Perfil del Estudiante */}

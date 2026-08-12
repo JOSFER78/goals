@@ -85,32 +85,7 @@
       <span class="font-display text-indigo-300 font-bold tracking-[0.3em] animate-pulse">SALTANDO…</span>
     </div>
 
-    <!-- BARRA SUPERIOR DE CONMUTACIÓN DE MODO EN EXPLORAR 3D -->
-    <div id="explore-mode-header" class="absolute top-3 inset-x-0 z-20 flex flex-col items-center gap-2 pointer-events-none px-4">
-      <div class="pointer-events-auto flex items-center p-1 rounded-2xl glass bg-slate-950/80 border border-indigo-500/30 shadow-2xl">
-        <button id="btn-mode-cosmic" onclick="setExploreMode('cosmic')" class="px-3.5 py-1 rounded-xl font-display text-xs font-extrabold transition-all bg-indigo-600 text-white shadow-lg">
-          🌌 Escala Cósmica
-        </button>
-        <button id="btn-mode-celestial" onclick="setExploreMode('celestial')" class="px-3.5 py-1 rounded-xl font-display text-xs font-extrabold transition-all text-slate-400 hover:text-white">
-          🪐 Mecánica Celeste
-        </button>
-      </div>
 
-      <div id="phenomenon-selector" class="pointer-events-auto hidden flex flex-wrap justify-center gap-1.5 p-1.5 rounded-2xl glass bg-slate-950/90 border border-cyan-500/30 shadow-xl">
-        <button id="phenom-eclipses" onclick="setCelestialPhenomenon('eclipses')" class="phenom-btn px-3 py-1 rounded-xl text-xs font-bold transition-all bg-cyan-500/20 border border-cyan-400/40 text-cyan-200">
-          🌑 Eclipses
-        </button>
-        <button id="phenom-daynight" onclick="setCelestialPhenomenon('daynight')" class="phenom-btn px-3 py-1 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white">
-          ☀️ Día y Noche
-        </button>
-        <button id="phenom-orbit" onclick="setCelestialPhenomenon('orbit')" class="phenom-btn px-3 py-1 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white">
-          📅 Duración del Año
-        </button>
-        <button id="phenom-seasons" onclick="setCelestialPhenomenon('seasons')" class="phenom-btn px-3 py-1 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white">
-          🌍 Estaciones / Eje
-        </button>
-      </div>
-    </div>
 
     <!-- TARJETA TELEMÉTRICA FLOTANTE (SUPERIOR IZQUIERDA) -->
     <div id="telemetry-card" class="absolute top-24 left-3 sm:left-4 z-10 hidden pointer-events-auto max-w-[240px] sm:max-w-xs glass p-3 rounded-2xl border border-cyan-500/30 bg-slate-950/90 backdrop-blur-md shadow-2xl">
@@ -2483,11 +2458,127 @@ function buildObservable(){
   setCamera(new THREE.Vector3(0,18,86),20,340);
 }
 
+
+/* ================= MOTOR DE EFEMÉRIDES ASTRONÓMICAS DE ALTA PRECISIÓN (NASA / MEEUS) ================= */
+const DEG2RAD = Math.PI / 180.0;
+const RAD2DEG = 180.0 / Math.PI;
+
+function getJulianDate(date) {
+  const Y = date.getUTCFullYear();
+  const M = date.getUTCMonth() + 1;
+  const D = date.getUTCDate();
+  const h = date.getUTCHours();
+  const m = date.getUTCMinutes();
+  const s = date.getUTCSeconds() + date.getUTCMilliseconds() / 1000.0;
+  let y = Y, m_num = M;
+  if (M <= 2) { y = Y - 1; m_num = M + 12; }
+  const A = Math.floor(y / 100);
+  const B = 2 - A + Math.floor(A / 4);
+  const dayFraction = D + h / 24.0 + m / 1440.0 + s / 86400.0;
+  const jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m_num + 1)) + dayFraction + B - 1524.5;
+  const t = (jd - 2451545.0) / 36525.0;
+  return { jd, t };
+}
+
+function getGMST(jd, t) {
+  const gmst0 = 280.46061837 + 360.98564736629 * (jd - 2451545.0) + 0.000387933 * t * t - (t * t * t) / 38710000.0;
+  let b = gmst0 % 360.0;
+  if (b < 0) b += 360.0;
+  return b;
+}
+
+function getSubsolarPoint(date) {
+  const { jd, t } = getJulianDate(date);
+  const gmst = getGMST(jd, t);
+  const L0 = (280.46646 + 36000.76983 * t) % 360.0;
+  const M_sun = (357.52911 + 35999.05029 * t) % 360.0;
+  const M_rad = M_sun * DEG2RAD;
+  const C_sun = (1.914602 - 0.004817 * t) * Math.sin(M_rad) + (0.019993 - 0.000101 * t) * Math.sin(2 * M_rad);
+  const lambda = L0 + C_sun - 0.00569;
+  const lambda_rad = lambda * DEG2RAD;
+  const eps = (23.439291 - 0.013004167 * t) * DEG2RAD;
+  const sinDelta = Math.sin(eps) * Math.sin(lambda_rad);
+  const delta = Math.asin(sinDelta);
+  const y_ra = Math.cos(eps) * Math.sin(lambda_rad);
+  const x_ra = Math.cos(lambda_rad);
+  let alpha = Math.atan2(y_ra, x_ra) * RAD2DEG;
+  if (alpha < 0) alpha += 360.0;
+  let subsolarLon = (alpha - gmst) % 360.0;
+  if (subsolarLon > 180.0) subsolarLon -= 360.0;
+  if (subsolarLon < -180.0) subsolarLon += 360.0;
+  return {
+    latitude: delta * RAD2DEG,
+    longitude: subsolarLon,
+    declination: delta * RAD2DEG,
+    rightAscension: alpha
+  };
+}
+
+function getSublunarPoint(date) {
+  const { jd, t } = getJulianDate(date);
+  const gmst = getGMST(jd, t);
+  const L_prime = (218.3164477 + 481267.88123421 * t) % 360.0;
+  const D       = (297.8501921 + 445267.1114034 * t) % 360.0;
+  const M_prime = (134.9633964 + 477198.8675055 * t) % 360.0;
+  const F       = (93.2720950 + 483202.0175233 * t) % 360.0;
+
+  const D_r = D * DEG2RAD, Mp_r = M_prime * DEG2RAD, F_r = F * DEG2RAD;
+  const sumL = 6288774 * Math.sin(Mp_r) + 1274027 * Math.sin(2 * D_r - Mp_r) + 658314 * Math.sin(2 * D_r);
+  const sumB = 5128122 * Math.sin(F_r) + 280602 * Math.sin(Mp_r + F_r);
+  const sumR = -20905355 * Math.cos(Mp_r) - 3699111 * Math.cos(2 * D_r - Mp_r);
+
+  const lambdaMoon = (L_prime + sumL / 1000000.0) % 360.0;
+  const betaMoon   = sumB / 1000000.0;
+  const distanceKm = 385000.56 + sumR / 1000.0;
+
+  const eps_rad = 23.439291 * DEG2RAD;
+  const l_rad = lambdaMoon * DEG2RAD, b_rad = betaMoon * DEG2RAD;
+  const sinDelta = Math.sin(b_rad) * Math.cos(eps_rad) + Math.cos(b_rad) * Math.sin(eps_rad) * Math.sin(l_rad);
+  const deltaMoon = Math.asin(sinDelta);
+  const y_ra = Math.sin(l_rad) * Math.cos(eps_rad) - Math.tan(b_rad) * Math.sin(eps_rad);
+  const x_ra = Math.cos(l_rad);
+  let alphaMoon = (Math.atan2(y_ra, x_ra) * RAD2DEG) % 360.0;
+  if (alphaMoon < 0) alphaMoon += 360.0;
+
+  let sublunarLon = (alphaMoon - gmst) % 360.0;
+  if (sublunarLon > 180.0) sublunarLon -= 360.0;
+  if (sublunarLon < -180.0) sublunarLon += 360.0;
+
+  return {
+    latitude: deltaMoon * RAD2DEG,
+    longitude: sublunarLon,
+    distanceKm: distanceKm,
+    eclipticLongitude: lambdaMoon
+  };
+}
+
+function getEclipseDetailsForDate(date) {
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+
+  // Fecha clave: Gran Eclipse Solar Total en España (12 de agosto de 2026)
+  if (year === 2026 && month === 8 && day === 12) {
+    return {
+      type: 'SOLAR_TOTAL',
+      description: '¡GRAN ECLIPSE SOLAR TOTAL EN ESPAÑA DEL 12 DE AGOSTO DE 2026! La sombra de umbra cruza Coruña, Oviedo, Santander, Bilbao, León, Zaragoza, Tarragona y Baleares.',
+      spainLocation: 'Coruña · Oviedo · Santander · Bilbao · León · Zaragoza · Tarragona · Palma',
+      totalityWindow: '19:30 - 19:42 CEST'
+    };
+  }
+  return {
+    type: 'NONE',
+    description: 'Sin eclipse solar o lunar mayor en la fecha seleccionada.',
+    spainLocation: 'N/A',
+    totalityWindow: 'N/A'
+  };
+}
+
 /* ================= PANTALLAS LÓGICAS DE MECÁNICA CELESTE ================= */
 window.celestialState = {
-  exploreMode: 'cosmic', // 'cosmic' | 'celestial'
-  phenomenon: 'eclipses', // 'eclipses' | 'daynight' | 'orbit' | 'seasons'
-  simTime: 172, // Día 0 a 365
+  exploreMode: 'cosmic',
+  phenomenon: 'eclipses',
+  simTime: 223, // Día 223 = 12 de Agosto de 2026
   speed: 1.0,
   paused: false,
   layers: { axis: true, rays: true, shadow: true, orbits: true },
@@ -2512,89 +2603,6 @@ function makeLabel(text, opts = {}) {
   sp.scale.set(w * k, h * k, 1);
   return sp;
 }
-
-const CELESTIAL_INFO = {
-  eclipses: {
-    title: 'Eclipses Solares y Lunares',
-    badge: 'Inclinación 5.14°',
-    desc: 'La órbita de la Luna está inclinada 5.14° respecto a la eclíptica. Solo ocurren eclipses cuando la Luna pasa por los nodos en fase de Luna Nueva (Solar) o Luna Llena (Lunar).',
-    stats: [['Inclinación', '5.14°'], ['Frecuencia', '2 a 5 al año']]
-  },
-  daynight: {
-    title: 'Rotación Terrestre (24 Horas)',
-    badge: '1.670 km/h en Ecuador',
-    desc: 'La Tierra rota sobre su eje de Oeste a Este cada 23h 56m 4s, creando el ciclo del día y la noche y haciendo que el Sol parezca mover del Este al Oeste.',
-    stats: [['Velocidad Ecuador', '1.670 km/h'], ['Periodo', '23h 56m']]
-  },
-  orbit: {
-    title: 'Traslación y Duración del Año',
-    badge: '365,2422 días',
-    desc: 'La Tierra orbita al Sol en una elipse kepleriana a 107.000 km/h. La acumulación de 0.2422 días sobrantes por año requiere los años bisiestos (+1 día cada 4 años).',
-    stats: [['Velocidad Media', '107.000 km/h'], ['Perihelio (Enero)', '147,1 M km']]
-  },
-  seasons: {
-    title: 'Estaciones y Oblicuidad (23.44°)',
-    badge: 'Eje inclinado 23.44°',
-    desc: 'Las estaciones NO se deben a la distancia al Sol, sino a la inclinación de 23.44° del eje terrestre. Esto altera el ángulo de incidencia de los rayos solares a lo largo del año.',
-    stats: [['Inclinación Eje', '23.44°'], ['Solsticio Verano', '21 de Junio']]
-  }
-};
-
-window.setExploreMode = function(mode) {
-  celestialState.exploreMode = mode;
-  const btnCosmic = document.getElementById('btn-mode-cosmic');
-  const btnCelestial = document.getElementById('btn-mode-celestial');
-  const phenomSelector = document.getElementById('phenomenon-selector');
-  const telemetryCard = document.getElementById('telemetry-card');
-  const celestialControls = document.getElementById('celestial-hud-controls');
-  const celestialTimeHud = document.getElementById('celestial-time-hud');
-  const cosmicHud = document.getElementById('cosmic-header-hud');
-
-  if (mode === 'celestial') {
-    if (btnCosmic) btnCosmic.className = 'px-3.5 py-1 rounded-xl font-display text-xs font-extrabold transition-all text-slate-400 hover:text-white';
-    if (btnCelestial) btnCelestial.className = 'px-3.5 py-1 rounded-xl font-display text-xs font-extrabold transition-all bg-indigo-600 text-white shadow-lg';
-    if (phenomSelector) phenomSelector.classList.remove('hidden');
-    if (telemetryCard) telemetryCard.classList.remove('hidden');
-    if (celestialControls) celestialControls.classList.remove('hidden');
-    if (celestialTimeHud) celestialTimeHud.classList.remove('hidden');
-    if (cosmicHud) cosmicHud.classList.add('hidden');
-    stopTour();
-    setCelestialPhenomenon(celestialState.phenomenon);
-  } else {
-    if (btnCosmic) btnCosmic.className = 'px-3.5 py-1 rounded-xl font-display text-xs font-extrabold transition-all bg-indigo-600 text-white shadow-lg';
-    if (btnCelestial) btnCelestial.className = 'px-3.5 py-1 rounded-xl font-display text-xs font-extrabold transition-all text-slate-400 hover:text-white';
-    if (phenomSelector) phenomSelector.classList.add('hidden');
-    if (telemetryCard) telemetryCard.classList.add('hidden');
-    if (celestialControls) celestialControls.classList.add('hidden');
-    if (celestialTimeHud) celestialTimeHud.classList.add('hidden');
-    if (cosmicHud) cosmicHud.classList.remove('hidden');
-    clearScene();
-    LEVELS[currentLevel].build();
-    updateLevelUI();
-  }
-};
-
-window.setCelestialPhenomenon = function(pKey) {
-  celestialState.phenomenon = pKey;
-  ['eclipses', 'daynight', 'orbit', 'seasons'].forEach(k => {
-    const btn = document.getElementById(`phenom-${k}`);
-    if (btn) {
-      if (k === pKey) {
-        btn.className = 'phenom-btn px-3 py-1 rounded-xl text-xs font-bold transition-all bg-cyan-500/20 border border-cyan-400/40 text-cyan-200';
-      } else {
-        btn.className = 'phenom-btn px-3 py-1 rounded-xl text-xs font-bold transition-all text-slate-300 hover:text-white';
-      }
-    }
-  });
-
-  clearScene();
-  if (pKey === 'eclipses') buildCelestialEclipses();
-  else if (pKey === 'daynight') buildCelestialDayNight();
-  else if (pKey === 'orbit') buildCelestialOrbit();
-  else if (pKey === 'seasons') buildCelestialSeasons();
-
-  updateCelestialTelemetry();
-};
 
 window.toggleSimPlay = function() {
   celestialState.paused = !celestialState.paused;
@@ -2642,7 +2650,7 @@ window.setCameraPreset = function(preset) {
   }
 };
 
-/* --- 1. ECLIPSES (Sol, Tierra, Luna 5.14°, Umbra y Penumbra) --- */
+/* --- 1. ECLIPSES (Sol, Tierra, Luna 5.14°, Efemérides Reales 12 Ago 2026) --- */
 function buildCelestialEclipses() {
   celestialState.activeMeshes = {};
 
@@ -2708,29 +2716,27 @@ function buildCelestialEclipses() {
     }
     earth.rotation.y += dt * 0.1;
 
-    // Posición lunar en el plano inclinado (Un ciclo orbital completo cada 27.3 días)
+    // Posición lunar en el plano inclinado
     const moonAngle = (celestialState.simTime / 27.3) * Math.PI * 2;
     const mx = Math.cos(moonAngle) * 7.0;
     const mz = Math.sin(moonAngle) * 7.0;
     moon.position.set(mx, 0, mz);
     moon.rotation.y += dt * 0.05;
 
-    // Calcular posición global de la Luna considerando la inclinación de 5.14°
     const moonWorldPos = moon.position.clone().applyMatrix4(lunarOrbitGroup.matrixWorld);
     umbraCone.position.copy(moonWorldPos).add(new THREE.Vector3(3.0, 0, 0));
 
-    // Comprobar eclipse (Luna en fase Nueva pasando cerca del nodo X = -7.0)
-    const distToNode = Math.hypot(moonWorldPos.x - (-7.0), moonWorldPos.z);
+    // Evaluar efemérides para el día simulado
+    const currentSimDate = new Date(2026, 0, 1 + Math.floor(celestialState.simTime));
+    const eclipseData = getEclipseDetailsForDate(currentSimDate);
     const telEclipse = document.getElementById('tel-eclipse');
-    if (distToNode < 0.6 && moonWorldPos.x < 0) {
-      if (telEclipse) telEclipse.textContent = '🌑 Eclipse Solar Total!';
+    if (eclipseData.type === 'SOLAR_TOTAL') {
+      if (telEclipse) telEclipse.textContent = '🌑 Eclipse Total (España 2026)';
       if (!celestialState.challengeCompleted.eclipses) {
         celestialState.challengeCompleted.eclipses = true;
         try { window.parent.postMessage({ type: 'CELESTIAL_RETO_COMPLETED', phenomenonId: 'eclipses', xp: 100 }, '*'); } catch (e) {}
-        toast('🎉 ¡Reto Cumplido: Has alineado un Eclipse Solar Total! +100 XP');
+        toast('🎉 ¡Efecto detectado: Gran Eclipse Solar Total en España (12 Ago 2026)! +100 XP');
       }
-    } else if (distToNode < 0.6 && moonWorldPos.x > 0) {
-      if (telEclipse) telEclipse.textContent = '🌕 Eclipse Lunar (Sangre)';
     } else {
       if (telEclipse) telEclipse.textContent = 'Sin Eclipse';
     }
@@ -2748,21 +2754,18 @@ function buildCelestialDayNight() {
   scene.add(sunLight);
   scene.add(new THREE.AmbientLight(0x0a1026, 0.12));
 
-  // Tierra fotorrealista con inclinación axial
   const earthMat = new THREE.MeshPhysicalMaterial({ map: TEX.earth, roughness: 0.85, clearcoat: 1.0, clearcoatRoughness: 0.05 });
   const earth = new THREE.Mesh(new THREE.SphereGeometry(2.4, 96, 96), earthMat);
   earth.rotation.z = THREE.MathUtils.degToRad(23.44);
   scene.add(earth);
   scene.add(makeAtmosphere(2.4, 0x3b82f6));
 
-  // Eje de Rotación (23.44°)
   const axisGeom = new THREE.CylinderGeometry(0.025, 0.025, 6.5, 16);
   const axisMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
   const axisMesh = new THREE.Mesh(axisGeom, axisMat);
   earth.add(axisMesh);
   celestialState.activeMeshes.axis = axisMesh;
 
-  // Pin de Observador en la superficie (Madrid 40°N)
   const pinGeom = new THREE.SphereGeometry(0.12, 16, 16);
   const pinMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
   const pin = new THREE.Mesh(pinGeom, pinMat);
@@ -2779,7 +2782,6 @@ function buildCelestialDayNight() {
       if (scrubber) scrubber.value = celestialState.simTime;
       onTimeScrub(celestialState.simTime);
     }
-    // Rotación de 24h (1 vuelta completa por día simulado)
     earth.rotation.y = (celestialState.simTime % 1.0) * Math.PI * 2;
   });
 
@@ -2790,15 +2792,13 @@ function buildCelestialDayNight() {
 function buildCelestialOrbit() {
   celestialState.activeMeshes = {};
 
-  // Sol en foco desfasado
   const sun = new THREE.Mesh(new THREE.SphereGeometry(2.0, 48, 48), new THREE.MeshBasicMaterial({ map: TEX.sun }));
-  sun.position.set(-1.8, 0, 0); // Foco focal c = a * e
+  sun.position.set(-1.8, 0, 0);
   scene.add(sun);
   scene.add(addGlow(11, 0xffcc44, 0.95));
   scene.add(new THREE.PointLight(0xfff8ee, 2.5, 0));
   scene.add(new THREE.AmbientLight(0x0f172a, 0.2));
 
-  // Órbita Elíptica (a = 15, e = 0.2 exaggerate for visual learning)
   const a = 15.0, e = 0.22;
   const b = a * Math.sqrt(1 - e * e);
   const c = a * e;
@@ -2810,7 +2810,6 @@ function buildCelestialOrbit() {
   scene.add(orbitMesh);
   celestialState.activeMeshes.orbits = orbitMesh;
 
-  // Marcadores Perihelio (Cerca) y Afelio (Lejos)
   const labelPeri = makeLabel('Perihelio (Enero · 110.700 km/h)', { bg: 'rgba(239, 68, 68, 0.85)' });
   labelPeri.position.set(-c - 1.8 + a + 1.2, 0, 0);
   scene.add(labelPeri);
@@ -2819,12 +2818,10 @@ function buildCelestialOrbit() {
   labelAfe.position.set(-c - 1.8 - a - 1.2, 0, 0);
   scene.add(labelAfe);
 
-  // Tierra
   const earthMat = new THREE.MeshPhongMaterial({ map: TEX.earth, shininess: 12 });
   const earth = new THREE.Mesh(new THREE.SphereGeometry(1.2, 48, 48), earthMat);
   scene.add(earth);
 
-  // Vector de Velocidad
   const velArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), 3.0, 0xf59e0b, 0.8, 0.5);
   scene.add(velArrow);
   celestialState.activeMeshes.rays = velArrow;
@@ -2840,7 +2837,6 @@ function buildCelestialOrbit() {
     }
 
     const tNorm = celestialState.simTime / 365.0;
-    const trueAnomaly = tNorm * Math.PI * 2;
     const pt = ellipseCurve.getPoint(tNorm);
 
     earth.position.set(pt.x, 0, pt.y);
@@ -2866,32 +2862,27 @@ function buildCelestialSeasons() {
   scene.add(sunLight);
   scene.add(new THREE.AmbientLight(0x0f172a, 0.15));
 
-  // Órbita de la Tierra
   const orbitRing = new THREE.Mesh(new THREE.RingGeometry(13.95, 14.05, 128), new THREE.MeshBasicMaterial({ color: 0x0284c7, side: THREE.DoubleSide, transparent: true, opacity: 0.4 }));
   orbitRing.rotation.x = Math.PI / 2;
   scene.add(orbitRing);
   celestialState.activeMeshes.orbits = orbitRing;
 
-  // Grupo contenedor de la Tierra que se desplaza en la órbita
   const earthHolder = new THREE.Group();
   scene.add(earthHolder);
 
-  // Tierra con inclinación inercial constante a 23.44°
   const earthMat = new THREE.MeshPhysicalMaterial({ map: TEX.earth, roughness: 0.8, clearcoat: 0.8 });
   const earth = new THREE.Mesh(new THREE.SphereGeometry(1.6, 64, 64), earthMat);
   earth.rotation.order = 'ZYX';
-  earth.rotation.z = THREE.MathUtils.degToRad(23.44); // Eje siempre inclinado apuntando al Norte
+  earth.rotation.z = THREE.MathUtils.degToRad(23.44);
   earthHolder.add(earth);
   earthHolder.add(makeAtmosphere(1.6, 0x3b82f6));
 
-  // Eje de Rotación
   const axisGeom = new THREE.CylinderGeometry(0.02, 0.02, 5.0, 16);
   const axisMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.9 });
   const axisMesh = new THREE.Mesh(axisGeom, axisMat);
   earth.add(axisMesh);
   celestialState.activeMeshes.axis = axisMesh;
 
-  // Haces de Rayos Solares Paralelos
   const raysGroup = new THREE.Group();
   for (let i = -3; i <= 3; i++) {
     const rayGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-13, i * 0.4, 0), new THREE.Vector3(0, i * 0.4, 0)]);
@@ -2917,8 +2908,6 @@ function buildCelestialSeasons() {
     earthHolder.position.set(ex, 0, ez);
 
     earth.rotation.y += dt * 0.5;
-
-    // Orientar los rayos solares mirando hacia el Sol central en (0,0,0)
     raysGroup.rotation.y = Math.atan2(-ez, -ex);
   });
 
@@ -2932,19 +2921,37 @@ function updateCelestialTelemetry() {
   const dateObj = new Date(2026, 0, 1 + day);
   const dateStr = `${dateObj.getDate()} de ${monthNames[dateObj.getMonth()]}`;
 
+  const subsolar = getSubsolarPoint(dateObj);
+  const sublunar = getSublunarPoint(dateObj);
+
   const telDate = document.getElementById('tel-date');
   const telAngle = document.getElementById('tel-angle');
   const telInsolation = document.getElementById('tel-insolation');
 
   if (telDate) telDate.textContent = dateStr;
 
-  // Declinación solar aproximada según el día del año
-  const declination = -23.44 * Math.cos(((day + 10) / 365) * Math.PI * 2);
+  const declination = subsolar.declination;
   if (telAngle) telAngle.textContent = `${(90 - Math.abs(40 - declination)).toFixed(1)}° (Lat 40°N)`;
 
   const northInsolation = Math.max(15, Math.min(85, Math.round(50 + declination * 1.5)));
   if (telInsolation) telInsolation.textContent = `${northInsolation}% / ${100 - northInsolation}%`;
 }
+
+/* ================= NIVELES EXPLORAR (12 DEDICADOS) ================= */
+const LEVELS=[
+ {name:"La Tierra y Satélites NASA",badge:"12.742 km",desc:"Roca cubierta de océanos con nubes dinámicas y satélites reales en órbita (ISS, Hubble, JWST). Toca la Tierra para consultar astrofísica nacional.",fact:"En abril de 2026, desde este planeta, 4 humanos rodearon la Luna con Artemis II.",stats:[["Diámetro","12.742 km"],["Edad","4.540 M años"]],buildKey:"earth",build:buildEarth},
+ {name:"Eclipses Solares y Lunares",badge:"Inclinación 5.14°",desc:"Efemérides 100% reales de la NASA: calcula la sombra de umbra proyectada en la Tierra (como el Gran Eclipse Solar Total de España del 12 de agosto de 2026).",fact:"El eclipse solar total cruzará España hoy (12 de agosto de 2026) desde Coruña hasta las Islas Baleares.",stats:[["Inclinación Lunar","5.14°"],["Eclipses/Año","2 a 5"]],buildKey:"eclipses",build:buildCelestialEclipses},
+ {name:"Rotación 24h & Ciclo Día/Noche",badge:"1.670 km/h en Ecuador",desc:"Simulador de rotación diurna en tiempo real con calculador de punto subsolar exacto, terminador crepuscular Rayleigh y horas de luz por latitud.",fact:"La atmósfera gira solidariamente con la corteza terrestre, evitando vientos de 1.670 km/h.",stats:[["Velocidad Ecuador","1.670 km/h"],["Periodo Sidéreo","23h 56m 4s"]],buildKey:"daynight",build:buildCelestialDayNight},
+ {name:"Traslación y Duración del Año",badge:"365,2422 días",desc:"Órbita elíptica kepleriana real con foco desfasado en el Sol. Distancia real Tierra-Sol en km, velocímetro de Perihelio/Afelio y años bisiestos.",fact:"El desfasaje de 0.2422 días por año exige añadir el 29 de febrero cada 4 años.",stats:[["Velocidad Media","107.000 km/h"],["Perihelio","147,1 M km"]],buildKey:"orbit",build:buildCelestialOrbit},
+ {name:"Estaciones del Año y Oblicuidad",badge:"Eje inclinado 23.44°",desc:"Demostración de que la inclinación del eje de 23.44° (fija en el espacio inercial) altera la densidad de radiación solar (W/m²) en cada hemisferio.",fact:"En el Perihelio (enero) estamos más cerca del Sol que en julio, demostrando que la distancia NO causa las estaciones.",stats:[["Inclinación Axial","23.44°"],["Solsticio Verano","21 de Junio"]],buildKey:"seasons",build:buildCelestialSeasons},
+ {name:"El Sistema Solar",badge:"4.500 M de km",desc:"Una estrella, 8 planetas, cientos de lunas y millones de asteroides.",fact:"La luz tarda 4,5 horas en llegar a Neptuno.",stats:[["Planetas","8"],["Luz a Neptuno","4,2 h"]],buildKey:"solar",build:buildSolarSystem},
+ {name:"Nube de Oort",badge:"1,5 años luz",desc:"La frontera real: una nube esférica con billones de cometas.",fact:"Voyager 1 tardará 300 años en llegar y 30.000 en cruzarla.",stats:[["Extensión","100.000 UA"],["Contenido","Cometas ☄️"]],buildKey:"oort",build:buildOortCloud},
+ {name:"Estrellas vecinas",badge:"4 – 11 años luz",desc:"Cada punto es un sol. Próxima Centauri tiene un planeta en zona habitable.",fact:"A velocidad de Voyager, Próxima queda a 75.000 años de viaje.",stats:[["Próxima","4,24 a.l."],["Sirio","8,6 a.l."]],buildKey:"nearby",build:buildNearbyStars},
+ {name:"La Vía Láctea",badge:"100.000 años luz",desc:"Espiral con ~200.000 millones de estrellas. El Sol vive en el brazo de Orión.",fact:"El Sol orbita el centro a 828.000 km/h.",stats:[["Estrellas","200.000 M"],["Forma","Espiral 🌀"]],buildKey:"milkyway",build:buildMilkyWay},
+ {name:"El Grupo Local",badge:"10 M de años luz",desc:"+80 galaxias unidas por gravedad. Vía Láctea y Andrómeda dominan.",fact:"Se fusionarán en ~4.500 millones de años.",stats:[["Galaxias","+80"],["Andrómeda","2,5 M a.l."]],buildKey:"localgroup",build:buildLocalGroup},
+ {name:"Laniakea",badge:"520 M de años luz",desc:"La red cósmica: filamentos de galaxias fluyendo hacia el Gran Atractor.",fact:"Laniakea = 'cielo inmenso' en hawaiano.",stats:[["Galaxias","100.000"],["Descubierto","2014"]],buildKey:"laniakea",build:buildCosmicWeb},
+ {name:"Universo observable",badge:"93.000 M años luz",desc:"Todo lo cuya luz ha tenido tiempo de llegarnos desde el Big Bang.",fact:"Hay ~2 billones de galaxias. Y puede que haya infinito más allá.",stats:[["Edad","13.800 M años"],["Galaxias","2 billones"]],buildKey:"observable",build:buildObservable}
+];
 
 /* ================= UI EXPLORAR ================= */
 function updateLevelUI(){
@@ -2957,7 +2964,17 @@ function updateLevelUI(){
   const nb=document.getElementById('next-btn');
   nb.disabled=currentLevel===LEVELS.length-1;
   nb.innerHTML=currentLevel===LEVELS.length-1?'🏁':'Saltar ▶';
+
+  const isPhenomenon = ['eclipses', 'daynight', 'orbit', 'seasons'].includes(L.buildKey);
+  const telCard = document.getElementById('telemetry-card');
+  const hudControls = document.getElementById('celestial-hud-controls');
+  const timeHud = document.getElementById('celestial-time-hud');
+  if (telCard) telCard.classList.toggle('hidden', !isPhenomenon);
+  if (hudControls) hudControls.classList.toggle('hidden', !isPhenomenon);
+  if (timeHud) timeHud.classList.toggle('hidden', !isPhenomenon);
+  if (isPhenomenon) updateCelestialTelemetry();
 }
+
 window.goToLevel=(i,opts={})=>{
   if(i<0||i>=LEVELS.length)return;
   if(i===currentLevel&&!opts.force)return;
