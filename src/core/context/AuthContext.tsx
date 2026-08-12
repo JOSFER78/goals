@@ -72,17 +72,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setUser(profile);
         localStorage.setItem('goals_local_user', JSON.stringify(profile));
 
-        // Sincronizar automáticamente la ficha del usuario en Firestore para que el Admin la vea al instante
+        // Sincronizar automáticamente la ficha del usuario en Firestore
         if (db && u.uid && !u.isAnonymous) {
-          const isAdminEmail = u.email === 'josferestudio@gmail.com';
           setDoc(doc(db, 'users', u.uid), {
             uid: u.uid,
             email: u.email,
             displayName: profile.displayName,
             photoURL: u.photoURL,
-            isApproved: isAdminEmail ? true : (profile.isApproved === true ? true : false),
+            isApproved: true,
             requestedAt: new Date().toISOString(),
-            status: isAdminEmail ? 'approved' : 'pending'
+            status: 'approved'
           }, { merge: true }).catch(err => console.warn("Error guardando ficha en Firestore:", err));
         }
       } else {

@@ -15,10 +15,18 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [inviteCode, setInviteCode] = useState('3333');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAuthError(null);
+
+    if (inviteCode.trim() !== '3333') {
+      setAuthError('🔑 Código de acceso incorrecto. Introduce el código de invitación 3333 para registrarte o iniciar sesión.');
+      return;
+    }
+
     setIsSubmitting(true);
     const cleanEmail = email.trim().toLowerCase();
     const cleanName = displayName.trim();
@@ -37,6 +45,17 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   };
 
   const handleGoogleAuth = async () => {
+    setAuthError(null);
+    let code = inviteCode.trim();
+    if (code !== '3333') {
+      const input = window.prompt('Introduce el código de acceso (3333):', '3333');
+      if (!input || input.trim() !== '3333') {
+        setAuthError('🔑 Código de acceso incorrecto. Se requiere el código 3333.');
+        return;
+      }
+      setInviteCode('3333');
+    }
+
     setIsSubmitting(true);
     try {
       await signInWithGoogle();
@@ -137,6 +156,24 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-indigo-500 transition-all"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-[11px] font-semibold text-amber-300 mb-1 flex items-center justify-between">
+              <span>Código de Invitación Requerido</span>
+              <span className="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30">Código: 3333</span>
+            </label>
+            <div className="relative">
+              <Sparkles className="w-4 h-4 text-amber-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                required
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value)}
+                placeholder="Introduce el código 3333"
+                className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-amber-500/40 text-xs font-bold text-amber-300 placeholder-slate-500 focus:border-amber-400 transition-all"
               />
             </div>
           </div>

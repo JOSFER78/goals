@@ -2042,6 +2042,135 @@ function loadTextures(){
   TEX.saturn=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/143a458a2-b53b-493d-82a2-8172a65f7eef.png',[232,217,176]);
   TEX.galaxy=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1f1319534-2cbf-4e73-8509-296a56757632.png',null);
   TEX.nebula=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/177f87097-1dc6-4249-b985-5b778e09a9c7.png',null);
+  TEX.earthNight=makeNightTexture();
+  TEX.clouds=makeCloudTexture();
+}
+
+function makeNightTexture() {
+  const c = document.createElement('canvas');
+  c.width = 1024; c.height = 512;
+  const x = c.getContext('2d');
+  x.fillStyle = '#02050e';
+  x.fillRect(0, 0, 1024, 512);
+
+  const clusters = [
+    { x: 480, y: 150, r: 45, d: 140 }, // Europa
+    { x: 470, y: 175, r: 25, d: 90 },  // España / Madrid
+    { x: 260, y: 160, r: 50, d: 150 }, // EE.UU. Este
+    { x: 190, y: 180, r: 35, d: 90 },  // EE.UU. Oeste
+    { x: 820, y: 180, r: 55, d: 160 }, // Asia Este / Japón
+    { x: 870, y: 170, r: 30, d: 110 }, 
+    { x: 700, y: 220, r: 40, d: 100 }, // India
+    { x: 610, y: 200, r: 30, d: 70 },  // Oriente Medio
+    { x: 350, y: 340, r: 35, d: 80 },  // América del Sur
+    { x: 860, y: 350, r: 30, d: 60 },  // Australia
+    { x: 530, y: 300, r: 35, d: 60 }   // África
+  ];
+
+  clusters.forEach(cl => {
+    for (let i = 0; i < cl.d; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const dist = Math.pow(Math.random(), 0.7) * cl.r;
+      const px = cl.x + Math.cos(ang) * dist;
+      const py = cl.y + Math.sin(ang) * dist;
+      const sz = 0.8 + Math.random() * 1.5;
+      const alpha = 0.4 + Math.random() * 0.6;
+      x.fillStyle = Math.random() > 0.3 ? `rgba(255, 190, 70, ${alpha})` : `rgba(255, 230, 150, ${alpha})`;
+      x.fillRect(px, py, sz, sz);
+    }
+  });
+
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+function makeCloudTexture() {
+  const c = document.createElement('canvas');
+  c.width = 1024; c.height = 512;
+  const x = c.getContext('2d');
+  x.fillStyle = 'rgba(0,0,0,0)';
+  x.fillRect(0, 0, 1024, 512);
+
+  for (let i = 0; i < 180; i++) {
+    const cx = Math.random() * 1024;
+    const cy = 60 + Math.random() * 390;
+    const rx = 40 + Math.random() * 120;
+    const ry = 10 + Math.random() * 35;
+    const g = x.createRadialGradient(cx, cy, 0, cx, cy, rx);
+    g.addColorStop(0, `rgba(255, 255, 255, ${0.18 + Math.random() * 0.32})`);
+    g.addColorStop(0.6, `rgba(240, 245, 255, ${0.05 + Math.random() * 0.12})`);
+    g.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    x.fillStyle = g;
+    x.beginPath();
+    x.ellipse(cx, cy, rx, ry, (Math.random() - 0.5) * 0.4, 0, Math.PI * 2);
+    x.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+function createEarthDayNightMaterial(sunDirVector) {
+  return new THREE.ShaderMaterial({
+    uniforms: {
+      uDayTex: { value: TEX.earth },
+      uNightTex: { value: TEX.earthNight },
+      uSunDir: { value: sunDirVector || new THREE.Vector3(1, 0.2, 0.5).normalize() },
+      uShininess: { value: 32.0 }
+    },
+    vertexShader: `
+      varying vec3 vNormal;
+      varying vec2 vUv;
+      varying vec3 vWorldPosition;
+      varying vec3 vViewPosition;
+
+      void main() {
+        vUv = uv;
+        vNormal = normalize(normalMatrix * normal);
+        vec4 worldPos = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = worldPos.xyz;
+        vec4 mvPos = modelViewMatrix * vec4(position, 1.0);
+        vViewPosition = -mvPos.xyz;
+        gl_Position = projectionMatrix * mvPos;
+      }
+    `,
+    fragmentShader: `
+      uniform sampler2D uDayTex;
+      uniform sampler2D uNightTex;
+      uniform vec3 uSunDir;
+      uniform float uShininess;
+
+      varying vec3 vNormal;
+      varying vec2 vUv;
+      varying vec3 vWorldPosition;
+      varying vec3 vViewPosition;
+
+      void main() {
+        vec3 norm = normalize(vNormal);
+        vec3 lightDir = normalize(uSunDir);
+        vec3 viewDir = normalize(vViewPosition);
+
+        float dotNL = dot(norm, lightDir);
+        float dayFactor = smoothstep(-0.15, 0.15, dotNL);
+
+        vec4 dayColor = texture2D(uDayTex, vUv);
+        vec4 nightColor = texture2D(uNightTex, vUv);
+
+        vec3 nightGlow = nightColor.rgb * 1.8;
+
+        float twilightRim = smoothstep(-0.2, 0.05, dotNL) * smoothstep(0.2, -0.05, dotNL);
+        vec3 sunsetColor = vec3(1.0, 0.42, 0.12) * twilightRim * 0.85;
+
+        float isOcean = step(0.08, dayColor.b - dayColor.r);
+        vec3 halfDir = normalize(lightDir + viewDir);
+        float specComp = pow(max(dot(norm, halfDir), 0.0), uShininess);
+        vec3 specular = vec3(1.0, 0.95, 0.85) * specComp * isOcean * dayFactor * 1.3;
+        vec3 finalColor = mix(nightGlow, dayColor.rgb, dayFactor) + sunsetColor + specular;
+        gl_FragColor = vec4(finalColor, 1.0);
+      }
+    `
+  });
 }
 function makePlanetTexture(colors,speckle){
   const c=document.createElement('canvas');c.width=512;c.height=256;const x=c.getContext('2d');
@@ -2088,8 +2217,12 @@ function setCamera(pos,minD,maxD){
   controls.minDistance=minD;controls.maxDistance=maxD;controls.target.set(0,0,0);
   const start=pos.clone().multiplyScalar(1.8);camera.position.copy(start);
   intro={from:start,to:pos.clone(),t:0,dur:1.6};controls.update();}
+
 function clearScene(){
   updaters=[];intro=null;clickables=[];
+  if (window.celestialState) {
+    celestialState.activeMeshes = { axis: [], rays: [], shadow: [], orbits: [] };
+  }
   scene.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)(Array.isArray(o.material)?o.material:[o.material]).forEach(m=>m.dispose());});
   while(scene.children.length)scene.remove(scene.children[0]);}
 function initThree(){
@@ -2184,27 +2317,36 @@ const INFO={
 
 /* ================= NIVELES EXPLORAR (DECLARADOS MÁS ABAJO) ================= */
 
-/* ================= PANTALLA 1: LA TIERRA Y LA LUNA (HIPERREALISTA NASA) ================= */
+/* ================= PANTALLA 1: LA TIERRA 4-CAPAS (HIPERREALISTA NASA) ================= */
 function buildEarth(){
-  // 1. TIERRA: MeshPhysicalMaterial PBR con specular clearcoat de océanos
-  const earthMat = new THREE.MeshPhysicalMaterial({
-    map: TEX.earth,
-    roughness: 0.88,
-    metalness: 0.0,
-    clearcoat: 1.0,            // Brillo especular real de los océanos
-    clearcoatRoughness: 0.08,  // Reflejo líquido pulido
-    ior: 1.333
-  });
-  const earth = new THREE.Mesh(new THREE.SphereGeometry(2, 96, 96), earthMat);
-  earth.rotation.z = THREE.MathUtils.degToRad(23.44); // Inclinación real del eje terrestre
+  clearScene();
+
+  const sunDir = new THREE.Vector3(20, 6, 15).normalize();
+
+  // 1. CORTEZA TERRESTRE (Crust: ShaderMaterial Día/Noche GLSL + Specular Océanos)
+  const earthMat = createEarthDayNightMaterial(sunDir);
+  const earth = new THREE.Mesh(new THREE.SphereGeometry(2.0, 96, 96), earthMat);
+  earth.rotation.z = THREE.MathUtils.degToRad(23.44); // Inclinación axial inercial real
   earth.userData.isEarthMesh = true;
   scene.add(earth);
   clickables.push(earth);
 
-  // Atmósfera Rayleigh sutil
-  scene.add(makeAtmosphere(2, 0x3a82ee));
+  // 2. NUBES INDEPENDIENTES (Clouds: Radio 2.016 animadas independientemente)
+  const cloudsMat = new THREE.MeshStandardMaterial({
+    map: TEX.clouds,
+    transparent: true,
+    opacity: 0.38,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+  const clouds = new THREE.Mesh(new THREE.SphereGeometry(2.016, 96, 96), cloudsMat);
+  earth.add(clouds);
 
-  // 2. SATÉLITES REALES: Puntos micro-pixelados (CERO modelos sobredimensionados)
+  // 3. DISPERSIÓN ATMOSFÉRICA (Atmosphere: Halo Rayleigh Fresnel)
+  const atmosphere = makeAtmosphere(2.0, 0x3b82f6);
+  scene.add(atmosphere);
+
+  // 4. SATÉLITES REALES (ISS, Hubble, JWST) & LUNA
   const satPositions = new Float32Array(SATELLITE_DATA.length * 3);
   const satColors = new Float32Array(SATELLITE_DATA.length * 3);
 
@@ -2217,7 +2359,6 @@ function buildEarth(){
     satColors[i * 3 + 1] = 0.85;
     satColors[i * 3 + 2] = 1.0;
 
-    // Hitbox invisible para clic sin alterar la escala visual
     const proxy = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), new THREE.MeshBasicMaterial({ visible: false }));
     proxy.userData.info = satData.info;
     scene.add(proxy);
@@ -2245,14 +2386,14 @@ function buildEarth(){
 
   const satPoints = new THREE.Points(satGeo, new THREE.PointsMaterial({
     size: 4,
-    sizeAttenuation: false, // Tamaño constante en píxeles (sin distorsión de escala)
+    sizeAttenuation: false,
     vertexColors: true,
     transparent: true,
     opacity: 0.95
   }));
   scene.add(satPoints);
 
-  // 3. LUNA: MeshStandardMaterial mate con sombra de cráteres
+  // Luna
   const moonMat = new THREE.MeshStandardMaterial({
     map: TEX.moon,
     roughness: 0.95,
@@ -2262,14 +2403,12 @@ function buildEarth(){
   scene.add(moon);
   addClickProxy(moon, 0.85, INFO.moon);
 
-  // 4. ILUMINACIÓN CINEMÁTICA Y ESPACIO PROFUNDO
+  // Iluminación cinematográfica
   const sunLight = new THREE.DirectionalLight(0xfffaed, 3.0);
   sunLight.position.set(20, 6, 15);
   sunLight.castShadow = true;
   scene.add(sunLight);
-
-  // Luz ambiental casi nula para sombras oscuras espaciales reales
-  scene.add(new THREE.AmbientLight(0x0a0f1d, 0.08));
+  scene.add(new THREE.AmbientLight(0x0a0f1d, 0.12));
 
   addBackdrop();
   addStars(2200, 180, 0.35, 0.7);
@@ -2277,6 +2416,7 @@ function buildEarth(){
   let ma = 0;
   updaters.push((t, dt) => {
     earth.rotation.y += dt * 0.06;
+    clouds.rotation.y += dt * 0.09;
     ma += dt * 0.08;
     moon.position.set(Math.cos(ma) * 6.2, 0.4, Math.sin(ma) * 6.2);
     moon.rotation.y += dt * 0.04;
@@ -2622,10 +2762,38 @@ window.setSimSpeed = function(spd) {
   });
 };
 
+/* ================= CELESTIAL LAYER REGISTRATION & TOGGLES ================= */
+window.registerLayerMesh = function(layerKey, meshOrGroup) {
+  if (!celestialState.activeMeshes[layerKey]) {
+    celestialState.activeMeshes[layerKey] = [];
+  }
+  if (!Array.isArray(celestialState.activeMeshes[layerKey])) {
+    celestialState.activeMeshes[layerKey] = [celestialState.activeMeshes[layerKey]];
+  }
+  celestialState.activeMeshes[layerKey].push(meshOrGroup);
+
+  const isVisible = celestialState.layers[layerKey] !== false;
+  meshOrGroup.visible = isVisible;
+};
+
 window.toggleLayer = function(layerKey, val) {
   celestialState.layers[layerKey] = val;
-  const obj = celestialState.activeMeshes[layerKey];
-  if (obj) obj.visible = val;
+  const target = celestialState.activeMeshes[layerKey];
+  if (!target) return;
+  if (Array.isArray(target)) {
+    target.forEach(m => { if (m) m.visible = val; });
+  } else if (target.visible !== undefined) {
+    target.visible = val;
+  }
+};
+
+window.syncHUDCheckboxes = function() {
+  ['axis', 'rays', 'shadow', 'orbits'].forEach(key => {
+    const el = document.getElementById(`layer-${key}`);
+    if (el) {
+      el.checked = celestialState.layers[key] !== false;
+    }
+  });
 };
 
 window.setCameraPreset = function(preset) {
@@ -2640,11 +2808,12 @@ window.setCameraPreset = function(preset) {
   }
 };
 
-/* --- 1. ECLIPSES (Sol, Tierra, Luna 5.14°, Efemérides Reales 12 Ago 2026) --- */
+/* --- 1. ECLIPSES (Sol, Tierra, Luna 5.14°, Umbra Cone & Blood Moon 12 Ago 2026) --- */
 function buildCelestialEclipses() {
-  celestialState.activeMeshes = {};
+  clearScene();
+  syncHUDCheckboxes();
 
-  // Sol en origen
+  // Sol
   const sunMat = new THREE.MeshBasicMaterial({ map: TEX.sun });
   const sun = new THREE.Mesh(new THREE.SphereGeometry(2.2, 48, 48), sunMat);
   sun.position.set(-18, 0, 0);
@@ -2655,20 +2824,34 @@ function buildCelestialEclipses() {
   scene.add(sunLight);
   scene.add(new THREE.AmbientLight(0x0f172a, 0.15));
 
-  // Tierra en (0,0,0)
-  const earthMat = new THREE.MeshPhysicalMaterial({ map: TEX.earth, roughness: 0.8, clearcoat: 0.9, clearcoatRoughness: 0.1 });
+  const sunDir = new THREE.Vector3(18, 0, 0).normalize();
+
+  // Tierra (Día/Noche GLSL Crust)
+  const earthMat = createEarthDayNightMaterial(sunDir);
   const earth = new THREE.Mesh(new THREE.SphereGeometry(2.0, 64, 64), earthMat);
   earth.rotation.z = THREE.MathUtils.degToRad(23.44);
   scene.add(earth);
   scene.add(makeAtmosphere(2.0, 0x3b82f6));
 
-  // Plano de la Eclíptica (Tierra-Sol)
+  // Nubes
+  const cloudsMat = new THREE.MeshStandardMaterial({ map: TEX.clouds, transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending });
+  const clouds = new THREE.Mesh(new THREE.SphereGeometry(2.016, 64, 64), cloudsMat);
+  earth.add(clouds);
+
+  // Eje de Rotación (Capa 'axis')
+  const axisGeom = new THREE.CylinderGeometry(0.02, 0.02, 6.0, 16);
+  const axisMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
+  const axisMesh = new THREE.Mesh(axisGeom, axisMat);
+  earth.add(axisMesh);
+  registerLayerMesh('axis', axisMesh);
+
+  // Plano de la Eclíptica (Capa 'orbits')
   const eclipticGrid = new THREE.GridHelper(30, 20, 0x0284c7, 0x1e293b);
   eclipticGrid.position.set(-5, -0.01, 0);
   scene.add(eclipticGrid);
-  celestialState.activeMeshes.orbits = eclipticGrid;
+  registerLayerMesh('orbits', eclipticGrid);
 
-  // Plano Orbital Lunar Inclinado 5.14°
+  // Plano Orbital Lunar Inclinado 5.14° (Capa 'orbits')
   const lunarOrbitGroup = new THREE.Group();
   lunarOrbitGroup.rotation.x = THREE.MathUtils.degToRad(5.14);
   scene.add(lunarOrbitGroup);
@@ -2676,24 +2859,38 @@ function buildCelestialEclipses() {
   const moonOrbitRing = new THREE.Mesh(new THREE.RingGeometry(6.95, 7.05, 128), new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.4 }));
   moonOrbitRing.rotation.x = Math.PI / 2;
   lunarOrbitGroup.add(moonOrbitRing);
+  registerLayerMesh('orbits', moonOrbitRing);
 
-  // Línea de Nodos
+  // Línea de Nodos (Capa 'orbits')
   const nodeGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-8.5, 0, 0), new THREE.Vector3(8.5, 0, 0)]);
   const nodeLine = new THREE.Line(nodeGeom, new THREE.LineDashedMaterial({ color: 0xf59e0b, dashSize: 0.4, gapSize: 0.3 }));
   nodeLine.computeLineDistances();
   scene.add(nodeLine);
+  registerLayerMesh('orbits', nodeLine);
 
-  // Luna
-  const moonMat = new THREE.MeshStandardMaterial({ map: TEX.moon, roughness: 0.9 });
-  const moon = new THREE.Mesh(new THREE.SphereGeometry(0.55, 32, 32), moonMat);
+  // Luna & Material Luna de Sangre
+  const normalMoonMat = new THREE.MeshStandardMaterial({ map: TEX.moon, roughness: 0.9 });
+  const bloodMoonMat = new THREE.MeshStandardMaterial({ map: TEX.moon, roughness: 0.8, color: 0xd94826 });
+  const moon = new THREE.Mesh(new THREE.SphereGeometry(0.55, 32, 32), normalMoonMat);
   lunarOrbitGroup.add(moon);
 
-  // Cono de Umbra (Sombra de la Luna)
-  const umbraMat = new THREE.MeshBasicMaterial({ color: 0x0f051d, transparent: true, opacity: 0.65 });
-  const umbraCone = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.45, 6.0, 32, 1, true), umbraMat);
+  const bloodGlow = addGlow(3.5, 0xff3311, 0.85);
+  bloodGlow.visible = false;
+  moon.add(bloodGlow);
+
+  // Cono de Umbra translúcido (Capa 'shadow')
+  const umbraMat = new THREE.MeshBasicMaterial({ color: 0x070210, transparent: true, opacity: 0.65, depthWrite: false });
+  const umbraCone = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.48, 7.0, 32, 1, true), umbraMat);
   umbraCone.rotation.z = -Math.PI / 2;
   scene.add(umbraCone);
-  celestialState.activeMeshes.shadow = umbraCone;
+  registerLayerMesh('shadow', umbraCone);
+
+  // Mancha de Umbra sobre la corteza terrestre (Capa 'shadow')
+  const umbraSpotMat = new THREE.MeshBasicMaterial({ color: 0x05010a, transparent: true, opacity: 0.85 });
+  const umbraSpot = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), umbraSpotMat);
+  earth.add(umbraSpot);
+  umbraSpot.visible = false;
+  registerLayerMesh('shadow', umbraSpot);
 
   addStars(1800, 200, 0.35, 0.7);
 
@@ -2705,8 +2902,8 @@ function buildCelestialEclipses() {
       onTimeScrub(celestialState.simTime);
     }
     earth.rotation.y += dt * 0.1;
+    clouds.rotation.y += dt * 0.14;
 
-    // Posición lunar en el plano inclinado
     const moonAngle = (celestialState.simTime / 27.3) * Math.PI * 2;
     const mx = Math.cos(moonAngle) * 7.0;
     const mz = Math.sin(moonAngle) * 7.0;
@@ -2714,48 +2911,91 @@ function buildCelestialEclipses() {
     moon.rotation.y += dt * 0.05;
 
     const moonWorldPos = moon.position.clone().applyMatrix4(lunarOrbitGroup.matrixWorld);
-    umbraCone.position.copy(moonWorldPos).add(new THREE.Vector3(3.0, 0, 0));
+    umbraCone.position.copy(moonWorldPos).add(new THREE.Vector3(3.5, 0, 0));
 
-    // Evaluar efemérides para el día simulado
+    // Detección de Luna de Sangre (Eclipse Lunar al estar detrás de la Tierra)
+    const isBloodMoon = (moonWorldPos.x > 5.5 && Math.abs(moonWorldPos.y) < 1.0 && Math.abs(moonWorldPos.z) < 1.0);
+    if (isBloodMoon) {
+      moon.material = bloodMoonMat;
+      bloodGlow.visible = true;
+    } else {
+      moon.material = normalMoonMat;
+      bloodGlow.visible = false;
+    }
+
+    // Eclipse Solar Total 12 Ago 2026 (Día ~223)
     const currentSimDate = new Date(2026, 0, 1 + Math.floor(celestialState.simTime));
     const eclipseData = getEclipseDetailsForDate(currentSimDate);
     const telEclipse = document.getElementById('tel-eclipse');
-    if (eclipseData.type === 'SOLAR_TOTAL') {
-      if (telEclipse) telEclipse.textContent = '🌑 Eclipse Total (España 2026)';
-      if (!celestialState.challengeCompleted.eclipses) {
-        celestialState.challengeCompleted.eclipses = true;
-        try { window.parent.postMessage({ type: 'CELESTIAL_RETO_COMPLETED', phenomenonId: 'eclipses', xp: 100 }, '*'); } catch (e) {}
-        toast('🎉 ¡Efecto detectado: Gran Eclipse Solar Total en España (12 Ago 2026)! +100 XP');
+
+    const isSolarEclipse = (eclipseData.type === 'SOLAR_TOTAL');
+    umbraSpot.visible = isSolarEclipse && (celestialState.layers.shadow !== false);
+    if (isSolarEclipse) {
+      umbraSpot.position.set(-1.95, 0.4, 0.3); // Proyectado sobre España en la corteza terrestre
+    }
+
+    if (telEclipse) {
+      if (isSolarEclipse) {
+        telEclipse.textContent = '🌑 Eclipse Total (España 2026)';
+        if (!celestialState.challengeCompleted.eclipses) {
+          celestialState.challengeCompleted.eclipses = true;
+          try { window.parent.postMessage({ type: 'CELESTIAL_RETO_COMPLETED', phenomenonId: 'eclipses', xp: 100 }, '*'); } catch (e) {}
+          toast('🎉 ¡Efecto detectado: Gran Eclipse Solar Total en España (12 Ago 2026)! +100 XP');
+        }
+      } else if (isBloodMoon) {
+        telEclipse.textContent = '🌕 Eclipse Lunar (Luna de Sangre)';
+      } else {
+        telEclipse.textContent = 'Sin Eclipse';
       }
-    } else {
-      if (telEclipse) telEclipse.textContent = 'Sin Eclipse';
     }
   });
 
   setCamera(new THREE.Vector3(0, 3.0, 11.5), 2.0, 60);
 }
 
-/* --- 2. ROTACIÓN Y DÍA/NOCHE (24h, Luces de ciudades y Eje) --- */
+/* --- 2. ROTACIÓN Y DÍA/NOCHE (24h, Luces de ciudades y Eje a 23.44°) --- */
 function buildCelestialDayNight() {
-  celestialState.activeMeshes = {};
+  clearScene();
+  syncHUDCheckboxes();
 
+  const sunLightPos = new THREE.Vector3(20, 2, 0);
   const sunLight = new THREE.DirectionalLight(0xfffaed, 3.5);
-  sunLight.position.set(20, 2, 0);
+  sunLight.position.copy(sunLightPos);
   scene.add(sunLight);
   scene.add(new THREE.AmbientLight(0x0a1026, 0.12));
 
-  const earthMat = new THREE.MeshPhysicalMaterial({ map: TEX.earth, roughness: 0.85, clearcoat: 1.0, clearcoatRoughness: 0.05 });
+  const sunDir = sunLightPos.clone().normalize();
+
+  // Tierra Corteza con Shader Día/Noche
+  const earthMat = createEarthDayNightMaterial(sunDir);
   const earth = new THREE.Mesh(new THREE.SphereGeometry(2.4, 96, 96), earthMat);
   earth.rotation.z = THREE.MathUtils.degToRad(23.44);
   scene.add(earth);
   scene.add(makeAtmosphere(2.4, 0x3b82f6));
 
-  const axisGeom = new THREE.CylinderGeometry(0.025, 0.025, 6.5, 16);
+  // Nubes
+  const cloudsMat = new THREE.MeshStandardMaterial({ map: TEX.clouds, transparent: true, opacity: 0.38, depthWrite: false, blending: THREE.AdditiveBlending });
+  const clouds = new THREE.Mesh(new THREE.SphereGeometry(2.418, 96, 96), cloudsMat);
+  earth.add(clouds);
+
+  // Eje de Rotación 23.44° (Capa 'axis')
+  const axisGeom = new THREE.CylinderGeometry(0.025, 0.025, 7.0, 16);
   const axisMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
   const axisMesh = new THREE.Mesh(axisGeom, axisMat);
   earth.add(axisMesh);
-  celestialState.activeMeshes.axis = axisMesh;
+  registerLayerMesh('axis', axisMesh);
 
+  // Rayos Solares (Capa 'rays')
+  const raysGroup = new THREE.Group();
+  for (let i = -3; i <= 3; i++) {
+    const rayGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(12, i * 0.6, 0), new THREE.Vector3(2.5, i * 0.6, 0)]);
+    const rayLine = new THREE.Line(rayGeom, new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.6 }));
+    raysGroup.add(rayLine);
+  }
+  scene.add(raysGroup);
+  registerLayerMesh('rays', raysGroup);
+
+  // Pin de Ubicación en España (Lat 40°N)
   const pinGeom = new THREE.SphereGeometry(0.12, 16, 16);
   const pinMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
   const pin = new THREE.Mesh(pinGeom, pinMat);
@@ -2773,6 +3013,7 @@ function buildCelestialDayNight() {
       onTimeScrub(celestialState.simTime);
     }
     earth.rotation.y = (celestialState.simTime % 1.0) * Math.PI * 2;
+    clouds.rotation.y = earth.rotation.y * 1.05;
   });
 
   setCamera(new THREE.Vector3(0, 1.5, 7.5), 2.2, 40);
@@ -2780,41 +3021,57 @@ function buildCelestialDayNight() {
 
 /* --- 3. TRASLACIÓN Y DURACIÓN DEL AÑO (Órbita Elíptica Kepleriana) --- */
 function buildCelestialOrbit() {
-  celestialState.activeMeshes = {};
+  clearScene();
+  syncHUDCheckboxes();
 
   const sun = new THREE.Mesh(new THREE.SphereGeometry(2.0, 48, 48), new THREE.MeshBasicMaterial({ map: TEX.sun }));
-  sun.position.set(-1.8, 0, 0);
+  sun.position.set(-2.4, 0, 0);
   scene.add(sun);
   scene.add(addGlow(11, 0xffcc44, 0.95));
   scene.add(new THREE.PointLight(0xfff8ee, 2.5, 0));
   scene.add(new THREE.AmbientLight(0x0f172a, 0.2));
 
-  const a = 15.0, e = 0.22;
+  // Parámetros de la elipse kepleriana
+  const a = 15.0, e = 0.16;
   const b = a * Math.sqrt(1 - e * e);
   const c = a * e;
 
-  const ellipseCurve = new THREE.EllipseCurve(-c - 1.8, 0, a, b, 0, 2 * Math.PI, false, 0);
+  const ellipseCurve = new THREE.EllipseCurve(-c - 2.4, 0, a, b, 0, 2 * Math.PI, false, 0);
   const orbitPoints = ellipseCurve.getPoints(256);
   const orbitGeom = new THREE.BufferGeometry().setFromPoints(orbitPoints.map(p => new THREE.Vector3(p.x, 0, p.y)));
   const orbitMesh = new THREE.Line(orbitGeom, new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6 }));
   scene.add(orbitMesh);
-  celestialState.activeMeshes.orbits = orbitMesh;
+  registerLayerMesh('orbits', orbitMesh);
 
+  // Marcadores Perihelio y Afelio (Capa 'orbits')
   const labelPeri = makeLabel('Perihelio (Enero · 110.700 km/h)', { bg: 'rgba(239, 68, 68, 0.85)' });
-  labelPeri.position.set(-c - 1.8 + a + 1.2, 0, 0);
+  labelPeri.position.set(-c - 2.4 + a + 1.2, 0, 0);
   scene.add(labelPeri);
+  registerLayerMesh('orbits', labelPeri);
 
   const labelAfe = makeLabel('Afelio (Julio · 105.400 km/h)', { bg: 'rgba(59, 130, 246, 0.85)' });
-  labelAfe.position.set(-c - 1.8 - a - 1.2, 0, 0);
+  labelAfe.position.set(-c - 2.4 - a - 1.2, 0, 0);
   scene.add(labelAfe);
+  registerLayerMesh('orbits', labelAfe);
 
-  const earthMat = new THREE.MeshPhongMaterial({ map: TEX.earth, shininess: 12 });
+  // Tierra y Eje
+  const sunDir = new THREE.Vector3(1, 0, 0);
+  const earthMat = createEarthDayNightMaterial(sunDir);
   const earth = new THREE.Mesh(new THREE.SphereGeometry(1.2, 48, 48), earthMat);
+  earth.rotation.z = THREE.MathUtils.degToRad(23.44);
   scene.add(earth);
+  scene.add(makeAtmosphere(1.2, 0x3b82f6));
 
+  const axisGeom = new THREE.CylinderGeometry(0.018, 0.018, 3.8, 16);
+  const axisMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.85 });
+  const axisMesh = new THREE.Mesh(axisGeom, axisMat);
+  earth.add(axisMesh);
+  registerLayerMesh('axis', axisMesh);
+
+  // Vector Flecha de Velocidad Tangencial (Capa 'rays')
   const velArrow = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(0, 0, 0), 3.0, 0xf59e0b, 0.8, 0.5);
   scene.add(velArrow);
-  celestialState.activeMeshes.rays = velArrow;
+  registerLayerMesh('rays', velArrow);
 
   addStars(1800, 220, 0.35, 0.7);
 
@@ -2832,6 +3089,9 @@ function buildCelestialOrbit() {
     earth.position.set(pt.x, 0, pt.y);
     earth.rotation.y += dt * 0.4;
 
+    const toSun = new THREE.Vector3(-2.4, 0, 0).sub(earth.position).normalize();
+    earthMat.uniforms.uSunDir.value.copy(toSun);
+
     velArrow.position.copy(earth.position);
     const tangent = ellipseCurve.getTangent(tNorm);
     velArrow.setDirection(new THREE.Vector3(tangent.x, 0, tangent.y).normalize());
@@ -2842,7 +3102,8 @@ function buildCelestialOrbit() {
 
 /* --- 4. ESTACIONES Y OBLICUIDAD (Eje a 23.44° Fijo Inercialmente) --- */
 function buildCelestialSeasons() {
-  celestialState.activeMeshes = {};
+  clearScene();
+  syncHUDCheckboxes();
 
   const sun = new THREE.Mesh(new THREE.SphereGeometry(2.4, 48, 48), new THREE.MeshBasicMaterial({ map: TEX.sun }));
   sun.position.set(0, 0, 0);
@@ -2852,35 +3113,42 @@ function buildCelestialSeasons() {
   scene.add(sunLight);
   scene.add(new THREE.AmbientLight(0x0f172a, 0.15));
 
+  // Órbita (Capa 'orbits')
   const orbitRing = new THREE.Mesh(new THREE.RingGeometry(13.95, 14.05, 128), new THREE.MeshBasicMaterial({ color: 0x0284c7, side: THREE.DoubleSide, transparent: true, opacity: 0.4 }));
   orbitRing.rotation.x = Math.PI / 2;
   scene.add(orbitRing);
-  celestialState.activeMeshes.orbits = orbitRing;
+  registerLayerMesh('orbits', orbitRing);
 
   const earthHolder = new THREE.Group();
   scene.add(earthHolder);
 
-  const earthMat = new THREE.MeshPhysicalMaterial({ map: TEX.earth, roughness: 0.8, clearcoat: 0.8 });
+  const earthMat = createEarthDayNightMaterial(new THREE.Vector3(-1, 0, 0));
   const earth = new THREE.Mesh(new THREE.SphereGeometry(1.6, 64, 64), earthMat);
   earth.rotation.order = 'ZYX';
-  earth.rotation.z = THREE.MathUtils.degToRad(23.44);
+  earth.rotation.z = THREE.MathUtils.degToRad(23.44); // Inclinación fija inercial
   earthHolder.add(earth);
   earthHolder.add(makeAtmosphere(1.6, 0x3b82f6));
 
-  const axisGeom = new THREE.CylinderGeometry(0.02, 0.02, 5.0, 16);
+  const cloudsMat = new THREE.MeshStandardMaterial({ map: TEX.clouds, transparent: true, opacity: 0.38, depthWrite: false, blending: THREE.AdditiveBlending });
+  const clouds = new THREE.Mesh(new THREE.SphereGeometry(1.615, 64, 64), cloudsMat);
+  earth.add(clouds);
+
+  // Eje 23.44° (Capa 'axis')
+  const axisGeom = new THREE.CylinderGeometry(0.02, 0.02, 5.2, 16);
   const axisMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.9 });
   const axisMesh = new THREE.Mesh(axisGeom, axisMat);
   earth.add(axisMesh);
-  celestialState.activeMeshes.axis = axisMesh;
+  registerLayerMesh('axis', axisMesh);
 
+  // Rayos Solares Paralelos (Capa 'rays')
   const raysGroup = new THREE.Group();
   for (let i = -3; i <= 3; i++) {
-    const rayGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-13, i * 0.4, 0), new THREE.Vector3(0, i * 0.4, 0)]);
-    const rayLine = new THREE.Line(rayGeom, new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.5 }));
+    const rayGeom = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-13, i * 0.45, 0), new THREE.Vector3(0, i * 0.45, 0)]);
+    const rayLine = new THREE.Line(rayGeom, new THREE.LineBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.55 }));
     raysGroup.add(rayLine);
   }
   earthHolder.add(raysGroup);
-  celestialState.activeMeshes.rays = raysGroup;
+  registerLayerMesh('rays', raysGroup);
 
   addStars(1800, 220, 0.35, 0.7);
 
@@ -2898,6 +3166,11 @@ function buildCelestialSeasons() {
     earthHolder.position.set(ex, 0, ez);
 
     earth.rotation.y += dt * 0.5;
+    clouds.rotation.y += dt * 0.08;
+
+    const toSun = new THREE.Vector3(-ex, 0, -ez).normalize();
+    earthMat.uniforms.uSunDir.value.copy(toSun);
+
     raysGroup.rotation.y = Math.atan2(-ez, -ex);
   });
 

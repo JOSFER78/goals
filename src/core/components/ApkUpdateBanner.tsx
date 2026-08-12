@@ -29,9 +29,16 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
     }
   }, [isOpen]);
 
-  const handleDismissAndClose = () => {
+  const handleDismissAndClose = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    // Guardar descarte en localStorage (memoria)
     if (updateInfo?.latestVersion) {
       markUpdateDismissed(updateInfo.latestVersion);
+    } else {
+      markUpdateDismissed('1.0.1');
     }
     onClose();
   };
@@ -39,16 +46,23 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-      <div className="bg-[#0b0f19] border border-slate-800 w-full max-w-xs rounded-2xl p-4 space-y-4 shadow-2xl text-center font-display relative">
+    <div 
+      onClick={handleDismissAndClose}
+      className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn cursor-pointer"
+    >
+      <div 
+        onClick={(e) => e.stopPropagation()}
+        className="bg-[#0b0f19] border border-slate-800 w-full max-w-xs rounded-2xl p-4 space-y-4 shadow-2xl text-center font-display relative cursor-default"
+      >
         
-        {/* Botón Cerrar (Guarda memoria de descarte en localStorage) */}
+        {/* Botón 'X' destacado para cerrar (Guarda memoria de descarte) */}
         <button 
+          type="button"
           onClick={handleDismissAndClose}
-          className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors p-1"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white flex items-center justify-center transition-all active:scale-90 cursor-pointer z-10"
           title="Cerrar y recordar descarte"
         >
-          <X className="w-4 h-4" />
+          <X className="w-4 h-4 text-slate-300" />
         </button>
 
         {/* 1. Icono + Título */}
@@ -77,23 +91,39 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
           )}
         </div>
 
-        {/* 3. Botón de Acción Único */}
-        {updateInfo?.hasUpdate ? (
+        {/* 3. Botones de Acción */}
+        <div className="space-y-2">
+          {updateInfo?.hasUpdate ? (
+            <button
+              type="button"
+              onClick={() => {
+                triggerApkInstall(updateInfo.downloadUrl);
+                handleDismissAndClose();
+              }}
+              className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Download className="w-4 h-4" /> Descargar e Instalar
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCheckUpdate}
+              disabled={loading}
+              className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50 cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${loading ? 'animate-spin' : ''}`} /> Verificar Ahora
+            </button>
+          )}
+
+          {/* Botón de Cierre Secundario Explicito */}
           <button
-            onClick={() => triggerApkInstall(updateInfo.downloadUrl)}
-            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center justify-center gap-1.5"
+            type="button"
+            onClick={handleDismissAndClose}
+            className="w-full py-1 text-[11px] font-semibold text-slate-400 hover:text-slate-200 transition-colors cursor-pointer"
           >
-            <Download className="w-4 h-4" /> Descargar e Instalar
+            Cerrar y recordar más tarde
           </button>
-        ) : (
-          <button
-            onClick={handleCheckUpdate}
-            disabled={loading}
-            className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 disabled:opacity-50"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-emerald-400 ${loading ? 'animate-spin' : ''}`} /> Verificar Ahora
-          </button>
-        )}
+        </div>
 
       </div>
     </div>
