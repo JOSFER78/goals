@@ -18,17 +18,20 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Pantalla previa de bloqueo por Código de Invitación (3333)
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    return localStorage.getItem('goals_invite_unlocked') === 'true';
+  });
   const [enteredCode, setEnteredCode] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
 
   const handleVerifyCode = (e: React.FormEvent) => {
     e.preventDefault();
     if (enteredCode.trim() === '3333') {
+      localStorage.setItem('goals_invite_unlocked', 'true');
       setIsUnlocked(true);
       setCodeError(null);
     } else {
-      setCodeError('🔑 Código de invitación incorrecto. El código requerido es 3333.');
+      setCodeError('🔑 Código de invitación incorrecto. Acceso denegado.');
     }
   };
 
@@ -37,7 +40,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
     setAuthError(null);
 
     if (!isUnlocked && enteredCode.trim() !== '3333') {
-      setCodeError('🔑 Debes verificar primero el código de acceso 3333.');
+      setCodeError('🔑 Debes verificar primero el código de acceso.');
       return;
     }
 
@@ -61,7 +64,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   const handleGoogleAuth = async () => {
     setAuthError(null);
     if (!isUnlocked && enteredCode.trim() !== '3333') {
-      setCodeError('🔑 Debes introducir primero el código de acceso 3333 antes de continuar con Google.');
+      setCodeError('🔑 Debes introducir primero el código de acceso antes de continuar con Google.');
       return;
     }
 
@@ -76,7 +79,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
     }
   };
 
-  // 🔒 PANTALLA PREVIA OBLIGATORIA: CÓDIGO DE INVITACIÓN 3333
+  // 🔒 PANTALLA PREVIA OBLIGATORIA: CÓDIGO DE INVITACIÓN SECRETO
   if (!isUnlocked) {
     return (
       <div className="py-12 max-w-md mx-auto px-4 animate-fadeIn font-display">
@@ -99,7 +102,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
           <div className="space-y-2">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-widest">
               <Lock className="w-3 h-3" />
-              <span>Control de Acceso Requerido</span>
+              <span>Control de Acceso Secreto</span>
             </div>
 
             <h2 className="text-2xl font-black text-white leading-tight">
@@ -107,7 +110,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
             </h2>
 
             <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
-              Para poder registrarte o iniciar sesión (vía Email o con Google), primero debes introducir el código de acceso de 4 dígitos.
+              Para poder registrarte o iniciar sesión (vía Email o con Google), debes introducir tu clave secreta de acceso de 4 dígitos.
             </p>
           </div>
 
@@ -120,16 +123,16 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
           <form onSubmit={handleVerifyCode} className="space-y-4">
             <div>
               <input
-                type="text"
+                type="password"
                 maxLength={4}
                 required
                 autoFocus
                 value={enteredCode}
                 onChange={(e) => { setEnteredCode(e.target.value); setCodeError(null); }}
-                placeholder="3333"
+                placeholder="••••"
                 className="w-full text-center tracking-[0.4em] text-2xl font-black py-3.5 rounded-2xl bg-slate-950 border-2 border-amber-500/50 text-amber-300 placeholder-slate-600 focus:border-amber-400 transition-all outline-none shadow-inner"
               />
-              <p className="text-[10px] text-slate-500 mt-2 font-semibold">Código de acceso requerido: <span className="text-amber-400 font-bold">3333</span></p>
+              <p className="text-[10px] text-slate-500 mt-2 font-semibold">Introduce la clave secreta de 4 dígitos proporcionada por el administrador.</p>
             </div>
 
             <button
