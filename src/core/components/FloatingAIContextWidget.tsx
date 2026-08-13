@@ -90,6 +90,23 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Listener para sincronizar cambios de Mascota en tiempo real desde ProfileModal
+  useEffect(() => {
+    const syncMascot = () => {
+      const savedSkin = (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
+      const savedScale = parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
+      setCurrentSkinId(savedSkin);
+      setMascotScale(savedScale);
+    };
+
+    window.addEventListener('goals_mascot_updated', syncMascot);
+    window.addEventListener('storage', syncMascot);
+    return () => {
+      window.removeEventListener('goals_mascot_updated', syncMascot);
+      window.removeEventListener('storage', syncMascot);
+    };
+  }, []);
+
   const handleSelectSkin = async (skinId: MascotSkinId) => {
     setCurrentSkinId(skinId);
     localStorage.setItem('goals_mascot_skin', skinId);

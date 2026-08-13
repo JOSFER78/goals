@@ -3,6 +3,7 @@ import { Download, Shield, Globe, BookOpen, Orbit, RefreshCw, ChevronUp, HelpCir
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
 import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
 import { useProgress } from '../context/ProgressContext';
+import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
 
 interface FooterProps {
   onSelectExperience?: (expId: any) => void;
@@ -47,7 +48,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
 
   return (
     <>
-      <footer className="w-full bg-slate-950/95 border-t border-slate-800/80 text-slate-400 text-xs font-display backdrop-blur-md z-10 py-5 px-4 sm:px-8 mt-auto relative">
+      <footer className="w-full bg-slate-950/95 border-t border-slate-800/80 text-slate-400 text-xs font-display backdrop-blur-md z-10 py-5 px-4 sm:px-8 mt-auto relative snap-start">
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-4">
           
           {/* Fila Principal: Branding, Links de Navegación & Único Icono Android */}
@@ -56,9 +57,11 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
             {/* Columna 1: Branding GOALS */}
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center font-black text-indigo-400 text-xs">
-                  G
-                </div>
+                <img 
+                  src="/goals_platform_logo.png" 
+                  alt="GOALS Platform Logo" 
+                  className="w-7 h-7 rounded-lg border border-indigo-500/40 shadow-sm object-cover shrink-0" 
+                />
                 <span className="font-extrabold text-white text-sm tracking-tight">GOALS Platform</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
@@ -70,18 +73,20 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
             <div className="space-y-1.5">
               <h4 className="font-bold text-xs uppercase tracking-wider text-slate-300">Ecosistema</h4>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px]">
-                <button type="button" className="hover:text-emerald-400 flex items-center gap-1 transition-colors" onClick={() => onSelectExperience?.('school')}>
-                  <BookOpen className="w-3 h-3 text-emerald-400" /> Escuela IA
-                </button>
-                <button type="button" className="hover:text-cyan-400 flex items-center gap-1 transition-colors" onClick={() => onSelectExperience?.('languages')}>
-                  <Globe className="w-3 h-3 text-cyan-400" /> AstroLingo
-                </button>
-                <button type="button" className="hover:text-indigo-400 flex items-center gap-1 transition-colors" onClick={() => onSelectExperience?.('astro')}>
-                  <Orbit className="w-3 h-3 text-indigo-400" /> Astro 3D
-                </button>
-                <button type="button" className="hover:text-amber-400 flex items-center gap-1 transition-colors" onClick={() => onSelectExperience?.('verify')}>
-                  <Shield className="w-3 h-3 text-amber-400" /> Verifica
-                </button>
+                {Object.values(GOALS_EXPERIENCES).map((exp) => {
+                  const IconComp = exp.icon;
+                  return (
+                    <button
+                      key={exp.id}
+                      type="button"
+                      className={`hover:${exp.iconColorClass} flex items-center gap-1 transition-colors cursor-pointer`}
+                      onClick={() => onSelectExperience?.(exp.id)}
+                    >
+                      <IconComp className={`w-3 h-3 ${exp.iconColorClass}`} />
+                      <span>{exp.name}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -95,7 +100,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                 className="px-3.5 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/40 hover:border-emerald-400 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer group"
               >
                 <img src="/android-logo.png" alt="Android" className="w-4 h-4 object-contain group-hover:scale-110 transition-transform" />
-                <span className="text-emerald-400 font-mono">v2.2</span>
+                <span className="text-emerald-400 font-mono">v2.3</span>
                 <ChevronUp className={`w-3.5 h-3.5 text-emerald-400 transition-transform duration-200 ${isDropdownOpen ? '' : 'rotate-180'}`} />
               </button>
 
@@ -110,9 +115,9 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                       <div>
                         <h4 className="font-extrabold text-xs text-white leading-tight flex items-center gap-1">
                           <span>Android App</span>
-                          <span className="text-emerald-400 font-mono">v2.2.0</span>
+                          <span className="text-emerald-400 font-mono">v2.3.0</span>
                         </h4>
-                        <p className="text-[9px] text-slate-400 font-mono">goalskid2.2.zip</p>
+                        <p className="text-[9px] text-slate-400 font-mono">goalskid_2.3.zip</p>
                       </div>
                     </div>
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -120,15 +125,15 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
 
                   {/* Botón de Descargar Directa */}
                   <a
-                    href="https://goalskid.web.app/downloads/goalskid2.2.zip"
-                    download="goalskid2.2.zip"
+                    href="https://goalskid.web.app/downloads/goalskid_2.3.zip"
+                    download="goalskid_2.3.zip"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsDropdownOpen(false)}
                     className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Descargar goalskid2.2.zip</span>
+                    <span>Descargar goalskid_2.3.zip</span>
                   </a>
 
                   {/* Acciones Secundarias en Grilla */}

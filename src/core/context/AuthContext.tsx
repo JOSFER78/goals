@@ -114,35 +114,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Autenticación NATIVA con Google Play Services en Android
           const res = await FirebaseAuthentication.signInWithGoogle();
           const idToken = res.credential?.idToken;
-          if (!idToken) {
-            throw new Error("No se obtuvo el idToken nativo de Google.");
+          if (idToken) {
+            const credential = GoogleAuthProvider.credential(idToken);
+            await signInWithCredential(auth, credential);
+            setIsCloud(true);
+            setAuthError(null);
+            return;
           }
-          const credential = GoogleAuthProvider.credential(idToken);
-          await signInWithCredential(auth, credential);
-          setIsCloud(true);
         } catch (nativeErr: any) {
-          console.warn("Plugin nativo no disponible o falló:", nativeErr);
-          // Si el plugin nativo no está activo por falta de google-services.json, usar popup o mensaje limpio
-          try {
-            const res = await signInWithPopup(auth, googleProvider);
-            if (res.user) setIsCloud(true);
-          } catch (popupErr: any) {
-            setAuthError("💡 En la APK Nativa Móvil, por favor inicia sesión o regístrate usando tu Correo Electrónico y Contraseña.");
-          }
+          console.warn("Inicio de sesión nativo con Google cancelado o no disponible:", nativeErr);
+          setAuthError(null);
         }
       } else {
         // Autenticación WEB estándar en navegador
         const res = await signInWithPopup(auth, googleProvider);
         if (res.user) {
           setIsCloud(true);
+          setAuthError(null);
         }
       }
     } catch (err: any) {
       console.error("Google Auth Error:", err);
-      const msg = err.code === 'auth/popup-closed-by-user' 
-        ? 'Cancelado por el usuario.' 
-        : '💡 En la APK Nativa Móvil, usa tu Correo Electrónico y Contraseña para Iniciar Sesión de forma nativa e instantánea.';
-      setAuthError(msg);
+      setAuthError(null);
     }
   };
 
@@ -226,6 +219,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateUserProfileData = async (name: string, photoURL?: string) => {
     if (auth && auth.currentUser) {
       await updateProfile(auth.currentUser, { displayName: name, photoURL: photoURL || null });
+      if (db && auth.currentUser.uid && !auth.currentUser.isAnonymous) {
+        try {
+          await setDoc(doc(db, 'users', auth.currentUser.uid), {
+            displayName: name,
+            photoURL: photoURL || null
+          }, { merge: true });
+        } catch (e) {
+          console.warn("Error saving updated profile to Firestore:", e);
+        }
+      }
     }
     setUser((prev) => {
       if (!prev) return null;

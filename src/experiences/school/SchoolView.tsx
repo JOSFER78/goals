@@ -74,14 +74,14 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
     <div className="w-full space-y-4">
       {/* Banner de Modo Exploración Libre si no ha iniciado sesión */}
       {!isAuthenticated && (
-        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-wrap items-center justify-between gap-3 text-amber-300 text-xs">
+        <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex flex-wrap items-center justify-between gap-3 text-emerald-300 text-xs">
           <div className="flex items-center gap-2 font-medium">
-            <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+            <Lock className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>Navegación Libre: Puedes explorar la Mini App Escuela. Inicia sesión para usar el Tutor IA Real y acumular XP.</span>
           </div>
           <button
             onClick={() => onOpenAuth?.('signup')}
-            className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shrink-0 transition-all text-xs flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.3)] active:scale-95"
+            className="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black shrink-0 transition-all text-xs flex items-center gap-1.5 shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-95 cursor-pointer"
           >
             <Lock className="w-3.5 h-3.5" />
             <span>Desbloquear Todo</span>

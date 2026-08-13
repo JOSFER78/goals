@@ -421,11 +421,7 @@ const Auth={
   photoURL(){return this.user?(this.user.photoURL||null):null;},
   isAdmin(){return this.email().toLowerCase()==='josferestudio@gmail.com'||this.email().includes('admin');},
   registered(){
-    if(!this.user) return false;
-    if(this.user.isAnonymous) return false;
-    if(this.user.email) return true;
-    if(this.user.providerData && this.user.providerData.some(p => p.providerId !== 'anonymous')) return true;
-    return this.mode === 'cloud' && this.user.uid !== 'guest';
+    return true;
   },
   init(){
     if(firebaseReady){
@@ -1099,12 +1095,6 @@ function renderLearnHome(){
 /* ================= APRENDER (Detalle de Lección) ================= */
 let currentLesson=null,currentStepIdx=0;
 window.openLesson=function(id){
-  if (!Auth.registered()) {
-    try { window.parent.postMessage('AUTH_REQUIRED', '*'); } catch(e) {}
-    toast('🔒 Debes iniciar sesión o registrarte para realizar las lecciones.');
-    if (typeof openGoogleGuestModal === 'function') openGoogleGuestModal(id);
-    return;
-  }
   currentLesson=LESSONS.find(l=>l.id===id);currentStepIdx=0;
   state.view='step';renderLessonStep();
 };
@@ -1229,12 +1219,6 @@ function renderTestsHome(){
 /* ================= EJECUCIÓN DE TEST ================= */
 let testIdx=0,testScore=0,selectedOption=null,userOrder=[];
 window.startTestForLesson=function(id){
-  if (!Auth.registered()) {
-    try { window.parent.postMessage('AUTH_REQUIRED', '*'); } catch(e) {}
-    toast('🔒 Debes iniciar sesión o registrarte para hacer los tests.');
-    if (typeof openGoogleGuestModal === 'function') openGoogleGuestModal(id);
-    return;
-  }
   currentLesson=LESSONS.find(l=>l.id===id);
   state.view='test';testIdx=0;testScore=0;
   quiz=shuffle([...currentLesson.test]);

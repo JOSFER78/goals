@@ -6,6 +6,12 @@ node_modules
 dist
 build
 
+# Large APK / ZIP binaries
+public/downloads/*.apk
+public/downloads/*.zip
+dist/downloads/*.apk
+dist/downloads/*.zip
+
 # Firebase & Local config
 .firebase
 .DS_Store

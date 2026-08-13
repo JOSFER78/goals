@@ -89,6 +89,7 @@ const MainContent: React.FC = () => {
 
   const handleNavigateHome = () => {
     setActiveExperience(null);
+    setIsAuthViewOpen(false);
   };
 
   return (

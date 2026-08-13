@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { db, collection, onSnapshot } from '../config/firebase';
-import { Zap, Flame, ArrowLeft, Shield, LogIn, UserPlus, Bot } from 'lucide-react';
+import { Zap, Flame, Star, ArrowLeft, Shield, LogIn, User, Bot } from 'lucide-react';
 import { ExperienceId } from '../types';
+import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
 
 interface HeaderProps {
   activeExperience: ExperienceId | null;
@@ -25,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleMascot
 }) => {
   const { user, isCloud } = useAuth();
-  const { userData } = useProgress();
+  const { userData, totalStars } = useProgress();
   const [pendingCount, setPendingCount] = useState<number>(0);
 
   const isAdmin = user?.email === 'josferestudio@gmail.com';
@@ -47,64 +48,62 @@ export const Header: React.FC<HeaderProps> = ({
   }, [isAdmin]);
 
   const initial = user?.displayName ? user.displayName[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : 'E');
-
-  const EXPERIENCE_TITLES: Record<ExperienceId, { name: string; tag: string }> = {
-    astro: { name: 'Astro', tag: 'Astrofísica 3D' },
-    languages: { name: 'Idiomas', tag: 'Práctica de Voz' },
-    school: { name: 'Escolar', tag: 'Tutor IA' },
-    verify: { name: 'Verifica', tag: 'Investigación' },
-    galaxy: { name: 'Galaxy', tag: 'Exploración' }
-  };
+  const activeExpConfig = activeExperience ? GOALS_EXPERIENCES[activeExperience] : null;
 
   return (
-    <header className="p-2 px-3 sm:px-5 flex justify-between items-center border-b border-slate-800 bg-slate-950/95 backdrop-blur-md z-30 sticky top-0 shadow-md">
+    <header className="p-2 px-3 sm:px-5 flex justify-between items-center border-b border-slate-800 bg-slate-950/95 backdrop-blur-md z-50 sticky top-0 shadow-lg select-none">
       
-      {/* Sección Izquierda: Logotipo o Migas de Pan */}
+      {/* Sección Izquierda: Logotipo [G] GOALS SIEMPRE VISIBLE + Migas de Pan */}
       <div className="flex items-center gap-2">
-        {activeExperience ? (
-          <div className="flex items-center gap-2">
-            <button
-              onClick={onNavigateHome}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-all active:scale-95"
-              title="Volver al Dashboard de GOALS"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Volver a GOALS</span>
-              <span className="sm:hidden">GOALS</span>
-            </button>
-            <span className="text-slate-600 text-xs font-bold">/</span>
-            <div className="flex items-center gap-1">
-              <span className="font-display font-bold text-xs sm:text-sm tracking-tight text-white">
-                {EXPERIENCE_TITLES[activeExperience]?.name || 'Astro'}
-              </span>
-              <span className="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] font-semibold">
-                GOALS
-              </span>
-            </div>
-          </div>
-        ) : (
-          <div 
-            className="flex items-center gap-2 cursor-pointer group"
-            onClick={onNavigateHome}
-          >
-            <div className="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center font-display font-black text-indigo-400 text-xs shadow-sm group-hover:scale-105 transition-transform">
-              G
-            </div>
-            <div>
+        <button 
+          type="button"
+          onClick={onNavigateHome}
+          className="flex items-center gap-2 cursor-pointer group shrink-0 text-left bg-transparent border-0 p-0 focus:outline-none"
+          title="Ir al Inicio de GOALS"
+        >
+          <img 
+            src="/goals_platform_logo.png" 
+            alt="GOALS Logo" 
+            className="w-8 h-8 rounded-lg border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.4)] object-cover group-hover:scale-105 transition-transform shrink-0" 
+          />
+          {!activeExpConfig && (
+            <div className="hidden xs:block">
               <h1 className="font-display font-bold text-sm tracking-tight text-white leading-none">
                 GOALS
               </h1>
               <p className="text-[9px] text-slate-400 font-medium">Plataforma Educativa</p>
             </div>
+          )}
+        </button>
+
+        {activeExpConfig && (
+          <div className="flex items-center gap-1.5 ml-1">
+            <span className="text-slate-600 text-xs font-bold">/</span>
+            <button
+              type="button"
+              onClick={onNavigateHome}
+              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-300 hover:text-white transition-all active:scale-95 cursor-pointer"
+              title="Volver a GOALS"
+            >
+              <ArrowLeft className="w-3 h-3 text-slate-400" />
+              <span className="hidden sm:inline text-[11px]">Volver</span>
+            </button>
+            <span className="text-slate-600 text-xs font-bold">/</span>
+            <div className={`px-2 py-0.5 rounded-full border text-[10px] font-extrabold flex items-center gap-1 ${activeExpConfig.badgeClass}`}>
+              <activeExpConfig.icon className="w-3 h-3" />
+              <span>{activeExpConfig.name}</span>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Sección Derecha: Métricas, Perfil o Autenticación (Limpio y Espacioso) */}
+      {/* Sección Derecha: Botón Pet IA, Admin, Métricas de Gamificación y Perfil */}
       <div className="flex items-center gap-2">
         
+        {/* Toggle Mascota IA */}
         {onToggleMascot && (
           <button
+            type="button"
             onClick={onToggleMascot}
             className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer ${
               isMascotMinimized
@@ -118,10 +117,12 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
+        {/* Botón Admin */}
         {isAdmin && onOpenAdmin && (
           <button
+            type="button"
             onClick={onOpenAdmin}
-            className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 border border-amber-500/40 text-amber-300 hover:bg-slate-800 transition-all flex items-center gap-1.5 relative shadow-sm"
+            className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 border border-amber-500/40 text-amber-300 hover:bg-amber-500/20 transition-all flex items-center gap-1.5 relative shadow-sm cursor-pointer active:scale-95"
             title="Panel de Administración"
           >
             <Shield className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -134,41 +135,68 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
+        {/* Si el usuario ESTÁ AUTENTICADO: muestra métricas y botón de perfil */}
         {isAuthenticated ? (
           <>
-            <div className="flex items-center gap-1 text-amber-400 font-bold text-xs bg-amber-400/10 px-2 py-1 rounded-lg border border-amber-400/20">
+            <button
+              type="button"
+              onClick={onOpenProfile}
+              className="flex items-center gap-1 text-amber-400 font-bold text-xs bg-amber-400/10 hover:bg-amber-400/20 px-2 py-1 rounded-lg border border-amber-400/20 transition-all active:scale-95 cursor-pointer"
+              title="Tus Puntos de Experiencia (XP) - Ver Perfil"
+            >
               <Zap className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>{userData.xp}</span>
-            </div>
+              <span>{userData?.xp || 0}</span>
+            </button>
             
-            <div className="flex items-center gap-1 text-rose-400 font-bold text-xs bg-rose-400/10 px-2 py-1 rounded-lg border border-rose-400/20">
+            <button
+              type="button"
+              onClick={onOpenProfile}
+              className="flex items-center gap-1 text-rose-400 font-bold text-xs bg-rose-400/10 hover:bg-rose-400/20 px-2 py-1 rounded-lg border border-rose-400/20 transition-all active:scale-95 cursor-pointer"
+              title="Tu Racha Diaria de Conexión - Ver Perfil"
+            >
               <Flame className="w-3.5 h-3.5 fill-rose-400 text-rose-400" />
-              <span>{userData.streak}</span>
-            </div>
+              <span>{userData?.streak || 1}</span>
+            </button>
 
             <button
+              type="button"
               onClick={onOpenProfile}
-              className="w-7 h-7 rounded-lg border border-emerald-500/40 bg-slate-900 text-emerald-300 flex items-center justify-center font-bold text-xs transition-all transform hover:scale-105 active:scale-95 shadow-md overflow-hidden"
-              title="Ver Perfil"
+              className="hidden sm:flex items-center gap-1 text-yellow-400 font-bold text-xs bg-yellow-400/10 hover:bg-yellow-400/20 px-2 py-1 rounded-lg border border-yellow-400/20 transition-all active:scale-95 cursor-pointer"
+              title="Tus Estrellas Conseguidas - Ver Perfil"
             >
-              {user?.photoURL ? (
+              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+              <span>{totalStars()}</span>
+            </button>
+
+            {/* Avatar de Perfil de Usuario Autenticado */}
+            <button
+              type="button"
+              onClick={onOpenProfile}
+              className="w-7 h-7 rounded-lg border border-indigo-500/40 bg-slate-900 hover:bg-indigo-950/60 text-indigo-300 flex items-center justify-center font-bold text-xs transition-all transform hover:scale-105 active:scale-95 shadow-md overflow-hidden cursor-pointer shrink-0"
+              title="Ver Perfil de Usuario"
+            >
+              {user?.photoURL && (user.photoURL.startsWith('http') || user.photoURL.startsWith('/') || user.photoURL.startsWith('data:')) ? (
                 <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
               ) : (
-                <span>{initial}</span>
+                <span className="text-sm">{user?.photoURL || initial || '👽'}</span>
               )}
             </button>
           </>
         ) : (
+          /* Si NO ESTÁ AUTENTICADO: ÚNICAMENTE botón de Acceso / Registro (sin icono de perfil ni salir) */
           <button
+            type="button"
             onClick={() => onOpenAuth?.('login')}
-            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-extrabold shadow-md shadow-indigo-600/30 transition-all flex items-center gap-1.5 active:scale-95"
+            className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-extrabold shadow-md shadow-indigo-600/30 transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer"
             title="Acceso o Registro de Usuario"
           >
             <LogIn className="w-3.5 h-3.5" />
             <span>Acceso / Registro</span>
           </button>
         )}
+
       </div>
     </header>
   );
 };
+

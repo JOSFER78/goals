@@ -36,10 +36,10 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
   const SLIDES: MiniAppSlide[] = [
     {
       id: 'school',
-      name: 'Escuela',
+      name: 'Escuela IA',
       icon: '📚',
       tagline: 'Tutor IA Multimodal & OCR de Cuadernos Manuscritos',
-      badgeTag: 'Mini App #1 Principal',
+      badgeTag: 'Tutor & OCR',
       themeColor: '#10b981',
       cardBorder: 'border-emerald-500/50',
       glowShadow: 'shadow-[0_0_30px_rgba(16,185,129,0.2)]',
@@ -58,7 +58,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
     },
     {
       id: 'languages',
-      name: 'Idiomas',
+      name: 'Idiomas Voz',
       icon: '🌐',
       tagline: 'AstroLingo Conversacional & Profesor de Voz en Tiempo Real',
       badgeTag: 'Voz & Memoria IA',
@@ -80,7 +80,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
     },
     {
       id: 'astro',
-      name: 'AstroLingo',
+      name: 'AstroLingo 3D',
       icon: '🪐',
       tagline: 'Astrofísica, Misiones Espaciales & Laboratorio 3D NASA',
       badgeTag: 'Visor 3D NASA',
@@ -89,36 +89,37 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
       glowShadow: 'shadow-[0_0_30px_rgba(99,102,241,0.2)]',
       bgGradient: 'from-indigo-950/90 via-slate-950 to-slate-950',
       badgeBg: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
-      btnBg: 'bg-indigo-500 hover:bg-indigo-400 text-slate-950 font-black shadow-[0_0_20px_rgba(99,102,241,0.4)]',
-      heading: 'Exploración Espacial 3D Fotorrealista en 8 Escalas',
-      description: 'Navega en 3D interactivo a través de 8 escalas del Universo: desde la órbita Tierra-Luna hasta el agujero negro supermasivo M87*.',
-      image: 'https://images.unsplash.com/photo-1614730321146-b6fa6a46bcb4?q=80&w=800&auto=format&fit=crop',
+      btnBg: 'bg-indigo-600 hover:bg-indigo-500 text-white font-black shadow-[0_0_20px_rgba(99,102,241,0.4)]',
+      heading: 'Simulador 3D en Vivo con Datos Oficiales de NASA & ESA',
+      description: 'Viaja por el sistema solar a escala interactiva 3D con shaders procedimentales y físicas reales de órbitas keplerianas.',
+      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop',
       bullets: [
-        'Simulador 3D en tiempo real con controles de órbita y Three.js',
-        'Lecciones de misiones reales: Artemis II, Starship Raptor 3 y Webb',
-        'Tests dinámicos con preguntas de ordenación cronológica espacial',
-        'Visualizador de texturas procedimentales e iluminación de la NASA'
+        'Renderizado 3D fotorrealista del Sistema Solar en 8 escalas astronómicas',
+        'Simulación en directo de eclipses, oblicuidad de 23.44° y fases lunares',
+        '18 lecciones gamificadas con misiones Artemis, Starship y James Webb',
+        'Consigue hasta 3 estrellas por lección y desbloquea insignias'
       ]
     },
     {
       id: 'verify',
       name: 'Verifica',
       icon: '🛡️',
-      tagline: 'Investigación & Contraste con Fuentes Científicas Oficiales',
-      badgeTag: 'Rigor & Evidencia',
+      tagline: 'Detector de Bulos Científicos & Auditor de Noticias con IA',
+      badgeTag: 'Rigor & Fuentes Primarias',
       themeColor: '#f59e0b',
       cardBorder: 'border-amber-500/50',
       glowShadow: 'shadow-[0_0_30px_rgba(245,158,11,0.2)]',
       bgGradient: 'from-amber-950/90 via-slate-950 to-slate-950',
       badgeBg: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
       btnBg: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-black shadow-[0_0_20px_rgba(245,158,11,0.4)]',
-      heading: 'Verificación Científica y Auditoría de Información',
-      description: 'Contrasta noticias, titulares y afirmaciones en tiempo real con bases de datos científicas oficiales de la NASA y la ESA.',
-      image: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=800&auto=format&fit=crop',
+      heading: 'Investigador y Verificador de Información en Tiempo Real',
+      description: 'Introduce cualquier noticia, titular o rumor: la IA lo contrasta con papers científicos y bases de datos oficiales.',
+      image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
       bullets: [
-        'Búsqueda y análisis de fuentes de información primarias',
-        'Evaluación del nivel de evidencia científica oficial',
-        'Informes claros de verificación estructurados para estudiantes'
+        'Análisis de credibilidad con porcentaje de veracidad',
+        'Citas directas con hipervínculos a fuentes científicas primarias',
+        'Explicación clara de por qué un titular es falso, manipulado o real',
+        'Fomento del pensamiento crítico frente a la desinformación'
       ]
     }
   ];
@@ -144,27 +145,11 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
   return (
     <div className="relative w-full text-slate-100 font-display">
 
-      {/* CONTROLES NAVEGACIÓN FLOTANTE LATERAL (Fijo en pantalla) */}
-      <div className="fixed right-3 top-1/2 -translate-y-1/2 z-40 flex flex-col items-center gap-2 bg-slate-950/90 border border-slate-800/90 p-2 rounded-full backdrop-blur-md shadow-2xl">
-        {[1, 2, 3, 4, 5].map((sec) => (
-          <button
-            key={sec}
-            onClick={() => scrollToSection(sec)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              activeTab === sec 
-                ? 'h-6 bg-gradient-to-b from-cyan-400 to-indigo-500 shadow-[0_0_12px_rgba(34,211,238,0.9)]' 
-                : 'bg-slate-700 hover:bg-slate-500'
-            }`}
-            title={`Ir al bloque ${sec}`}
-          />
-        ))}
-      </div>
-
       {/* Contenedor Responsivo Full-Width (Estilo Unificado AstroLingo) */}
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
 
         {/* ========================================================================= */}
-        {/* BLOQUE 1: HERO FUTURISTA 3D CON INFOGRAFÍA VECTORIAL CIBERNÉTICA */}
+        {/* BLOQUE 1: HERO FUTURISTA 3D CON PRESENTACIÓN OFICIAL DE GOALS */}
         {/* ========================================================================= */}
         <section 
           id="section-snap-1" 
@@ -176,19 +161,31 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
             <div className="absolute -top-32 -left-32 w-64 h-64 bg-indigo-600/20 rounded-full blur-[90px] pointer-events-none" />
             <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-emerald-500/20 rounded-full blur-[90px] pointer-events-none" />
 
-            {/* Header del Hero */}
-            <div className="space-y-1.5 z-10 max-w-xl">
+            {/* Header del Hero con Logo de GOALS y Copy Presentación */}
+            <div className="flex flex-col items-center gap-2.5 z-10 max-w-xl my-auto">
+              
+              <div className="relative group cursor-pointer">
+                <img
+                  src="/goals_platform_logo.png"
+                  alt="GOALS Platform Logo"
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl border-2 border-indigo-500/40 shadow-[0_0_30px_rgba(99,102,241,0.4)] object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute -bottom-1.5 -right-1.5 px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 text-[9px] font-black uppercase tracking-wider border border-slate-950 shadow-md">
+                  v2.2 IA
+                </div>
+              </div>
+
               <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-[10px] font-black uppercase tracking-widest shadow-[0_0_15px_rgba(99,102,241,0.2)]">
                 <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '4s' }} />
-                <span>Ecosistema de Inteligencia Educativa</span>
+                <span>Plataforma de Inteligencia Educativa</span>
               </div>
 
               <h1 className="text-2xl sm:text-4xl font-black tracking-tight text-white leading-tight">
-                Bienvenido a <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(34,211,238,0.4)]">GOALS</span>
+                Ecosistema Educativo <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-indigo-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(34,211,238,0.4)]">GOALS</span>
               </h1>
               
-              <p className="text-[11px] sm:text-xs text-slate-300 max-w-lg mx-auto leading-relaxed line-clamp-2">
-                La primera plataforma integral donde tus lecciones de clase, práctica de idiomas por voz y laboratorios 3D se conectan en un solo perfil.
+              <p className="text-[11px] sm:text-xs text-slate-300 max-w-lg mx-auto leading-relaxed font-sans">
+                La solución pedagógica integral donde tus deberes manuscritos con tutor OCR, profesor conversacional de voz IA, simuladores astrofísicos 3D y análisis de veracidad científica conviven en un solo espacio gamificado.
               </p>
             </div>
 

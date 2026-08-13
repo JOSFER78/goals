@@ -153,11 +153,14 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         setUserData(loadedData);
         if (isCloud && db && user?.uid && !user.isAnonymous) {
           try {
-            setDoc(doc(db, 'users', user.uid), {
+            const updatePayload: any = {
               email: user.email,
               displayName: user.displayName,
-              isApproved: loadedData.isApproved
-            }, { merge: true });
+            };
+            if (loadedData.isApproved === true || isAdminUser) {
+              updatePayload.isApproved = true;
+            }
+            setDoc(doc(db, 'users', user.uid), updatePayload, { merge: true });
           } catch (e) {}
         }
         persistData(loadedData);

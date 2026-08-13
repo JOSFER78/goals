@@ -290,7 +290,6 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
           <div className="text-left flex-1 min-w-0">
             <p className="text-[11px] font-bold text-white flex items-center gap-1">
               <span>App Nativa para Android</span>
-              <span className="px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 text-[9px] font-extrabold border border-emerald-400/30">v2.0 ZIP</span>
             </p>
             <p className="text-[10px] text-slate-400">Instala GOALS directamente en tu dispositivo móvil.</p>
           </div>
