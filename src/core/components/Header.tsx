@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { db, collection, onSnapshot } from '../config/firebase';
-import { Zap, Flame, ArrowLeft, Shield, LogIn, UserPlus } from 'lucide-react';
+import { Zap, Flame, ArrowLeft, Shield, LogIn, UserPlus, Bot } from 'lucide-react';
 import { ExperienceId } from '../types';
 
 interface HeaderProps {
@@ -11,6 +11,8 @@ interface HeaderProps {
   onOpenProfile: () => void;
   onOpenAdmin?: () => void;
   onOpenAuth?: (mode: 'login' | 'signup') => void;
+  isMascotMinimized?: boolean;
+  onToggleMascot?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,7 +20,9 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigateHome,
   onOpenProfile,
   onOpenAdmin,
-  onOpenAuth
+  onOpenAuth,
+  isMascotMinimized = false,
+  onToggleMascot
 }) => {
   const { user, isCloud } = useAuth();
   const { userData } = useProgress();
@@ -99,6 +103,21 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Sección Derecha: Métricas, Perfil o Autenticación (Limpio y Espacioso) */}
       <div className="flex items-center gap-2">
         
+        {onToggleMascot && (
+          <button
+            onClick={onToggleMascot}
+            className={`px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer ${
+              isMascotMinimized
+                ? 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                : 'bg-indigo-950/60 border-indigo-500/40 text-indigo-300 hover:bg-indigo-900/50'
+            }`}
+            title={isMascotMinimized ? "Mostrar Mascota Asomada" : "Ocultar / Minimizar Mascota"}
+          >
+            <Bot className={`w-3.5 h-3.5 ${isMascotMinimized ? 'text-slate-500' : 'text-indigo-400 animate-pulse'} shrink-0`} />
+            <span className="hidden sm:inline">{isMascotMinimized ? 'Pet Inactivo' : 'Pet IA'}</span>
+          </button>
+        )}
+
         {isAdmin && onOpenAdmin && (
           <button
             onClick={onOpenAdmin}

@@ -67,6 +67,19 @@ const MainContent: React.FC = () => {
     xpMultiplier: 1
   });
 
+  // Estado de Minimización / Asomado de la Mascota
+  const [isMascotMinimized, setIsMascotMinimized] = useState<boolean>(() => {
+    return localStorage.getItem('goals_mascot_minimized') === 'true';
+  });
+
+  const handleToggleMascot = () => {
+    setIsMascotMinimized((prev) => {
+      const next = !prev;
+      localStorage.setItem('goals_mascot_minimized', String(next));
+      return next;
+    });
+  };
+
   const isAuthenticated = isCloud && user && !user.isAnonymous;
   const isApproved = isAdmin || userData?.isApproved === true || user?.isApproved === true;
 
@@ -91,6 +104,8 @@ const MainContent: React.FC = () => {
           setAuthViewMode(mode);
           setIsAuthViewOpen(true);
         }}
+        isMascotMinimized={isMascotMinimized}
+        onToggleMascot={handleToggleMascot}
       />
 
       {/* Área Principal de Contenido */}
@@ -185,6 +200,8 @@ const MainContent: React.FC = () => {
           setAuthViewMode(mode);
           setIsAuthViewOpen(true);
         }}
+        isMinimized={isMascotMinimized}
+        onToggleMinimize={handleToggleMascot}
       />
 
     </div>

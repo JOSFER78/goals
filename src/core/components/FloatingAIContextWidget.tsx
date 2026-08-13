@@ -13,11 +13,15 @@ import { useMascotTTS } from '../hooks/useMascotTTS';
 interface FloatingAIContextWidgetProps {
   activeExperience: string | null;
   onOpenAuth?: (mode: 'login' | 'signup') => void;
+  isMinimized?: boolean;
+  onToggleMinimize?: () => void;
 }
 
 export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = ({
   activeExperience,
-  onOpenAuth
+  onOpenAuth,
+  isMinimized = false,
+  onToggleMinimize
 }) => {
   const { user, isCloud } = useAuth();
   const isAuthenticated = isCloud && user && !user.isAnonymous;
@@ -72,6 +76,25 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
+
+  // Recalcular límites de pantalla al redimensionar la ventana para que la mascota nunca se salga
+  useEffect(() => {
+    const handleResize = () => {
+      setPosition((prevPos) => {
+        if (prevPos.x === undefined || prevPos.y === undefined) return prevPos;
+        const mascotW = dragRef.current ? dragRef.current.offsetWidth : 80;
+        const mascotH = dragRef.current ? dragRef.current.offsetHeight : 80;
+        const maxX = Math.max(12, window.innerWidth - mascotW - 12);
+        const maxY = Math.max(12, window.innerHeight - mascotH - 12);
+        return {
+          x: Math.max(12, Math.min(prevPos.x, maxX)),
+          y: Math.max(12, Math.min(prevPos.y, maxY))
+        };
+      });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Cambiar Skin de la Mascota y guardar en Firestore
   const handleSelectSkin = async (skinId: MascotSkinId) => {
@@ -249,11 +272,16 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
       let newLeft = pointerStartRef.current.startLeft + dx;
       let newTop = pointerStartRef.current.startTop + dy;
 
-      const maxLeft = window.innerWidth - 120;
-      const maxTop = window.innerHeight - 120;
+      const mascotW = dragRef.current ? dragRef.current.offsetWidth : (64 * mascotScale);
+      const mascotH = dragRef.current ? dragRef.current.offsetHeight : (64 * mascotScale);
 
-      newLeft = Math.max(10, Math.min(newLeft, maxLeft));
-      newTop = Math.max(10, Math.min(newTop, maxTop));
+      const minX = 12;
+      const maxX = Math.max(12, window.innerWidth - mascotW - 12);
+      const minY = 12;
+      const maxY = Math.max(12, window.innerHeight - mascotH - 12);
+
+      newLeft = Math.max(minX, Math.min(newLeft, maxX));
+      newTop = Math.max(minY, Math.min(newTop, maxY));
 
       setPosition({ x: newLeft, y: newTop });
     }
@@ -268,6 +296,35 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
     }
     setIsDragging(false);
   };
+
+  if (isMinimized) {
+    return (
+      <>
+        {/* Mascota Asomándose sutilmente en el borde de la pantalla (Peek Mode) */}
+        <div
+          onClick={onToggleMinimize}
+          className="fixed bottom-4 right-0 z-50 flex items-center gap-1.5 p-1.5 pl-2.5 rounded-l-2xl bg-slate-950/90 border-l border-t border-b border-indigo-500/40 shadow-[0_0_25px_rgba(99,102,241,0.5)] backdrop-blur-md cursor-pointer group hover:translate-x-0 translate-x-2 transition-all duration-300 font-display select-none animate-fadeIn"
+          title="Mascota Asomada — Haz clic para expandir"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <div className="scale-75 origin-right">
+            <MascotPet skinId={currentSkinId} animState="idle" scale={0.6} />
+          </div>
+          <span className="text-[10px] font-extrabold text-indigo-300 pr-1 group-hover:text-white transition-colors">
+            {currentSkin.name}
+          </span>
+        </div>
+
+        {isSkinModalOpen && (
+          <MascotSkinSelectorModal
+            currentSkinId={currentSkinId}
+            onSelectSkin={handleSelectSkin}
+            onClose={() => setIsSkinModalOpen(false)}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>
@@ -295,13 +352,13 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
                   {currentSkin.avatarIcon}
                 </span>
                 <div>
-                  <div className="flex items-center gap-1.5">
-                    <h3 className="font-display font-extrabold text-xs text-white">{currentSkin.name} Copilot</h3>
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  </div>
-                  <p className="text-[10px] text-indigo-300 font-medium">
-                    {activeExperience ? `Viendo: ${activeExperience.toUpperCase()}` : 'Viendo: Inicio GOALS'}
-                  </p>
+                  <h3 className="font-extrabold text-sm text-white flex items-center gap-1.5">
+                    <span>{currentSkin.name}</span>
+                    <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-semibold border border-indigo-500/30">
+                      Tutor IA
+                    </span>
+                  </h3>
+                  <p className="text-[10px] text-indigo-300 font-medium">Asistente Didáctico con Memoria</p>
                 </div>
               </div>
 
@@ -310,10 +367,10 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
                 <button
                   type="button"
                   onClick={toggleMute}
-                  className={`p-1.5 rounded-lg text-xs transition-all cursor-pointer ${
-                    isMuted ? 'text-rose-400 bg-rose-500/10' : 'text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20'
+                  className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
+                    isMuted ? 'text-slate-500 hover:text-slate-300' : 'text-amber-400 bg-amber-400/10 border border-amber-400/20'
                   }`}
-                  title={isMuted ? 'Voz desactivada' : 'Voz didáctica activa'}
+                  title={isMuted ? "Activar Voz TTS" : "Desactivar Voz TTS"}
                 >
                   {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 animate-pulse" />}
                 </button>
@@ -383,28 +440,25 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
             <div className="flex-1 p-3.5 space-y-3 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-900">
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-2.5 text-slate-400">
-                  <span className="text-4xl animate-bounce">{currentSkin.avatarIcon}</span>
-                  <h4 className="font-bold text-xs text-slate-200">¡Hola! Soy {currentSkin.name}</h4>
-                  <p className="text-[11px] text-slate-400 max-w-[260px]">
-                    Veo automáticamente la lección y los gráficos en tu pantalla. ¡Hazme cualquier pregunta o pídeme explicaciones paso a paso!
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-md">
+                    <Sparkles className="w-6 h-6 animate-pulse" />
+                  </div>
+                  <h4 className="font-extrabold text-sm text-white">¡Hola! Soy {currentSkin.name}</h4>
+                  <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
+                    Estoy leyendo el contexto de lo que ves en pantalla. Puedes preguntarme cualquier duda sobre esta página o pedirme explicaciones paso a paso.
                   </p>
                 </div>
               ) : (
                 messages.map((m, idx) => (
                   <div
                     key={idx}
-                    className={`flex gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
                   >
-                    {m.role === 'assistant' && (
-                      <span className="text-lg p-1 bg-slate-900 rounded-lg border border-slate-800 shrink-0 self-start">
-                        {currentSkin.avatarIcon}
-                      </span>
-                    )}
                     <div
-                      className={`p-3 rounded-2xl text-xs max-w-[85%] leading-relaxed ${
+                      className={`max-w-[88%] p-3 rounded-2xl text-xs leading-relaxed ${
                         m.role === 'user'
-                          ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-br-none shadow-md font-medium'
-                          : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none shadow-sm space-y-1'
+                          ? 'bg-indigo-600 text-white rounded-br-none shadow-md'
+                          : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none shadow-md font-sans'
                       }`}
                     >
                       {m.content}
@@ -454,6 +508,21 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
           onPointerUp={handlePointerUp}
           className="group relative cursor-grab active:cursor-grabbing"
         >
+          {/* Botón X discreto al pasar el ratón para ocultar/asomar */}
+          {onToggleMinimize && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleMinimize();
+              }}
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900 border border-slate-700 hover:border-rose-500 text-slate-400 hover:text-rose-400 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-all z-30 shadow-md cursor-pointer active:scale-90"
+              title="Asomar mascota al borde de la pantalla (Minimizar)"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
+
           <MascotPet skinId={currentSkinId} animState={animState} scale={mascotScale} />
         </div>
       </div>
