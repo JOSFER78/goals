@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, Settings, Move, Maximize2, Minimize2, ChevronLeft, ChevronUp, ChevronDown, Mic, MicOff } from 'lucide-react';
-import { askAI, ChatMessage } from '../services/aiService';
+import { 
+  Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, 
+  Settings, Move, Maximize2, Minimize2, ChevronLeft, ChevronUp, ChevronDown, 
+  Mic, MicOff, AudioLines, Palette, Zap, RotateCcw, Check, Sparkle, Paperclip, Camera
+} from 'lucide-react';
+import { askAI, ChatMessage, buildChildSystemPrompt, getCustomMascotName } from '../services/aiService';
 import { useAuth } from '../context/AuthContext';
 import { db, collection, addDoc, doc, setDoc } from '../config/firebase';
 
@@ -9,12 +13,20 @@ import { MASCOT_SKINS } from '../config/mascotSkins';
 import { MascotPet } from './mascot/MascotPet';
 import { MascotSkinSelectorModal } from './mascot/MascotSkinSelectorModal';
 import { useMascotTTS } from '../hooks/useMascotTTS';
+import { VoiceListeningModal } from './VoiceListeningModal';
+import { DidacticResponseRenderer } from './DidacticResponseRenderer';
 
 interface FloatingAIContextWidgetProps {
   activeExperience: string | null;
   onOpenAuth?: (mode: 'login' | 'signup') => void;
   isMinimized?: boolean;
   onToggleMinimize?: () => void;
+}
+
+interface ContextMenuState {
+  visible: boolean;
+  x: number;
+  y: number;
 }
 
 export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = ({
@@ -32,14 +44,28 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
   const currentSkin = MASCOT_SKINS[currentSkinId] || MASCOT_SKINS.astrobot;
 
   const [isOpen, setIsOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false); // Modo Píldora (false) vs Modo Extendido (true)
-  const [isVoiceActive, setIsVoiceActive] = useState(false); // Voz a Voz Live
+  const [isExpanded, setIsExpanded] = useState(false); // Modo Píldora vs Extendido
+  const [isVoiceActive, setIsVoiceActive] = useState(false); // Conversación Voz a Voz Live
+  const [isDictating, setIsDictating] = useState(false); // Dictado por voz en input
   const [isSkinModalOpen, setIsSkinModalOpen] = useState(false);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [animState, setAnimState] = useState<MascotAnimState>('idle');
+
+  // Tamaño personalizable de la ventana extendida (Redimensionable desde la Esquina Superior Izquierda)
+  const [windowSize, setWindowSize] = useState<{ width: number; height: number }>(() => {
+    const savedW = parseInt(localStorage.getItem('goals_chat_w') || '380', 10);
+    const savedH = parseInt(localStorage.getItem('goals_chat_h') || '480', 10);
+    return { width: savedW, height: savedH };
+  });
+
+  const [isResizingTL, setIsResizingTL] = useState(false);
+  const resizeStartRef = useRef<{ x: number; y: number; startW: number; startH: number }>({ x: 0, y: 0, startW: 380, startH: 480 });
+
+  // Menú contextual del botón derecho del ratón
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>({ visible: false, x: 0, y: 0 });
 
   const [mascotScale, setMascotScale] = useState(() => {
     return parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
@@ -50,8 +76,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
   const dragRef = useRef<HTMLDivElement>(null);
   const pointerStartRef = useRef<{ x: number; y: number; startLeft: number; startTop: number }>({ x: 0, y: 0, startLeft: 0, startTop: 0 });
 
-  const { speak, stop, isSpeaking, isMuted, toggleMute } = useMascotTTS(currentSkin);
-
+  const { speak, speakFiller, stop, isSpeaking, isMuted, toggleMute } = useMascotTTS(currentSkin);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,25 +97,18 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     }
   }, [messages, isOpen]);
 
+  // Listener global para cerrar el menú contextual con clic izquierdo
   useEffect(() => {
-    const handleResize = () => {
-      setPosition((prevPos) => {
-        if (prevPos.x === undefined || prevPos.y === undefined) return prevPos;
-        const mascotW = dragRef.current ? dragRef.current.offsetWidth : 80;
-        const mascotH = dragRef.current ? dragRef.current.offsetHeight : 80;
-        const maxX = Math.max(12, window.innerWidth - mascotW - 12);
-        const maxY = Math.max(12, window.innerHeight - mascotH - 12);
-        return {
-          x: Math.max(12, Math.min(prevPos.x, maxX)),
-          y: Math.max(12, Math.min(prevPos.y, maxY))
-        };
-      });
+    const handleCloseMenu = () => {
+      if (contextMenu.visible) {
+        setContextMenu({ visible: false, x: 0, y: 0 });
+      }
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+    window.addEventListener('click', handleCloseMenu);
+    return () => window.removeEventListener('click', handleCloseMenu);
+  }, [contextMenu.visible]);
 
-  // Listener para sincronizar cambios de Mascota en tiempo real desde ProfileModal
+  // Listener para sincronizar cambios de la mascota
   useEffect(() => {
     const syncMascot = () => {
       const savedSkin = (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
@@ -119,9 +137,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
           scale: mascotScale,
           updatedAt: Date.now()
         }, { merge: true });
-      } catch (e) {
-        console.warn('Error guardando pet_config en Firestore:', e);
-      }
+      } catch (e) {}
     }
   };
 
@@ -136,84 +152,115 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     }
   };
 
-  const captureScreenContext = (): string => {
-    const sectionName = activeExperience
-      ? `Mini App ${activeExperience.toUpperCase()}`
-      : 'Dashboard Principal GOALS';
-    
-    let pageText = '';
-    const mainEl = document.querySelector('main');
-    if (mainEl) {
-      pageText = mainEl.innerText.slice(0, 1500);
-    } else {
-      pageText = document.body.innerText.slice(0, 1500);
-    }
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
 
-    try {
-      const astroIframe = document.querySelector('iframe') as HTMLIFrameElement | null;
-      if (astroIframe && astroIframe.contentDocument) {
-        const iframeBodyText = astroIframe.contentDocument.body?.innerText || '';
-        if (iframeBodyText.trim()) {
-          pageText += `\n\n--- CONTENIDO INTERNO EN PANTALLA 3D (ASTROLINGO IFRAME) ---\n${iframeBodyText.slice(0, 1500)}`;
-        }
-      }
-    } catch (e) {}
-
-    return `Sección actual: ${sectionName}\nTexto visible en pantalla:\n${pageText}`;
+  // Dictado por voz para niños con modal de aviso e IA
+  const handleStartDictation = () => {
+    setIsVoiceModalOpen(true);
   };
 
-  const saveToChatDiary = async (userPrompt: string, aiReply: string, screenContext: string) => {
-    const diaryEntry = {
-      timestamp: Date.now(),
-      dateStr: new Date().toISOString(),
-      activeExperience: activeExperience || 'goals_home',
-      skinId: currentSkinId,
-      userPrompt,
-      aiReply,
-      screenContextSnippet: screenContext.slice(0, 300)
-    };
-
-    try {
-      const localHistory = JSON.parse(localStorage.getItem('goals_chat_diary') || '[]');
-      localHistory.push(diaryEntry);
-      if (localHistory.length > 50) localHistory.shift();
-      localStorage.setItem('goals_chat_diary', JSON.stringify(localHistory));
-    } catch (e) {}
-
-    if (db && user?.uid && !user.isAnonymous) {
-      try {
-        await addDoc(collection(db, 'users', user.uid, 'chat_diary'), diaryEntry);
-      } catch (err) {
-        console.warn('Error guardando diario de chat en Firestore:', err);
-      }
+  const captureScreenContext = (): string => {
+    const sectionName = activeExperience
+      ? `Mini App / Vista: ${activeExperience.toUpperCase()}`
+      : 'Dashboard Principal de Inicio GOALS';
+    
+    let pageText = '';
+    const mainEl = document.querySelector('main') || document.querySelector('#app') || document.body;
+    if (mainEl) {
+      const clone = mainEl.cloneNode(true) as HTMLElement;
+      // Remover texto del propio widget de chat para no duplicar
+      const chatWidget = clone.querySelector('[data-widget="ai-chat"]');
+      if (chatWidget) chatWidget.remove();
+      pageText = (clone.innerText || '').slice(0, 2000).replace(/\s+/g, ' ').trim();
     }
+
+    let extra3DInfo = '';
+    const iframeEl = document.querySelector('iframe') as HTMLIFrameElement;
+    if (iframeEl && iframeEl.src.includes('astrolingo')) {
+      extra3DInfo = '\n[ESTADO 3D ASTROLINGO: El alumno tiene abierta la experiencia 3D de Mecánica Celeste, Eclipses u Órbitas Planetarias].';
+    }
+
+    return `VISTA ACTUAL: ${sectionName}${extra3DInfo}\nTEXTO VISIBLE EN LA PANTALLA DEL ALUMNO:\n${pageText || 'Página de inicio cargada.'}`;
+  };
+
+  const [attachedImage, setAttachedImage] = useState<{ file: File; previewUrl: string; base64: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const previewUrl = URL.createObjectURL(file);
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setAttachedImage({
+        file,
+        previewUrl,
+        base64: reader.result as string
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSendMessage = async (customMessage?: string) => {
     const query = customMessage || inputText;
-    if (!query.trim() || isLoading) return;
+    if ((!query.trim() && !attachedImage) || isLoading) return;
 
     if (!isAuthenticated) {
       onOpenAuth?.('signup');
       return;
     }
 
-    const contextInfo = captureScreenContext();
-    const fullPrompt = `${query}\n\n[CONTEXTO VISIBLE EN PANTALLA DEL ESTUDIANTE]:\n${contextInfo}`;
+    const currentImg = attachedImage;
+    setAttachedImage(null);
 
-    const newMessages: ChatMessage[] = [...messages, { role: 'user', content: query }];
+    const userContent = query.trim() || (currentImg ? 'Analiza esta foto de mi cuaderno escolar.' : '');
+    const newMessages: ChatMessage[] = [...messages, { role: 'user', content: userContent }];
     setMessages(newMessages);
     if (!customMessage) setInputText('');
     setIsLoading(true);
 
+    // Capturar contexto REAL de la pantalla en este milisegundo
+    const screenContext = captureScreenContext();
+
+    // Locución de relleno instantánea (<100ms)
+    speakFiller();
+
     try {
-      const responseText = await askAI({
-        messages: [{ role: 'system', content: `Eres ${currentSkin.name}, asistente de GOALS.` }, ...newMessages],
-        temperature: 0.6
+      let promptToUse = buildChildSystemPrompt(currentSkin.name);
+
+      // INYECCIÓN OBLIGATORIA DEL CONTEXTO DE PANTALLA EN TIEMPO REAL
+      promptToUse += `\n\n=== CONTEXTO DE LA PANTALLA EN TIEMPO REAL ===\n${screenContext}\nDIRECTIVA OBLIGATORIA: El estudiante está viendo esta pantalla exactamente en este milisegundo. Si hace preguntas sobre "qué hay aquí", "qué es esto", "explícame esta pantalla" o sobre el contenido visible, responde utilizando los datos exactos del texto visible en su pantalla.`;
+
+      if (currentImg) {
+        promptToUse += `\nNOTA: El usuario te ha adjuntado una foto de su cuaderno o ficha escolar. Lee el manuscrito, analiza el ejercicio y guíale didácticamente.`;
+      }
+
+      // Si el niño pide explícitamente ver una imagen/foto/infografía
+      const isRequestingVisual = /ver|foto|imagen|dibujo|infografía|mostrar/i.test(query);
+      if (isRequestingVisual) {
+        promptToUse += `\nIMPORTANTE: El estudiante ha pedido ver una imagen/foto/infografía. SIEMPRE incluye una ilustración o esquema visual en formato Markdown usando la siguiente sintaxis exacta: ![Nombre del objeto](https://image.pollinations.ai/prompt/objeto_en_ingles?width=600&height=400&nologo=true)`;
+      }
+
+      let responseText = await askAI({
+        messages: [
+          { role: 'system', content: promptToUse },
+          ...newMessages
+        ],
+        temperature: 0.5
       });
+
+      // Fallback si solicitó una imagen y la respuesta no incluye URL de imagen
+      if (isRequestingVisual && !responseText.includes('http')) {
+        const topicMatch = query.replace(/quiero|ver|una|foto|de|un|una|imagen|dibujo|infografía/gi, '').trim();
+        const searchTopic = topicMatch || 'educational illustration';
+        const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(searchTopic)}?width=600&height=400&nologo=true`;
+        responseText += `\n\n![${searchTopic}](${imgUrl})`;
+      }
+
       setMessages([...newMessages, { role: 'assistant', content: responseText }]);
       speak(responseText);
-      saveToChatDiary(query, responseText, contextInfo);
     } catch (err: any) {
       setMessages([
         ...newMessages,
@@ -224,12 +271,13 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     }
   };
 
-  const handleExplainScreen = () => {
-    handleSendMessage('🔍 Explícame qué hay en esta pantalla.');
-  };
+  const lastClickTimeRef = useRef<number>(0);
 
+  // Arrastre del Bot (Pointer Events)
   const handlePointerDown = (e: React.PointerEvent) => {
+    if (e.button !== 0) return; // Solo clic izquierdo para arrastrar
     if (!dragRef.current) return;
+    setIsDragging(false);
     const rect = dragRef.current.getBoundingClientRect();
     pointerStartRef.current = {
       x: e.clientX,
@@ -245,7 +293,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     const dx = e.clientX - pointerStartRef.current.x;
     const dy = e.clientY - pointerStartRef.current.y;
 
-    if (!isDragging && Math.hypot(dx, dy) > 5) {
+    if (!isDragging && Math.hypot(dx, dy) > 6) {
       setIsDragging(true);
     }
 
@@ -270,12 +318,70 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
   const handlePointerUp = (e: React.PointerEvent) => {
     if ((e.target as HTMLElement).hasPointerCapture(e.pointerId)) {
-      (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      try {
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch (err) {}
     }
-    if (!isDragging) {
-      setIsOpen(!isOpen);
+
+    const now = Date.now();
+    // Previene parpadeo o saltos caóticos al pulsar la mascota varias veces rápidamente
+    if (!isDragging && now - lastClickTimeRef.current > 180) {
+      lastClickTimeRef.current = now;
+      if (!isOpen) {
+        setIsOpen(true);
+        setIsExpanded(false);
+      } else {
+        setIsOpen(!isOpen);
+      }
     }
     setIsDragging(false);
+  };
+
+  // Evento Clic Derecho (onContextMenu) sobre la Mascota
+  const handleMascotContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({
+      visible: true,
+      x: Math.min(e.clientX, window.innerWidth - 220),
+      y: Math.min(e.clientY, window.innerHeight - 260)
+    });
+  };
+
+  // Redimensionar ventana desde la Esquina Superior Izquierda (Top-Left Resize)
+  const handleResizeTLStart = (e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsResizingTL(true);
+    resizeStartRef.current = {
+      x: e.clientX,
+      y: e.clientY,
+      startW: windowSize.width,
+      startH: windowSize.height
+    };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handleResizeTLMove = (e: React.PointerEvent) => {
+    if (!isResizingTL) return;
+    const dx = resizeStartRef.current.x - e.clientX;
+    const dy = resizeStartRef.current.y - e.clientY;
+
+    const newW = Math.max(280, Math.min(750, resizeStartRef.current.startW + dx));
+    const newH = Math.max(300, Math.min(800, resizeStartRef.current.startH + dy));
+
+    setWindowSize({ width: newW, height: newH });
+  };
+
+  const handleResizeTLEnd = (e: React.PointerEvent) => {
+    if (isResizingTL) {
+      setIsResizingTL(false);
+      try {
+        (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+      } catch (err) {}
+      localStorage.setItem('goals_chat_w', String(windowSize.width));
+      localStorage.setItem('goals_chat_h', String(windowSize.height));
+    }
   };
 
   if (isMinimized) {
@@ -283,7 +389,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
       <>
         <div
           onClick={onToggleMinimize}
-          className="fixed bottom-6 right-0 z-50 flex items-center gap-1 py-2 px-1.5 rounded-l-xl bg-slate-950/90 border-l border-t border-b border-indigo-500/40 shadow-[0_0_20px_rgba(99,102,241,0.4)] backdrop-blur-md cursor-pointer hover:pl-2.5 transition-all duration-300 select-none animate-fadeIn group"
+          className="fixed bottom-6 right-0 z-50 flex items-center gap-1 py-2 px-1.5 rounded-l-xl bg-slate-950/90 border-l border-t border-b border-indigo-500/40 shadow-lg backdrop-blur-md cursor-pointer hover:pl-2.5 transition-all duration-300 select-none animate-fadeIn group"
           title={`Restaurar ${currentSkin.name}`}
         >
           <ChevronLeft className="w-4 h-4 text-indigo-400 group-hover:text-white transition-colors animate-pulse" />
@@ -301,12 +407,12 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     );
   }
 
-  // Posición de la Burbuja Píldora Adosada al Pet (Modo Compacto)
+  // Posición de la Ventana Píldora
   const getPillPosition = () => {
     const windowW = window.innerWidth;
     const windowH = window.innerHeight;
-    const pillW = Math.min(windowW - 24, 350);
-    const pillH = 74;
+    const pillW = Math.min(windowW - 24, 340);
+    const pillH = 64;
 
     if (!dragRef.current) {
       return {
@@ -320,13 +426,8 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     const isRightHalf = rect.left + rect.width / 2 > windowW / 2;
     const isBottomHalf = rect.top + rect.height / 2 > windowH / 2;
 
-    let left = isRightHalf
-      ? rect.right - pillW
-      : rect.left;
-
-    let top = isBottomHalf
-      ? rect.top - pillH - 8
-      : rect.bottom + 8;
+    let left = isRightHalf ? rect.right - pillW : rect.left;
+    let top = isBottomHalf ? rect.top - pillH - 8 : rect.bottom + 8;
 
     left = Math.max(12, Math.min(left, windowW - pillW - 12));
     top = Math.max(12, Math.min(top, windowH - pillH - 12));
@@ -334,12 +435,12 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     return { left, top, width: pillW };
   };
 
-  // Posición Inteligente de la Ventana Extendida
+  // Posición de la Ventana Extendida
   const getSmartPopupPosition = () => {
     const windowW = window.innerWidth;
     const windowH = window.innerHeight;
-    const popupW = Math.min(windowW - 24, 380);
-    const popupH = Math.min(windowH - 100, 480);
+    const popupW = Math.min(windowW - 24, windowSize.width);
+    const popupH = Math.min(windowH - 80, windowSize.height);
 
     if (!dragRef.current) {
       return {
@@ -354,13 +455,8 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     const isRightHalf = rect.left + rect.width / 2 > windowW / 2;
     const isBottomHalf = rect.top + rect.height / 2 > windowH / 2;
 
-    let left = isRightHalf
-      ? rect.right - popupW
-      : rect.left;
-
-    let top = isBottomHalf
-      ? rect.top - popupH - 12
-      : rect.bottom + 12;
+    let left = isRightHalf ? rect.right - popupW : rect.left;
+    let top = isBottomHalf ? rect.top - popupH - 12 : rect.bottom + 12;
 
     left = Math.max(12, Math.min(left, windowW - popupW - 12));
     top = Math.max(12, Math.min(top, windowH - popupH - 12));
@@ -370,73 +466,63 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
   return (
     <>
-      {/* 1. Burbuja Píldora Ultra-Minimalista Adosada al Pet (Estilo Codex / Hermes Pet) */}
+      {/* 1. VENTANA PÍLDORA ULTRA-MINIMALISTA (PULSANDO EN CUALQUIER LADO SE AMPLÍA O PLEGA) */}
       {isOpen && !isExpanded && (() => {
         const pill = getPillPosition();
         const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant');
-        const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
 
         return (
           <div
+            onClick={() => setIsExpanded(true)}
             style={{
               position: 'fixed',
               left: `${pill.left}px`,
               top: `${pill.top}px`,
               width: `${pill.width}px`,
             }}
-            className="z-50 rounded-2xl bg-slate-950/95 border border-indigo-500/40 shadow-[0_10px_40px_rgba(0,0,0,0.85)] backdrop-blur-xl p-2.5 px-3.5 flex items-center justify-between gap-3 animate-in fade-in zoom-in-95 duration-200 font-sans select-none"
+            className="z-50 rounded-2xl bg-slate-950/90 border border-slate-800 hover:border-slate-700 shadow-2xl backdrop-blur-xl p-2.5 px-3.5 flex items-center justify-between gap-3 animate-in fade-in zoom-in-95 duration-200 font-sans select-none cursor-pointer group"
           >
-            {/* Texto Resumido / Último mensaje */}
-            <div className="flex-1 min-w-0 flex flex-col justify-center">
-              <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-white">
-                <span className="truncate">{lastUserMsg ? lastUserMsg.content : `Preguntar a ${currentSkin.name}`}</span>
-              </div>
-              <p className="text-[11px] text-slate-300 truncate font-sans mt-0.5">
+            {/* Texto Resumido */}
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-slate-200 truncate font-medium">
                 {isLoading
-                  ? 'Pensando respuesta...'
+                  ? 'Escribiendo...'
                   : lastAssistantMsg
                     ? lastAssistantMsg.content
-                    : 'Voy a responder sobre lo que ves en pantalla...'}
+                    : 'Pregunta sobre la pantalla...'}
               </p>
             </div>
 
-            {/* Iconos de Acción Ultra-Minimalistas */}
-            <div className="flex items-center gap-1 shrink-0 border-l border-slate-800 pl-2">
-              {/* Botón de Voz a Voz Live */}
+            {/* Iconos de Acción Minimalistas */}
+            <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+              
+              {/* Icono Dictar por Voz */}
+              <button
+                type="button"
+                onClick={handleStartDictation}
+                className={`p-2 rounded-full transition-all cursor-pointer ${
+                  isDictating ? 'bg-rose-500 text-white animate-pulse' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+                title="Dictar por voz"
+              >
+                <Mic className="w-4 h-4" />
+              </button>
+
+              {/* Icono Conversación Voz a Voz Live (Formato Círculo Blanco) */}
               <button
                 type="button"
                 onClick={() => setIsVoiceActive(!isVoiceActive)}
-                className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
-                  isVoiceActive ? 'text-rose-400 bg-rose-500/20 border border-rose-500/40 animate-pulse' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-md ${
+                  isVoiceActive
+                    ? 'bg-rose-500 text-white animate-pulse'
+                    : 'bg-white text-slate-950 hover:bg-slate-200'
                 }`}
-                title={isVoiceActive ? "Desactivar Voz Live" : "Activar Voz Live (Gemini Live)"}
+                title={isVoiceActive ? "Desactivar Voz Live" : "Modo Conversación Voz a Voz"}
               >
-                {isVoiceActive ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                <AudioLines className="w-4 h-4" />
               </button>
 
-              {/* Botón TTS */}
-              <button
-                type="button"
-                onClick={toggleMute}
-                className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
-                  isMuted ? 'text-slate-500 hover:text-slate-300' : 'text-amber-400 bg-amber-400/10'
-                }`}
-                title={isMuted ? "Activar Voz TTS" : "Desactivar Voz TTS"}
-              >
-                {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-              </button>
-
-              {/* Botón Ampliar Chat Flecha ^ */}
-              <button
-                type="button"
-                onClick={() => setIsExpanded(true)}
-                className="p-1.5 rounded-lg text-indigo-400 hover:text-white hover:bg-indigo-500/20 transition-all cursor-pointer"
-                title="Ampliar chat completo (^)"
-              >
-                <ChevronUp className="w-4 h-4" />
-              </button>
-
-              {/* Botón Cerrar Píldora */}
+              {/* Botón Plegar/Cerrar */}
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -450,7 +536,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
         );
       })()}
 
-      {/* 2. Ventana Extendida de Chat Flotante (Cuando el usuario pulsa ^) */}
+      {/* 2. VENTANA EXTENDIDA ULTRA-MINIMALISTA (REDIMENSIONABLE DESDE LA ESQUINA SUPERIOR IZQUIERDA) */}
       {isOpen && isExpanded && (() => {
         const pop = getSmartPopupPosition();
         return (
@@ -462,89 +548,99 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
               width: `${pop.width}px`,
               height: `${pop.height}px`,
             }}
-            className="z-50 rounded-3xl bg-slate-950/75 border border-indigo-500/30 shadow-[0_10px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-sans"
+            className="z-50 rounded-3xl bg-slate-950/90 border border-slate-800 shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-sans relative"
           >
-            {/* Cabecera Minimalista de la Mascota */}
-            <div className="p-3 px-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{currentSkin.avatarIcon}</span>
-                <h3 className="font-extrabold text-xs text-white tracking-wide">{currentSkin.name}</h3>
+            
+            {/* 📐 AGARRE ESQUINA SUPERIOR IZQUIERDA PARA REDIMENSIONAR (TOP-LEFT RESIZE HANDLE) */}
+            <div
+              onPointerDown={handleResizeTLStart}
+              onPointerMove={handleResizeTLMove}
+              onPointerUp={handleResizeTLEnd}
+              className="absolute top-0 left-0 w-7 h-7 z-30 cursor-nwse-resize group/resize p-1 flex items-center justify-center select-none"
+              title="Arrastrar desde la esquina superior izquierda para redimensionar la ventana"
+            >
+              <div className="w-3 h-3 border-t-2 border-l-2 border-slate-500 group-hover/resize:border-amber-400 rounded-tl-sm transition-colors" />
+            </div>
+
+            {/* BARRA SUPERIOR ULTRA-MINIMALISTA (PULSANDO EN CUALQUIER ZONA VACÍA PLEGA LA VENTANA) */}
+            <div 
+              onClick={() => setIsExpanded(false)}
+              className="p-2.5 px-4 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between shrink-0 cursor-pointer select-none"
+            >
+              <div className="flex items-center gap-2 pl-3">
+                <span className="text-base">{currentSkin.avatarIcon}</span>
+                <span className="text-[11px] font-extrabold text-white">{getCustomMascotName()}</span>
               </div>
 
-              {/* Botones de Control */}
-              <div className="flex items-center gap-1">
-                {/* Botón de Voz a Voz Live */}
+              {/* ICONOS DE ACCIÓN MINIMALISTAS */}
+              <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                
+                {/* Dictar por voz */}
+                <button
+                  type="button"
+                  onClick={handleStartDictation}
+                  className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
+                    isDictating ? 'bg-rose-500 text-white animate-pulse' : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                  }`}
+                  title="Dictar por voz"
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+
+                {/* Conversación Voz a Voz (Botón Círculo Blanco) */}
                 <button
                   type="button"
                   onClick={() => setIsVoiceActive(!isVoiceActive)}
-                  className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
-                    isVoiceActive ? 'text-rose-400 bg-rose-500/20 border border-rose-500/40 animate-pulse' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-sm ${
+                    isVoiceActive
+                      ? 'bg-rose-500 text-white animate-pulse'
+                      : 'bg-white text-slate-950 hover:bg-slate-200'
                   }`}
-                  title={isVoiceActive ? "Desactivar Voz Live" : "Activar Voz Live (Gemini Live)"}
+                  title={isVoiceActive ? "Desactivar Voz Live" : "Modo Conversación Voz a Voz"}
                 >
-                  {isVoiceActive ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                  <AudioLines className="w-3.5 h-3.5" />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setIsExpanded(false)}
-                  className="p-1.5 rounded-lg text-indigo-400 hover:text-white hover:bg-indigo-500/20 transition-all cursor-pointer"
-                  title="Reducir a Píldora"
-                >
-                  <ChevronDown className="w-4 h-4" />
-                </button>
+
+                {/* Mute TTS */}
                 <button
                   type="button"
                   onClick={toggleMute}
                   className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
-                    isMuted ? 'text-slate-500 hover:text-slate-300' : 'text-amber-400 bg-amber-400/10 border border-amber-400/20'
+                    isMuted ? 'text-slate-500 hover:text-slate-300' : 'text-amber-400 hover:bg-amber-400/10'
                   }`}
                   title={isMuted ? "Activar Voz TTS" : "Desactivar Voz TTS"}
                 >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 animate-pulse" />}
+                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </button>
+
+                {/* Plegar Ventana */}
                 <button
                   type="button"
-                  onClick={() => { setMessages([]); stop(); }}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-all text-xs cursor-pointer"
-                  title="Limpiar chat"
+                  onClick={() => setIsExpanded(false)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+                  title="Plegar a píldora"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <ChevronDown className="w-4 h-4" />
                 </button>
+
+                {/* Cerrar */}
                 <button
                   type="button"
                   onClick={() => { setIsOpen(false); stop(); }}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer"
+                  title="Cerrar"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Chips Rápidos */}
-            <div className="p-2 px-3 bg-slate-900/80 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 text-[11px]">
-              <button
-                type="button"
-                onClick={handleExplainScreen}
-                className="px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold flex items-center gap-1.5 shrink-0 transition-all active:scale-95 cursor-pointer"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>Analizar Pantalla</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSendMessage('💡 ¿Qué consejos me das para esta sección?')}
-                className="px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 font-bold shrink-0 transition-all active:scale-95 cursor-pointer"
-              >
-                💡 Consejos
-              </button>
-            </div>
-
             {/* Historial de Mensajes */}
-            <div className="flex-1 p-3.5 space-y-3 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-900">
+            <div className="flex-1 p-3 space-y-2.5 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-800">
               {messages.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-2 text-slate-500">
-                  <Sparkles className="w-5 h-5 text-indigo-400/60 animate-pulse" />
-                  <p className="text-xs font-medium text-slate-400">Pregunta lo que quieras sobre esta pantalla</p>
+                  <Sparkles className="w-5 h-5 text-amber-400/80 animate-pulse" />
+                  <p className="text-xs text-slate-400">Escribe o dicta tu consulta didáctica</p>
                 </div>
               ) : (
                 messages.map((m, idx) => (
@@ -553,25 +649,54 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                     className={`flex flex-col ${m.role === 'user' ? 'items-end' : 'items-start'}`}
                   >
                     <div
-                      className={`max-w-[88%] p-3 rounded-2xl text-xs leading-relaxed ${
+                      className={`max-w-[95%] p-2.5 rounded-2xl text-xs leading-relaxed ${
                         m.role === 'user'
-                          ? 'bg-indigo-600 text-white rounded-br-none shadow-md'
-                          : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none shadow-md font-sans'
+                          ? 'bg-indigo-600 text-white rounded-br-none shadow-sm font-semibold'
+                          : 'bg-slate-900 border border-slate-800 text-slate-200 rounded-bl-none shadow-sm font-sans w-full'
                       }`}
                     >
-                      {m.content}
+                      {m.role === 'assistant' ? (
+                        <DidacticResponseRenderer content={m.content} />
+                      ) : (
+                        m.content
+                      )}
                     </div>
                   </div>
                 ))
               )}
               {isLoading && (
-                <div className="flex items-center gap-2 text-xs text-indigo-400 p-2 bg-indigo-950/40 border border-indigo-500/20 rounded-xl w-fit animate-pulse">
+                <div className="flex items-center gap-2 text-xs text-amber-400 p-2 bg-slate-900 border border-slate-800 rounded-xl w-fit animate-pulse">
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>Analizando pantalla...</span>
+                  <span>Procesando...</span>
                 </div>
               )}
               <div ref={chatEndRef} />
             </div>
+
+            {/* Vista previa de imagen adjuntada */}
+            {attachedImage && (
+              <div className="px-3 py-1.5 bg-slate-900 border-t border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="relative group">
+                    <img
+                      src={attachedImage.previewUrl}
+                      alt="Foto cuaderno"
+                      className="w-9 h-9 rounded-xl object-cover border border-indigo-500/50 shadow-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setAttachedImage(null)}
+                      className="absolute -top-1 -right-1 w-4 h-4 bg-rose-600 text-white rounded-full flex items-center justify-center text-[9px] shadow-md hover:scale-110 transition-transform cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <span className="text-[10px] font-extrabold text-indigo-300">
+                    Imagen de Cuaderno / Consulta adjuntada
+                  </span>
+                </div>
+              </div>
+            )}
 
             {/* Entrada de Texto */}
             <form
@@ -579,19 +704,19 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                 e.preventDefault();
                 handleSendMessage();
               }}
-              className="p-2.5 bg-slate-900 border-t border-slate-800 flex items-center gap-2 shrink-0"
+              className="p-2 bg-slate-900 border-t border-slate-800 flex items-center gap-2 shrink-0"
             >
               <input
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Preguntar..."
+                placeholder="Escribe o dicta aquí..."
                 className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/60 transition-all"
               />
               <button
                 type="submit"
-                disabled={!inputText.trim() || isLoading}
-                className="p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white transition-all shadow-md active:scale-95 shrink-0 cursor-pointer"
+                disabled={(!inputText.trim() && !attachedImage) || isLoading}
+                className="p-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 text-white transition-all shadow-sm shrink-0 cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
@@ -600,7 +725,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
         );
       })()}
 
-      {/* Contenedor Principal Flotante (Draggable Position de la Mascota) */}
+      {/* 3. MASCOTA FLOTANTE DRAGGABLE (CON EVENTO CLIC DERECHO HABILITADO) */}
       <div 
         ref={dragRef}
         style={{
@@ -613,14 +738,14 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
         }}
         className="z-50 font-sans select-none flex flex-col items-end"
       >
-        {/* Mascota Pet Animada (Draggable) */}
         <div
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onContextMenu={handleMascotContextMenu}
           className="group relative cursor-grab active:cursor-grabbing"
         >
-          {/* Botón X discreto al pasar el ratón para ocultar/asomar */}
+          {/* Botón Minimizar al Borde */}
           {onToggleMinimize && (
             <button
               type="button"
@@ -629,7 +754,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                 onToggleMinimize();
               }}
               className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-slate-900 border border-slate-700 hover:border-rose-500 text-slate-400 hover:text-rose-400 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-all z-30 shadow-md cursor-pointer active:scale-90"
-              title="Asomar mascota al borde de la pantalla (Minimizar)"
+              title="Minimizar al borde"
             >
               <X className="w-3 h-3" />
             </button>
@@ -639,7 +764,87 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
         </div>
       </div>
 
-      {/* Modal de Selección de Skins de la Mascota */}
+      {/* 4. MENÚ CONTEXTUAL DEL BOTÓN DERECHO DEL RATÓN (BOTÓN DERECHO EN LA WEB / BOT) */}
+      {contextMenu.visible && (
+        <div
+          style={{
+            position: 'fixed',
+            left: `${contextMenu.x}px`,
+            top: `${contextMenu.y}px`,
+          }}
+          className="z-50 w-56 bg-slate-950/95 border border-slate-800 rounded-2xl p-1.5 shadow-2xl backdrop-blur-xl font-sans text-xs space-y-1 animate-in fade-in zoom-in-95 duration-150 select-none"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="px-2 py-1 text-[10px] font-bold text-amber-400 border-b border-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+            <Sparkles className="w-3 h-3" />
+            <span>Configuración Mascota</span>
+          </div>
+
+          {/* Opción: Cambiar Skin */}
+          <button
+            onClick={() => {
+              setContextMenu({ visible: false, x: 0, y: 0 });
+              setIsSkinModalOpen(true);
+            }}
+            className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-800 text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+          >
+            <Palette className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Cambiar Aspecto / Skin</span>
+          </button>
+
+          {/* Opción: Probar Animación */}
+          <button
+            onClick={() => {
+              setAnimState('speaking');
+              setTimeout(() => setAnimState('idle'), 2500);
+              setContextMenu({ visible: false, x: 0, y: 0 });
+            }}
+            className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-800 text-slate-200 flex items-center gap-2 transition-colors cursor-pointer"
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-400" />
+            <span>Animar Mascota (Saludar)</span>
+          </button>
+
+          {/* Opción: Ajustar Escala */}
+          <div className="px-2 py-1 border-t border-slate-800/80">
+            <span className="text-[10px] text-slate-400 font-semibold block mb-1">Tamaño Avatar:</span>
+            <div className="grid grid-cols-3 gap-1">
+              {[0.9, 1.2, 1.5].map((scale) => (
+                <button
+                  key={scale}
+                  onClick={() => {
+                    handleScaleChange(scale);
+                    setContextMenu({ visible: false, x: 0, y: 0 });
+                  }}
+                  className={`py-1 rounded-lg text-[10px] font-bold border transition-all cursor-pointer ${
+                    mascotScale === scale
+                      ? 'bg-amber-400/20 border-amber-400 text-amber-300'
+                      : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {scale}x
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Opción: Restablecer Tamaño Ventana */}
+          <button
+            onClick={() => {
+              setWindowSize({ width: 380, height: 480 });
+              localStorage.setItem('goals_chat_w', '380');
+              localStorage.setItem('goals_chat_h', '480');
+              setContextMenu({ visible: false, x: 0, y: 0 });
+            }}
+            className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-800 text-slate-200 flex items-center gap-2 transition-colors cursor-pointer border-t border-slate-800/80"
+          >
+            <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
+            <span>Restablecer Tamaño Ventana</span>
+          </button>
+        </div>
+      )}
+
+      {/* Modal de Selección de Skins */}
       {isSkinModalOpen && (
         <MascotSkinSelectorModal
           currentSkinId={currentSkinId}
@@ -647,6 +852,15 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
           onClose={() => setIsSkinModalOpen(false)}
         />
       )}
+
+      {/* Modal de Escucha Activa Inteligente para Niños */}
+      <VoiceListeningModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        onTranscriptComplete={(cleanText) => {
+          handleSendMessage(cleanText);
+        }}
+      />
     </>
   );
 };

@@ -8,6 +8,8 @@ import { MASCOT_SKINS } from '../config/mascotSkins';
 import { MascotSkinId } from '../types/mascot';
 import { MascotPet } from './mascot/MascotPet';
 import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
+import { getChildAge, setChildAge, getChildProfile, setChildProfile, getCustomMascotName, setCustomMascotName } from '../services/aiService';
+import { ChildLearningProfile, AVAILABLE_GRADES, AVAILABLE_SUBJECTS, AVAILABLE_EXTRACURRICULARS, AVAILABLE_INTERESTS } from '../types/childProfile';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -38,10 +40,20 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const { user, isCloud, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut, updateUserProfileData, authError, setAuthError } = useAuth();
   const { userData, totalStars, maxStars, claimReto, getRankInfo, getRetosList, showToast } = useProgress();
 
-  const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'stats' | 'mascota' | 'cuenta' | 'about' | 'admin'>('retos');
+  const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'stats' | 'ficha_niño' | 'mascota' | 'cuenta' | 'about' | 'admin'>('retos');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
+  // Child Learning Profile State
+  const [childProfile, setChildProfileState] = useState<ChildLearningProfile>(() => getChildProfile());
+
+  const handleSaveChildProfile = (updated: ChildLearningProfile) => {
+    setChildProfileState(updated);
+    setChildProfile(updated);
+    showToast('¡Ficha del Alumno guardada e inyectada en la IA!');
+  };
+
   // Mascot customization state
+  const [customMascotName, setCustomMascotNameState] = useState<string>(() => getCustomMascotName());
   const [mascotSkinId, setMascotSkinId] = useState<MascotSkinId>(() => {
     return (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
   });
@@ -50,7 +62,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   });
   const [mascotAnimState, setMascotAnimState] = useState<'idle' | 'hover' | 'thinking' | 'speaking' | 'dragging'>('idle');
   const [mascotSoulPrompt, setMascotSoulPrompt] = useState<string>(() => {
-    return localStorage.getItem('goals_mascot_soul') || 'Eres AstroBot, un mentor espacial súper divertido y sabio experto en ciencia, física y programación. Explicas conceptos complejos con metáforas espaciales emocionantes.';
+    const skinName = MASCOT_SKINS[mascotSkinId]?.name || 'el tutor de GOALS';
+    return localStorage.getItem('goals_mascot_soul') || `Eres ${skinName}, un mentor súper divertido y sabio experto en ciencia, idiomas y tecnología. Explicas conceptos complejos con metáforas emocionantes.`;
   });
   const [mascotPitch, setMascotPitch] = useState<number>(() => {
     return parseFloat(localStorage.getItem('goals_mascot_pitch') || '1.15');
@@ -86,6 +99,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   // Editing Profile State
   const [newDisplayName, setNewDisplayName] = useState(user?.displayName || '');
   const [selectedAvatar, setSelectedAvatar] = useState(user?.photoURL || '👽');
+  const [childAge, setChildAgeState] = useState<number>(() => getChildAge());
+
+  const handleAgeChange = (newAge: number) => {
+    setChildAgeState(newAge);
+    setChildAge(newAge);
+    showToast(`Edad adaptativa ajustada a ${newAge} años`);
+  };
 
   useEffect(() => {
     if (user?.displayName) setNewDisplayName(user.displayName);
@@ -234,18 +254,18 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 <span>Mascota</span>
               </button>
               <button 
+                onClick={() => setActiveTab('ficha_niño')}
+                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'ficha_niño' ? 'bg-pink-600 text-white shadow' : 'text-pink-300 hover:text-white'}`}
+              >
+                <Brain className="w-4 h-4 text-pink-300" />
+                <span>Ficha Alumno 👧</span>
+              </button>
+              <button 
                 onClick={() => setActiveTab('cuenta')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'cuenta' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'cuenta' ? 'bg-cyan-600 text-white shadow' : 'text-cyan-300 hover:text-white'}`}
               >
                 <User className="w-4 h-4 text-cyan-300" />
                 <span>Perfil</span>
-              </button>
-              <button 
-                onClick={() => setActiveTab('about')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'about' ? 'bg-emerald-600 text-white shadow' : 'text-emerald-400 hover:text-white'}`}
-              >
-                <Smartphone className="w-4 h-4 text-emerald-300" />
-                <span>Actualizaciones</span>
               </button>
               {user?.email === 'josferestudio@gmail.com' && (
                 <button 
@@ -598,11 +618,55 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       </div>
                     </div>
 
+                    {/* Nombre Personalizado de la Mascota */}
+                    <div className="bg-slate-900/60 border border-purple-500/40 rounded-2xl p-4 space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-xs font-extrabold text-purple-300 flex items-center gap-1.5">
+                          <Bot className="w-4 h-4 text-purple-400" />
+                          <span>Nombre Personalizado de tu Mascota</span>
+                        </h4>
+                        <span className="text-[9px] font-mono text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30">
+                          Nombre Propio
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400">
+                        Escribe el nombre con el que tu mascota se presentará y te hablará de viva voz:
+                      </p>
+                      <input
+                        type="text"
+                        value={customMascotName}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCustomMascotNameState(val);
+                          setCustomMascotName(val);
+                        }}
+                        placeholder="Ej. Búho Sabio, Sabiondo, Toby, AstroBot..."
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-purple-500/40 text-xs font-black text-white focus:border-purple-400 outline-none transition-all"
+                      />
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {['🦉 Búho Sabio', '🤖 AstroBot', '🐲 Dragón Cósmico', '🐱 Gatito Galáctico'].map((preset) => (
+                          <button
+                            key={preset}
+                            type="button"
+                            onClick={() => {
+                              const clean = preset.split(' ').slice(1).join(' ');
+                              setCustomMascotNameState(clean);
+                              setCustomMascotName(clean);
+                              showToast(`Nombre ajustado a ${clean}`);
+                            }}
+                            className="px-2.5 py-1 rounded-xl bg-purple-950/60 border border-purple-500/30 text-purple-300 text-[10px] font-extrabold hover:bg-purple-900/50 transition-all cursor-pointer"
+                          >
+                            {preset}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
                     {/* Selector de Skins en Grilla */}
                     <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 space-y-3">
                       <h4 className="text-xs font-extrabold text-white flex items-center gap-1.5">
                         <Sparkles className="w-4 h-4 text-purple-400" />
-                        <span>Elige tu Compañero Interactivo</span>
+                        <span>Elige tu Especie / Avatar 3D</span>
                       </h4>
 
                       <div className="grid grid-cols-2 gap-2.5">
@@ -721,7 +785,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                             if ('speechSynthesis' in window) {
                               window.speechSynthesis.cancel();
                               const skin = MASCOT_SKINS[mascotSkinId];
-                              const utt = new SpeechSynthesisUtterance(`¡Hola! Soy ${skin.name}. Estoy listo para guiarte en GOALS.`);
+                              const nameToSay = customMascotName || skin.name;
+                              const greetingName = childProfile.childName ? ` ${childProfile.childName}` : '';
+                              const utt = new SpeechSynthesisUtterance(`¡Hola${greetingName}! Soy ${nameToSay}. Estoy listo para guiarte en GOALS.`);
                               utt.lang = 'es-ES';
                               utt.pitch = mascotPitch;
                               utt.rate = mascotRate;
@@ -777,6 +843,259 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   </div>
                 )}
 
+                {/* TAB 👧 FICHA COMPLETA DEL ALUMNO / NIÑO */}
+                {activeTab === 'ficha_niño' && (
+                  <div className="space-y-4 animate-fadeIn">
+                    
+                    {/* Banner Explicativo */}
+                    <div className="bg-gradient-to-r from-pink-950/80 via-slate-900 to-purple-950/80 border border-pink-500/30 rounded-2xl p-4 space-y-1.5 shadow-lg">
+                      <h3 className="font-extrabold text-sm text-white flex items-center gap-2">
+                        <Brain className="w-4 h-4 text-pink-400" />
+                        <span>Expediente & Ficha Personal del Alumno</span>
+                      </h3>
+                      <p className="text-[11px] text-slate-300 leading-relaxed font-medium">
+                        Esta información se inyecta directamente en el <b>System Prompt</b> de la Mascota IA para adaptar las metáforas, el tono y las explicaciones a sus intereses y necesidades reales.
+                      </p>
+                    </div>
+
+                    {/* 1. Datos Personales y Escolares */}
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-3">
+                      <h4 className="text-xs font-extrabold text-pink-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <User className="w-3.5 h-3.5 text-pink-400" />
+                        <span>1. Datos del Estudiante & Colegio</span>
+                      </h4>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Nombre del Alumno/a</label>
+                          <input
+                            type="text"
+                            value={childProfile.childName}
+                            onChange={(e) => setChildProfileState({ ...childProfile, childName: e.target.value })}
+                            placeholder="Ej. Mateo, Sofía..."
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-pink-500 outline-none transition-all font-semibold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Edad ({childProfile.age} Años)</label>
+                          <select
+                            value={childProfile.age}
+                            onChange={(e) => setChildProfileState({ ...childProfile, age: parseInt(e.target.value, 10) })}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-amber-200 font-bold focus:border-pink-500 outline-none transition-all cursor-pointer"
+                          >
+                            {Array.from({ length: 11 }, (_, i) => i + 6).map((a) => (
+                              <option key={a} value={a} className="bg-slate-900 text-white">
+                                {a} Años
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Colegio / Centro Educativo</label>
+                          <input
+                            type="text"
+                            value={childProfile.schoolName}
+                            onChange={(e) => setChildProfileState({ ...childProfile, schoolName: e.target.value })}
+                            placeholder="Ej. CEIP San José, Colegio Montserrat..."
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-pink-500 outline-none transition-all font-semibold"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Curso Escolar Actual</label>
+                          <select
+                            value={childProfile.grade}
+                            onChange={(e) => setChildProfileState({ ...childProfile, grade: e.target.value })}
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-indigo-300 font-bold focus:border-pink-500 outline-none transition-all cursor-pointer"
+                          >
+                            {AVAILABLE_GRADES.map((g) => (
+                              <option key={g} value={g} className="bg-slate-900 text-white">
+                                {g}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Asignaturas Favoritas ⭐ */}
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+                      <h4 className="text-xs font-extrabold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
+                        <span>2. Asignaturas Favoritas</span>
+                      </h4>
+                      <p className="text-[10px] text-slate-400">Toca para marcar las materias que más le gustan:</p>
+                      
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {AVAILABLE_SUBJECTS.map((sub) => {
+                          const isSelected = childProfile.favoriteSubjects.includes(sub);
+                          return (
+                            <button
+                              key={sub}
+                              type="button"
+                              onClick={() => {
+                                const next = isSelected
+                                  ? childProfile.favoriteSubjects.filter((s) => s !== sub)
+                                  : [...childProfile.favoriteSubjects, sub];
+                                setChildProfileState({ ...childProfile, favoriteSubjects: next });
+                              }}
+                              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-emerald-500/20 border border-emerald-500/60 text-emerald-300 shadow-sm'
+                                  : 'bg-slate-950/60 border border-slate-800 text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              {isSelected ? '⭐ ' : ''}{sub}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 3. Asignaturas a Reforzar 🎯 */}
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+                      <h4 className="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Target className="w-3.5 h-3.5 text-amber-400" />
+                        <span>3. Asignaturas a Reforzar (Le Cuentan Más)</span>
+                      </h4>
+                      <p className="text-[10px] text-slate-400">La IA será especialmente paciente y explicativa en estas materias:</p>
+                      
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {AVAILABLE_SUBJECTS.map((sub) => {
+                          const isSelected = childProfile.weakSubjects.includes(sub);
+                          return (
+                            <button
+                              key={sub}
+                              type="button"
+                              onClick={() => {
+                                const next = isSelected
+                                  ? childProfile.weakSubjects.filter((s) => s !== sub)
+                                  : [...childProfile.weakSubjects, sub];
+                                setChildProfileState({ ...childProfile, weakSubjects: next });
+                              }}
+                              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-amber-500/20 border border-amber-500/60 text-amber-300 shadow-sm'
+                                  : 'bg-slate-950/60 border border-slate-800 text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              {isSelected ? '🎯 ' : ''}{sub}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 4. Actividades Extraescolares */}
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+                      <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Zap className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>4. Actividades Extraescolares</span>
+                      </h4>
+                      
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {AVAILABLE_EXTRACURRICULARS.map((ext) => {
+                          const isSelected = childProfile.extracurriculars.includes(ext);
+                          return (
+                            <button
+                              key={ext}
+                              type="button"
+                              onClick={() => {
+                                const next = isSelected
+                                  ? childProfile.extracurriculars.filter((e) => e !== ext)
+                                  : [...childProfile.extracurriculars, ext];
+                                setChildProfileState({ ...childProfile, extracurriculars: next });
+                              }}
+                              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-cyan-500/20 border border-cyan-500/60 text-cyan-300 shadow-sm'
+                                  : 'bg-slate-950/60 border border-slate-800 text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              {ext}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 5. Intereses & Hobbies Personales 🚀🎮 */}
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+                      <h4 className="text-xs font-extrabold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                        <span>5. Intereses & Hobbies (Para Analogías de la IA)</span>
+                      </h4>
+                      <p className="text-[10px] text-slate-400">La IA usará estos temas para ponerle ejemplos divertidos:</p>
+                      
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {AVAILABLE_INTERESTS.map((inte) => {
+                          const isSelected = childProfile.interests.includes(inte);
+                          return (
+                            <button
+                              key={inte}
+                              type="button"
+                              onClick={() => {
+                                const next = isSelected
+                                  ? childProfile.interests.filter((i) => i !== inte)
+                                  : [...childProfile.interests, inte];
+                                setChildProfileState({ ...childProfile, interests: next });
+                              }}
+                              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-purple-500/20 border border-purple-500/60 text-purple-300 shadow-sm'
+                                  : 'bg-slate-950/60 border border-slate-800 text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              {inte}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 6. Estilo de Aprendizaje */}
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
+                      <h4 className="text-xs font-extrabold text-pink-300 uppercase tracking-wider">
+                        6. Estilo de Aprendizaje
+                      </h4>
+                      <div className="grid grid-cols-4 gap-2">
+                        {[
+                          { id: 'visual', label: 'Visual 🎨' },
+                          { id: 'auditivo', label: 'Auditivo 🎧' },
+                          { id: 'practico', label: 'Práctico 🛠️' },
+                          { id: 'general', label: 'General 📚' }
+                        ].map((st) => (
+                          <button
+                            key={st.id}
+                            type="button"
+                            onClick={() => setChildProfileState({ ...childProfile, learningStyle: st.id as any })}
+                            className={`py-2 rounded-xl text-[10px] font-extrabold transition-all cursor-pointer ${
+                              childProfile.learningStyle === st.id
+                                ? 'bg-pink-600 text-white shadow-md'
+                                : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            {st.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Botón de Guardado Prominente */}
+                    <button
+                      type="button"
+                      onClick={() => handleSaveChildProfile(childProfile)}
+                      className="w-full py-3 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black text-xs transition-all shadow-xl shadow-pink-600/30 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Guardar Ficha e Inyectar Contexto en la IA 👧✨</span>
+                    </button>
+
+                  </div>
+                )}
+
                 {/* TAB 👤 PERFIL & AVATARES DE ALTA TECNOLOGÍA */}
                 {activeTab === 'cuenta' && (
                   <div className="space-y-3.5 animate-fadeIn">
@@ -807,6 +1126,25 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-indigo-500 outline-none transition-all font-semibold"
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-[10px] font-bold text-amber-300 mb-1 flex items-center justify-between">
+                          <span>Edad del Estudiante / Niño</span>
+                          <span className="text-[9px] text-slate-400 font-normal">Ajusta el lenguaje de la IA</span>
+                        </label>
+                        <select
+                          value={childAge}
+                          onChange={(e) => handleAgeChange(parseInt(e.target.value, 10))}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-amber-500/40 text-xs text-amber-200 font-bold focus:border-amber-400 outline-none transition-all cursor-pointer"
+                        >
+                          {Array.from({ length: 11 }, (_, i) => i + 6).map((age) => (
+                            <option key={age} value={age} className="bg-slate-900 text-white">
+                              {age} Años {age <= 9 ? '(Primaria Inicial - Frases sencillas)' : age <= 13 ? '(Primaria / ESO - Dinámico)' : '(Secundaria - Analítico y Conciso)'}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
                       <button 
                         onClick={handleSaveProfile}
                         className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition-all active:scale-95 shadow-md shadow-indigo-600/30 cursor-pointer"
@@ -850,99 +1188,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
                     <button
                       onClick={signOut}
-                      className="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold text-xs transition-all"
+                      className="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold text-xs transition-all cursor-pointer"
                     >
                       Cerrar Sesión
                     </button>
-                  </div>
-                )}
-
-                {/* TAB 📲 BUSCADOR Y DESCARGA DINÁMICA DE ACTUALIZACIONES */}
-                {activeTab === 'about' && (
-                  <div className="space-y-3 animate-fadeIn">
-                    
-                    {/* Tarjeta de Verificación Dinámica */}
-                    <div className="bg-gradient-to-r from-emerald-950/60 via-slate-900 to-teal-950/60 border border-emerald-500/30 rounded-2xl p-4 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <img 
-                            src="/goals_apk_logo.png" 
-                            alt="GOALS APK Logo" 
-                            className="w-12 h-12 rounded-2xl border border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.3)] object-cover shrink-0" 
-                          />
-                          <div>
-                            <h4 className="font-extrabold text-sm text-white">GOALS App v2.0</h4>
-                            <p className="text-[10px] text-emerald-300 font-mono">Comprobador Remoto In-App</p>
-                          </div>
-                        </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                          Nativa Android
-                        </span>
-                      </div>
-
-                      {/* Botón dinámico de Comprobar Actualización en la Nube */}
-                      <button
-                        type="button"
-                        onClick={handleCheckForUpdates}
-                        disabled={isCheckingUpdate}
-                        className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 cursor-pointer"
-                      >
-                        <RefreshCw className={`w-4 h-4 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
-                        <span>{isCheckingUpdate ? 'Consultando Servidor de Actualizaciones...' : 'Buscar Actualización en la Nube'}</span>
-                      </button>
-                    </div>
-
-                    {/* Resultado Dinámico de la Comprobación */}
-                    {updateInfo && (
-                      <div className={`p-3.5 rounded-2xl border ${
-                        updateInfo.hasUpdate 
-                          ? 'bg-emerald-950/50 border-emerald-500/40 shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
-                          : 'bg-slate-900/60 border-slate-800'
-                      } space-y-2.5`}>
-                        <div className="flex items-center justify-between text-xs font-bold text-white">
-                          <span className="flex items-center gap-1.5">
-                            {updateInfo.hasUpdate ? (
-                              <span className="text-amber-400">🔔 ¡Nueva versión v{updateInfo.latestVersion} disponible!</span>
-                            ) : (
-                              <span className="text-emerald-400 flex items-center gap-1">
-                                <CheckCircle2 className="w-4 h-4" /> Tu app está en la versión más reciente (v{updateInfo.currentVersion})
-                              </span>
-                            )}
-                          </span>
-                        </div>
-
-                        <p className="text-[11px] text-slate-300 leading-relaxed font-sans bg-slate-950 p-2.5 rounded-xl border border-slate-800">
-                          {updateInfo.releaseNotes}
-                        </p>
-
-                        <button
-                          type="button"
-                          onClick={() => setIsGuideOpen(true)}
-                          className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 hover:from-emerald-500 hover:to-teal-300 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
-                        >
-                          <Download className="w-4 h-4" />
-                          <span>Descargar goalskid_2.3.zip (v{updateInfo.latestVersion})</span>
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Estado del Servidor de IA */}
-                    <div className="bg-slate-900/60 border border-indigo-500/30 rounded-2xl p-3.5 space-y-2 text-xs">
-                      <div className="flex items-center justify-between font-bold text-white">
-                        <span className="flex items-center gap-1.5 text-indigo-300">
-                          <Brain className="w-4 h-4 text-indigo-400" />
-                          <span>Servidor de IA Unificado</span>
-                        </span>
-                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[9px] font-mono font-bold">
-                          model: "auto"
-                        </span>
-                      </div>
-
-                      <p className="text-[10px] text-slate-400 leading-relaxed font-mono">
-                        Integración activa y automatizada para todas las mini apps.
-                      </p>
-                    </div>
-
                   </div>
                 )}
 

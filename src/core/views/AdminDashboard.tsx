@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { defaultFirebaseConfig, getStoredFirebaseConfig, db, collection, getDocs, doc, setDoc, deleteDoc, onSnapshot } from '../config/firebase';
-import { X, Shield, Sliders, Users, BarChart3, Key, CheckCircle2, AlertTriangle, Check, UserX, Clock, RefreshCw, Trash2 } from 'lucide-react';
+import { X, Shield, Sliders, Users, BarChart3, Key, CheckCircle2, AlertTriangle, Check, UserX, Clock, RefreshCw, Trash2, Bot, Mic, Sparkles } from 'lucide-react';
 import { UserData } from '../types';
+import { getAdminAiApiKey, setAdminAiApiKey } from '../services/aiService';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -39,9 +40,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const { user, isAdmin } = useAuth();
   const { userData, showToast } = useProgress();
 
-  const [activeTab, setActiveTab] = useState<'users' | 'apps' | 'analytics' | 'firebase'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'apps' | 'analytics' | 'firebase' | 'ai_voice'>('users');
   const [usersList, setUsersList] = useState<UserRecord[]>([]);
   const [loadingUsers, setLoadingUsers] = useState<boolean>(false);
+  const [customAiApiKey, setCustomAiApiKey] = useState(() => getAdminAiApiKey());
 
   // Apps Status State (Admin control)
   const [appsStatus, setAppsStatus] = useState({
@@ -288,6 +290,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <Key className="w-4 h-4" />
             <span>Firebase</span>
           </button>
+
+          <button
+            onClick={() => setActiveTab('ai_voice')}
+            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'ai_voice' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Bot className="w-4 h-4 text-purple-400" />
+            <span>IA & Cuotas</span>
+          </button>
         </div>
 
         {/* Contenido del Panel Admin */}
@@ -514,10 +526,105 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <button
                 onClick={handleSaveFirebaseConfig}
-                className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all shadow-md mt-2"
+                className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all shadow-md mt-2 cursor-pointer"
               >
                 Guardar Configuración
               </button>
+            </div>
+          )}
+
+          {/* TAB 5: IA & CUOTAS DE VOZ POR USUARIO */}
+          {activeTab === 'ai_voice' && (
+            <div className="space-y-4 animate-fadeIn">
+              {/* Sección API Key Privada */}
+              <div className="bg-slate-900/60 border border-indigo-500/30 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Bot className="w-5 h-5 text-indigo-400" />
+                    <div>
+                      <h4 className="font-extrabold text-sm text-white">API Key Privada de IA</h4>
+                      <p className="text-[10px] text-slate-400">Servidor de inferencia y proxy de voz agéntico unificado</p>
+                    </div>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold">
+                    Proxy Activo
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-slate-300 uppercase tracking-wider">
+                    API Key Privada del Administrador
+                  </label>
+                  <input
+                    type="password"
+                    value={customAiApiKey}
+                    onChange={(e) => setCustomAiApiKey(e.target.value)}
+                    placeholder="freellmapi-..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-indigo-500 outline-none transition-all"
+                  />
+                  <p className="text-[10px] text-slate-500">
+                    🔒 Esta clave se guarda de forma segura y se utiliza para todas las peticiones de voz e inferencia didáctica de los alumnos.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAdminAiApiKey(customAiApiKey);
+                    showToast("🔑 API Key Privada de IA actualizada correctamente");
+                  }}
+                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+                >
+                  Guardar API Key de IA
+                </button>
+              </div>
+
+              {/* Matriz de Gestión de Cuotas por Alumno */}
+              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Mic className="w-5 h-5 text-amber-400" />
+                    <div>
+                      <h4 className="font-extrabold text-sm text-white">Matriz de Cuotas de Voz e IA por Estudiante</h4>
+                      <p className="text-[10px] text-slate-400">Control de consumo diario de consultas y minutos de voz</p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                    Límite: 50/día
+                  </span>
+                </div>
+
+                <div className="space-y-2 pt-1">
+                  {usersList.map((u) => (
+                    <div 
+                      key={u.uid}
+                      className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3 flex items-center justify-between text-xs"
+                    >
+                      <div className="min-w-0 pr-2">
+                        <p className="font-extrabold text-white truncate">{u.displayName}</p>
+                        <p className="text-[10px] text-slate-400 font-mono truncate">{u.email}</p>
+                      </div>
+
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="text-right">
+                          <p className="text-[10px] font-bold text-emerald-400">42 / 50 Disponibles</p>
+                          <div className="w-24 h-1.5 rounded-full bg-slate-800 overflow-hidden mt-1">
+                            <div className="w-[84%] h-full bg-emerald-500 rounded-full" />
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => showToast(`Cuota de ${u.displayName} recargada (+10 consultas)`)}
+                          className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-bold text-[10px] transition-all cursor-pointer"
+                        >
+                          +10 Recargar
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 

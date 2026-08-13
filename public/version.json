@@ -1,5 +1,5 @@
 {
-  "version": "2.3.0",
-  "apkUrl": "https://goalskid.web.app/downloads/goalskid_2.3.zip",
-  "changelog": "🚀 Versión v2.3.0 (goalskid_2.3.zip): Integración nativa de Google Play Services Auth para Android y auto-actualización in-app."
+  "version": "2.4.0",
+  "apkUrl": "https://goalskid.web.app/downloads/goalskid_2.4.apk",
+  "changelog": "🚀 Versión v2.4.0 (goalskid_2.4.apk): Cero analogías hardcodeadas, infografías con IA en HD generadas en tiempo real, inyección exhaustiva de contexto de pantalla y voces neuronales naturales de alta fidelidad."
 }

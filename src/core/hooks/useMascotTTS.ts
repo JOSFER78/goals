@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { MascotSkinConfig } from '../types/mascot';
+import { sanitizeTextForSpeech, getBestSpanishVoice } from '../services/aiService';
 
 export const useMascotTTS = (skin: MascotSkinConfig) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -19,16 +20,19 @@ export const useMascotTTS = (skin: MascotSkinConfig) => {
     // Detener cualquier lectura previa
     synthRef.current.cancel();
 
-    // Limpiar Markdown y etiquetas de HTML antes de enviar a voz
-    const cleanText = text
-      .replace(/[*_#`~[\]()]/g, '')
-      .replace(/<[^>]*>/g, '')
-      .trim();
-
+    // Sanitización 100% libre de Markdown, URLs, corchetes y símbolos
+    const cleanText = sanitizeTextForSpeech(text);
     if (!cleanText) return;
 
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = 'es-ES';
+
+    // Asignar voz neural/natural si está disponible
+    const bestVoice = getBestSpanishVoice();
+    if (bestVoice) {
+      utterance.voice = bestVoice;
+    }
+
     utterance.pitch = skin.speechPitch;
     utterance.rate = skin.speechRate * playbackSpeed;
 
@@ -51,8 +55,22 @@ export const useMascotTTS = (skin: MascotSkinConfig) => {
     setIsMuted(!isMuted);
   };
 
+  const FILLER_PHRASES = [
+    "¡Oído! Dame un segundito...",
+    "¡Te escucho! Pensando...",
+    "¡Sí, claro! Déjame ver...",
+    "¡Buena pregunta! Voy a ver..."
+  ];
+
+  const speakFiller = () => {
+    if (!synthRef.current || isMuted) return;
+    const randomFiller = FILLER_PHRASES[Math.floor(Math.random() * FILLER_PHRASES.length)];
+    speak(randomFiller);
+  };
+
   return {
     speak,
+    speakFiller,
     stop,
     isSpeaking,
     isMuted,

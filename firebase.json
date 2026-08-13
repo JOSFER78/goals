@@ -1,16 +1,15 @@
 {
   "hosting": {
-    "site": "goalskid",
+    "site": "goals-v24",
     "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
+      "downloads/**",
       "**/*.apk",
       "**/*.zip",
-      "**/*.exe",
-      "**/downloads/*.apk",
-      "**/downloads/*.zip"
+      "**/*.exe"
     ],
     "rewrites": [
       {

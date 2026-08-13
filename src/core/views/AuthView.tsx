@@ -187,23 +187,12 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
             G
           </div>
           <h2 className="font-display font-bold text-xl text-white">
-            {mode === 'login' ? 'Iniciar Sesión en GOALS' : 'Solicitar Acceso por Invitación'}
+            {mode === 'login' ? 'Iniciar Sesión en GOALS' : 'Crear Cuenta en GOALS'}
           </h2>
           <p className="text-xs text-slate-400">
             {mode === 'login' 
-              ? 'Accede a tu perfil autorizado y progreso en la nube' 
-              : 'Registra tu solicitud. Requiere aprobación del administrador para ingresar.'}
-          </p>
-        </div>
-
-        {/* Banner Infografía Acceso por Invitación */}
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-left space-y-1">
-          <div className="flex items-center gap-1.5 text-amber-300 font-bold text-xs">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Acceso Exclusivo por Invitación</span>
-          </div>
-          <p className="text-[10px] text-slate-300 leading-normal">
-            Al registrarte (vía Email o con Google), tu cuenta pasará a la lista de solicitudes. El administrador la autorizará para darte acceso completo.
+              ? 'Accede a tu perfil y progreso educacional' 
+              : 'Regístrate para comenzar a aprender'}
           </p>
         </div>
 
@@ -264,9 +253,9 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50"
+            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-all shadow-lg shadow-indigo-600/20 disabled:opacity-50 cursor-pointer"
           >
-            {isSubmitting ? 'Procesando...' : mode === 'login' ? 'Iniciar Sesión' : 'Enviar Solicitud de Registro'}
+            {isSubmitting ? 'Procesando...' : mode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta'}
           </button>
         </form>
 
@@ -278,7 +267,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
         <button
           onClick={handleGoogleAuth}
           disabled={isSubmitting}
-          className="w-full py-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-2.5 transition-all shadow-sm disabled:opacity-50 active:scale-95"
+          className="w-full py-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-semibold flex items-center justify-center gap-2.5 transition-all shadow-sm disabled:opacity-50 active:scale-95 cursor-pointer"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -286,7 +275,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
           </svg>
-          <span>{mode === 'login' ? 'Iniciar sesión con Google' : 'Solicitar Acceso con Google'}</span>
+          <span>{mode === 'login' ? 'Iniciar sesión con Google' : 'Registrarse con Google'}</span>
         </button>
 
         <div className="text-center pt-2 border-t border-slate-800/60">
@@ -295,27 +284,9 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
               setMode(mode === 'login' ? 'signup' : 'login');
               setAuthError(null);
             }}
-            className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold"
+            className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
           >
-            {mode === 'login' ? '¿No tienes cuenta? Registrate aquí' : '¿Ya tienes cuenta? Inicia sesión aquí'}
-          </button>
-        </div>
-
-        {/* Aviso de App Nativa para Android con Icono Oficial (Abre la Guia de Descarga) */}
-        <div className="bg-gradient-to-r from-emerald-950/40 via-slate-950 to-slate-950 border border-emerald-500/30 rounded-xl p-3 flex items-center gap-3">
-          <img src="/android-logo.png" alt="Android Official Logo" className="w-8 h-8 object-contain shrink-0" />
-          <div className="text-left flex-1 min-w-0">
-            <p className="text-[11px] font-bold text-white flex items-center gap-1">
-              <span>App Nativa para Android</span>
-            </p>
-            <p className="text-[10px] text-slate-400">Instala GOALS directamente en tu dispositivo móvil.</p>
-          </div>
-          <button
-            type="button"
-            onClick={onOpenDownloadGuide}
-            className="px-2.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] shrink-0 transition-all shadow active:scale-95 cursor-pointer"
-          >
-            Descargar
+            {mode === 'login' ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión aquí'}
           </button>
         </div>
       </div>

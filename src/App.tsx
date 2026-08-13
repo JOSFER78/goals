@@ -120,9 +120,6 @@ const MainContent: React.FC = () => {
               onSuccess={() => setIsAuthViewOpen(false)}
               onOpenDownloadGuide={() => setIsGuideOpen(true)}
             />
-          ) : isAuthenticated && !isApproved && !isPendingDismissed ? (
-            /* Pantalla de Espera de Autorización (con botón 'X' para cerrar y continuar) */
-            <PendingApprovalView onClose={() => setIsPendingDismissed(true)} />
           ) : !isAuthenticated && !activeExperience ? (
             /* Landing Page Pública Scrollable con Navegación Libre */
             <GoalsLanding
