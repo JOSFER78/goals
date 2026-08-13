@@ -12,7 +12,7 @@ export interface UpdateInfo {
   isNative: boolean;
 }
 
-const CURRENT_APP_VERSION = '1.0.0';
+const CURRENT_APP_VERSION = '2.1.0';
 const VERSION_ENDPOINT = 'https://goalskid.web.app/version.json';
 
 export const isNativeApp = (): boolean => Capacitor.isNativePlatform();

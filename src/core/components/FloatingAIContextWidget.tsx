@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, ChevronDown, MessageSquare } from 'lucide-react';
+import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Database, ShieldCheck } from 'lucide-react';
 import { askAI, ChatMessage } from '../services/aiService';
 import { useAuth } from '../context/AuthContext';
+import { db, collection, addDoc } from '../config/firebase';
 
 interface FloatingAIContextWidgetProps {
   activeExperience: string | null;
@@ -63,7 +64,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 ${iframeText ? `\n🪐 CONTENIDO, LECCIÓN Y TELEMETRÍA DENTRO DEL SIMULADOR 3D / IFRAME:\n"${iframeText}"` : ''}`;
   };
 
-  // Persistencia de conversaciones en el Diario de IA para evaluación y compresión
+  // Persistencia de conversaciones en el Diario de IA de Firebase Firestore (users/{uid}/chat_diary)
   const saveToChatDiary = async (query: string, response: string, context: string) => {
     const todayStr = new Date().toISOString().split('T')[0];
     const diaryEntry = {
@@ -73,23 +74,22 @@ ${iframeText ? `\n🪐 CONTENIDO, LECCIÓN Y TELEMETRÍA DENTRO DEL SIMULADOR 3D
       userQuery: query,
       aiResponse: response,
       screenContext: context.slice(0, 500),
-      userId: user?.uid || 'local_user'
+      userId: user?.uid || 'anonymous'
     };
 
-    // 1. Guardar en LocalStorage
+    // 1. Guardar en LocalStorage (backup de reserva local)
     try {
       const existingDiary = JSON.parse(localStorage.getItem('goals_chat_diary') || '[]');
       existingDiary.unshift(diaryEntry);
       localStorage.setItem('goals_chat_diary', JSON.stringify(existingDiary.slice(0, 100)));
     } catch (e) {}
 
-    // 2. Guardar en Firestore si está conectado en la nube
-    if (isCloud && user?.uid && (window as any).fbDb) {
+    // 2. Guardar directamente en Firebase Firestore si el usuario está autenticado
+    if (db && user?.uid && !user.isAnonymous) {
       try {
-        const fbDb = (window as any).fbDb;
-        await fbDb.collection('users').doc(user.uid).collection('chat_diary').add(diaryEntry);
+        await addDoc(collection(db, 'users', user.uid, 'chat_diary'), diaryEntry);
       } catch (e) {
-        console.warn('Firestore chat diary error:', e);
+        console.warn('Error guardando diario de IA en Firestore:', e);
       }
     }
   };
