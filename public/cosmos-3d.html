@@ -196,14 +196,17 @@
 
   <!-- NAVEGACIÓN INFERIOR (3 BOTONES ESTÁNDAR) -->
   <nav id="bottom-nav" class="flex border-t border-slate-800 bg-slate-950">
-    <button id="tab-learn" onclick="showTab('learn')" class="flex-1 py-2.5 flex flex-col items-center gap-0.5 text-xs font-bold text-slate-400 hover:text-white">
-      <span class="text-lg">📖</span><span>Lecciones</span>
+    <button id="tab-learn" onclick="showTab('learn')" class="flex-1 py-2.5 flex flex-col items-center gap-1 text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+      <span>Lecciones</span>
     </button>
-    <button id="tab-tests" onclick="showTab('tests')" class="flex-1 py-2.5 flex flex-col items-center gap-0.5 text-xs font-bold text-slate-400 hover:text-white">
-      <span class="text-lg">🎯</span><span>Tests</span>
+    <button id="tab-tests" onclick="showTab('tests')" class="flex-1 py-2.5 flex flex-col items-center gap-1 text-xs font-bold text-slate-400 hover:text-white transition-colors cursor-pointer">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <span>Tests</span>
     </button>
-    <button id="tab-explore" onclick="showTab('explore')" class="flex-1 py-2.5 flex flex-col items-center gap-0.5 text-xs font-bold text-slate-400 hover:text-white relative">
-      <span class="text-lg">🚀</span><span>Explorar 3D</span>
+    <button id="tab-explore" onclick="showTab('explore')" class="flex-1 py-2.5 flex flex-col items-center gap-1 text-xs font-bold text-slate-400 hover:text-white transition-colors relative cursor-pointer">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+      <span>Explorar 3D</span>
     </button>
   </nav>
 </div>
@@ -830,20 +833,20 @@ function renderHomeDashboard(){
       <div class="glass rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-indigo-950/90 via-slate-900/90 to-slate-950 border border-indigo-500/30 shadow-2xl space-y-4">
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-indigo-600/30 border border-indigo-400/40 flex items-center justify-center text-2xl shadow-lg cursor-pointer" onclick="openProfile('account')">
-              ${state.avatar || '👨‍🚀'}
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shadow-lg cursor-pointer" onclick="openProfile('account')">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
             </div>
             <div>
-              <h2 class="font-display font-bold text-xl text-white">¡Hola, ${userName}! 👋</h2>
+              <h2 class="font-display font-bold text-xl text-white">¡Hola, ${userName}!</h2>
               <p class="text-xs text-slate-300 mt-0.5">${state.bio ? `"${state.bio}"` : 'Explorador del Cosmos en AstroLingo'}</p>
             </div>
           </div>
           <div class="flex items-center gap-2">
             <div class="px-3 py-1.5 rounded-2xl bg-indigo-500/20 border border-indigo-400/40 flex items-center gap-2">
-              <span class="text-xs font-bold ${rank.color}">${rank.title}</span>
+              <span class="text-xs font-bold ${rank.color}">${rank.title.replace(/[🌍✨⭐🪐🌌💫👑🌟🏅🏆]/g, '').trim()}</span>
               <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-600 text-white font-extrabold">${state.xp} XP</span>
             </div>
-            <button onclick="openProfile('account')" title="Editar Perfil" class="px-3 py-1.5 rounded-xl glass text-xs font-bold text-slate-300 hover:text-white transition-all">⚙️ Perfil</button>
+            <button onclick="openProfile('account')" title="Editar Perfil" class="px-3 py-1.5 rounded-xl glass text-xs font-bold text-slate-300 hover:text-white transition-all cursor-pointer">Perfil</button>
           </div>
         </div>
 
@@ -851,22 +854,22 @@ function renderHomeDashboard(){
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-white/10 text-center relative overflow-hidden">
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Estrellas</span>
-            <span class="text-xl sm:text-2xl font-bold text-amber-300 font-display mt-0.5 block">${totalStars()} / ${maxStars()} ⭐</span>
+            <span class="text-xl sm:text-2xl font-bold text-amber-300 font-display mt-0.5 block">${totalStars()} / ${maxStars()}</span>
             <span class="text-[9px] text-slate-400 block mt-1">Conseguidas en tests</span>
           </div>
           <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-white/10 text-center relative overflow-hidden">
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Tests Superados</span>
-            <span class="text-xl sm:text-2xl font-bold text-emerald-400 font-display mt-0.5 block">${testsDone} / 18 🎯</span>
+            <span class="text-xl sm:text-2xl font-bold text-emerald-400 font-display mt-0.5 block">${testsDone} / 18</span>
             <span class="text-[9px] text-slate-400 block mt-1">Cuestionarios al 100%</span>
           </div>
           <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-white/10 text-center relative overflow-hidden">
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Racha Activa</span>
-            <span class="text-xl sm:text-2xl font-bold text-rose-400 font-display mt-0.5 block">⚡ ${state.streak || 1} Días</span>
+            <span class="text-xl sm:text-2xl font-bold text-rose-400 font-display mt-0.5 block">${state.streak || 1} Días</span>
             <span class="text-[9px] text-slate-400 block mt-1">Constancia de lectura</span>
           </div>
           <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-white/10 text-center relative overflow-hidden">
             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Lecciones Leídas</span>
-            <span class="text-xl sm:text-2xl font-bold text-cyan-300 font-display mt-0.5 block">${lessonsRead} / 18 📖</span>
+            <span class="text-xl sm:text-2xl font-bold text-cyan-300 font-display mt-0.5 block">${lessonsRead} / 18</span>
             <span class="text-[9px] text-slate-400 block mt-1">Módulos explorados</span>
           </div>
         </div>
@@ -887,10 +890,10 @@ function renderHomeDashboard(){
       <div class="glass rounded-3xl p-5 bg-gradient-to-r from-indigo-950/90 to-slate-900/90 border border-indigo-500/30 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div class="space-y-1 max-w-xl">
           <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-[11px] font-bold">
-            <span>🎯 Próxima Misión Astronómica Recomendada</span>
+            <span>Próxima Misión Astronómica Recomendada</span>
           </div>
           <h3 class="font-display font-bold text-lg text-white">Lección ${nextLesson.id}: ${nextLesson.title}</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">${nextLesson.subtitle} — Lee la teoría y supera el cuestionario interactivo para ganar +50 XP y 3 estrellas.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">${nextLesson.subtitle || nextLesson.topic || 'Astrofísica & Exploración Espacial'} — Lee la teoría y supera el cuestionario interactivo para ganar +50 XP y 3 estrellas.</p>
         </div>
         <button onclick="${isNextUnlocked ? `openLesson(${nextLesson.id})` : `showTab('learn')`}" class="px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-extrabold text-xs shadow-xl transition-all active:scale-95 shrink-0 cursor-pointer flex items-center gap-2">
           <span>Comenzar Lección</span> ➔
@@ -900,7 +903,7 @@ function renderHomeDashboard(){
       <!-- BLOQUE 3: DESGLOSE GRÁFICO POR ÁREAS DE CONOCIMIENTO (GRÁFICO DE BARRAS POR MÓDULOS) -->
       <div class="glass rounded-3xl p-5 sm:p-6 bg-slate-900/90 border border-white/10 space-y-4">
         <div>
-          <h3 class="font-display font-bold text-base text-white">📊 Desglose de Progreso por Módulos Temáticos</h3>
+          <h3 class="font-display font-bold text-base text-white">Desglose de Progreso por Módulos Temáticos</h3>
           <p class="text-xs text-slate-400 mt-0.5">Comprobación del grado de aprendizaje en las 3 grandes áreas del programa:</p>
         </div>
 
@@ -908,7 +911,7 @@ function renderHomeDashboard(){
           <!-- MÓDULO 1 -->
           <div class="space-y-1.5">
             <div class="flex justify-between items-center text-xs font-bold">
-              <span class="text-indigo-300 flex items-center gap-1.5"><span>🌙</span> <span>Bloque 1: Sistema Solar & Exploración Lunar (L1 a L6)</span></span>
+              <span class="text-indigo-300 flex items-center gap-1.5"><span>Bloque 1: Sistema Solar & Exploración Lunar (L1 a L6)</span></span>
               <span class="text-slate-300 font-mono">${m1Done} / 6 (${m1Pct}%)</span>
             </div>
             <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden p-0.5 border border-white/5">
@@ -919,7 +922,7 @@ function renderHomeDashboard(){
           <!-- MÓDULO 2 -->
           <div class="space-y-1.5">
             <div class="flex justify-between items-center text-xs font-bold">
-              <span class="text-cyan-300 flex items-center gap-1.5"><span>⭐</span> <span>Bloque 2: Estrellas, Nebulosas & Galaxias (L7 a L12)</span></span>
+              <span class="text-cyan-300 flex items-center gap-1.5"><span>Bloque 2: Estrellas, Nebulosas & Galaxias (L7 a L12)</span></span>
               <span class="text-slate-300 font-mono">${m2Done} / 6 (${m2Pct}%)</span>
             </div>
             <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden p-0.5 border border-white/5">
@@ -930,7 +933,7 @@ function renderHomeDashboard(){
           <!-- MÓDULO 3 -->
           <div class="space-y-1.5">
             <div class="flex justify-between items-center text-xs font-bold">
-              <span class="text-emerald-300 flex items-center gap-1.5"><span>🕳️</span> <span>Bloque 3: Agujeros Negros & Astrofísica Teórica (L13 a L18)</span></span>
+              <span class="text-emerald-300 flex items-center gap-1.5"><span>Bloque 3: Agujeros Negros & Astrofísica Teórica (L13 a L18)</span></span>
               <span class="text-slate-300 font-mono">${m3Done} / 6 (${m3Pct}%)</span>
             </div>
             <div class="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden p-0.5 border border-white/5">
@@ -940,24 +943,24 @@ function renderHomeDashboard(){
         </div>
       </div>
 
-      <!-- BLOQUE 4: ROADMAP DEL FUTURO (LO QUE APRENDERÁS MÁS ADELANTE) -->
+      <!-- BLOQUE 4: ROADMAP DEL FUTURO -->
       <div class="glass rounded-3xl p-5 sm:p-6 bg-slate-900/90 border border-white/10 space-y-3">
         <div>
-          <h3 class="font-display font-bold text-base text-white">🗺️ Roadmap del Conocimiento (Lo que Vas a Aprender)</h3>
+          <h3 class="font-display font-bold text-base text-white">Roadmap del Conocimiento (Estructura Académica)</h3>
           <p class="text-xs text-slate-400">Objetivos académicos clave incluidos en los 18 módulos del curso:</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
           <div class="bg-slate-950/60 p-3.5 rounded-2xl border border-white/5 space-y-1">
-            <div class="text-xs font-bold text-indigo-400 font-display">🛰️ Módulo Artemis & Starship</div>
+            <div class="text-xs font-bold text-indigo-400 font-display">Módulo Artemis & Starship</div>
             <p class="text-[11px] text-slate-300 leading-snug">Vuelos orbitales, propulsión con Metano/Oxígeno líquido, estación Gateway y transferencia Hohmann.</p>
           </div>
           <div class="bg-slate-950/60 p-3.5 rounded-2xl border border-white/5 space-y-1">
-            <div class="text-xs font-bold text-cyan-400 font-display">🌌 Espectroscopía & Estrellas</div>
+            <div class="text-xs font-bold text-cyan-400 font-display">Espectroscopía & Estrellas</div>
             <p class="text-[11px] text-slate-300 leading-snug">Fusión nuclear de Hidrógeno a Helio, diagrama Hertzsprung-Russell y espectros de emisión.</p>
           </div>
           <div class="bg-slate-950/60 p-3.5 rounded-2xl border border-white/5 space-y-1">
-            <div class="text-xs font-bold text-emerald-400 font-display">🕳️ Relatividad & Singularidad</div>
+            <div class="text-xs font-bold text-emerald-400 font-display">Relatividad & Singularidad</div>
             <p class="text-[11px] text-slate-300 leading-snug">Curvatura del espacio-tiempo de Einstein, radio de Schwarzschild y radiación de Hawking.</p>
           </div>
         </div>
