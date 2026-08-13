@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, Settings, Move, Maximize2, Minimize2 } from 'lucide-react';
 import { askAI, ChatMessage } from '../services/aiService';
 import { useAuth } from '../context/AuthContext';
@@ -6,11 +6,9 @@ import { db, collection, addDoc, doc, setDoc } from '../config/firebase';
 
 import { MascotSkinId, MascotAnimState } from '../types/mascot';
 import { MASCOT_SKINS } from '../config/mascotSkins';
+import { MascotPet } from './mascot/MascotPet';
 import { MascotSkinSelectorModal } from './mascot/MascotSkinSelectorModal';
 import { useMascotTTS } from '../hooks/useMascotTTS';
-
-// Lazy load del motor 3D (Three.js) — se carga solo cuando la mascota se renderiza
-const MascotRender3D = lazy(() => import('./mascot/MascotRender3D').then(m => ({ default: m.MascotRender3D })));
 
 interface FloatingAIContextWidgetProps {
   activeExperience: string | null;
@@ -449,30 +447,14 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
           </div>
         )}
 
-        {/* Mascota 3D Interactiva Flotante Trigger (Draggable + Eye Tracking) */}
+        {/* Mascota Pet Animada (Draggable) — Sin textos, solo el bicho */}
         <div
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          className="group relative flex items-center gap-2 p-1.5 rounded-full bg-slate-950/80 border border-indigo-500/40 shadow-[0_0_30px_rgba(99,102,241,0.5)] hover:shadow-[0_0_50px_rgba(168,85,247,0.8)] transition-all duration-300 cursor-grab active:cursor-grabbing backdrop-blur-md"
+          className="group relative cursor-grab active:cursor-grabbing"
         >
-          <Suspense fallback={
-            <div className="w-16 h-16 flex items-center justify-center text-2xl animate-pulse">
-              {currentSkin.avatarIcon}
-            </div>
-          }>
-            <MascotRender3D skinId={currentSkinId} animState={animState} scale={mascotScale} />
-          </Suspense>
-          
-          <div className="hidden sm:flex flex-col pr-2">
-            <span className="font-display font-black text-xs text-white flex items-center gap-1">
-              <span>{currentSkin.name}</span>
-              <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
-            </span>
-            <span className="text-[10px] text-indigo-300 font-medium">Copilot 3D</span>
-          </div>
-
-          <Move className="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-300 transition-colors" />
+          <MascotPet skinId={currentSkinId} animState={animState} scale={mascotScale} />
         </div>
       </div>
 
