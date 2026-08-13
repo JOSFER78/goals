@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Shield, Globe, BookOpen, Orbit, RefreshCw, ChevronUp, HelpCircle, CheckCircle2, Smartphone } from 'lucide-react';
+import { Download, Shield, Globe, BookOpen, Orbit, RefreshCw, ChevronUp, HelpCircle, CheckCircle2, Smartphone, Bell, Sparkles } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
 import { checkForApkUpdate, isNativeApp, UpdateInfo, CURRENT_APP_VERSION } from '../services/updateService';
 import { useProgress } from '../context/ProgressContext';
@@ -35,9 +35,9 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
       const info = await checkForApkUpdate();
       setUpdateInfo(info);
       if (info.hasUpdate) {
-        showToast(`🔔 ¡Nueva versión v${info.latestVersion} disponible!`);
+        showToast(`Nueva versión v${info.latestVersion} disponible para descargar`);
       } else {
-        showToast(`✅ Estás en la versión más reciente (v${info.currentVersion})`);
+        showToast(`Versión actual v${info.currentVersion} al día`);
       }
     } catch (e) {
       showToast("Error consultando servidor de versiones");
@@ -48,7 +48,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
 
   return (
     <>
-      <footer className="w-full bg-slate-950/95 border-t border-slate-800/80 text-slate-400 text-xs font-display backdrop-blur-md z-10 py-5 px-4 sm:px-8 mt-auto relative snap-start">
+      <footer className="w-full bg-slate-950/90 border-t border-slate-800/80 text-slate-400 text-xs font-display backdrop-blur-md z-10 py-5 px-4 sm:px-8 mt-auto relative snap-start">
         <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 space-y-4">
           
           {/* Fila Principal: Branding, Links de Navegación & Único Icono Android */}
@@ -65,7 +65,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                 <span className="font-extrabold text-white text-sm tracking-tight">GOALS Platform</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Plataforma Educativa Gamificada con IA Real, Astrofísica 3D y Aprendizaje Adaptativo.
+                Plataforma Educativa Adaptativa con IA Multimodal, Astrofísica 3D y Aprendizaje Guiado.
               </p>
             </div>
 
@@ -90,23 +90,23 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
               </div>
             </div>
 
-            {/* Columna 3: ÚNICO BOTÓN ELEGANTE CON ICONO OFICIAL ANDROID / MÓVIL Y DESPLEGABLE */}
+            {/* Columna 3: Android App y Desplegable */}
             <div className="sm:text-right flex sm:justify-end relative" ref={dropdownRef}>
               
               {/* Botón Principal Mínimo de Android */}
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/30 hover:border-emerald-400 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer group"
+                className="px-3 py-1.5 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-emerald-500/30 hover:border-emerald-400 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer group"
               >
-                <img src="/android-logo.png" alt="Android" className="w-4 h-4 object-contain group-hover:scale-110 transition-transform" />
+                <img src="/android-logo.png" alt="Android" className="w-4 h-4 object-contain group-hover:scale-105 transition-transform" />
                 <span className="text-emerald-400 font-mono text-[11px]">v{CURRENT_APP_VERSION}</span>
                 <ChevronUp className={`w-3 h-3 text-emerald-400 transition-transform duration-200 ${isDropdownOpen ? '' : 'rotate-180'}`} />
               </button>
 
               {/* Mini Desplegable Ultra-Mínimo */}
               {isDropdownOpen && (
-                <div className="absolute right-0 bottom-full mb-2 w-64 bg-[#0b0f19] border border-emerald-500/30 rounded-2xl p-3 shadow-2xl space-y-2.5 z-50 font-display animate-fadeIn text-left">
+                <div className="absolute right-0 bottom-full mb-2 w-64 bg-slate-950 border border-slate-800 rounded-2xl p-3 shadow-2xl space-y-2.5 z-50 font-display animate-fadeIn text-left backdrop-blur-xl">
                   
                   {/* Cabecera limpia */}
                   <div className="flex items-center justify-between pb-2 border-b border-slate-800/80">
@@ -120,14 +120,14 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                   </div>
 
-                  {/* Botón de Descargar Directa Mínimo */}
+                  {/* Botón de Descargar Directa */}
                   <a
                     href="https://appgoals.web.app/downloads/goalskid_2.5.zip"
                     download="goalskid_2.5.zip"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="w-full py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer"
+                    className="w-full py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Descargar APK</span>
@@ -153,18 +153,18 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                     <button
                       type="button"
                       onClick={() => { setIsGuideOpen(true); setIsDropdownOpen(false); }}
-                      className="w-full py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-400 text-[10px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
+                      className="w-full py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-[10px] font-semibold flex items-center justify-center gap-1.5 transition-all active:scale-95 cursor-pointer"
                     >
-                      <HelpCircle className="w-3 h-3 text-amber-400" />
+                      <HelpCircle className="w-3 h-3 text-indigo-400" />
                       <span>Guía de Instalación</span>
                     </button>
                   </div>
 
                   {/* Resultado dinámico en la APK */}
                   {updateInfo && isNativeApp() && (
-                    <div className="p-2 rounded-lg bg-slate-950 border border-slate-800 text-[10px] text-slate-300 flex items-center gap-1.5">
+                    <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 text-[10px] text-slate-300 flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>{updateInfo.hasUpdate ? `¡Nueva versión v${updateInfo.latestVersion} disponible!` : `App actualizada (v${updateInfo.currentVersion})`}</span>
+                      <span>{updateInfo.hasUpdate ? `Nueva versión v${updateInfo.latestVersion} disponible` : `App actualizada (v${updateInfo.currentVersion})`}</span>
                     </div>
                   )}
 
@@ -175,12 +175,13 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
 
           </div>
 
-          {/* Fila Inferior: Copyright */}
+          {/* Fila Inferior: Copyright & Status */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-slate-500">
             <p>© 2026 GOALS Educational Ecosystem. Todos los derechos reservados.</p>
-            <div className="flex items-center gap-3">
-              <span className="text-slate-400 font-semibold flex items-center gap-1">
-                🟢 IA Real Conectada (model: "auto")
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-slate-400 font-medium">
+                IA Real Conectada (model: auto)
               </span>
             </div>
           </div>
@@ -196,3 +197,4 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
     </>
   );
 };
+

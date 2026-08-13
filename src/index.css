@@ -18,16 +18,13 @@
   50% { opacity: 0.8; filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.6)); }
 }
 
-.animate-float {
-  animation: float 4s ease-in-out infinite;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.animate-twinkle {
-  animation: twinkle 3s ease-in-out infinite;
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 3s ease-in-out infinite;
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
 }
 
 /* Ocultar barras de desplazamiento nativas manteniendo scroll táctil */
