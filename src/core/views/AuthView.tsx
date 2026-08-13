@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Lock, Mail, User, Sparkles, KeyRound } from 'lucide-react';
+import { ArrowLeft, Lock, Mail, User, Sparkles, KeyRound, X } from 'lucide-react';
 
 interface AuthViewProps {
   initialMode?: 'login' | 'signup';
@@ -81,10 +81,10 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   // 🔒 PANTALLA PREVIA OBLIGATORIA: CÓDIGO DE INVITACIÓN SECRETO
   if (!isUnlocked) {
     return (
-      <div className="py-12 max-w-md mx-auto px-4 animate-fadeIn font-display">
+      <div className="pt-2 pb-12 max-w-md mx-auto px-4 w-full animate-fadeIn font-display">
         <button
           onClick={onBackToLanding}
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-all mb-6"
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-all mb-4"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Volver a la Presentación GOALS</span>
@@ -92,6 +92,15 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
 
         <div className="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(245,158,11,0.15)] space-y-6 text-center relative overflow-hidden">
           
+          <button
+            type="button"
+            onClick={onBackToLanding}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer z-20"
+            title="Cerrar y volver a GOALS"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
           <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto shadow-inner animate-pulse">
@@ -136,7 +145,7 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
 
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/25 active:scale-95 flex items-center justify-center gap-2"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <KeyRound className="w-4 h-4" />
               <span>Verificar Código y Desbloquear</span>
@@ -152,19 +161,27 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   }
 
   return (
-    <div className="py-8 max-w-md mx-auto px-4 animate-fadeIn">
+    <div className="pt-2 pb-12 max-w-md mx-auto px-4 w-full animate-fadeIn">
       
       {/* Botón Volver */}
       <button
         onClick={onBackToLanding}
-        className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-all mb-6"
+        className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-all mb-4"
       >
         <ArrowLeft className="w-4 h-4" />
         <span>Volver a la Presentación GOALS</span>
       </button>
 
       {/* Tarjeta Formulario de Autenticación */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-5">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-5 relative">
+        <button
+          type="button"
+          onClick={onBackToLanding}
+          className="absolute top-4 right-4 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer z-20"
+          title="Cerrar y volver a GOALS"
+        >
+          <X className="w-5 h-5" />
+        </button>
         <div className="text-center space-y-1">
           <div className="w-10 h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center font-display font-black text-indigo-400 text-sm mx-auto mb-2">
             G
