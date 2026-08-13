@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, Settings, Move, Maximize2, Minimize2, ChevronLeft } from 'lucide-react';
+import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, Settings, Move, Maximize2, Minimize2, ChevronLeft, ChevronUp, ChevronDown, Mic, MicOff } from 'lucide-react';
 import { askAI, ChatMessage } from '../services/aiService';
 import { useAuth } from '../context/AuthContext';
 import { db, collection, addDoc, doc, setDoc } from '../config/firebase';
@@ -32,6 +32,8 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
   const currentSkin = MASCOT_SKINS[currentSkinId] || MASCOT_SKINS.astrobot;
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // Modo Píldora (false) vs Modo Extendido (true)
+  const [isVoiceActive, setIsVoiceActive] = useState(false); // Voz a Voz Live
   const [isSkinModalOpen, setIsSkinModalOpen] = useState(false);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -282,7 +284,40 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     );
   }
 
-  // Calcular la posición inteligente de la ventana de chat para que JAMÁS se salga de la pantalla
+  // Posición de la Burbuja Píldora Adosada al Pet (Modo Compacto)
+  const getPillPosition = () => {
+    const windowW = window.innerWidth;
+    const windowH = window.innerHeight;
+    const pillW = Math.min(windowW - 24, 350);
+    const pillH = 74;
+
+    if (!dragRef.current) {
+      return {
+        left: Math.max(12, windowW - pillW - 24),
+        top: Math.max(12, windowH - pillH - 95),
+        width: pillW
+      };
+    }
+
+    const rect = dragRef.current.getBoundingClientRect();
+    const isRightHalf = rect.left + rect.width / 2 > windowW / 2;
+    const isBottomHalf = rect.top + rect.height / 2 > windowH / 2;
+
+    let left = isRightHalf
+      ? rect.right - pillW
+      : rect.left;
+
+    let top = isBottomHalf
+      ? rect.top - pillH - 8
+      : rect.bottom + 8;
+
+    left = Math.max(12, Math.min(left, windowW - pillW - 12));
+    top = Math.max(12, Math.min(top, windowH - pillH - 12));
+
+    return { left, top, width: pillW };
+  };
+
+  // Posición Inteligente de la Ventana Extendida
   const getSmartPopupPosition = () => {
     const windowW = window.innerWidth;
     const windowH = window.innerHeight;
@@ -310,7 +345,6 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
       ? rect.top - popupH - 12
       : rect.bottom + 12;
 
-    // Clamping estricto dentro de la pantalla visible (Márgenes de 12px)
     left = Math.max(12, Math.min(left, windowW - popupW - 12));
     top = Math.max(12, Math.min(top, windowH - popupH - 12));
 
@@ -319,8 +353,88 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
   return (
     <>
-      {/* Ventana de Chat Flotante con Clamping Estricto (Nunca se sale de la pantalla) */}
-      {isOpen && (() => {
+      {/* 1. Burbuja Píldora Ultra-Minimalista Adosada al Pet (Estilo Codex / Hermes Pet) */}
+      {isOpen && !isExpanded && (() => {
+        const pill = getPillPosition();
+        const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant');
+        const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+
+        return (
+          <div
+            style={{
+              position: 'fixed',
+              left: `${pill.left}px`,
+              top: `${pill.top}px`,
+              width: `${pill.width}px`,
+            }}
+            className="z-50 rounded-2xl bg-slate-950/95 border border-indigo-500/40 shadow-[0_10px_40px_rgba(0,0,0,0.85)] backdrop-blur-xl p-2.5 px-3.5 flex items-center justify-between gap-3 animate-in fade-in zoom-in-95 duration-200 font-sans select-none"
+          >
+            {/* Texto Resumido / Último mensaje */}
+            <div className="flex-1 min-w-0 flex flex-col justify-center">
+              <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-white">
+                <span className="truncate">{lastUserMsg ? lastUserMsg.content : `Preguntar a ${currentSkin.name}`}</span>
+              </div>
+              <p className="text-[11px] text-slate-300 truncate font-sans mt-0.5">
+                {isLoading
+                  ? 'Pensando respuesta...'
+                  : lastAssistantMsg
+                    ? lastAssistantMsg.content
+                    : 'Voy a responder sobre lo que ves en pantalla...'}
+              </p>
+            </div>
+
+            {/* Iconos de Acción Ultra-Minimalistas */}
+            <div className="flex items-center gap-1 shrink-0 border-l border-slate-800 pl-2">
+              {/* Botón de Voz a Voz Live */}
+              <button
+                type="button"
+                onClick={() => setIsVoiceActive(!isVoiceActive)}
+                className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
+                  isVoiceActive ? 'text-rose-400 bg-rose-500/20 border border-rose-500/40 animate-pulse' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                }`}
+                title={isVoiceActive ? "Desactivar Voz Live" : "Activar Voz Live (Gemini Live)"}
+              >
+                {isVoiceActive ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+              </button>
+
+              {/* Botón TTS */}
+              <button
+                type="button"
+                onClick={toggleMute}
+                className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
+                  isMuted ? 'text-slate-500 hover:text-slate-300' : 'text-amber-400 bg-amber-400/10'
+                }`}
+                title={isMuted ? "Activar Voz TTS" : "Desactivar Voz TTS"}
+              >
+                {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
+              </button>
+
+              {/* Botón Ampliar Chat Flecha ^ */}
+              <button
+                type="button"
+                onClick={() => setIsExpanded(true)}
+                className="p-1.5 rounded-lg text-indigo-400 hover:text-white hover:bg-indigo-500/20 transition-all cursor-pointer"
+                title="Ampliar chat completo (^)"
+              >
+                <ChevronUp className="w-4 h-4" />
+              </button>
+
+              {/* Botón Cerrar Píldora */}
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 transition-all cursor-pointer"
+                title="Cerrar"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* 2. Ventana Extendida de Chat Flotante (Cuando el usuario pulsa ^) */}
+      {isOpen && isExpanded && (() => {
         const pop = getSmartPopupPosition();
         return (
           <div
@@ -342,6 +456,14 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
               {/* Botones de Control */}
               <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(false)}
+                  className="p-1.5 rounded-lg text-indigo-400 hover:text-white hover:bg-indigo-500/20 transition-all cursor-pointer"
+                  title="Reducir a Píldora"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
                 <button
                   type="button"
                   onClick={toggleMute}
