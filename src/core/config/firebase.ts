@@ -18,7 +18,7 @@ import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteD
 
 export const defaultFirebaseConfig = {
   apiKey: "AIzaSyBsaRLUUFG1QdSjMMzxzOVmzW4aqrN0TbM",
-  authDomain: "appgoals.web.app",
+  authDomain: "goalskid-app-4c276.firebaseapp.com",
   projectId: "goalskid-app",
   storageBucket: "goalskid-app.firebasestorage.app",
   messagingSenderId: "828956321348",
@@ -27,16 +27,8 @@ export const defaultFirebaseConfig = {
 
 export function getStoredFirebaseConfig() {
   try {
-    const custom = localStorage.getItem('goals_firebase_config');
-    if (custom) {
-      const parsed = JSON.parse(custom);
-      if (parsed && parsed.apiKey && parsed.apiKey.length > 5) {
-        return parsed;
-      }
-    }
-  } catch (e) {
-    console.warn("Error leyendo configuración personalizada de Firebase", e);
-  }
+    localStorage.removeItem('goals_firebase_config');
+  } catch {}
   return defaultFirebaseConfig;
 }
 
