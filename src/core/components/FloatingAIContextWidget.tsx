@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, Settings, Move } from 'lucide-react';
+import React, { useState, useRef, useEffect, Suspense, lazy } from 'react';
+import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, Settings, Move, Maximize2, Minimize2 } from 'lucide-react';
 import { askAI, ChatMessage } from '../services/aiService';
 import { useAuth } from '../context/AuthContext';
 import { db, collection, addDoc, doc, setDoc } from '../config/firebase';
 
 import { MascotSkinId, MascotAnimState } from '../types/mascot';
 import { MASCOT_SKINS } from '../config/mascotSkins';
-import { MascotRender } from './mascot/MascotRender';
 import { MascotSkinSelectorModal } from './mascot/MascotSkinSelectorModal';
 import { useMascotTTS } from '../hooks/useMascotTTS';
+
+// Lazy load del motor 3D (Three.js) — se carga solo cuando la mascota se renderiza
+const MascotRender3D = lazy(() => import('./mascot/MascotRender3D').then(m => ({ default: m.MascotRender3D })));
 
 interface FloatingAIContextWidgetProps {
   activeExperience: string | null;
@@ -37,6 +39,11 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [animState, setAnimState] = useState<MascotAnimState>('idle');
+
+  // Tamaño de la mascota (Resize dinámico)
+  const [mascotScale, setMascotScale] = useState(() => {
+    return parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
+  });
 
   // Arrastre Libre (Draggable)
   const [position, setPosition] = useState<{ x?: number; y?: number }>({});
@@ -79,11 +86,24 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
       try {
         await setDoc(doc(db, 'users', user.uid, 'ai_profile', 'pet_config'), {
           skinId,
+          scale: mascotScale,
           updatedAt: Date.now()
         }, { merge: true });
       } catch (e) {
         console.warn('Error guardando pet_config en Firestore:', e);
       }
+    }
+  };
+
+  // Actualizar tamaño de la mascota y persistir
+  const handleScaleChange = (newScale: number) => {
+    setMascotScale(newScale);
+    localStorage.setItem('goals_mascot_scale', String(newScale));
+    if (db && user?.uid && !user.isAnonymous) {
+      setDoc(doc(db, 'users', user.uid, 'ai_profile', 'pet_config'), {
+        scale: newScale,
+        updatedAt: Date.now()
+      }, { merge: true }).catch(() => {});
     }
   };
 
@@ -325,6 +345,23 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
               </div>
             </div>
 
+            {/* Slider de Resize de la Mascota */}
+            <div className="px-4 py-1.5 bg-slate-900/60 border-b border-slate-800/50 flex items-center gap-2 shrink-0">
+              <Minimize2 className="w-3 h-3 text-slate-500" />
+              <input
+                type="range"
+                min={0.6}
+                max={2.5}
+                step={0.1}
+                value={mascotScale}
+                onChange={(e) => handleScaleChange(parseFloat(e.target.value))}
+                className="flex-1 h-1 accent-indigo-500 cursor-pointer"
+                title={`Tamaño: ${mascotScale.toFixed(1)}x`}
+              />
+              <Maximize2 className="w-3 h-3 text-slate-500" />
+              <span className="text-[9px] font-mono text-indigo-400 w-7 text-right">{mascotScale.toFixed(1)}x</span>
+            </div>
+
             {/* Chips Rápidos */}
             <div className="p-2 px-3 bg-slate-900/80 border-b border-slate-800/80 flex items-center gap-2 overflow-x-auto scrollbar-none shrink-0 text-[11px]">
               <button
@@ -412,21 +449,27 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
           </div>
         )}
 
-        {/* Mascota Interactiva Flotante Trigger (Draggable + Eye Tracking) */}
+        {/* Mascota 3D Interactiva Flotante Trigger (Draggable + Eye Tracking) */}
         <div
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          className="group relative flex items-center gap-2 p-2 px-3 rounded-full bg-slate-950/90 border border-indigo-500/40 shadow-[0_0_30px_rgba(99,102,241,0.5)] hover:shadow-[0_0_40px_rgba(168,85,247,0.7)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-grab active:cursor-grabbing backdrop-blur-md"
+          className="group relative flex items-center gap-2 p-1.5 rounded-full bg-slate-950/80 border border-indigo-500/40 shadow-[0_0_30px_rgba(99,102,241,0.5)] hover:shadow-[0_0_50px_rgba(168,85,247,0.8)] transition-all duration-300 cursor-grab active:cursor-grabbing backdrop-blur-md"
         >
-          <MascotRender skinId={currentSkinId} animState={animState} />
+          <Suspense fallback={
+            <div className="w-16 h-16 flex items-center justify-center text-2xl animate-pulse">
+              {currentSkin.avatarIcon}
+            </div>
+          }>
+            <MascotRender3D skinId={currentSkinId} animState={animState} scale={mascotScale} />
+          </Suspense>
           
-          <div className="hidden sm:flex flex-col pr-1">
+          <div className="hidden sm:flex flex-col pr-2">
             <span className="font-display font-black text-xs text-white flex items-center gap-1">
               <span>{currentSkin.name}</span>
               <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
             </span>
-            <span className="text-[10px] text-indigo-300 font-medium">Copilot IA Pantalla</span>
+            <span className="text-[10px] text-indigo-300 font-medium">Copilot 3D</span>
           </div>
 
           <Move className="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-300 transition-colors" />

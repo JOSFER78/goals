@@ -9,6 +9,15 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'three-engine': ['three', '@react-three/fiber', '@react-three/drei'],
+        }
+      }
+    }
+  },
   server: {
     port: 3000,
     open: true,
