@@ -7,8 +7,10 @@
       "**/.*",
       "**/node_modules/**",
       "**/*.apk",
+      "**/*.zip",
       "**/*.exe",
-      "**/downloads/*.apk"
+      "**/downloads/*.apk",
+      "**/downloads/*.zip"
     ],
     "rewrites": [
       {
