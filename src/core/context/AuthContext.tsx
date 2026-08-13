@@ -110,15 +110,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     try {
       if (Capacitor.isNativePlatform()) {
-        // Autenticación NATIVA con Google Play Services en Android
-        const res = await FirebaseAuthentication.signInWithGoogle();
-        const idToken = res.credential?.idToken;
-        if (!idToken) {
-          throw new Error("No se obtuvo el idToken nativo de Google.");
+        try {
+          // Autenticación NATIVA con Google Play Services en Android
+          const res = await FirebaseAuthentication.signInWithGoogle();
+          const idToken = res.credential?.idToken;
+          if (!idToken) {
+            throw new Error("No se obtuvo el idToken nativo de Google.");
+          }
+          const credential = GoogleAuthProvider.credential(idToken);
+          await signInWithCredential(auth, credential);
+          setIsCloud(true);
+        } catch (nativeErr: any) {
+          console.warn("Plugin nativo no disponible o falló:", nativeErr);
+          // Si el plugin nativo no está activo por falta de google-services.json, usar popup o mensaje limpio
+          try {
+            const res = await signInWithPopup(auth, googleProvider);
+            if (res.user) setIsCloud(true);
+          } catch (popupErr: any) {
+            setAuthError("💡 En la APK Nativa Móvil, por favor inicia sesión o regístrate usando tu Correo Electrónico y Contraseña.");
+          }
         }
-        const credential = GoogleAuthProvider.credential(idToken);
-        await signInWithCredential(auth, credential);
-        setIsCloud(true);
       } else {
         // Autenticación WEB estándar en navegador
         const res = await signInWithPopup(auth, googleProvider);
@@ -130,9 +141,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.error("Google Auth Error:", err);
       const msg = err.code === 'auth/popup-closed-by-user' 
         ? 'Cancelado por el usuario.' 
-        : (err.message || 'Error al iniciar sesión con Google.');
+        : '💡 En la APK Nativa Móvil, usa tu Correo Electrónico y Contraseña para Iniciar Sesión de forma nativa e instantánea.';
       setAuthError(msg);
-      throw err;
     }
   };
 

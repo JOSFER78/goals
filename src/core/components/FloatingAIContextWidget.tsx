@@ -445,10 +445,10 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
               width: `${pop.width}px`,
               height: `${pop.height}px`,
             }}
-            className="z-50 rounded-3xl bg-slate-950/95 border border-indigo-500/40 shadow-[0_10px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-sans"
+            className="z-50 rounded-3xl bg-slate-950/75 border border-indigo-500/30 shadow-[0_10px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-sans"
           >
             {/* Cabecera Minimalista de la Mascota */}
-            <div className="p-3 px-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between shrink-0">
+            <div className="p-3 px-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <span className="text-xl">{currentSkin.avatarIcon}</span>
                 <h3 className="font-extrabold text-xs text-white tracking-wide">{currentSkin.name}</h3>
@@ -456,6 +456,17 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
               {/* Botones de Control */}
               <div className="flex items-center gap-1">
+                {/* Botón de Voz a Voz Live */}
+                <button
+                  type="button"
+                  onClick={() => setIsVoiceActive(!isVoiceActive)}
+                  className={`p-1.5 rounded-lg transition-all text-xs cursor-pointer ${
+                    isVoiceActive ? 'text-rose-400 bg-rose-500/20 border border-rose-500/40 animate-pulse' : 'text-slate-400 hover:text-white hover:bg-white/10'
+                  }`}
+                  title={isVoiceActive ? "Desactivar Voz Live" : "Activar Voz Live (Gemini Live)"}
+                >
+                  {isVoiceActive ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+                </button>
                 <button
                   type="button"
                   onClick={() => setIsExpanded(false)}
@@ -476,14 +487,6 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIsSkinModalOpen(true)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all text-xs cursor-pointer"
-                  title="Cambiar Skin"
-                >
-                  <Settings className="w-4 h-4" />
-                </button>
-                <button
-                  type="button"
                   onClick={() => { setMessages([]); stop(); }}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-all text-xs cursor-pointer"
                   title="Limpiar chat"
@@ -498,23 +501,6 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                   <X className="w-4 h-4" />
                 </button>
               </div>
-            </div>
-
-            {/* Slider de Resize */}
-            <div className="px-4 py-1.5 bg-slate-900/60 border-b border-slate-800/50 flex items-center gap-2 shrink-0">
-              <Minimize2 className="w-3 h-3 text-slate-500" />
-              <input
-                type="range"
-                min={0.6}
-                max={2.5}
-                step={0.1}
-                value={mascotScale}
-                onChange={(e) => handleScaleChange(parseFloat(e.target.value))}
-                className="flex-1 h-1 accent-indigo-500 cursor-pointer"
-                title={`Tamaño: ${mascotScale.toFixed(1)}x`}
-              />
-              <Maximize2 className="w-3 h-3 text-slate-500" />
-              <span className="text-[9px] font-mono text-indigo-400 w-7 text-right">{mascotScale.toFixed(1)}x</span>
             </div>
 
             {/* Chips Rápidos */}

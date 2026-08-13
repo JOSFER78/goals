@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { X, Zap, Check, Gift, Download, Brain, RefreshCw, CheckCircle2 } from 'lucide-react';
+import { X, Zap, Check, Gift, Download, Brain, RefreshCw, CheckCircle2, Sliders, Volume2 } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
 import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
+import { MASCOT_SKINS } from '../config/mascotSkins';
+import { MascotSkinId } from '../types/mascot';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -22,8 +24,27 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const { user, isCloud, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut, updateUserProfileData, authError, setAuthError } = useAuth();
   const { userData, totalStars, maxStars, claimReto, getRankInfo, getRetosList, showToast } = useProgress();
 
-  const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'cuenta' | 'about' | 'admin'>('retos');
+  const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'mascota' | 'cuenta' | 'about' | 'admin'>('retos');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
+
+  // Mascot customization state
+  const [mascotSkinId, setMascotSkinId] = useState<MascotSkinId>(() => {
+    return (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
+  });
+  const [mascotScale, setMascotScale] = useState<number>(() => {
+    return parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
+  });
+
+  const handleSelectMascotSkin = (skinId: MascotSkinId) => {
+    setMascotSkinId(skinId);
+    localStorage.setItem('goals_mascot_skin', skinId);
+    showToast(`🐾 Mascota cambiada a ${MASCOT_SKINS[skinId].name}`);
+  };
+
+  const handleScaleChange = (scale: number) => {
+    setMascotScale(scale);
+    localStorage.setItem('goals_mascot_scale', String(scale));
+  };
 
   // Update checking state
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
@@ -136,6 +157,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'racha' ? 'bg-rose-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                 >
                   🔥 Racha & ⭐
+                </button>
+                <button 
+                  onClick={() => setActiveTab('mascota')}
+                  className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'mascota' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                >
+                  🐾 Mascota
                 </button>
                 <button 
                   onClick={() => setActiveTab('cuenta')}
