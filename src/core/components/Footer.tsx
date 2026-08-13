@@ -95,7 +95,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                 className="px-3.5 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/40 hover:border-emerald-400 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer group"
               >
                 <img src="/android-logo.png" alt="Android" className="w-4 h-4 object-contain group-hover:scale-110 transition-transform" />
-                <span className="text-emerald-400 font-mono">v2.1</span>
+                <span className="text-emerald-400 font-mono">v2.2</span>
                 <ChevronUp className={`w-3.5 h-3.5 text-emerald-400 transition-transform duration-200 ${isDropdownOpen ? '' : 'rotate-180'}`} />
               </button>
 
@@ -110,9 +110,9 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                       <div>
                         <h4 className="font-extrabold text-xs text-white leading-tight flex items-center gap-1">
                           <span>Android App</span>
-                          <span className="text-emerald-400 font-mono">v2.1.0</span>
+                          <span className="text-emerald-400 font-mono">v2.2.0</span>
                         </h4>
-                        <p className="text-[9px] text-slate-400 font-mono">goalskid2.1.zip</p>
+                        <p className="text-[9px] text-slate-400 font-mono">goalskid2.2.zip</p>
                       </div>
                     </div>
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -120,15 +120,15 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
 
                   {/* Botón de Descargar Directa */}
                   <a
-                    href="https://goalskid.web.app/downloads/goalskid2.1.zip"
-                    download="goalskid2.1.zip"
+                    href="https://goalskid.web.app/downloads/goalskid2.2.zip"
+                    download="goalskid2.2.zip"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsDropdownOpen(false)}
                     className="w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer"
                   >
                     <Download className="w-4 h-4" />
-                    <span>Descargar goalskid2.1.zip</span>
+                    <span>Descargar goalskid2.2.zip</span>
                   </a>
 
                   {/* Acciones Secundarias en Grilla */}

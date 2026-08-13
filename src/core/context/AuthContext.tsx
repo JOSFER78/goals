@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { 
   auth, 
   db,
@@ -106,15 +109,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error("Firebase no está configurado correctamente.");
     }
     try {
-      const res = await signInWithPopup(auth, googleProvider);
-      if (res.user) {
+      if (Capacitor.isNativePlatform()) {
+        // Autenticación NATIVA con Google Play Services en Android
+        const res = await FirebaseAuthentication.signInWithGoogle();
+        const idToken = res.credential?.idToken;
+        if (!idToken) {
+          throw new Error("No se obtuvo el idToken nativo de Google.");
+        }
+        const credential = GoogleAuthProvider.credential(idToken);
+        await signInWithCredential(auth, credential);
         setIsCloud(true);
+      } else {
+        // Autenticación WEB estándar en navegador
+        const res = await signInWithPopup(auth, googleProvider);
+        if (res.user) {
+          setIsCloud(true);
+        }
       }
     } catch (err: any) {
       console.error("Google Auth Error:", err);
       const msg = err.code === 'auth/popup-closed-by-user' 
         ? 'Cancelado por el usuario.' 
-        : 'Sugerencia: En la App Nativa Móvil, usa tu Correo y Contraseña para Iniciar Sesión de forma nativa e instantánea sin salir de la App.';
+        : (err.message || 'Error al iniciar sesión con Google.');
       setAuthError(msg);
       throw err;
     }
