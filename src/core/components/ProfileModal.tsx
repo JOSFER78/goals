@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { X, Zap, Check, Gift, Download, Brain, RefreshCw, CheckCircle2, Sliders, Volume2 } from 'lucide-react';
+import { X, Zap, Check, Gift, Download, Brain, RefreshCw, CheckCircle2, Sliders, Volume2, Target, Flame, Star, Bot, User, Smartphone, ShieldCheck, Sparkles, Award } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
 import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
 import { MASCOT_SKINS } from '../config/mascotSkins';
 import { MascotSkinId } from '../types/mascot';
+import { MascotPet } from './mascot/MascotPet';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -38,7 +39,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const handleSelectMascotSkin = (skinId: MascotSkinId) => {
     setMascotSkinId(skinId);
     localStorage.setItem('goals_mascot_skin', skinId);
-    showToast(`🐾 Mascota cambiada a ${MASCOT_SKINS[skinId].name}`);
+    showToast(`Mascota cambiada a ${MASCOT_SKINS[skinId].name}`);
   };
 
   const handleScaleChange = (scale: number) => {
@@ -61,16 +62,22 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [signupName, setSignupName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const isGuest = !user || user.isAnonymous;
+  const rank = getRankInfo(userData?.xp || 0);
+
+  const currentStars = totalStars || 0;
+  const maxPossibleStars = maxStars || 18;
+
   const handleCheckForUpdates = async () => {
     setIsCheckingUpdate(true);
     try {
       const info = await checkForApkUpdate();
       setUpdateInfo(info);
       if (info.hasUpdate) {
-        showToast(`🔔 ¡Nueva versión v${info.latestVersion} lista para descargar!`);
+        showToast(`Nueva versión v${info.latestVersion} lista para descargar`);
         setIsGuideOpen(true);
       } else {
-        showToast(`✅ Tu aplicación está en la versión más reciente (v${info.currentVersion})`);
+        showToast(`Tu aplicación está en la versión más reciente (v${info.currentVersion})`);
       }
     } catch (e: any) {
       showToast("Error al conectar con el servidor de actualizaciones");
@@ -87,15 +94,10 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
   if (!isOpen) return null;
 
-  const isGuest = user?.isAnonymous || !isCloud;
-  const rank = getRankInfo(userData.xp);
-  const retosList = getRetosList();
-  const currentStars = totalStars();
-  const maxPossibleStars = maxStars();
-
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setAuthError(null);
     try {
       if (authMode === 'login') {
         await signInWithEmail(email, password);
@@ -123,64 +125,72 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
   return (
     <>
-      <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn cursor-pointer">
-        <div onClick={(e) => e.stopPropagation()} className="bg-[#0b0f19] border border-indigo-500/30 rounded-3xl w-full max-w-md max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col relative hide-scrollbar font-display cursor-default">
+      <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn cursor-pointer font-sans">
+        <div onClick={(e) => e.stopPropagation()} className="bg-slate-950/95 border border-indigo-500/30 rounded-3xl w-full max-w-2xl h-[85vh] max-h-[680px] overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative cursor-default animate-in fade-in zoom-in-95 duration-200">
           
-          {/* HEADER COMPACTO */}
-          <div className="p-3.5 border-b border-white/5 flex items-center justify-between sticky top-0 bg-[#0b0f19]/95 backdrop-blur-md z-20">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🚀</span>
+          {/* HEADER COMPACTO CON ICONO SVG */}
+          <div className="p-3.5 px-5 border-b border-slate-800 flex items-center justify-between sticky top-0 bg-slate-950/90 backdrop-blur-md z-20 shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
+                <User className="w-5 h-5" />
+              </div>
               <div>
-                <h2 className="font-extrabold text-base text-white leading-tight">Centro de Astronauta</h2>
+                <h2 className="font-extrabold text-base text-white leading-tight">Centro de Usuario</h2>
                 <p className="text-[10px] text-slate-400 font-medium">{rank.title}</p>
               </div>
             </div>
-            <button onClick={onClose} className="w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-700 transition-colors">
-              <X className="w-3.5 h-3.5" />
+            <button onClick={onClose} className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+              <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Contenido principal */}
-          <div className="p-3 space-y-3">
+          <div className="p-4 flex-1 overflow-y-auto hide-scrollbar space-y-4">
             
-            {/* NAVEGACIÓN DE PESTAÑAS */}
+            {/* NAVEGACIÓN DE PESTAÑAS CON ICONOS SVG */}
             {!isGuest && (
-              <div className="flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-white/5 text-[10px] font-extrabold overflow-x-auto hide-scrollbar">
+              <div className="flex items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-extrabold overflow-x-auto hide-scrollbar shrink-0">
                 <button 
                   onClick={() => setActiveTab('retos')}
-                  className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'retos' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'retos' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                 >
-                  ⚡ Retos
+                  <Target className="w-4 h-4 text-amber-400" />
+                  <span>Retos</span>
                 </button>
                 <button 
                   onClick={() => setActiveTab('racha')}
-                  className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'racha' ? 'bg-rose-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'racha' ? 'bg-rose-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                 >
-                  🔥 Racha & ⭐
+                  <Flame className="w-4 h-4 text-orange-400" />
+                  <span>Racha & Estrellas</span>
                 </button>
                 <button 
                   onClick={() => setActiveTab('mascota')}
-                  className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'mascota' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'mascota' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                 >
-                  🐾 Mascota
+                  <Bot className="w-4 h-4 text-purple-300" />
+                  <span>Mascota</span>
                 </button>
                 <button 
                   onClick={() => setActiveTab('cuenta')}
-                  className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'cuenta' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'cuenta' ? 'bg-cyan-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
                 >
-                  👤 Perfil
+                  <User className="w-4 h-4 text-cyan-300" />
+                  <span>Perfil</span>
                 </button>
                 <button 
                   onClick={() => setActiveTab('about')}
-                  className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'about' ? 'bg-emerald-600 text-white shadow' : 'text-emerald-400 hover:text-white'}`}
+                  className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'about' ? 'bg-emerald-600 text-white shadow' : 'text-emerald-400 hover:text-white'}`}
                 >
-                  📲 Actualizaciones
+                  <Smartphone className="w-4 h-4 text-emerald-300" />
+                  <span>Actualizaciones</span>
                 </button>
                 <button 
                   onClick={() => { onClose(); onOpenAdminDashboard(); }}
-                  className="px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30"
+                  className="px-3 py-2 rounded-xl transition-all whitespace-nowrap text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center gap-1.5 ml-auto"
                 >
-                  ⚙️ Admin
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Admin</span>
                 </button>
               </div>
             )}
@@ -402,6 +412,84 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-black">
                         {Math.round((currentStars / (maxPossibleStars || 1)) * 100)}%
                       </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 🐾 MASCOTA PET */}
+                {activeTab === 'mascota' && (
+                  <div className="space-y-4 animate-fadeIn">
+                    {/* Tarjeta de Previsualización Centrada y Nítida */}
+                    <div className="bg-gradient-to-b from-purple-950/40 to-slate-900 border border-purple-500/30 rounded-3xl p-5 text-center space-y-3 relative overflow-hidden shadow-xl">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Bot className="w-5 h-5 text-purple-400" />
+                          <h3 className="font-extrabold text-sm text-white">Vista Previa de Mascota</h3>
+                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
+                          {MASCOT_SKINS[mascotSkinId]?.name}
+                        </span>
+                      </div>
+
+                      {/* Pedestal Luminoso Centrado para el Bicho */}
+                      <div className="w-36 h-36 rounded-full bg-slate-950/80 border-2 border-purple-500/40 shadow-[0_0_30px_rgba(168,85,247,0.35)] flex items-center justify-center mx-auto relative group">
+                        <div className="absolute inset-0 rounded-full bg-purple-500/10 animate-ping opacity-20 pointer-events-none" />
+                        <MascotPet skinId={mascotSkinId} animState="idle" scale={1.2} />
+                      </div>
+
+                      <p className="text-xs text-slate-300 font-medium max-w-sm mx-auto">
+                        {MASCOT_SKINS[mascotSkinId]?.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Selector de Skins en Grilla */}
+                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 space-y-3">
+                      <h4 className="text-xs font-extrabold text-white flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        <span>Elige tu Compañero Interactivo</span>
+                      </h4>
+
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {Object.values(MASCOT_SKINS).map((skin) => (
+                          <button
+                            key={skin.id}
+                            onClick={() => handleSelectMascotSkin(skin.id as MascotSkinId)}
+                            className={`p-3 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
+                              mascotSkinId === skin.id
+                                ? 'bg-purple-950/70 border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.4)] scale-[1.02]'
+                                : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+                            }`}
+                          >
+                            <span className="text-2xl p-1.5 bg-slate-900 rounded-xl border border-white/5 shrink-0">{skin.avatarIcon}</span>
+                            <div className="min-w-0 flex-1">
+                              <h5 className="font-extrabold text-xs text-white truncate">{skin.name}</h5>
+                              <p className="text-[9px] text-slate-400 truncate">{skin.subtitle}</p>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Slider de Tamaño de la Mascota */}
+                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-200">
+                        <span>Escala de Pantalla</span>
+                        <span className="font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/30">{mascotScale.toFixed(1)}x</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0.6}
+                        max={2.5}
+                        step={0.1}
+                        value={mascotScale}
+                        onChange={(e) => handleScaleChange(parseFloat(e.target.value))}
+                        className="w-full h-2 accent-purple-500 cursor-pointer"
+                      />
+                      <div className="flex items-center justify-between text-[9px] text-slate-500 font-mono">
+                        <span>0.6x (Compacto)</span>
+                        <span>1.5x (Estándar)</span>
+                        <span>2.5x (Gigante)</span>
+                      </div>
                     </div>
                   </div>
                 )}

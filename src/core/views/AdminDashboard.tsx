@@ -200,11 +200,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const pendingCount = usersList.filter(u => !u.isApproved && u.email !== 'josferestudio@gmail.com').length;
 
   return (
-    <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn font-display cursor-pointer">
-      <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-amber-500/30 rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] cursor-default">
+    <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn font-sans cursor-pointer">
+      <div onClick={(e) => e.stopPropagation()} className="bg-slate-950/95 border border-amber-500/30 rounded-3xl w-full max-w-2xl h-[85vh] max-h-[680px] overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative cursor-default animate-in fade-in zoom-in-95 duration-200">
         
         {/* Header del Admin Dashboard */}
-        <div className="p-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
+        <div className="p-4 px-5 border-b border-slate-800 bg-slate-950/90 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
               <Shield className="w-5 h-5" />

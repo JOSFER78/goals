@@ -53,50 +53,54 @@ export const GoalsHome: React.FC<GoalsHomeProps> = ({ onSelectExperience, onOpen
     {
       id: 'school' as ExperienceId,
       name: 'Escuela IA',
-      icon: '📚',
-      tagline: 'Tutor OCR & Cuadernos',
-      badge: 'Mini App #1',
-      colorHex: '#10b981',
-      border: 'border-emerald-500/40 hover:border-emerald-400',
-      bgGradient: 'from-emerald-950/80 via-slate-900 to-slate-950',
-      btnBg: 'bg-emerald-500 text-slate-950 font-black',
-      progressPct: 85
+      icon: BookOpen,
+      tagline: 'Tutor OCR & Cuadernos Cyber',
+      badge: 'Cian & Índigo',
+      colorHex: '#00F0FF',
+      border: 'border-cyan-500/40 hover:border-cyan-400',
+      bgGradient: 'from-cyan-950/80 via-indigo-950/70 to-slate-950',
+      btnBg: 'bg-cyan-500 text-slate-950 font-black',
+      progressPct: 85,
+      iconColor: 'text-cyan-400'
     },
     {
       id: 'languages' as ExperienceId,
       name: 'Idiomas Voz',
-      icon: '🌐',
+      icon: Globe,
       tagline: 'Profesor Particular de Voz',
-      badge: 'Voz & Memoria',
-      colorHex: '#06b6d4',
-      border: 'border-cyan-500/40 hover:border-cyan-400',
-      bgGradient: 'from-cyan-950/80 via-slate-900 to-slate-950',
-      btnBg: 'bg-cyan-500 text-slate-950 font-black',
-      progressPct: 60
+      badge: 'Rosa & Rose',
+      colorHex: '#EC4899',
+      border: 'border-pink-500/40 hover:border-pink-400',
+      bgGradient: 'from-pink-950/80 via-rose-950/70 to-slate-950',
+      btnBg: 'bg-pink-500 text-white font-black',
+      progressPct: 65,
+      iconColor: 'text-pink-400'
     },
     {
       id: 'astro' as ExperienceId,
       name: 'AstroLingo 3D',
-      icon: '🪐',
-      tagline: 'Astrofísica & NASA 3D',
-      badge: 'Visor 3D NASA',
-      colorHex: '#6366f1',
-      border: 'border-indigo-500/40 hover:border-indigo-400',
-      bgGradient: 'from-indigo-950/80 via-slate-900 to-slate-950',
-      btnBg: 'bg-indigo-500 text-slate-950 font-black',
-      progressPct: Math.round((currentStars / (maxPossibleStars || 1)) * 100)
+      icon: Orbit,
+      tagline: 'Simulador Espacial NASA',
+      badge: 'Oro & Violeta',
+      colorHex: '#F59E0B',
+      border: 'border-amber-500/40 hover:border-amber-400',
+      bgGradient: 'from-amber-950/80 via-purple-950/70 to-slate-950',
+      btnBg: 'bg-amber-500 text-slate-950 font-black',
+      progressPct: Math.round((currentStars / (maxPossibleStars || 1)) * 100),
+      iconColor: 'text-amber-400'
     },
     {
       id: 'verify' as ExperienceId,
       name: 'Verifica',
-      icon: '🛡️',
-      tagline: 'Rigor & Fuentes Oficiales',
-      badge: 'ESA / NASA',
-      colorHex: '#f59e0b',
-      border: 'border-amber-500/40 hover:border-amber-400',
-      bgGradient: 'from-amber-950/80 via-slate-900 to-slate-950',
-      btnBg: 'bg-amber-500 text-slate-950 font-black',
-      progressPct: 100
+      icon: Shield,
+      tagline: 'Investigación & Rigor',
+      badge: 'Esmeralda & Turquesa',
+      colorHex: '#10B981',
+      border: 'border-emerald-500/40 hover:border-emerald-400',
+      bgGradient: 'from-emerald-950/80 via-teal-950/70 to-slate-950',
+      btnBg: 'bg-emerald-500 text-slate-950 font-black',
+      progressPct: 100,
+      iconColor: 'text-emerald-400'
     }
   ];
 
@@ -212,32 +216,37 @@ export const GoalsHome: React.FC<GoalsHomeProps> = ({ onSelectExperience, onOpen
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                {MINI_APPS.map((app) => (
-                  <div
-                    key={app.id}
-                    onClick={() => onSelectExperience(app.id)}
-                    className={`bg-slate-900/90 border ${app.border} rounded-2xl p-2.5 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 shadow-md flex flex-col justify-between group`}
-                  >
-                    <div className="flex items-start justify-between">
-                      <span className="text-2xl p-1.5 rounded-xl bg-slate-950 border border-slate-800 group-hover:scale-110 transition-transform">{app.icon}</span>
-                      <span className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-[9px] font-bold text-slate-300">
-                        {app.badge}
-                      </span>
-                    </div>
+                {MINI_APPS.map((app) => {
+                  const IconComp = app.icon;
+                  return (
+                    <div
+                      key={app.id}
+                      onClick={() => onSelectExperience(app.id)}
+                      className={`bg-slate-900/90 border ${app.border} rounded-2xl p-3 cursor-pointer transition-all hover:scale-[1.02] active:scale-95 shadow-md flex flex-col justify-between group`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className={`p-2 rounded-xl bg-slate-950 border border-slate-800 group-hover:scale-110 transition-transform ${app.iconColor}`}>
+                          <IconComp className="w-5 h-5" />
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full bg-slate-950 border border-slate-800 text-[9px] font-bold text-slate-300">
+                          {app.badge}
+                        </span>
+                      </div>
 
                     <div className="mt-2">
                       <h3 className="font-extrabold text-xs text-white truncate">{app.name}</h3>
                       <p className="text-[9px] text-slate-400 truncate">{app.tagline}</p>
                     </div>
 
-                    <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[9px]">
-                      <div className="w-16 bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-800">
-                        <div className="h-full bg-emerald-400" style={{ width: `${app.progressPct}%` }} />
+                      <div className="mt-2 pt-1.5 border-t border-slate-800/80 flex items-center justify-between text-[9px]">
+                        <div className="w-16 bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-800">
+                          <div className="h-full bg-emerald-400" style={{ width: `${app.progressPct}%` }} />
+                        </div>
+                        <span className="font-bold text-emerald-400">{app.progressPct}%</span>
                       </div>
-                      <span className="font-bold text-emerald-400">{app.progressPct}%</span>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
