@@ -13,8 +13,8 @@ export interface UpdateInfo {
 }
 
 export const CURRENT_APP_VERSION = '2.4.0';
-const VERSION_ENDPOINT = 'https://goalskid.web.app/version.json';
-const DEFAULT_APK_URL = 'https://goalskid.web.app/downloads/goalskid_2.4.apk';
+const VERSION_ENDPOINT = 'https://astrolingo-96820.web.app/version.json';
+const DEFAULT_APK_URL = 'https://astrolingo-96820.web.app/downloads/goalskid_2.4.apk';
 
 export const isNativeApp = (): boolean => Capacitor.isNativePlatform();
 

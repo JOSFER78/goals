@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "goalskid",
     "public": "dist",
     "ignore": [
       "firebase.json",
