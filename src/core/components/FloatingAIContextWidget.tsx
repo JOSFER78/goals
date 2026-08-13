@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, Settings, Move, Maximize2, Minimize2 } from 'lucide-react';
+import { Sparkles, Bot, X, Send, Eye, RefreshCw, Trash2, Volume2, VolumeX, Settings, Move, Maximize2, Minimize2, ChevronLeft } from 'lucide-react';
 import { askAI, ChatMessage } from '../services/aiService';
 import { useAuth } from '../context/AuthContext';
 import { db, collection, addDoc, doc, setDoc } from '../config/firebase';
@@ -26,39 +26,32 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
   const { user, isCloud } = useAuth();
   const isAuthenticated = isCloud && user && !user.isAnonymous;
 
-  // Estado de la Skin de la Mascota
   const [currentSkinId, setCurrentSkinId] = useState<MascotSkinId>(() => {
     return (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
   });
   const currentSkin = MASCOT_SKINS[currentSkinId] || MASCOT_SKINS.astrobot;
 
-  // Modales y Visibilidad
   const [isOpen, setIsOpen] = useState(false);
   const [isSkinModalOpen, setIsSkinModalOpen] = useState(false);
 
-  // Mensajes y Conversación
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [animState, setAnimState] = useState<MascotAnimState>('idle');
 
-  // Tamaño de la mascota (Resize dinámico)
   const [mascotScale, setMascotScale] = useState(() => {
     return parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
   });
 
-  // Arrastre Libre (Draggable)
   const [position, setPosition] = useState<{ x?: number; y?: number }>({});
   const [isDragging, setIsDragging] = useState(false);
   const dragRef = useRef<HTMLDivElement>(null);
   const pointerStartRef = useRef<{ x: number; y: number; startLeft: number; startTop: number }>({ x: 0, y: 0, startLeft: 0, startTop: 0 });
 
-  // Hook de Sintetizador de Voz TTS
   const { speak, stop, isSpeaking, isMuted, toggleMute } = useMascotTTS(currentSkin);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
-  // Sincronizar estado de animación con lectura de voz e IA
   useEffect(() => {
     if (isLoading) {
       setAnimState('thinking');
@@ -77,7 +70,6 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     }
   }, [messages, isOpen]);
 
-  // Recalcular límites de pantalla al redimensionar la ventana para que la mascota nunca se salga
   useEffect(() => {
     const handleResize = () => {
       setPosition((prevPos) => {
@@ -96,13 +88,11 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Cambiar Skin de la Mascota y guardar en Firestore
   const handleSelectSkin = async (skinId: MascotSkinId) => {
     setCurrentSkinId(skinId);
     localStorage.setItem('goals_mascot_skin', skinId);
     setIsSkinModalOpen(false);
 
-    // Guardar en Firestore ai_profile si está autenticado
     if (db && user?.uid && !user.isAnonymous) {
       try {
         await setDoc(doc(db, 'users', user.uid, 'ai_profile', 'pet_config'), {
@@ -116,7 +106,6 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     }
   };
 
-  // Actualizar tamaño de la mascota y persistir
   const handleScaleChange = (newScale: number) => {
     setMascotScale(newScale);
     localStorage.setItem('goals_mascot_scale', String(newScale));
@@ -128,114 +117,88 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     }
   };
 
-  // Captura profunda del texto y telemetría visible en pantalla (incluyendo iframes 3D)
   const captureScreenContext = (): string => {
     const sectionName = activeExperience
-      ? activeExperience.toUpperCase()
-      : 'PRESENTACIÓN PRINCIPAL GOALS';
+      ? `Mini App ${activeExperience.toUpperCase()}`
+      : 'Dashboard Principal GOALS';
     
-    const mainEl = document.querySelector('main');
     let pageText = '';
+    const mainEl = document.querySelector('main');
     if (mainEl) {
-      pageText = mainEl.innerText.replace(/\s+/g, ' ').slice(0, 1000);
+      pageText = mainEl.innerText.slice(0, 1500);
+    } else {
+      pageText = document.body.innerText.slice(0, 1500);
     }
 
-    let iframeText = '';
     try {
-      const iframe = document.querySelector('iframe') as HTMLIFrameElement | null;
-      if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
-        iframeText = iframe.contentDocument.body.innerText.replace(/\s+/g, ' ').slice(0, 1500);
+      const astroIframe = document.querySelector('iframe') as HTMLIFrameElement | null;
+      if (astroIframe && astroIframe.contentDocument) {
+        const iframeBodyText = astroIframe.contentDocument.body?.innerText || '';
+        if (iframeBodyText.trim()) {
+          pageText += `\n\n--- CONTENIDO INTERNO EN PANTALLA 3D (ASTROLINGO IFRAME) ---\n${iframeBodyText.slice(0, 1500)}`;
+        }
       }
     } catch (e) {}
 
-    return `📍 SECCIÓN ACTIVA EN PANTALLA: ${sectionName}
-📄 TEXTO VISIBLE EN PANTALLA PRINCIPAL:
-"${pageText}"
-${iframeText ? `\n🪐 CONTENIDO Y TELEMETRÍA DENTRO DEL SIMULADOR 3D / IFRAME:\n"${iframeText}"` : ''}`;
+    return `Sección actual: ${sectionName}\nTexto visible en pantalla:\n${pageText}`;
   };
 
-  // Persistencia de diario de conversaciones en Firestore (users/{uid}/chat_diary)
-  const saveToChatDiary = async (query: string, response: string, context: string) => {
-    const todayStr = new Date().toISOString().split('T')[0];
+  const saveToChatDiary = async (userPrompt: string, aiReply: string, screenContext: string) => {
     const diaryEntry = {
-      date: todayStr,
       timestamp: Date.now(),
-      activeExperience: activeExperience || 'home',
-      userQuery: query,
-      aiResponse: response,
-      screenContext: context.slice(0, 500),
-      userId: user?.uid || 'anonymous'
+      dateStr: new Date().toISOString(),
+      activeExperience: activeExperience || 'goals_home',
+      skinId: currentSkinId,
+      userPrompt,
+      aiReply,
+      screenContextSnippet: screenContext.slice(0, 300)
     };
 
     try {
-      const existingDiary = JSON.parse(localStorage.getItem('goals_chat_diary') || '[]');
-      existingDiary.unshift(diaryEntry);
-      localStorage.setItem('goals_chat_diary', JSON.stringify(existingDiary.slice(0, 100)));
+      const localHistory = JSON.parse(localStorage.getItem('goals_chat_diary') || '[]');
+      localHistory.push(diaryEntry);
+      if (localHistory.length > 50) localHistory.shift();
+      localStorage.setItem('goals_chat_diary', JSON.stringify(localHistory));
     } catch (e) {}
 
     if (db && user?.uid && !user.isAnonymous) {
       try {
         await addDoc(collection(db, 'users', user.uid, 'chat_diary'), diaryEntry);
-      } catch (e) {
-        console.warn('Error guardando diario en Firestore:', e);
+      } catch (err) {
+        console.warn('Error guardando diario de chat en Firestore:', err);
       }
     }
   };
 
-  const handleSendMessage = async (textToSend?: string) => {
-    const query = (textToSend || inputText).trim();
-    if (!query || isLoading) return;
+  const handleSendMessage = async (customMessage?: string) => {
+    const query = customMessage || inputText;
+    if (!query.trim() || isLoading) return;
 
     if (!isAuthenticated) {
       onOpenAuth?.('signup');
       return;
     }
 
-    const newMessages: ChatMessage[] = [
-      ...messages,
-      { role: 'user', content: query }
-    ];
+    const contextInfo = captureScreenContext();
+    const fullPrompt = `${query}\n\n[CONTEXTO VISIBLE EN PANTALLA DEL ESTUDIANTE]:\n${contextInfo}`;
 
+    const newMessages: ChatMessage[] = [...messages, { role: 'user', content: query }];
     setMessages(newMessages);
-    setInputText('');
+    if (!customMessage) setInputText('');
     setIsLoading(true);
 
     try {
-      const contextInfo = captureScreenContext();
-      
-      const systemPrompt: ChatMessage = {
-        role: 'system',
-        content: `Eres ${currentSkin.name}, la Mascota IA Copilot Educativa de la plataforma GOALS.
-Tu función es responder con precisión didáctica a lo que el usuario está viendo en su pantalla actual.
-
-${contextInfo}
-
-INSTRUCCIONES CLAVE DE RESPUESTA:
-- Utiliza la información de la pantalla e iframe proporcionada arriba (telemetría 3D, lecciones, datos del visor, ejercicios).
-- Responde de forma súper concisa, directa, amable y didáctica en formato Markdown.
-- Si corresponde, incluye explicaciones sencillas y amigables.`
-      };
-
       const responseText = await askAI({
-        messages: [systemPrompt, ...newMessages],
+        messages: [{ role: 'system', content: `Eres ${currentSkin.name}, asistente de GOALS.` }, ...newMessages],
         temperature: 0.6
       });
-
-      setMessages([
-        ...newMessages,
-        { role: 'assistant', content: responseText }
-      ]);
-
-      // Leer la respuesta por voz si no está silenciada
+      setMessages([...newMessages, { role: 'assistant', content: responseText }]);
       speak(responseText);
-
-      // Guardar en Firestore chat_diary
       saveToChatDiary(query, responseText, contextInfo);
-
     } catch (err: any) {
       setMessages([
         ...newMessages,
-        { role: 'assistant', content: `⚠️ Error de respuesta: ${err.message}` }
+        { role: 'assistant', content: `⚠️ Error: ${err.message}` }
       ]);
     } finally {
       setIsLoading(false);
@@ -243,10 +206,9 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
   };
 
   const handleExplainScreen = () => {
-    handleSendMessage('🔍 Explícame qué hay en esta pantalla y qué puedo hacer aquí.');
+    handleSendMessage('🔍 Explícame qué hay en esta pantalla.');
   };
 
-  // Manejo de Arrastre Libre (PointerEvents)
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!dragRef.current) return;
     const rect = dragRef.current.getBoundingClientRect();
@@ -300,19 +262,13 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
   if (isMinimized) {
     return (
       <>
-        {/* Mascota Asomándose sutilmente en el borde de la pantalla (Peek Mode) */}
         <div
           onClick={onToggleMinimize}
-          className="fixed bottom-4 right-0 z-50 flex items-center gap-1.5 p-1.5 pl-2.5 rounded-l-2xl bg-slate-950/90 border-l border-t border-b border-indigo-500/40 shadow-[0_0_25px_rgba(99,102,241,0.5)] backdrop-blur-md cursor-pointer group hover:translate-x-0 translate-x-2 transition-all duration-300 font-display select-none animate-fadeIn"
-          title="Mascota Asomada — Haz clic para expandir"
+          className="fixed bottom-6 right-0 z-50 flex items-center gap-1 py-2 px-1.5 rounded-l-xl bg-slate-950/90 border-l border-t border-b border-indigo-500/40 shadow-[0_0_20px_rgba(99,102,241,0.4)] backdrop-blur-md cursor-pointer hover:pl-2.5 transition-all duration-300 select-none animate-fadeIn group"
+          title={`Restaurar ${currentSkin.name}`}
         >
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <div className="scale-75 origin-right">
-            <MascotPet skinId={currentSkinId} animState="idle" scale={0.6} />
-          </div>
-          <span className="text-[10px] font-extrabold text-indigo-300 pr-1 group-hover:text-white transition-colors">
-            {currentSkin.name}
-          </span>
+          <ChevronLeft className="w-4 h-4 text-indigo-400 group-hover:text-white transition-colors animate-pulse" />
+          <div className="w-2 h-2 rounded-full bg-emerald-400" />
         </div>
 
         {isSkinModalOpen && (
@@ -328,7 +284,6 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
 
   return (
     <>
-      {/* Contenedor Principal Flotante (Draggable Position) */}
       <div 
         ref={dragRef}
         style={{
@@ -345,24 +300,14 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
         {isOpen && (
           <div className="mb-3 w-[340px] sm:w-[420px] h-[500px] max-h-[80vh] rounded-3xl bg-slate-950/95 border border-indigo-500/40 shadow-[0_10px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
             
-            {/* Cabecera de la Mascota */}
-            <div className="p-3.5 px-4 bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 border-b border-indigo-500/30 flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-2.5">
-                <span className="text-2xl p-1 bg-slate-900/80 rounded-xl border border-indigo-500/30">
-                  {currentSkin.avatarIcon}
-                </span>
-                <div>
-                  <h3 className="font-extrabold text-sm text-white flex items-center gap-1.5">
-                    <span>{currentSkin.name}</span>
-                    <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-semibold border border-indigo-500/30">
-                      Tutor IA
-                    </span>
-                  </h3>
-                  <p className="text-[10px] text-indigo-300 font-medium">Asistente Didáctico con Memoria</p>
-                </div>
+            {/* Cabecera Minimalista de la Mascota */}
+            <div className="p-3 px-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{currentSkin.avatarIcon}</span>
+                <h3 className="font-extrabold text-xs text-white tracking-wide">{currentSkin.name}</h3>
               </div>
 
-              {/* Botones de Control de la Mascota */}
+              {/* Botones de Control */}
               <div className="flex items-center gap-1">
                 <button
                   type="button"
@@ -378,7 +323,7 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
                   type="button"
                   onClick={() => setIsSkinModalOpen(true)}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-all text-xs cursor-pointer"
-                  title="Personalizar Mascota (Skins)"
+                  title="Cambiar Skin"
                 >
                   <Settings className="w-4 h-4" />
                 </button>
@@ -386,7 +331,7 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
                   type="button"
                   onClick={() => { setMessages([]); stop(); }}
                   className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-white/5 transition-all text-xs cursor-pointer"
-                  title="Limpiar conversacion"
+                  title="Limpiar chat"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -400,7 +345,7 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
               </div>
             </div>
 
-            {/* Slider de Resize de la Mascota */}
+            {/* Slider de Resize */}
             <div className="px-4 py-1.5 bg-slate-900/60 border-b border-slate-800/50 flex items-center gap-2 shrink-0">
               <Minimize2 className="w-3 h-3 text-slate-500" />
               <input
@@ -425,28 +370,23 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
                 className="px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold flex items-center gap-1.5 shrink-0 transition-all active:scale-95 cursor-pointer"
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Analizar Pantalla Activa</span>
+                <span>Analizar Pantalla</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleSendMessage('💡 ¿Qué consejos me das para esta sección?')}
                 className="px-2.5 py-1 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 border border-purple-500/40 text-purple-300 font-bold shrink-0 transition-all active:scale-95 cursor-pointer"
               >
-                💡 Consejos Didácticos
+                💡 Consejos
               </button>
             </div>
 
-            {/* Historial de Mensajes Didácticos */}
+            {/* Historial de Mensajes */}
             <div className="flex-1 p-3.5 space-y-3 overflow-y-auto scrollbar-thin scrollbar-thumb-indigo-900">
               {messages.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-2.5 text-slate-400">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-md">
-                    <Sparkles className="w-6 h-6 animate-pulse" />
-                  </div>
-                  <h4 className="font-extrabold text-sm text-white">¡Hola! Soy {currentSkin.name}</h4>
-                  <p className="text-xs text-slate-400 max-w-xs leading-relaxed">
-                    Estoy leyendo el contexto de lo que ves en pantalla. Puedes preguntarme cualquier duda sobre esta página o pedirme explicaciones paso a paso.
-                  </p>
+                <div className="h-full flex flex-col items-center justify-center text-center p-4 space-y-2 text-slate-500">
+                  <Sparkles className="w-5 h-5 text-indigo-400/60 animate-pulse" />
+                  <p className="text-xs font-medium text-slate-400">Pregunta lo que quieras sobre esta pantalla</p>
                 </div>
               ) : (
                 messages.map((m, idx) => (
@@ -469,7 +409,7 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
               {isLoading && (
                 <div className="flex items-center gap-2 text-xs text-indigo-400 p-2 bg-indigo-950/40 border border-indigo-500/20 rounded-xl w-fit animate-pulse">
                   <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                  <span>{currentSkin.name} está analizando la pantalla...</span>
+                  <span>Analizando pantalla...</span>
                 </div>
               )}
               <div ref={chatEndRef} />
@@ -487,7 +427,7 @@ INSTRUCCIONES CLAVE DE RESPUESTA:
                 type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder={`Pregunta a ${currentSkin.name}...`}
+                placeholder="Preguntar..."
                 className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500/60 transition-all"
               />
               <button
