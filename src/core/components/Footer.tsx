@@ -67,7 +67,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                   className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold transition-all flex items-center gap-1.5 active:scale-95 sm:ml-auto shadow-md w-fit cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Descargar goalskid.zip (v2.1.0)</span>
+                  <span>Descargar goalskid2.1.zip (v2.1.0)</span>
                 </button>
               </div>
             </div>

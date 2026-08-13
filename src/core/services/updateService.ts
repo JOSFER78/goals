@@ -69,7 +69,7 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
 
     const data = await response.json();
     const latestVersion = data.version || CURRENT_APP_VERSION;
-    const downloadUrl = data.apkUrl || 'https://goalskid.web.app/downloads/goalskid.apk';
+    const downloadUrl = data.apkUrl || 'https://goalskid.web.app/downloads/goalskid2.1.zip';
     const hasUpdate = isVersionNewer(latestVersion, currentVersion);
 
     return {
@@ -87,7 +87,7 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
       hasUpdate: false,
       currentVersion,
       latestVersion: currentVersion,
-      downloadUrl: 'https://goalskid.web.app/downloads/goalskid.apk',
+      downloadUrl: 'https://goalskid.web.app/downloads/goalskid2.1.zip',
       releaseNotes: 'Servidor de actualizaciones en mantenimiento.',
       publishedAt: new Date().toISOString(),
       isNative
@@ -96,13 +96,13 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
 }
 
 /**
- * Descarga directa y 100% garantizada del archivo goalskid.apk usando elemento <a download>
+ * Descarga directa y 100% garantizada del archivo goalskid2.1.zip usando elemento <a download>
  */
 export function triggerApkInstall(downloadUrl?: string): void {
-  const url = downloadUrl || 'https://goalskid.web.app/downloads/goalskid.apk';
+  const url = downloadUrl || 'https://goalskid.web.app/downloads/goalskid2.1.zip';
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'goalskid.apk';
+  a.download = 'goalskid2.1.zip';
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
   document.body.appendChild(a);

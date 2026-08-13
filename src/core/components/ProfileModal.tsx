@@ -502,7 +502,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 hover:from-emerald-500 hover:to-teal-300 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 active:scale-95 cursor-pointer"
                         >
                           <Download className="w-4 h-4" />
-                          <span>Descargar goalskid.zip (v{updateInfo.latestVersion})</span>
+                          <span>Descargar goalskid2.1.zip (v{updateInfo.latestVersion})</span>
                         </button>
                       </div>
                     )}

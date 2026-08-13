@@ -34,7 +34,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
           </div>
           <div>
             <h3 className="font-extrabold text-base text-white leading-tight">Guía de Instalación en Móvil</h3>
-            <p className="text-[11px] text-emerald-400 font-mono">goalskid.zip (v2.1.0 Native APK)</p>
+            <p className="text-[11px] text-emerald-400 font-mono">goalskid2.1.zip (v2.1.0 Native APK)</p>
           </div>
         </div>
 
@@ -54,7 +54,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
               <div>
                 <h4 className="font-bold text-white text-[11px]">Descargar el paquete comprimido</h4>
                 <p className="text-[10px] text-slate-300 leading-relaxed">
-                  Pulsa el botón verde inferior para descargar el archivo <strong className="text-emerald-400">goalskid.zip</strong> (4.1 MB).
+                  Pulsa el botón verde inferior para descargar el archivo <strong className="text-emerald-400">goalskid2.1.zip</strong> (4.1 MB).
                 </p>
               </div>
             </div>
@@ -65,7 +65,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
               <div>
                 <h4 className="font-bold text-white text-[11px]">Descomprimir ("Abrir con ➔ Extraer")</h4>
                 <p className="text-[10px] text-slate-300 leading-relaxed">
-                  Abre las Descargas de tu teléfono y toca en <strong className="text-white">goalskid.zip</strong>. En el menú de tu pantalla que dice <em>"Abrir con"</em>, toca en el icono de la carpeta amarilla que dice <strong className="text-amber-300">"Extraer"</strong> para descomprimir el archivo <strong className="text-emerald-400">goalskid.apk</strong>.
+                  Abre las Descargas de tu teléfono y toca en <strong className="text-white">goalskid2.1.zip</strong>. En el menú de tu pantalla que dice <em>"Abrir con"</em>, toca en el icono de la carpeta amarilla que dice <strong className="text-amber-300">"Extraer"</strong> para descomprimir el archivo <strong className="text-emerald-400">goalskid2.1.apk</strong>.
                 </p>
               </div>
             </div>
@@ -76,7 +76,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
               <div>
                 <h4 className="font-bold text-white text-[11px]">Abrir e Iniciar Instalación</h4>
                 <p className="text-[10px] text-slate-300 leading-relaxed">
-                  Toca sobre el archivo extraído <strong className="text-emerald-400">goalskid.apk</strong> para iniciar el asistente de instalación de la aplicación.
+                  Toca sobre el archivo extraído <strong className="text-emerald-400">goalskid2.1.apk</strong> para iniciar el asistente de instalación de la aplicación.
                 </p>
               </div>
             </div>
@@ -95,18 +95,18 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
           </div>
         </div>
 
-        {/* Botón Final de Descargar goalskid.zip */}
+        {/* Botón Final de Descargar goalskid2.1.zip */}
         <div className="pt-2">
           <a
-            href="https://goalskid.web.app/downloads/goalskid.zip"
-            download="goalskid.zip"
+            href="https://goalskid.web.app/downloads/goalskid2.1.zip"
+            download="goalskid2.1.zip"
             target="_blank"
             rel="noopener noreferrer"
             onClick={onClose}
             className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 hover:from-emerald-500 hover:to-teal-300 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 active:scale-95 flex items-center justify-center gap-2"
           >
             <Download className="w-4 h-4" />
-            <span>Entendido, Descargar goalskid.zip</span>
+            <span>Entendido, Descargar goalskid2.1.zip</span>
           </a>
         </div>
 
