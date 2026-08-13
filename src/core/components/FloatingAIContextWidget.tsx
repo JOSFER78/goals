@@ -29,23 +29,69 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     }
   }, [messages, isOpen]);
 
-  // Captura del texto visible en pantalla para enviar como contexto
+  // Captura profunda del texto y telemetría visible en pantalla (incluyendo iframes 3D)
   const captureScreenContext = (): string => {
     const sectionName = activeExperience
       ? activeExperience.toUpperCase()
       : 'PRESENTACIÓN PRINCIPAL GOALS';
     
-    // Extraer texto relevante del contenedor principal
+    // 1. Extraer texto del contenedor principal de la vista
     const mainEl = document.querySelector('main');
     let pageText = '';
     if (mainEl) {
-      // Limpiar texto para no saturar tokens
       pageText = mainEl.innerText
         .replace(/\s+/g, ' ')
-        .slice(0, 1200);
+        .slice(0, 1000);
     }
 
-    return `📍 SECCIÓN ACTIVA EN PANTALLA: ${sectionName}\n📄 TEXTO VISIBLE EN PANTALLA:\n"${pageText}"`;
+    // 2. Extraer telemetría y contenido profundo dentro de iframe (ej. AstroLingo 3D)
+    let iframeText = '';
+    try {
+      const iframe = document.querySelector('iframe') as HTMLIFrameElement | null;
+      if (iframe && iframe.contentDocument && iframe.contentDocument.body) {
+        iframeText = iframe.contentDocument.body.innerText
+          .replace(/\s+/g, ' ')
+          .slice(0, 1500);
+      }
+    } catch (e) {
+      // Ignorar errores de origen si ocurrieran
+    }
+
+    return `📍 SECCIÓN ACTIVA EN PANTALLA: ${sectionName}
+📄 TEXTO VISIBLE EN PANTALLA PRINCIPAL:
+"${pageText}"
+${iframeText ? `\n🪐 CONTENIDO, LECCIÓN Y TELEMETRÍA DENTRO DEL SIMULADOR 3D / IFRAME:\n"${iframeText}"` : ''}`;
+  };
+
+  // Persistencia de conversaciones en el Diario de IA para evaluación y compresión
+  const saveToChatDiary = async (query: string, response: string, context: string) => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const diaryEntry = {
+      date: todayStr,
+      timestamp: Date.now(),
+      activeExperience: activeExperience || 'home',
+      userQuery: query,
+      aiResponse: response,
+      screenContext: context.slice(0, 500),
+      userId: user?.uid || 'local_user'
+    };
+
+    // 1. Guardar en LocalStorage
+    try {
+      const existingDiary = JSON.parse(localStorage.getItem('goals_chat_diary') || '[]');
+      existingDiary.unshift(diaryEntry);
+      localStorage.setItem('goals_chat_diary', JSON.stringify(existingDiary.slice(0, 100)));
+    } catch (e) {}
+
+    // 2. Guardar en Firestore si está conectado en la nube
+    if (isCloud && user?.uid && (window as any).fbDb) {
+      try {
+        const fbDb = (window as any).fbDb;
+        await fbDb.collection('users').doc(user.uid).collection('chat_diary').add(diaryEntry);
+      } catch (e) {
+        console.warn('Firestore chat diary error:', e);
+      }
+    }
   };
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -67,20 +113,20 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     setIsLoading(true);
 
     try {
-      // Capturar contexto fresco de la pantalla
+      // Capturar contexto fresco y profundo de la pantalla e iframe
       const contextInfo = captureScreenContext();
       
       const systemPrompt: ChatMessage = {
         role: 'system',
-        content: `Eres el Asistente Contextual Flotante de la plataforma educativa GOALS.
-Tu función es responder a las preguntas del usuario considerando la información visible en su pantalla actual.
+        content: `Eres el Asistente Contextual Flotante en vivo de la plataforma educativa GOALS.
+Tu función es responder con precisión absoluta a lo que el usuario está viendo en su pantalla actual.
 
 ${contextInfo}
 
-INSTRUCCIONES DE RESPUESTA:
-- Responde de forma súper clara, amable, directa y concisa en Markdown.
-- Si el usuario te pregunta por algo de su pantalla, usa la información del contexto capturado arriba.
-- Sé breve y ve al grano para una conversación ágil.`
+INSTRUCCIONES CLAVE DE RESPUESTA:
+- Utiliza la información detallada de la pantalla e iframe proporcionada arriba (telemetría 3D, lecciones, datos del visor, ejercicios).
+- Si el usuario dice "no entiendo lo que veo" o "cuál es la diferencia entre uno y otro", consulta la lección y los datos de la telemetría actual (por ejemplo eclipses, ángulos, órbita, vocabulario o apuntes) y explícalo claramente.
+- Responde de forma concisa, directa, amable y didáctica en formato Markdown.`
       };
 
       const responseText = await askAI({
@@ -92,6 +138,10 @@ INSTRUCCIONES DE RESPUESTA:
         ...newMessages,
         { role: 'assistant', content: responseText }
       ]);
+
+      // Guardar en la Base de Datos del Diario de IA para evaluación/compresión
+      saveToChatDiary(query, responseText, contextInfo);
+
     } catch (err: any) {
       setMessages([
         ...newMessages,
