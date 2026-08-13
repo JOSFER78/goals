@@ -14,7 +14,7 @@ export interface UpdateInfo {
 
 export const CURRENT_APP_VERSION = '2.4.0';
 const VERSION_ENDPOINT = 'https://goalskid.web.app/version.json';
-const DEFAULT_APK_URL = 'https://goalskid.web.app/downloads/goals.apk';
+const DEFAULT_APK_URL = 'https://goalskid.web.app/downloads/goalskid_2.4.apk';
 
 export const isNativeApp = (): boolean => Capacitor.isNativePlatform();
 
@@ -122,13 +122,13 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
 }
 
 /**
- * Descarga directa del archivo de APK único usando elemento <a download>
+ * Descarga directa del archivo goalskid_2.4.apk usando elemento <a download>
  */
 export function triggerApkInstall(downloadUrl?: string): void {
   const url = downloadUrl || DEFAULT_APK_URL;
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'goals.apk';
+  a.download = 'goalskid_2.4.apk';
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
   document.body.appendChild(a);

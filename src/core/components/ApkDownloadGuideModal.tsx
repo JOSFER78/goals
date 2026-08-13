@@ -28,7 +28,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
           </div>
           <div>
             <h3 className="font-extrabold text-base text-white leading-tight">Guía de Instalación en Móvil</h3>
-            <p className="text-[11px] text-emerald-400 font-mono">goals.apk (v2.4.0 Native APK)</p>
+            <p className="text-[11px] text-emerald-400 font-mono">goalskid_2.4.apk (v2.4.0 Native APK)</p>
           </div>
         </div>
 
@@ -48,7 +48,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
               <div>
                 <h4 className="font-bold text-white text-[11px]">Descargar el archivo APK</h4>
                 <p className="text-[10px] text-slate-300 leading-relaxed">
-                  Pulsa el botón verde inferior para descargar el archivo <strong className="text-emerald-400">goals.apk</strong>.
+                  Pulsa el botón verde inferior para descargar el archivo <strong className="text-emerald-400">goalskid_2.4.apk</strong>.
                 </p>
               </div>
             </div>
@@ -59,7 +59,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
               <div>
                 <h4 className="font-bold text-white text-[11px]">Abrir e Iniciar Instalación</h4>
                 <p className="text-[10px] text-slate-300 leading-relaxed">
-                  Abre las Descargas de tu teléfono y toca sobre el archivo <strong className="text-emerald-400">goals.apk</strong> para iniciar la instalación.
+                  Abre las Descargas de tu teléfono y toca sobre el archivo <strong className="text-emerald-400">goalskid_2.4.apk</strong> para iniciar la instalación.
                 </p>
               </div>
             </div>
@@ -78,18 +78,18 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
           </div>
         </div>
 
-        {/* Botón Final de Descargar goals.apk */}
+        {/* Botón Final de Descargar goalskid_2.4.apk */}
         <div className="pt-2">
           <a
-            href="https://goalskid.web.app/downloads/goals.apk"
-            download="goals.apk"
+            href="https://goalskid.web.app/downloads/goalskid_2.4.apk"
+            download="goalskid_2.4.apk"
             target="_blank"
             rel="noopener noreferrer"
             onClick={onClose}
             className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 hover:from-emerald-500 hover:to-teal-300 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 active:scale-95 flex items-center justify-center gap-2"
           >
             <Download className="w-4 h-4" />
-            <span>Entendido, Descargar goals.apk</span>
+            <span>Entendido, Descargar goalskid_2.4.apk</span>
           </a>
         </div>
 
