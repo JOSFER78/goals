@@ -12,8 +12,9 @@ export interface UpdateInfo {
   isNative: boolean;
 }
 
-export const CURRENT_APP_VERSION = '2.3.0';
-const VERSION_ENDPOINT = 'https://goalskid.web.app/version.json';
+export const CURRENT_APP_VERSION = '2.4.0';
+const VERSION_ENDPOINT = 'https://astrolingo-96820.web.app/version.json';
+const DEFAULT_APK_URL = 'https://astrolingo-96820.web.app/downloads/goals.apk';
 
 export const isNativeApp = (): boolean => Capacitor.isNativePlatform();
 
@@ -21,13 +22,11 @@ export const isNativeApp = (): boolean => Capacitor.isNativePlatform();
  * Obtener versión actual instalada en el dispositivo nativo Android
  */
 export async function getAppVersion(): Promise<string> {
-  // 1. Permite forzar una versión anterior desde localStorage para testing (ej: '2.1.0')
   const overrideVersion = localStorage.getItem('goals_override_app_version');
   if (overrideVersion) {
     return overrideVersion;
   }
 
-  // 2. En plataforma nativa (APK), pedir la versión real al sistema operativo Android
   if (Capacitor.isNativePlatform()) {
     try {
       const info = await App.getInfo();
@@ -39,12 +38,11 @@ export async function getAppVersion(): Promise<string> {
     }
   }
 
-  // 3. Fallback para entorno web
   return CURRENT_APP_VERSION;
 }
 
 /**
- * Compara dos versiones semver (ej: "2.3.0" > "2.1.0")
+ * Compara dos versiones semver (ej: "2.4.0" > "2.3.0")
  */
 export function isVersionNewer(latest: string, current: string): boolean {
   const cleanLatest = latest.replace(/^v/, '').trim();
@@ -68,13 +66,12 @@ export function isVersionNewer(latest: string, current: string): boolean {
 export async function checkForApkUpdate(): Promise<UpdateInfo> {
   const isNative = isNativeApp();
 
-  // En la Web, el usuario SIEMPRE está en la versión más reciente servida en tiempo real
   if (!isNative && !localStorage.getItem('goals_override_app_version')) {
     return {
       hasUpdate: false,
       currentVersion: CURRENT_APP_VERSION,
       latestVersion: CURRENT_APP_VERSION,
-      downloadUrl: 'https://goalskid.web.app/downloads/goalskid_2.3.zip',
+      downloadUrl: DEFAULT_APK_URL,
       releaseNotes: 'Estás navegando la versión web oficial en tiempo real.',
       publishedAt: new Date().toISOString(),
       isNative: false
@@ -98,7 +95,7 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
 
     const data = await response.json();
     const latestVersion = data.version || CURRENT_APP_VERSION;
-    const downloadUrl = data.apkUrl || 'https://goalskid.web.app/downloads/goalskid_2.3.zip';
+    const downloadUrl = data.apkUrl || DEFAULT_APK_URL;
     const hasUpdate = isVersionNewer(latestVersion, currentVersion);
 
     return {
@@ -116,7 +113,7 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
       hasUpdate: false,
       currentVersion,
       latestVersion: CURRENT_APP_VERSION,
-      downloadUrl: 'https://goalskid.web.app/downloads/goalskid_2.3.zip',
+      downloadUrl: DEFAULT_APK_URL,
       releaseNotes: 'Servidor de actualizaciones en mantenimiento.',
       publishedAt: new Date().toISOString(),
       isNative
@@ -125,13 +122,13 @@ export async function checkForApkUpdate(): Promise<UpdateInfo> {
 }
 
 /**
- * Descarga directa del archivo goalskid_2.3.zip usando elemento <a download>
+ * Descarga directa del archivo de APK único usando elemento <a download>
  */
 export function triggerApkInstall(downloadUrl?: string): void {
-  const url = downloadUrl || 'https://goalskid.web.app/downloads/goalskid_2.3.zip';
+  const url = downloadUrl || DEFAULT_APK_URL;
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'goalskid_2.3.zip';
+  a.download = 'goals.apk';
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
   document.body.appendChild(a);

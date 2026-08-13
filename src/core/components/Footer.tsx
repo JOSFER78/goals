@@ -122,8 +122,8 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
 
                   {/* Botón de Descargar Directa Mínimo */}
                   <a
-                    href="https://goalskid.web.app/downloads/goalskid_2.3.zip"
-                    download="goalskid_2.3.zip"
+                    href="https://astrolingo-96820.web.app/downloads/goals.apk"
+                    download="goals.apk"
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setIsDropdownOpen(false)}

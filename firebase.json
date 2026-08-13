@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "goals-v24",
     "public": "dist",
     "ignore": [
       "firebase.json",
