@@ -282,24 +282,57 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     );
   }
 
+  // Calcular la posición inteligente de la ventana de chat para que JAMÁS se salga de la pantalla
+  const getSmartPopupPosition = () => {
+    const windowW = window.innerWidth;
+    const windowH = window.innerHeight;
+    const popupW = Math.min(windowW - 24, 380);
+    const popupH = Math.min(windowH - 100, 480);
+
+    if (!dragRef.current) {
+      return {
+        left: Math.max(12, windowW - popupW - 24),
+        top: Math.max(12, windowH - popupH - 95),
+        width: popupW,
+        height: popupH
+      };
+    }
+
+    const rect = dragRef.current.getBoundingClientRect();
+    const isRightHalf = rect.left + rect.width / 2 > windowW / 2;
+    const isBottomHalf = rect.top + rect.height / 2 > windowH / 2;
+
+    let left = isRightHalf
+      ? rect.right - popupW
+      : rect.left;
+
+    let top = isBottomHalf
+      ? rect.top - popupH - 12
+      : rect.bottom + 12;
+
+    // Clamping estricto dentro de la pantalla visible (Márgenes de 12px)
+    left = Math.max(12, Math.min(left, windowW - popupW - 12));
+    top = Math.max(12, Math.min(top, windowH - popupH - 12));
+
+    return { left, top, width: popupW, height: popupH };
+  };
+
   return (
     <>
-      <div 
-        ref={dragRef}
-        style={{
-          position: 'fixed',
-          left: position.x !== undefined ? `${position.x}px` : undefined,
-          top: position.y !== undefined ? `${position.y}px` : undefined,
-          bottom: position.y === undefined ? '24px' : undefined,
-          right: position.x === undefined ? '24px' : undefined,
-          touchAction: 'none'
-        }}
-        className="z-50 font-sans select-none flex flex-col items-end"
-      >
-        {/* Burbuja de Cómic Transparente (Speech Bubble) */}
-        {isOpen && (
-          <div className="mb-3 w-[340px] sm:w-[420px] h-[500px] max-h-[80vh] rounded-3xl bg-slate-950/95 border border-indigo-500/40 shadow-[0_10px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200">
-            
+      {/* Ventana de Chat Flotante con Clamping Estricto (Nunca se sale de la pantalla) */}
+      {isOpen && (() => {
+        const pop = getSmartPopupPosition();
+        return (
+          <div
+            style={{
+              position: 'fixed',
+              left: `${pop.left}px`,
+              top: `${pop.top}px`,
+              width: `${pop.width}px`,
+              height: `${pop.height}px`,
+            }}
+            className="z-50 rounded-3xl bg-slate-950/95 border border-indigo-500/40 shadow-[0_10px_50px_rgba(0,0,0,0.85)] backdrop-blur-xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200 font-sans"
+          >
             {/* Cabecera Minimalista de la Mascota */}
             <div className="p-3 px-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
@@ -439,9 +472,23 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
               </button>
             </form>
           </div>
-        )}
+        );
+      })()}
 
-        {/* Mascota Pet Animada (Draggable) — Sin textos, solo el bicho */}
+      {/* Contenedor Principal Flotante (Draggable Position de la Mascota) */}
+      <div 
+        ref={dragRef}
+        style={{
+          position: 'fixed',
+          left: position.x !== undefined ? `${position.x}px` : undefined,
+          top: position.y !== undefined ? `${position.y}px` : undefined,
+          bottom: position.y === undefined ? '24px' : undefined,
+          right: position.x === undefined ? '24px' : undefined,
+          touchAction: 'none'
+        }}
+        className="z-50 font-sans select-none flex flex-col items-end"
+      >
+        {/* Mascota Pet Animada (Draggable) */}
         <div
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
