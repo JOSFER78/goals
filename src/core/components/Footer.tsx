@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Download, Shield, Globe, BookOpen, Orbit, RefreshCw, ChevronUp, HelpCircle, CheckCircle2, Smartphone } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
-import { checkForApkUpdate, isNativeApp, UpdateInfo } from '../services/updateService';
+import { checkForApkUpdate, isNativeApp, UpdateInfo, CURRENT_APP_VERSION } from '../services/updateService';
 import { useProgress } from '../context/ProgressContext';
 import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
 
@@ -100,7 +100,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                 className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/30 hover:border-emerald-400 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-md active:scale-95 cursor-pointer group"
               >
                 <img src="/android-logo.png" alt="Android" className="w-4 h-4 object-contain group-hover:scale-110 transition-transform" />
-                <span className="text-emerald-400 font-mono text-[11px]">v2.3</span>
+                <span className="text-emerald-400 font-mono text-[11px]">v{CURRENT_APP_VERSION}</span>
                 <ChevronUp className={`w-3 h-3 text-emerald-400 transition-transform duration-200 ${isDropdownOpen ? '' : 'rotate-180'}`} />
               </button>
 
@@ -114,7 +114,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                       <img src="/android-logo.png" alt="Android Logo" className="w-4 h-4 object-contain" />
                       <h4 className="font-extrabold text-xs text-white leading-tight flex items-center gap-1.5">
                         <span>Android App</span>
-                        <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono text-[10px] border border-emerald-500/20">v2.3.0</span>
+                        <span className="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono text-[10px] border border-emerald-500/20">v{CURRENT_APP_VERSION}</span>
                       </h4>
                     </div>
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -122,7 +122,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
 
                   {/* Botón de Descargar Directa Mínimo */}
                   <a
-                    href="https://astrolingo-96820.web.app/downloads/goals.apk"
+                    href="https://goalskid.web.app/downloads/goals.apk"
                     download="goals.apk"
                     target="_blank"
                     rel="noopener noreferrer"

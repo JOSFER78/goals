@@ -81,7 +81,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
         {/* Botón Final de Descargar goals.apk */}
         <div className="pt-2">
           <a
-            href="https://astrolingo-96820.web.app/downloads/goals.apk"
+            href="https://goalskid.web.app/downloads/goals.apk"
             download="goals.apk"
             target="_blank"
             rel="noopener noreferrer"
