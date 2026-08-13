@@ -64,14 +64,14 @@ export const Header: React.FC<HeaderProps> = ({
           <img 
             src="/goals_platform_logo.png" 
             alt="GOALS Logo" 
-            className="w-8 h-8 rounded-lg border border-indigo-500/40 shadow-[0_0_12px_rgba(99,102,241,0.4)] object-cover group-hover:scale-105 transition-transform shrink-0" 
+            className="w-8 h-8 rounded-lg border border-slate-700/80 shadow-md object-cover group-hover:scale-105 transition-transform shrink-0" 
           />
           {!activeExpConfig && (
-            <div className="hidden xs:block">
-              <h1 className="font-display font-bold text-sm tracking-tight text-white leading-none">
+            <div className="flex flex-col">
+              <h1 className="font-display font-black text-sm tracking-wide text-white leading-none">
                 GOALS
               </h1>
-              <p className="text-[9px] text-slate-400 font-medium">Plataforma Educativa</p>
+              <p className="text-[9.5px] text-amber-400/90 font-semibold tracking-tight">Tu Plataforma Educativa IA</p>
             </div>
           )}
         </button>
