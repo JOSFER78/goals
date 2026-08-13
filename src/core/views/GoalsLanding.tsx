@@ -136,117 +136,163 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
           <div className="w-full h-full bg-slate-950/80 border border-slate-800/80 rounded-3xl p-4 sm:p-6 shadow-xl relative overflow-hidden flex flex-col justify-between items-center text-center backdrop-blur-md">
             
             {/* Header del Hero */}
-            <div className="flex flex-col items-center gap-2.5 z-10 max-w-xl my-auto">
+            <div className="flex flex-col items-center gap-3 z-10 max-w-2xl my-auto">
               
-              <div className="flex items-center gap-3">
-                <img
-                  src="/goals_platform_logo.png"
-                  alt="GOALS Platform Logo"
-                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border border-slate-700/80 shadow-md object-cover"
-                />
-                <div className="text-left">
-                  <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-none">
-                    GOALS
-                  </h1>
-                  <p className="text-xs text-indigo-400 font-semibold tracking-wide">
-                    Plataforma Educativa Adaptativa
-                  </p>
-                </div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[11px] font-semibold tracking-wide shadow-sm">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Plataforma Educativa Adaptativa v2.5.0</span>
+                <span className="text-slate-500">|</span>
+                <span className="text-slate-400">Inferencia Multimodal en Tiempo Real</span>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300 text-[10px] font-semibold tracking-wider">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                <span>Inteligencia Artificial Multimodal Aplicada</span>
-              </div>
+              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                El Futuro del Aprendizaje <br className="hidden sm:inline" />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-cyan-300 to-emerald-300">
+                  Multimodal e Interactivo
+                </span>
+              </h1>
               
-              <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed font-sans">
-                Un entorno pedagógico integrado donde la resolución de ejercicios manuscritos, la práctica de conversación por voz, el laboratorio tridimensional y el contraste de evidencia científica conviven en una experiencia unificada.
+              <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed font-sans">
+                Resolución de ejercicios manuscritos por OCR, práctica conversacional de idiomas por voz, laboratorio 3D NASA y contraste de rigor científico en una sola experiencia unificada.
               </p>
-            </div>
 
-            {/* Panel de Nodos de Mini Apps */}
-            <div className="w-full my-auto py-1 relative z-10">
-              <div className="relative max-w-2xl mx-auto bg-slate-900/60 border border-slate-800/80 rounded-2xl p-3 shadow-inner">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 relative z-10">
-                  
-                  {/* Nodo 1: Escuela */}
-                  <div 
-                    onClick={() => onSelectExperience('school')}
-                    className="group cursor-pointer bg-slate-950/70 border border-slate-800/80 hover:border-emerald-500/50 p-3 rounded-xl text-center transition-all hover:bg-slate-900 shadow-sm"
-                  >
-                    <div className="w-8 h-8 mx-auto rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
-                      <GraduationCap className="w-4 h-4" />
-                    </div>
-                    <div className="font-bold text-xs text-white">Escuela IA</div>
-                    <div className="text-[10px] text-slate-400 font-medium">Tutor OCR</div>
-                  </div>
-
-                  {/* Nodo 2: Idiomas */}
-                  <div 
-                    onClick={() => onSelectExperience('languages')}
-                    className="group cursor-pointer bg-slate-950/70 border border-slate-800/80 hover:border-cyan-500/50 p-3 rounded-xl text-center transition-all hover:bg-slate-900 shadow-sm"
-                  >
-                    <div className="w-8 h-8 mx-auto rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
-                      <Globe className="w-4 h-4" />
-                    </div>
-                    <div className="font-bold text-xs text-white">Idiomas Voz</div>
-                    <div className="text-[10px] text-slate-400 font-medium">Profesor Voz</div>
-                  </div>
-
-                  {/* Nodo 3: Cosmos 3D */}
-                  <div 
-                    onClick={() => onSelectExperience('astro')}
-                    className="group cursor-pointer bg-slate-950/70 border border-slate-800/80 hover:border-indigo-500/50 p-3 rounded-xl text-center transition-all hover:bg-slate-900 shadow-sm"
-                  >
-                    <div className="w-8 h-8 mx-auto rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
-                      <Orbit className="w-4 h-4" />
-                    </div>
-                    <div className="font-bold text-xs text-white">Cosmos 3D</div>
-                    <div className="text-[10px] text-slate-400 font-medium">Visor NASA</div>
-                  </div>
-
-                  {/* Nodo 4: Verifica */}
-                  <div 
-                    onClick={() => onSelectExperience('verify')}
-                    className="group cursor-pointer bg-slate-950/70 border border-slate-800/80 hover:border-amber-500/50 p-3 rounded-xl text-center transition-all hover:bg-slate-900 shadow-sm"
-                  >
-                    <div className="w-8 h-8 mx-auto rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-1.5 group-hover:scale-105 transition-transform">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
-                    <div className="font-bold text-xs text-white">Verifica</div>
-                    <div className="text-[10px] text-slate-400 font-medium">Rigor Científico</div>
-                  </div>
-
-                </div>
-
-                {/* Medidor de Estado del Sistema */}
-                <div className="mt-2.5 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 px-2">
-                  <span className="flex items-center gap-1.5 font-medium text-slate-300"><Zap className="w-3.5 h-3.5 text-amber-400" /> Progreso Sincronizado</span>
-                  <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">Acceso Unificado</span>
-                  <span className="flex items-center gap-1.5 font-medium text-slate-300"><Flame className="w-3.5 h-3.5 text-rose-400" /> Racha Diaria</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Acciones */}
-            <div className="z-10 w-full space-y-2">
-              <div className="flex justify-center items-center gap-3">
+              <div className="flex flex-wrap justify-center items-center gap-3 pt-1">
                 <button
                   onClick={() => onOpenAuth('signup')}
-                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-indigo-600/20 active:scale-95 flex items-center gap-2 cursor-pointer"
+                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-lg shadow-indigo-600/30 active:scale-95 flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Comenzar Ahora</span>
+                  <span>Comenzar Ahora Gratis</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
+                <button
+                  onClick={() => scrollToSection(2)}
+                  className="px-5 py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>Ver Módulos & Demos</span>
+                  <ArrowDown className="w-3.5 h-3.5" />
+                </button>
               </div>
+            </div>
 
-              <button 
-                onClick={() => scrollToSection(2)}
-                className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-white transition-colors pt-0.5"
-              >
-                <span>Explorar características detalladas</span>
-                <ArrowDown className="w-3 h-3 text-slate-400" />
-              </button>
+            {/* BENTO GRID ASIMÉTRICO CON MICRO-DEMOS EN TIEMPO REAL */}
+            <div className="w-full my-auto py-2 relative z-10">
+              <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
+                
+                {/* BENTO 1 (Doble Ancho): ESCUELA IA & OCR SCANNER */}
+                <div 
+                  onClick={() => onSelectExperience('school')}
+                  className="sm:col-span-2 group cursor-pointer bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-slate-950 border border-emerald-500/30 hover:border-emerald-400/60 p-4 rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:-translate-y-0.5 flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <GraduationCap className="w-4 h-4" />
+                      </div>
+                      <div>
+                        <div className="font-extrabold text-sm text-white flex items-center gap-1.5">
+                          <span>Escuela IA</span>
+                          <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-mono">OCR LIVE</span>
+                        </div>
+                        <div className="text-[10px] text-slate-400">Tutor de Cuadernos & Manuscritos</div>
+                      </div>
+                    </div>
+                    <span className="text-emerald-400 font-extrabold text-xs opacity-0 group-hover:opacity-100 transition-opacity">Entrar →</span>
+                  </div>
+
+                  {/* Micro-Demo OCR Live */}
+                  <div className="bg-slate-950/80 border border-emerald-500/20 rounded-xl p-2.5 space-y-1.5 font-mono text-[10px] relative overflow-hidden">
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-pulse"></div>
+                    <div className="flex items-center justify-between text-slate-400">
+                      <span className="text-emerald-300 font-bold">● Reconocimiento Activo</span>
+                      <span>Confianza: 99.4%</span>
+                    </div>
+                    <div className="text-white text-[11px] font-sans font-medium flex items-center justify-between">
+                      <span>"2x² - 8 = 0 ➔ Factorización guiada"</span>
+                      <span className="text-[9px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-mono">Paso a paso</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* BENTO 2: IDIOMAS VOZ */}
+                <div 
+                  onClick={() => onSelectExperience('languages')}
+                  className="group cursor-pointer bg-gradient-to-br from-cyan-950/40 via-slate-900/90 to-slate-950 border border-cyan-500/30 hover:border-cyan-400/60 p-4 rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] hover:-translate-y-0.5 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <Globe className="w-4 h-4" />
+                      </div>
+                      <span className="text-cyan-400 font-extrabold text-xs opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                    </div>
+                    <div className="font-extrabold text-sm text-white">Idiomas Voz</div>
+                    <div className="text-[10px] text-slate-400">Profesor Particular de Voz</div>
+                  </div>
+
+                  {/* Micro-Demo Waveform */}
+                  <div className="bg-slate-950/80 border border-cyan-500/20 rounded-xl p-2 mt-2 flex items-center justify-between">
+                    <div className="flex items-center gap-0.5 h-4 text-cyan-400">
+                      <div className="w-0.5 bg-cyan-400 rounded-full h-1.5 animate-bounce"></div>
+                      <div className="w-0.5 bg-cyan-400 rounded-full h-3.5 animate-bounce delay-75"></div>
+                      <div className="w-0.5 bg-cyan-400 rounded-full h-2 animate-bounce delay-150"></div>
+                      <div className="w-0.5 bg-cyan-400 rounded-full h-4 animate-bounce delay-100"></div>
+                      <div className="w-0.5 bg-cyan-400 rounded-full h-2.5 animate-bounce"></div>
+                    </div>
+                    <span className="text-[9px] font-mono text-cyan-300 font-bold">98% Fluidez</span>
+                  </div>
+                </div>
+
+                {/* BENTO 3: COSMOS 3D */}
+                <div 
+                  onClick={() => onSelectExperience('astro')}
+                  className="group cursor-pointer bg-gradient-to-br from-indigo-950/40 via-slate-900/90 to-slate-950 border border-indigo-500/30 hover:border-indigo-400/60 p-4 rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] hover:-translate-y-0.5 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <Orbit className="w-4 h-4" />
+                      </div>
+                      <span className="text-indigo-400 font-extrabold text-xs opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                    </div>
+                    <div className="font-extrabold text-sm text-white">Cosmos 3D</div>
+                    <div className="text-[10px] text-slate-400">Simulador Astrofísico NASA</div>
+                  </div>
+
+                  {/* Micro-Demo Telemetría */}
+                  <div className="bg-slate-950/80 border border-indigo-500/20 rounded-xl p-2 mt-2 flex items-center justify-between font-mono text-[9px] text-indigo-300">
+                    <span>ALT: 408 KM</span>
+                    <span>VEL: 7.66 KM/S</span>
+                  </div>
+                </div>
+
+                {/* BENTO 4 (Fila inferior complementaria): VERIFICA */}
+                <div 
+                  onClick={() => onSelectExperience('verify')}
+                  className="sm:col-span-2 lg:col-span-4 group cursor-pointer bg-gradient-to-r from-amber-950/30 via-slate-900/90 to-slate-950 border border-amber-500/30 hover:border-amber-400/60 p-3.5 rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-0.5 flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="font-extrabold text-xs sm:text-sm text-white flex items-center gap-2">
+                        <span>Verifica · Auditor de Evidencia Científica</span>
+                        <span className="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-mono">100% Fuentes Oficiales</span>
+                      </div>
+                      <div className="text-[10px] text-slate-400">Contraste de rigor académico contra publicaciones de NASA, ESA, CSIC y BOE.</div>
+                    </div>
+                  </div>
+                  <span className="text-amber-400 font-extrabold text-xs opacity-0 group-hover:opacity-100 transition-opacity shrink-0">Explorar →</span>
+                </div>
+
+              </div>
+            </div>
+
+            {/* Métricas Inferiores de Respaldo */}
+            <div className="z-10 w-full pt-1 border-t border-slate-800/80 flex items-center justify-around text-[10px] text-slate-400">
+              <span className="flex items-center gap-1 text-slate-300 font-semibold"><Zap className="w-3 h-3 text-amber-400" /> Sincronización en la Nube</span>
+              <span className="flex items-center gap-1 text-slate-300 font-semibold"><Star className="w-3 h-3 text-cyan-400" /> 18 Módulos Interactivos</span>
+              <span className="flex items-center gap-1 text-slate-300 font-semibold"><Flame className="w-3 h-3 text-rose-400" /> Racha Gamificada</span>
             </div>
 
           </div>
@@ -343,8 +389,8 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                 onClick={() => onSelectExperience(currentSlide.id)}
                 className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer ${currentSlide.btnBg}`}
               >
-                <Lock className="w-3.5 h-3.5" />
-                <span>Acceder a la Mini App {currentSlide.name}</span>
+                <currentSlide.icon className="w-3.5 h-3.5" />
+                <span>Explorar {currentSlide.name}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
