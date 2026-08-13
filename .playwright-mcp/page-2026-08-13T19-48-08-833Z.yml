@@ -1,0 +1,129 @@
+- generic [ref=f87e4]:
+  - banner [ref=f87e5]:
+    - button [ref=f87e7] [cursor=pointer]:
+      - img "GOALS Logo" [ref=f87e8]
+      - generic [ref=f87e9]:
+        - heading "GOALS" [level=1] [ref=f87e10]
+        - paragraph [ref=f87e11]: Tu Plataforma Educativa IA
+    - generic [ref=f87e12]:
+      - button "Pet IA" [ref=f87e13] [cursor=pointer]
+      - button "Acceso / Registro" [ref=f87e18] [cursor=pointer]
+  - main [ref=f87e23]:
+    - generic [ref=f87e26]:
+      - generic [ref=f87e28]:
+        - generic [ref=f87e29]:
+          - generic [ref=f87e30]:
+            - img "GOALS Platform Logo" [ref=f87e31]
+            - generic [ref=f87e32]:
+              - heading "GOALS" [level=1] [ref=f87e33]
+              - paragraph [ref=f87e34]: Tu Plataforma Educativa IA
+          - generic [ref=f87e35]: Inteligencia Educativa Adaptativa
+          - paragraph [ref=f87e39]: Una solución pedagógica avanzada donde la resolución de cuadernos manuscritos, la práctica de conversación por voz, el laboratorio tridimensional de astrofísica y el análisis de evidencia científica conviven en un solo entorno unificado.
+        - generic [ref=f87e41]:
+          - generic [ref=f87e42]:
+            - generic [ref=f87e43] [cursor=pointer]:
+              - generic [ref=f87e48]: Escuela IA
+              - generic [ref=f87e49]: Tutor OCR
+            - generic [ref=f87e50] [cursor=pointer]:
+              - generic [ref=f87e55]: Idiomas Voz
+              - generic [ref=f87e56]: Profesor Voz
+            - generic [ref=f87e57] [cursor=pointer]:
+              - generic [ref=f87e65]: Cosmos 3D
+              - generic [ref=f87e66]: Visor NASA
+            - generic [ref=f87e67] [cursor=pointer]:
+              - generic [ref=f87e72]: Verifica
+              - generic [ref=f87e73]: Rigor Científico
+          - generic [ref=f87e74]:
+            - generic [ref=f87e75]: Progreso Sincronizado
+            - generic [ref=f87e78]: Acceso Unificado
+            - generic [ref=f87e79]: Racha Diaria
+        - generic [ref=f87e82]:
+          - button "Comenzar Ahora" [ref=f87e84] [cursor=pointer]
+          - button "Explorar características detalladas" [ref=f87e88] [cursor=pointer]
+      - generic [ref=f87e93]:
+        - generic [ref=f87e94]:
+          - generic [ref=f87e100]:
+            - generic [ref=f87e101]:
+              - heading "Escuela IA" [level=2] [ref=f87e102]
+              - generic [ref=f87e103]: Tutor & OCR
+            - paragraph [ref=f87e104]: Tutor IA Multimodal & OCR de Cuadernos Manuscritos
+          - generic [ref=f87e105]:
+            - button "Ver Escuela IA" [ref=f87e106] [cursor=pointer]
+            - button "Ver Idiomas Voz" [ref=f87e107] [cursor=pointer]
+            - button "Ver Cosmos 3D" [ref=f87e108] [cursor=pointer]
+            - button "Ver Verifica" [ref=f87e109] [cursor=pointer]
+        - generic [ref=f87e110]:
+          - img "Reconocimiento Didáctico de Cuadernos y Ejercicios Manuscritos" [ref=f87e111]
+          - generic [ref=f87e112]:
+            - heading "Reconocimiento Didáctico de Cuadernos y Ejercicios Manuscritos" [level=3] [ref=f87e113]
+            - paragraph [ref=f87e114]: Captura tus ejercicios o apuntes con la cámara. El motor OCR analiza tu caligrafía y razonamiento, orientándote paso a paso sin dar respuestas directas.
+          - button "Anterior" [ref=f87e115] [cursor=pointer]
+          - button "Siguiente" [ref=f87e118] [cursor=pointer]
+        - generic [ref=f87e121]:
+          - generic [ref=f87e122]:
+            - generic [ref=f87e123]: OCR multimodal especializado en texto manuscrito y expresiones algebraicas
+            - generic [ref=f87e128]: Explicaciones socráticas adaptadas a primaria, secundaria y bachillerato
+          - button "Acceder a la Mini App Escuela IA" [ref=f87e133] [cursor=pointer]
+      - generic [ref=f87e141]:
+        - generic [ref=f87e142]:
+          - generic [ref=f87e143]: Enfoque Pedagógico Integrado
+          - heading "¿Cómo Funciona la Metodología GOALS?" [level=2] [ref=f87e155]
+          - paragraph [ref=f87e156]: Reemplaza el estudio memorístico pasivo por una interacción guiada adaptada al ritmo del estudiante.
+        - generic [ref=f87e157]:
+          - generic [ref=f87e158]:
+            - heading "Tutoría Adaptativa Individual" [level=3] [ref=f87e170]
+            - paragraph [ref=f87e171]: Identifica patrones de duda en tiempo real. Ajusta el nivel de las pistas y explicaciones según el desempeño registrado en cada sesión.
+          - generic [ref=f87e172]:
+            - heading "Visualización Tridimensional" [level=3] [ref=f87e180]
+            - paragraph [ref=f87e181]: Facilita la comprensión de conceptos abstractos de física y astronomía mediante motores interactivos basados en datos oficiales.
+          - generic [ref=f87e182]:
+            - heading "Gamificación Medible" [level=3] [ref=f87e186]
+            - paragraph [ref=f87e187]: Fomenta la constancia diaria acumulando puntos de experiencia y manteniendo la racha activa a través de los cuatro módulos educativos.
+        - button "Ver especificaciones técnicas" [ref=f87e188] [cursor=pointer]
+      - generic [ref=f87e193]:
+        - generic [ref=f87e194]:
+          - generic [ref=f87e195]: Rigor Académico & Tecnología
+          - heading "Arquitectura Tecnológica" [level=2] [ref=f87e200]
+          - paragraph [ref=f87e201]: Construido con estándares modernos de procesamiento visual y bases de datos contrastadas.
+        - generic [ref=f87e202]:
+          - generic [ref=f87e203]:
+            - generic [ref=f87e204]: Procesamiento OCR Multimodal
+            - paragraph [ref=f87e208]: Reconocimiento de imágenes con extracción de texto manuscrito y expresiones matemáticas para orientación inmediata.
+          - generic [ref=f87e209]:
+            - generic [ref=f87e210]: Fuentes Oficiales NASA & ESA
+            - paragraph [ref=f87e215]: Constantes físicas verificadas, datos orbitales exactos y contraste automático de veracidad frente a la desinformación.
+          - generic [ref=f87e216]:
+            - generic [ref=f87e217]: Motor WebGL de Rendimiento
+            - paragraph [ref=f87e222]: Simulación de cuerpos celestes con shaders procedimentales fluidos y navegación en tiempo real sin instalaciones externas.
+        - button "Ir al acceso final" [ref=f87e223] [cursor=pointer]
+      - generic [ref=f87e228]:
+        - generic [ref=f87e232]:
+          - heading "Empieza a Utilizar GOALS Hoy Mismo" [level=2] [ref=f87e233]
+          - paragraph [ref=f87e234]: Crea tu cuenta de usuario para acceder a todo el ecosistema educativo desde cualquier navegador o dispositivo.
+          - generic [ref=f87e235]:
+            - button "Crear Cuenta Gratuita" [ref=f87e236] [cursor=pointer]
+            - button "Iniciar Sesión" [ref=f87e240] [cursor=pointer]
+        - generic [ref=f87e241]:
+          - generic [ref=f87e242]: Sin tarjeta de crédito
+          - generic [ref=f87e245]: Acceso inmediato en la nube
+    - generic [ref=f87e249]:
+      - generic [ref=f87e250]:
+        - generic [ref=f87e251]:
+          - generic [ref=f87e252]:
+            - img "GOALS Platform Logo" [ref=f87e253]
+            - generic [ref=f87e254]: GOALS Platform
+          - paragraph [ref=f87e255]: Plataforma Educativa Gamificada con IA Real, Astrofísica 3D y Aprendizaje Adaptativo.
+        - generic [ref=f87e256]:
+          - heading "Ecosistema" [level=4] [ref=f87e257]
+          - generic [ref=f87e258]:
+            - button "Escuela IA" [ref=f87e259] [cursor=pointer]
+            - button "Idiomas Voz" [ref=f87e264] [cursor=pointer]
+            - button "Cosmos 3D" [ref=f87e269] [cursor=pointer]
+            - button "Verifica" [ref=f87e277] [cursor=pointer]
+        - button "Android v2.4.0" [ref=f87e282] [cursor=pointer]:
+          - img "Android" [ref=f87e283]
+          - generic [ref=f87e284]: v2.4.0
+      - generic [ref=f87e287]:
+        - paragraph [ref=f87e288]: © 2026 GOALS Educational Ecosystem. Todos los derechos reservados.
+        - generic [ref=f87e289]: "🟢 IA Real Conectada (model: \"auto\")"
+  - button "Minimizar al borde" [ref=f87e293] [cursor=pointer]

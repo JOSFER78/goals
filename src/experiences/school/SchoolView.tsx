@@ -11,7 +11,7 @@ interface SchoolViewProps {
 export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
   const { addXP } = useProgress();
   const { user, isCloud } = useAuth();
-  const isAuthenticated = isCloud && user && !user.isAnonymous;
+  const isAuthenticated = !!(user && !user.isAnonymous);
 
   const [activeTab, setActiveTab] = useState<'tutor' | 'ocr' | 'step' | 'map'>('tutor');
   const [userQuery, setUserQuery] = useState('');

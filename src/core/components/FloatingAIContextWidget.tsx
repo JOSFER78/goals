@@ -176,8 +176,8 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
     let extra3DInfo = '';
     const iframeEl = document.querySelector('iframe') as HTMLIFrameElement;
-    if (iframeEl && iframeEl.src.includes('astrolingo')) {
-      extra3DInfo = '\n[ESTADO 3D ASTROLINGO: El alumno tiene abierta la experiencia 3D de Mecánica Celeste, Eclipses u Órbitas Planetarias].';
+    if (iframeEl && (iframeEl.src.includes('cosmos-3d') || iframeEl.src.includes('astrolingo'))) {
+      extra3DInfo = '\n[ESTADO 3D COSMOS: El alumno tiene abierta la experiencia 3D de Mecánica Celeste, Eclipses u Órbitas Planetarias].';
     }
 
     return `VISTA ACTUAL: ${sectionName}${extra3DInfo}\nTEXTO VISIBLE EN LA PANTALLA DEL ALUMNO:\n${pageText || 'Página de inicio cargada.'}`;

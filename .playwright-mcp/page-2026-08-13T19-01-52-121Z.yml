@@ -1,0 +1,121 @@
+- generic [ref=f4e4]:
+  - banner [ref=f4e5]:
+    - generic [ref=f4e7] [cursor=pointer]:
+      - generic [ref=f4e8]: G
+      - generic [ref=f4e9]:
+        - heading "GOALS" [level=1] [ref=f4e10]
+        - paragraph [ref=f4e11]: Plataforma Educativa
+    - generic [ref=f4e12]:
+      - button "v1.0.0" [ref=f4e13] [cursor=pointer]
+      - button "Iniciar Sesión" [ref=f4e19] [cursor=pointer]
+  - main [ref=f4e24]:
+    - generic [ref=f4e25]:
+      - generic [ref=f4e26]:
+        - button "Ir al bloque 1" [ref=f4e27] [cursor=pointer]
+        - button "Ir al bloque 2" [ref=f4e28] [cursor=pointer]
+        - button "Ir al bloque 3" [ref=f4e29] [cursor=pointer]
+        - button "Ir al bloque 4" [ref=f4e30] [cursor=pointer]
+        - button "Ir al bloque 5" [ref=f4e31] [cursor=pointer]
+      - generic [ref=f4e32]:
+        - generic [ref=f4e34]:
+          - generic [ref=f4e35]:
+            - generic [ref=f4e36]: Ecosistema de Inteligencia Educativa
+            - heading "Bienvenido a GOALS" [level=1] [ref=f4e40]
+            - paragraph [ref=f4e41]: La primera plataforma integral donde tus lecciones de clase, práctica de idiomas por voz y laboratorios 3D se conectan en un solo perfil.
+          - generic [ref=f4e43]:
+            - generic [ref=f4e44]:
+              - generic [ref=f4e45] [cursor=pointer]:
+                - generic [ref=f4e46]: 📚
+                - generic [ref=f4e47]: Escuela
+                - generic [ref=f4e48]: Tutor OCR
+              - generic [ref=f4e49] [cursor=pointer]:
+                - generic [ref=f4e50]: 🌐
+                - generic [ref=f4e51]: Idiomas
+                - generic [ref=f4e52]: Voz IA
+              - generic [ref=f4e53] [cursor=pointer]:
+                - generic [ref=f4e54]: 🪐
+                - generic [ref=f4e55]: AstroLingo
+                - generic [ref=f4e56]: 3D NASA
+              - generic [ref=f4e57] [cursor=pointer]:
+                - generic [ref=f4e58]: 🛡️
+                - generic [ref=f4e59]: Verifica
+                - generic [ref=f4e60]: Rigor ESA
+            - generic [ref=f4e61]:
+              - generic [ref=f4e62]: XP Unificado
+              - generic [ref=f4e65]: Perfil Sincronizado
+              - generic [ref=f4e66]: Racha Global
+          - generic [ref=f4e69]:
+            - button "Crear Cuenta Gratuita" [ref=f4e71] [cursor=pointer]
+            - button "Desliza para explorar mini apps" [ref=f4e75] [cursor=pointer]
+        - generic [ref=f4e80]:
+          - generic [ref=f4e81]:
+            - generic [ref=f4e82]:
+              - generic [ref=f4e83]: 📚
+              - generic [ref=f4e84]:
+                - generic [ref=f4e85]:
+                  - heading "Escuela" [level=2] [ref=f4e86]
+                  - generic [ref=f4e87]: "Mini App #1 Principal"
+                - paragraph [ref=f4e88]: Tutor IA Multimodal & OCR de Cuadernos Manuscritos
+            - generic [ref=f4e89]:
+              - button "Ir a Escuela" [ref=f4e90] [cursor=pointer]
+              - button "Ir a Idiomas" [ref=f4e91] [cursor=pointer]
+              - button "Ir a AstroLingo" [ref=f4e92] [cursor=pointer]
+              - button "Ir a Verifica" [ref=f4e93] [cursor=pointer]
+          - generic [ref=f4e94]:
+            - img "Escanea tus Ejercicios y Cuadernos con la Cámara" [ref=f4e95]
+            - generic [ref=f4e96]:
+              - heading "Escanea tus Ejercicios y Cuadernos con la Cámara" [level=3] [ref=f4e97]
+              - paragraph [ref=f4e98]: "Haz una foto a tus deberes: la IA reconoce la escritura manuscrita y te guía paso a paso sin dar la respuesta directamente."
+            - button "Anterior Mini App" [ref=f4e99] [cursor=pointer]
+            - button "Siguiente Mini App" [ref=f4e102] [cursor=pointer]
+          - generic [ref=f4e105]:
+            - generic [ref=f4e106]:
+              - generic [ref=f4e107]: Reconocimiento multimodal OCR de texto manuscrito y ecuaciones
+              - generic [ref=f4e112]: Explicaciones didácticas adaptadas a primaria, secundaria y bachillerato
+            - button "Entrar a la Mini App Escuela" [ref=f4e117] [cursor=pointer]
+        - generic [ref=f4e122]:
+          - generic [ref=f4e123]:
+            - generic [ref=f4e124]: Metodología Adaptativa
+            - heading "¿Por qué GOALS ayuda al Estudiante?" [level=2] [ref=f4e136]
+            - paragraph [ref=f4e137]: Elimina la frustración del estudio memorístico mediante tutores de inteligencia artificial.
+          - generic [ref=f4e138]:
+            - generic [ref=f4e139]:
+              - generic [ref=f4e140]: 🧠
+              - heading "Tutor IA que Aprende de Ti" [level=3] [ref=f4e141]
+              - paragraph [ref=f4e142]: Recuerda tus fallos habituales. Si necesitas reforzar un concepto de química o pronunciación, adapta los futuros tests automáticamente.
+            - generic [ref=f4e143]:
+              - generic [ref=f4e144]: 🌌
+              - heading "Comprensión Espacial 3D" [level=3] [ref=f4e145]
+              - paragraph [ref=f4e146]: Observa la física real de órbitas, satélites de la NASA y misiones espaciales con motores 3D interactivos en tiempo real.
+            - generic [ref=f4e147]:
+              - generic [ref=f4e148]: 🏆
+              - heading "Gamificación Unificada" [level=3] [ref=f4e149]
+              - paragraph [ref=f4e150]: Acumula XP en cualquiera de las 4 apps y mantén viva tu racha de estudio diaria para subir de nivel en el ranking global.
+          - button "Ver infraestructura tecnológica" [ref=f4e151] [cursor=pointer]
+        - generic [ref=f4e156]:
+          - generic [ref=f4e157]:
+            - generic [ref=f4e158]: Rigor Científico & IA
+            - heading "Infraestructura Tecnológica" [level=2] [ref=f4e163]
+            - paragraph [ref=f4e164]: Potenciado por motores gráficos modernos y bases de conocimiento contrastadas.
+          - generic [ref=f4e165]:
+            - generic [ref=f4e166]:
+              - generic [ref=f4e167]: OCR Multimodal
+              - paragraph [ref=f4e171]: Procesamiento de imagen para cuadernos manuscritos y conversación de voz sin latencia.
+            - generic [ref=f4e172]:
+              - generic [ref=f4e173]: Fuentes NASA & ESA
+              - paragraph [ref=f4e177]: Datos telemétricos reales, constantes de física astronómica y auditoría científica.
+            - generic [ref=f4e178]:
+              - generic [ref=f4e179]: Motor WebGL 3D
+              - paragraph [ref=f4e185]: Renderizado de partículas fotorreales en 60 FPS con controles de órbita fluidos.
+          - button "Ir al acceso final" [ref=f4e186] [cursor=pointer]
+        - generic [ref=f4e191]:
+          - generic [ref=f4e192]: 🚀
+          - generic [ref=f4e193]:
+            - heading "¿Listo para transformar tu forma de aprender?" [level=2] [ref=f4e194]
+            - paragraph [ref=f4e195]: Crea tu cuenta en menos de 30 segundos y accede gratis a todo el ecosistema de mini apps de GOALS.
+            - generic [ref=f4e196]:
+              - button "Crear Cuenta Gratuita" [ref=f4e197] [cursor=pointer]
+              - button "Iniciar Sesión" [ref=f4e201] [cursor=pointer]
+          - generic [ref=f4e202]:
+            - generic [ref=f4e203]: Sin tarjeta
+            - generic [ref=f4e206]: Acceso inmediato

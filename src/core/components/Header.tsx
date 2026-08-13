@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [pendingCount, setPendingCount] = useState<number>(0);
 
   const isAdmin = user?.email === 'josferestudio@gmail.com';
-  const isAuthenticated = isCloud && user && !user.isAnonymous;
+  const isAuthenticated = !!(user && !user.isAnonymous);
 
   useEffect(() => {
     if (!isAdmin || !db) return;

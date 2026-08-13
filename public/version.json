@@ -1,5 +1,5 @@
 {
-  "version": "2.4.0",
-  "apkUrl": "https://astrolingo-96820.web.app/downloads/goalskid_2.4.apk",
-  "changelog": "🚀 Versión v2.4.0 (goalskid_2.4.apk): Cero analogías hardcodeadas, infografías con IA en HD generadas en tiempo real, inyección exhaustiva de contexto de pantalla y voces neuronales naturales de alta fidelidad."
+  "version": "2.5.0",
+  "apkUrl": "https://appgoals.web.app/downloads/goalskid_2.5.zip",
+  "changelog": "🚀 Versión v2.5.0 Oficial (goalskid_2.5.zip): APK Android nativo (7.3MB) empaquetado. Firebase Auth real, Firestore DB en tiempo real e IA FreeLLMApi integrada."
 }

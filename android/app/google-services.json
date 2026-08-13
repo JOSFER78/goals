@@ -1,44 +1,26 @@
 {
   "project_info": {
-    "project_number": "882204482981",
-    "project_id": "astrolingo-96820",
-    "storage_bucket": "astrolingo-96820.firebasestorage.app"
+    "project_number": "828956321348",
+    "project_id": "goalskid-app",
+    "storage_bucket": "goalskid-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:882204482981:android:918f6576caf207345d1c4c",
+        "mobilesdk_app_id": "1:828956321348:android:34eb9b83f3e609b0823e11",
         "android_client_info": {
           "package_name": "app.goalskids.app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "882204482981-n4hqgbcdsoor0ef4bes1guogrhub5qtm.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "app.goalskids.app",
-            "certificate_hash": "0db3756913145d236c8a826fe923e84f200d35dd"
-          }
-        },
-        {
-          "client_id": "882204482981-1nq4c224mq8hh1ee4ib3h6ifsehrurro.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBB1U_ziKWvrIneQv46mzK0fSP_n-fsQ_k"
+          "current_key": "AIzaSyBsaRLUUFG1QdSjMMzxzOVmzW4aqrN0TbM"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "882204482981-1nq4c224mq8hh1ee4ib3h6ifsehrurro.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

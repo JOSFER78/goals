@@ -1,0 +1,54 @@
+- generic [ref=f61e3]:
+  - link "Ir al contenido principal" [ref=f61e4] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=f61e6]:
+    - generic [ref=f61e7]:
+      - navigation "Productos de Firebase console" [ref=f61e9]:
+        - heading [level=2] [ref=f61e10]:
+          - link "Firebase console (Ir a la lista de proyectos)" [ref=f61e11] [cursor=pointer]:
+            - /url: "#"
+            - img "Logotipo de Firebase" [ref=f61e14]
+        - img [ref=f61e19]: search
+        - link "Descripción general del proyecto" [ref=f61e21] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f61e22]: gmp_nav20_overview
+        - menu [ref=f61e23]:
+          - menuitem "Configuración" [ref=f61e24]:
+            - img [ref=f61e26] [cursor=pointer]: settings
+      - separator [ref=f61e27]
+      - group [ref=f61e29]:
+        - link "Hosting" [ref=f61e31] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f61e32]: gmp_nav20_hosting
+      - separator [ref=f61e33]
+    - button "Activar o desactivar la barra lateral de navegación" [ref=f61e36] [cursor=pointer]:
+      - img [ref=f61e37]: chevron_left
+  - banner
+  - main [active] [ref=f61e42]:
+    - generic [ref=f61e46]:
+      - generic [ref=f61e48]:
+        - generic [ref=f61e49]:
+          - generic [ref=f61e50]: goalskid-app
+          - button "Plan Spark" [ref=f61e52] [cursor=pointer]
+        - button "Agregar app" [ref=f61e59]:
+          - generic [ref=f61e61]:
+            - generic [ref=f61e62]: add
+            - generic [ref=f61e63]: Agregar app
+      - progressbar [ref=f61e67]
+  - generic "Gemini en Firebase" [ref=f61e82]:
+    - generic [ref=f61e83]:
+      - generic [ref=f61e84]:
+        - 'button "Cuenta de Google: José Fernández (josferestudio@gmail.com)" [ref=f61e92] [cursor=pointer]'
+        - button "Alertas abiertas" [ref=f61e102] [cursor=pointer]:
+          - img [ref=f61e103]: notifications
+        - button "Chatea con Gemini (Alt + G)" [ref=f61e112] [cursor=pointer]:
+          - img [ref=f61e114]: spark
+        - button "Ayuda" [ref=f61e117] [cursor=pointer]:
+          - img [ref=f61e118]: contact_support
+        - separator [ref=f61e121]
+        - button "Activar Cloud Shell" [ref=f61e122] [cursor=pointer]:
+          - tooltip "Potencia tu desarrollo. Prueba Cloud Shell para acceder a Firebase CLI integrado y ejecutar los emuladores de Firebase directamente en una máquina virtual." [ref=f61e128]
+        - button "Activar o desactivar el panel de aprendizaje" [ref=f61e131] [cursor=pointer]:
+          - img [ref=f61e132]: school
+      - 'button "Tema actual: claro, ajustar tema" [ref=f61e136] [cursor=pointer]':
+        - img [ref=f61e137]: dark_mode

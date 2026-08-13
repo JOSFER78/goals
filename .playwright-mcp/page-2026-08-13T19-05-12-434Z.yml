@@ -1,0 +1,67 @@
+- generic [ref=f5e3]:
+  - link "Ir al contenido principal" [ref=f5e4] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=f5e298]:
+    - navigation "Productos de Firebase console" [ref=f5e300]:
+      - heading [level=2] [ref=f5e301]:
+        - link "Firebase console (Ir a la lista de proyectos)" [ref=f5e302] [cursor=pointer]:
+          - /url: "#"
+          - img "Logotipo de Firebase" [ref=f5e305]
+      - img [ref=f5e310]: search
+      - link "Descripción general del proyecto" [ref=f5e312] [cursor=pointer]:
+        - /url: "#"
+        - img [ref=f5e313]: gmp_nav20_overview
+      - menu [ref=f5e314]:
+        - menuitem "Configuración" [ref=f5e315]:
+          - img [ref=f5e317] [cursor=pointer]: settings
+    - separator [ref=f5e318]
+    - group [ref=f5e320]:
+      - link "Authentication" [ref=f5e322] [cursor=pointer]:
+        - /url: "#"
+        - img [ref=f5e323]: gmp_nav20_auth
+      - link "Hosting" [ref=f5e325] [cursor=pointer]:
+        - /url: "#"
+        - img [ref=f5e326]: gmp_nav20_hosting
+      - link "Firestore" [ref=f5e328] [cursor=pointer]:
+        - /url: "#"
+        - img [ref=f5e329]: gmp_firestore
+    - separator [ref=f5e330]
+  - banner:
+    - generic [ref=f5e5]:
+      - button "Abrir el menú de navegación" [ref=f5e331] [cursor=pointer]:
+        - img [ref=f5e332]: menu
+      - button "Más opciones" [ref=f5e336] [cursor=pointer]:
+        - img [ref=f5e337]: more_vert
+  - main [active] [ref=f5e13]:
+    - generic [ref=f5e342]:
+      - generic [ref=f5e344]:
+        - generic [ref=f5e345]: astrolingo
+        - generic [ref=f5e349]:
+          - button "2 apps Configura las apps que se muestran en la página de descripción general" [ref=f5e350]:
+            - generic [ref=f5e351]:
+              - generic [ref=f5e352]:
+                - img [ref=f5e353]: apps
+                - generic [ref=f5e354]: 2 apps
+              - generic [ref=f5e355]: Configura las apps que se muestran en la página de descripción general
+          - button "Agregar app" [ref=f5e358]:
+            - generic [ref=f5e360]:
+              - generic [ref=f5e361]: add
+              - generic [ref=f5e362]: Agregar app
+      - progressbar [ref=f5e366]
+  - generic "Gemini en Firebase" [ref=f5e225]:
+    - generic [ref=f5e226]:
+      - generic [ref=f5e227]:
+        - 'button "Cuenta de Google: José Fernández (josferestudio@gmail.com)" [ref=f5e235] [cursor=pointer]'
+        - button "Alertas abiertas" [ref=f5e245] [cursor=pointer]:
+          - img [ref=f5e246]: notifications
+        - button "Chatea con Gemini (Alt + G)" [ref=f5e255] [cursor=pointer]:
+          - img [ref=f5e257]: spark
+        - button "Ayuda" [ref=f5e264] [cursor=pointer]:
+          - img [ref=f5e265]: contact_support
+        - separator [ref=f5e268]
+        - button "Activar Cloud Shell" [ref=f5e269] [cursor=pointer]:
+          - tooltip "Potencia tu desarrollo. Prueba Cloud Shell para acceder a Firebase CLI integrado y ejecutar los emuladores de Firebase directamente en una máquina virtual." [ref=f5e275]
+        - button "Activar o desactivar el panel de aprendizaje" [ref=f5e381] [cursor=pointer]:
+          - img [ref=f5e382]: school
+      - 'button "Tema actual: claro, ajustar tema" [ref=f5e279] [cursor=pointer]':
+        - img [ref=f5e280]: dark_mode

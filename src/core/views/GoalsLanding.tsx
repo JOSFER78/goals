@@ -68,7 +68,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
     },
     {
       id: 'astro',
-      name: 'AstroLingo 3D',
+      name: 'Cosmos 3D',
       icon: Orbit,
       tagline: 'Astrofísica, Misiones Espaciales & Simulador 3D NASA',
       badgeTag: 'Visor 3D NASA',
@@ -197,7 +197,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                     <div className="text-[9px] text-slate-400 font-medium">Profesor Voz</div>
                   </div>
 
-                  {/* Nodo 3: AstroLingo */}
+                  {/* Nodo 3: Cosmos 3D */}
                   <div 
                     onClick={() => onSelectExperience('astro')}
                     className="group cursor-pointer bg-slate-900/90 border border-slate-800 hover:border-amber-500/60 p-3 rounded-xl text-center transition-all hover:scale-102 shadow-sm"
@@ -205,7 +205,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                     <div className="w-8 h-8 mx-auto rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mb-1.5">
                       <Orbit className="w-4 h-4" />
                     </div>
-                    <div className="font-bold text-xs text-white">AstroLingo 3D</div>
+                    <div className="font-bold text-xs text-white">Cosmos 3D</div>
                     <div className="text-[9px] text-slate-400 font-medium">Visor NASA</div>
                   </div>
 

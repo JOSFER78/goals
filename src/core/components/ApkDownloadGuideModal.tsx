@@ -78,18 +78,18 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
           </div>
         </div>
 
-        {/* Botón Final de Descargar goalskid_2.4.apk */}
+        {/* Botón Final de Descargar goalskid_2.4.zip */}
         <div className="pt-2">
           <a
-            href="https://astrolingo-96820.web.app/downloads/goalskid_2.4.apk"
-            download="goalskid_2.4.apk"
+            href="https://appgoals.web.app/downloads/goalskid_2.4.zip"
+            download="goalskid_2.4.zip"
             target="_blank"
             rel="noopener noreferrer"
             onClick={onClose}
             className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-400 hover:from-emerald-500 hover:to-teal-300 text-white font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-emerald-600/30 active:scale-95 flex items-center justify-center gap-2"
           >
             <Download className="w-4 h-4" />
-            <span>Entendido, Descargar goalskid_2.4.apk</span>
+            <span>Entendido, Descargar goalskid_2.4.zip</span>
           </a>
         </div>
 

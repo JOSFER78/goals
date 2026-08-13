@@ -11,7 +11,7 @@ interface LanguagesViewProps {
 export const LanguagesView: React.FC<LanguagesViewProps> = ({ onOpenAuth }) => {
   const { addXP } = useProgress();
   const { user, isCloud } = useAuth();
-  const isAuthenticated = isCloud && user && !user.isAnonymous;
+  const isAuthenticated = !!(user && !user.isAnonymous);
 
   const [activeTab, setActiveTab] = useState<'voice' | 'science' | 'pronunciation'>('voice');
   const [userTextInput, setUserTextInput] = useState<string>('Hello teacher! Can you explain the difference between speed and velocity in physics?');

@@ -17,18 +17,17 @@ import {
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, onSnapshot, Firestore } from 'firebase/firestore';
 
 export const defaultFirebaseConfig = {
-  apiKey: "AIzaSyBgEZaM-qNSHKcNr6ZJmQlo8kzpg1qpfAA",
-  authDomain: "astrolingo-96820.firebaseapp.com",
-  projectId: "astrolingo-96820",
-  storageBucket: "astrolingo-96820.firebasestorage.app",
-  messagingSenderId: "882204482981",
-  appId: "1:882204482981:web:aebeb62cd46ad4035d1c4c",
-  measurementId: "G-X5C79PDNKB"
+  apiKey: "AIzaSyBsaRLUUFG1QdSjMMzxzOVmzW4aqrN0TbM",
+  authDomain: "goalskid-app.firebaseapp.com",
+  projectId: "goalskid-app",
+  storageBucket: "goalskid-app.firebasestorage.app",
+  messagingSenderId: "828956321348",
+  appId: "1:828956321348:web:babec7f340ae5c7f823e11"
 };
 
 export function getStoredFirebaseConfig() {
   try {
-    const custom = localStorage.getItem('goals_firebase_config') || localStorage.getItem('astrolingo_firebase_config');
+    const custom = localStorage.getItem('goals_firebase_config');
     if (custom) {
       const parsed = JSON.parse(custom);
       if (parsed && parsed.apiKey && parsed.apiKey.length > 5) {

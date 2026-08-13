@@ -1,0 +1,138 @@
+- generic [ref=e4]:
+  - banner [ref=e5]:
+    - button [ref=e7] [cursor=pointer]:
+      - img "GOALS Logo" [ref=e8]
+      - generic [ref=e9]:
+        - heading "GOALS" [level=1] [ref=e10]
+        - paragraph [ref=e11]: Tu Plataforma Educativa IA
+    - generic [ref=e12]:
+      - button "Pet IA" [ref=e13] [cursor=pointer]
+      - button "Acceso / Registro" [ref=e18] [cursor=pointer]
+  - main [ref=e23]:
+    - generic [ref=e26]:
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - img "GOALS Platform Logo" [ref=e31]
+            - generic [ref=e32]:
+              - heading "GOALS" [level=1] [ref=e33]
+              - paragraph [ref=e34]: Tu Plataforma Educativa IA
+          - generic [ref=e35]: Inteligencia Educativa Adaptativa
+          - paragraph [ref=e39]: Una solución pedagógica avanzada donde la resolución de cuadernos manuscritos, la práctica de conversación por voz, el laboratorio tridimensional de astrofísica y el análisis de evidencia científica conviven en un solo entorno unificado.
+        - generic [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e43] [cursor=pointer]:
+              - generic [ref=e48]: Escuela IA
+              - generic [ref=e49]: Tutor OCR
+            - generic [ref=e50] [cursor=pointer]:
+              - generic [ref=e55]: Idiomas Voz
+              - generic [ref=e56]: Profesor Voz
+            - generic [ref=e57] [cursor=pointer]:
+              - generic [ref=e65]: AstroLingo 3D
+              - generic [ref=e66]: Visor NASA
+            - generic [ref=e67] [cursor=pointer]:
+              - generic [ref=e72]: Verifica
+              - generic [ref=e73]: Rigor Científico
+          - generic [ref=e74]:
+            - generic [ref=e75]: Progreso Sincronizado
+            - generic [ref=e78]: Acceso Unificado
+            - generic [ref=e79]: Racha Diaria
+        - generic [ref=e82]:
+          - button "Comenzar Ahora" [ref=e84] [cursor=pointer]
+          - button "Explorar características detalladas" [ref=e88] [cursor=pointer]
+      - generic [ref=e93]:
+        - generic [ref=e94]:
+          - generic [ref=e100]:
+            - generic [ref=e101]:
+              - heading "AstroLingo 3D" [level=2] [ref=e337]
+              - generic [ref=e103]: Visor 3D NASA
+            - paragraph [ref=e104]: Astrofísica, Misiones Espaciales & Simulador 3D NASA
+          - generic [ref=e105]:
+            - button "Ver Escuela IA" [ref=e106] [cursor=pointer]
+            - button "Ver Idiomas Voz" [ref=e107] [cursor=pointer]
+            - button "Ver AstroLingo 3D" [active] [ref=e108] [cursor=pointer]
+            - button "Ver Verifica" [ref=e109] [cursor=pointer]
+        - generic [ref=e110]:
+          - img "Simulador 3D Interactivo con Datos de la NASA y la ESA" [ref=e338]
+          - generic [ref=e112]:
+            - heading "Simulador 3D Interactivo con Datos de la NASA y la ESA" [level=3] [ref=e339]
+            - paragraph [ref=e114]: Explora el Sistema Solar en tiempo real a escala fotorrealista. Estudia la mecánica celeste de eclipses, oblicuidad terrestre y misiones espaciales.
+          - button "Anterior" [ref=e115] [cursor=pointer]
+          - button "Siguiente" [ref=e118] [cursor=pointer]
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - generic [ref=e123]: Renderizado 3D de alta precisión con 8 escalas celestes navegables
+            - generic [ref=e128]: Simulación física de la inclinación orbital de 5.14° y rotación planetaria de 24h
+          - button "Acceder a la Mini App AstroLingo 3D" [ref=e340] [cursor=pointer]
+      - generic [ref=e141]:
+        - generic [ref=e142]:
+          - generic [ref=e143]: Enfoque Pedagógico Integrado
+          - heading "¿Cómo Funciona la Metodología GOALS?" [level=2] [ref=e155]
+          - paragraph [ref=e156]: Reemplaza el estudio memorístico pasivo por una interacción guiada adaptada al ritmo del estudiante.
+        - generic [ref=e157]:
+          - generic [ref=e158]:
+            - heading "Tutoría Adaptativa Individual" [level=3] [ref=e170]
+            - paragraph [ref=e171]: Identifica patrones de duda en tiempo real. Ajusta el nivel de las pistas y explicaciones según el desempeño registrado en cada sesión.
+          - generic [ref=e172]:
+            - heading "Visualización Tridimensional" [level=3] [ref=e180]
+            - paragraph [ref=e181]: Facilita la comprensión de conceptos abstractos de física y astronomía mediante motores interactivos basados en datos oficiales.
+          - generic [ref=e182]:
+            - heading "Gamificación Medible" [level=3] [ref=e186]
+            - paragraph [ref=e187]: Fomenta la constancia diaria acumulando puntos de experiencia y manteniendo la racha activa a través de los cuatro módulos educativos.
+        - button "Ver especificaciones técnicas" [ref=e188] [cursor=pointer]
+      - generic [ref=e193]:
+        - generic [ref=e194]:
+          - generic [ref=e195]: Rigor Académico & Tecnología
+          - heading "Arquitectura Tecnológica" [level=2] [ref=e200]
+          - paragraph [ref=e201]: Construido con estándares modernos de procesamiento visual y bases de datos contrastadas.
+        - generic [ref=e202]:
+          - generic [ref=e203]:
+            - generic [ref=e204]: Procesamiento OCR Multimodal
+            - paragraph [ref=e208]: Reconocimiento de imágenes con extracción de texto manuscrito y expresiones matemáticas para orientación inmediata.
+          - generic [ref=e209]:
+            - generic [ref=e210]: Fuentes Oficiales NASA & ESA
+            - paragraph [ref=e215]: Constantes físicas verificadas, datos orbitales exactos y contraste automático de veracidad frente a la desinformación.
+          - generic [ref=e216]:
+            - generic [ref=e217]: Motor WebGL de Rendimiento
+            - paragraph [ref=e222]: Simulación de cuerpos celestes con shaders procedimentales fluidos y navegación en tiempo real sin instalaciones externas.
+        - button "Ir al acceso final" [ref=e223] [cursor=pointer]
+      - generic [ref=e228]:
+        - generic [ref=e232]:
+          - heading "Empieza a Utilizar GOALS Hoy Mismo" [level=2] [ref=e233]
+          - paragraph [ref=e234]: Crea tu cuenta de usuario para acceder a todo el ecosistema educativo desde cualquier navegador o dispositivo.
+          - generic [ref=e235]:
+            - button "Crear Cuenta Gratuita" [ref=e236] [cursor=pointer]
+            - button "Iniciar Sesión" [ref=e240] [cursor=pointer]
+        - generic [ref=e241]:
+          - generic [ref=e242]: Sin tarjeta de crédito
+          - generic [ref=e245]: Acceso inmediato en la nube
+    - generic [ref=e249]:
+      - generic [ref=e250]:
+        - generic [ref=e251]:
+          - generic [ref=e252]:
+            - img "GOALS Platform Logo" [ref=e253]
+            - generic [ref=e254]: GOALS Platform
+          - paragraph [ref=e255]: Plataforma Educativa Gamificada con IA Real, Astrofísica 3D y Aprendizaje Adaptativo.
+        - generic [ref=e256]:
+          - heading "Ecosistema" [level=4] [ref=e257]
+          - generic [ref=e258]:
+            - button "Escuela IA" [ref=e259] [cursor=pointer]
+            - button "Idiomas Voz" [ref=e264] [cursor=pointer]
+            - button "AstroLingo 3D" [ref=e269] [cursor=pointer]
+            - button "Verifica" [ref=e277] [cursor=pointer]
+        - button "Android v2.4.0" [ref=e282] [cursor=pointer]:
+          - img "Android" [ref=e283]
+          - generic [ref=e284]: v2.4.0
+      - generic [ref=e287]:
+        - paragraph [ref=e288]: © 2026 GOALS Educational Ecosystem. Todos los derechos reservados.
+        - generic [ref=e289]: "🟢 IA Real Conectada (model: \"auto\")"
+  - generic [ref=e311]:
+    - generic [ref=e316]:
+      - generic [ref=e317]:
+        - heading "Privacidad & Cookies en GOALS" [level=3] [ref=e318]
+        - generic [ref=e319]: GDPR / LOPD
+      - paragraph [ref=e320]: Utilizamos cookies esenciales y almacenamiento local para guardar tu progreso educativo, sincronizar tus perfiles y garantizar la mejor experiencia interactiva en GOALS y Astrolingo.
+    - generic [ref=e321]:
+      - button "Aceptar Todas" [ref=e322] [cursor=pointer]
+      - button "Solo Esenciales" [ref=e326] [cursor=pointer]
+  - button "Minimizar al borde" [ref=e293] [cursor=pointer]

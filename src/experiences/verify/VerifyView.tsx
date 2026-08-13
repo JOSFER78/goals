@@ -11,7 +11,7 @@ interface VerifyViewProps {
 export const VerifyView: React.FC<VerifyViewProps> = ({ onOpenAuth }) => {
   const { addXP } = useProgress();
   const { user, isCloud } = useAuth();
-  const isAuthenticated = isCloud && user && !user.isAnonymous;
+  const isAuthenticated = !!(user && !user.isAnonymous);
 
   const [headline, setHeadline] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);

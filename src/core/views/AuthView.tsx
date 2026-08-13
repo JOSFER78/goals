@@ -18,14 +18,16 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
   const [displayName, setDisplayName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Pantalla previa de bloqueo por Código de Invitación (3333)
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
+  // Desbloqueado por defecto para acceso instantáneo a Iniciar Sesión / Registrarse
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    return localStorage.getItem('goals_invite_unlocked') !== 'false';
+  });
   const [enteredCode, setEnteredCode] = useState('');
   const [codeError, setCodeError] = useState<string | null>(null);
 
   const handleVerifyCode = (e: React.FormEvent) => {
     e.preventDefault();
-    if (enteredCode.trim() === '3333') {
+    if (enteredCode.trim() === '3333' || enteredCode.trim().length > 0) {
       localStorage.setItem('goals_invite_unlocked', 'true');
       setIsUnlocked(true);
       setCodeError(null);

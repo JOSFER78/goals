@@ -47,7 +47,7 @@ export const CookieBanner: React.FC = () => {
               </span>
             </div>
             <p className="text-xs text-slate-300 leading-relaxed">
-              Utilizamos cookies esenciales y almacenamiento local para guardar tu progreso educativo, sincronizar tus perfiles y garantizar la mejor experiencia interactiva en GOALS y Astrolingo.
+              Utilizamos cookies esenciales y almacenamiento local para guardar tu progreso educativo, sincronizar tus perfiles y garantizar la mejor experiencia interactiva en GOALS.
             </p>
           </div>
         </div>

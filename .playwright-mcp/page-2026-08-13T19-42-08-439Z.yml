@@ -1,0 +1,109 @@
+- generic [ref=f56e3]:
+  - link "Ir al contenido principal" [ref=f56e4] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=f56e6]:
+    - generic [ref=f56e7]:
+      - navigation "Productos de Firebase console" [ref=f56e9]:
+        - heading [level=2] [ref=f56e10]:
+          - link "Firebase console (Ir a la lista de proyectos)" [ref=f56e11] [cursor=pointer]:
+            - /url: "#"
+            - img "Logotipo de Firebase" [ref=f56e14]
+        - img [ref=f56e19]: search
+        - link "Descripción general del proyecto" [ref=f56e21] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f56e22]: gmp_nav20_overview
+        - menu [ref=f56e23]:
+          - menuitem "Configuración" [ref=f56e24]:
+            - img [ref=f56e26] [cursor=pointer]: settings
+      - separator [ref=f56e27]
+      - group [ref=f56e29]:
+        - link "Hosting" [ref=f56e31] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f56e32]: gmp_nav20_hosting
+      - separator [ref=f56e33]
+    - button "Activar o desactivar la barra lateral de navegación" [ref=f56e36] [cursor=pointer]:
+      - img [ref=f56e37]: chevron_left
+  - banner
+  - main [ref=f56e43]:
+    - generic [ref=f56e46]:
+      - region "Encabezado del producto" [ref=f56e47]:
+        - generic [ref=f56e49]:
+          - heading "Configuración de proyecto" [active] [level=2] [ref=f56e53]
+          - tablist "Funciones del producto" [ref=f56e57]:
+            - generic [ref=f56e60]:
+              - 'tab "Pestaña seleccionada: General" [selected] [ref=f56e61] [cursor=pointer]':
+                - generic [ref=f56e63]: General
+              - tab "Cloud Messaging" [ref=f56e67] [cursor=pointer]
+              - tab "Integraciones" [ref=f56e73] [cursor=pointer]
+              - tab "Cuentas de servicio" [ref=f56e79] [cursor=pointer]
+              - tab "Privacidad de los datos" [ref=f56e85] [cursor=pointer]
+              - tab "Usuarios y permisos" [ref=f56e91] [cursor=pointer]
+              - tab "Alertas" [ref=f56e97] [cursor=pointer]
+      - generic [ref=f56e104]:
+        - generic [ref=f56e107]:
+          - heading "Tu proyecto" [level=2] [ref=f56e108]
+          - button "Ver en Google Cloud (se abre una pestaña nueva)" [ref=f56e110]:
+            - generic [ref=f56e117]: Ver en Google Cloud open_in_new
+        - generic [ref=f56e121]:
+          - generic [ref=f56e122]:
+            - generic [ref=f56e124]:
+              - generic [ref=f56e125]: Nombre del proyecto
+              - generic [ref=f56e126]: goalskid-app
+              - button "Editar el nombre del proyecto" [ref=f56e127] [cursor=pointer]:
+                - img [ref=f56e128]: mode_edit
+            - generic [ref=f56e131]:
+              - generic [ref=f56e132]:
+                - text: ID del proyecto
+                - button "Más información sobre los ID de los proyectos" [ref=f56e134]:
+                  - img [ref=f56e135]: help
+              - generic [ref=f56e136]: goalskid-app
+            - generic [ref=f56e137]:
+              - generic [ref=f56e138]:
+                - text: Número del proyecto
+                - button "Más información sobre los números de los proyectos" [ref=f56e140]:
+                  - img [ref=f56e141]: help
+              - generic [ref=f56e142]: "828956321348"
+          - separator [ref=f56e143]
+          - generic [ref=f56e144]:
+            - heading "Entorno" [level=3] [ref=f56e145]
+            - generic [ref=f56e146]: Este parámetro de configuración permite personalizar tu proyecto para las diferentes etapas del ciclo de vida de la app
+            - generic [ref=f56e147]:
+              - generic [ref=f56e148]: Tipo de entorno
+              - generic [ref=f56e149]: Sin especificar
+              - button "Editar el tipo de entorno" [ref=f56e151] [cursor=pointer]:
+                - img [ref=f56e152]: mode_edit
+      - heading "Tus apps" [level=2] [ref=f56e159]
+      - generic [ref=f56e161]:
+        - generic [ref=f56e162]:
+          - text: No hay apps en tu proyecto
+          - generic [ref=f56e163]: Selecciona una plataforma para comenzar
+        - generic [ref=f56e165]:
+          - button "Agregar Firebase a tu app de Apple" [ref=f56e166] [cursor=pointer]:
+            - img [ref=f56e167]: plat_ios
+          - button "Agregar Firebase a tu app para Android" [ref=f56e170] [cursor=pointer]:
+            - img [ref=f56e171]: plat_android
+          - button "Agregar Firebase a tu app web" [ref=f56e174] [cursor=pointer]:
+            - img [ref=f56e175]: plat_web
+          - button "Agregar Firebase a tus apps de Unity" [ref=f56e179] [cursor=pointer]:
+            - img [ref=f56e180]: plat_unity
+          - button "Agregar Firebase a tu app de Flutter" [ref=f56e183] [cursor=pointer]:
+            - img [ref=f56e184]: plat_flutter
+      - button "Borrar proyecto" [ref=f56e189]:
+        - img [ref=f56e190]: delete
+  - generic "Gemini en Firebase" [ref=f56e195]:
+    - generic [ref=f56e196]:
+      - generic [ref=f56e197]:
+        - 'button "Cuenta de Google: José Fernández (josferestudio@gmail.com)" [ref=f56e205] [cursor=pointer]'
+        - button "Alertas abiertas" [ref=f56e215] [cursor=pointer]:
+          - img [ref=f56e216]: notifications
+        - button "Chatea con Gemini (Alt + G)" [ref=f56e224] [cursor=pointer]:
+          - img [ref=f56e226]: spark
+        - button "Ayuda" [ref=f56e229] [cursor=pointer]:
+          - img [ref=f56e230]: contact_support
+        - separator [ref=f56e233]
+        - button "Activar Cloud Shell" [ref=f56e234] [cursor=pointer]:
+          - tooltip "Potencia tu desarrollo. Prueba Cloud Shell para acceder a Firebase CLI integrado y ejecutar los emuladores de Firebase directamente en una máquina virtual." [ref=f56e240]
+        - button "Activar o desactivar el panel de aprendizaje" [ref=f56e243] [cursor=pointer]:
+          - img [ref=f56e244]: school
+      - 'button "Tema actual: claro, ajustar tema" [ref=f56e248] [cursor=pointer]':
+        - img [ref=f56e249]: dark_mode

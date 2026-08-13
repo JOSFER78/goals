@@ -39,7 +39,7 @@
   scrollbar-width: none;
 }
 
-/* Custom Scrollbar (Global from AstroLingo) */
+/* Custom Scrollbar (Global GOALS) */
 ::-webkit-scrollbar {
   width: 6px;
 }

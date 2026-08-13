@@ -1,14 +1,14 @@
 {
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
+    "site": "appgoals",
     "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
-      "**/node_modules/**",
-      "downloads/**",
-      "**/*.apk",
-      "**/*.zip",
-      "**/*.exe"
+      "**/node_modules/**"
     ],
     "rewrites": [
       {

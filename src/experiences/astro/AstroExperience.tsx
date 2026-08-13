@@ -45,10 +45,10 @@ export const AstroExperience: React.FC<AstroExperienceProps> = ({
 
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-transparent">
-      {/* Visor 100% Integrado e Interactivo de AstroLingo 3D */}
+      {/* Visor 100% Integrado e Interactivo de GOALS 3D Cosmos */}
       <iframe
-        src="/astrolingo-app.html"
-        title="AstroLingo 3D"
+        src="/cosmos-3d.html"
+        title="GOALS 3D Cosmos"
         className="w-full h-full flex-1 border-0 bg-transparent"
       />
     </div>

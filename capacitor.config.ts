@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   webDir: 'dist',
   server: {
     androidScheme: 'https',
-    hostname: 'astrolingo-96820.web.app'
+    hostname: 'appgoals.web.app'
   },
   plugins: {
     FirebaseAuthentication: {

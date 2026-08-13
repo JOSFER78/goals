@@ -1,0 +1,67 @@
+- generic [ref=f103e3]:
+  - link "Ir al contenido principal" [ref=f103e4] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=f103e6]:
+    - generic [ref=f103e7]:
+      - navigation "Productos de Firebase console" [ref=f103e9]:
+        - heading [level=2] [ref=f103e10]:
+          - link "Firebase console (Ir a la lista de proyectos)" [ref=f103e11] [cursor=pointer]:
+            - /url: "#"
+            - img "Logotipo de Firebase" [ref=f103e14]
+        - img [ref=f103e19]: search
+        - link "Descripción general del proyecto" [ref=f103e21] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f103e22]: gmp_nav20_overview
+        - menu [ref=f103e23]:
+          - menuitem "Configuración" [ref=f103e24]:
+            - img [ref=f103e26] [cursor=pointer]: settings
+      - separator [ref=f103e27]
+      - group [ref=f103e29]:
+        - link "Hosting" [ref=f103e31] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f103e32]: gmp_nav20_hosting
+      - separator [ref=f103e33]
+    - button "Activar o desactivar la barra lateral de navegación" [ref=f103e36] [cursor=pointer]:
+      - img [ref=f103e37]: chevron_left
+  - banner
+  - main [active] [ref=f103e42]:
+    - generic [ref=f103e46]:
+      - generic [ref=f103e48]:
+        - generic [ref=f103e49]:
+          - generic [ref=f103e50]: goalskid
+          - button "Plan Spark" [ref=f103e52] [cursor=pointer]
+        - generic [ref=f103e58]:
+          - button "2 apps Configura las apps que se muestran en la página de descripción general" [ref=f103e59]:
+            - generic [ref=f103e60]:
+              - generic [ref=f103e61]:
+                - img [ref=f103e62]: apps
+                - generic [ref=f103e63]: 2 apps
+              - generic [ref=f103e64]: Configura las apps que se muestran en la página de descripción general
+          - img [ref=f103e67]: filter_list
+          - button "Android GOALS Android" [ref=f103e68]:
+            - generic [ref=f103e71]:
+              - img "Android" [ref=f103e73]:
+                - generic [ref=f103e74]: plat_android
+              - generic [ref=f103e75]: GOALS Android
+          - button "Agregar app" [ref=f103e78]:
+            - generic [ref=f103e80]:
+              - generic [ref=f103e81]: add
+              - generic [ref=f103e82]: Agregar app
+      - progressbar [ref=f103e86]
+  - generic "Gemini en Firebase" [ref=f103e101]:
+    - generic [ref=f103e102]:
+      - generic [ref=f103e103]:
+        - 'button "Cuenta de Google: José Fernández (josferestudio@gmail.com)" [ref=f103e111] [cursor=pointer]'
+        - button "Alertas abiertas" [ref=f103e121] [cursor=pointer]:
+          - img [ref=f103e122]: notifications
+        - button "Chatea con Gemini (Alt + G)" [ref=f103e130] [cursor=pointer]:
+          - img [ref=f103e132]: spark
+        - button "Ayuda" [ref=f103e135] [cursor=pointer]:
+          - img [ref=f103e136]: contact_support
+        - separator [ref=f103e139]
+        - button "Activar Cloud Shell" [ref=f103e140] [cursor=pointer]:
+          - tooltip "Potencia tu desarrollo. Prueba Cloud Shell para acceder a Firebase CLI integrado y ejecutar los emuladores de Firebase directamente en una máquina virtual." [ref=f103e146]
+        - button "Activar o desactivar el panel de aprendizaje" [ref=f103e149] [cursor=pointer]:
+          - img [ref=f103e150]: school
+      - 'button "Tema actual: claro, ajustar tema" [ref=f103e154] [cursor=pointer]':
+        - img [ref=f103e155]: dark_mode

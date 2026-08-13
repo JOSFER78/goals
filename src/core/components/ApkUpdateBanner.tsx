@@ -47,7 +47,7 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
   };
 
   const handleStartDownload = () => {
-    const apkUrl = updateInfo?.downloadUrl || 'https://goalskid.web.app/downloads/goalskid.apk';
+    const apkUrl = updateInfo?.downloadUrl || 'https://appgoals.web.app/downloads/goalskid_2.4.zip';
     triggerApkInstall(apkUrl);
     handleDismissAndClose();
   };

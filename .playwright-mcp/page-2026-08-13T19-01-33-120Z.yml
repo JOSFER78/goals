@@ -1,0 +1,16 @@
+- generic [active] [ref=f2e1]:
+  - heading "Site Not Found" [level=1] [ref=f2e2]
+  - heading "Why am I seeing this?" [level=2] [ref=f2e3]
+  - paragraph [ref=f2e4]: "There are a few potential reasons:"
+  - list [ref=f2e5]:
+    - listitem [ref=f2e6]: You haven't deployed an app yet.
+    - listitem [ref=f2e7]: You may have deployed an empty directory.
+    - listitem [ref=f2e8]: This is a custom domain, but we haven't finished setting it up yet.
+  - heading "How can I deploy my first app?" [level=2] [ref=f2e9]
+  - paragraph [ref=f2e10]:
+    - text: Refer to our
+    - link "hosting documentation" [ref=f2e11] [cursor=pointer]:
+      - /url: https://firebase.google.com/docs/hosting/
+    - text: to get started.
+  - link [ref=f2e12] [cursor=pointer]:
+    - /url: https://firebase.google.com

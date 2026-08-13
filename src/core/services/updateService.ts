@@ -12,9 +12,9 @@ export interface UpdateInfo {
   isNative: boolean;
 }
 
-export const CURRENT_APP_VERSION = '2.4.0';
-const VERSION_ENDPOINT = 'https://astrolingo-96820.web.app/version.json';
-const DEFAULT_APK_URL = 'https://astrolingo-96820.web.app/downloads/goalskid_2.4.apk';
+export const CURRENT_APP_VERSION = '2.5.0';
+const VERSION_ENDPOINT = 'https://appgoals.web.app/version.json';
+const DEFAULT_APK_URL = 'https://appgoals.web.app/downloads/goalskid_2.5.zip';
 
 export const isNativeApp = (): boolean => Capacitor.isNativePlatform();
 
@@ -61,23 +61,10 @@ export function isVersionNewer(latest: string, current: string): boolean {
 }
 
 /**
- * Consulta el endpoint remoto version.json únicamente desde la APK nativa descargada
+ * Consulta el endpoint remoto version.json en tiempo real desde cualquier plataforma (Web, Windows, APK Nativa)
  */
 export async function checkForApkUpdate(): Promise<UpdateInfo> {
   const isNative = isNativeApp();
-
-  if (!isNative && !localStorage.getItem('goals_override_app_version')) {
-    return {
-      hasUpdate: false,
-      currentVersion: CURRENT_APP_VERSION,
-      latestVersion: CURRENT_APP_VERSION,
-      downloadUrl: DEFAULT_APK_URL,
-      releaseNotes: 'Estás navegando la versión web oficial en tiempo real.',
-      publishedAt: new Date().toISOString(),
-      isNative: false
-    };
-  }
-
   const currentVersion = await getAppVersion();
 
   try {

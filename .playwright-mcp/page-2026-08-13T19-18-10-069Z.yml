@@ -1,0 +1,168 @@
+- generic [ref=f24e3]:
+  - link "Ir al contenido principal" [ref=f24e4] [cursor=pointer]:
+    - /url: "#main"
+  - banner:
+    - heading [level=1] [ref=f24e7]:
+      - link "Firebase console" [ref=f24e8] [cursor=pointer]:
+        - /url: "#"
+        - img "Logotipo de Firebase" [ref=f24e11]
+  - main [ref=f24e13]:
+    - generic [ref=f24e16]:
+      - generic [ref=f24e17]:
+        - generic [ref=f24e18]: Hola José
+        - heading "Te damos nuevamente la bienvenida a Firebase" [active] [level=2] [ref=f24e19]
+      - generic [ref=f24e20]:
+        - generic [ref=f24e21]:
+          - heading "Comenzar" [level=3] [ref=f24e22]
+          - button "Crear un proyecto de Firebase nuevo" [ref=f24e26] [cursor=pointer]:
+            - generic [ref=f24e29]: Integra productos de Firebase para potenciar tu app
+        - generic [ref=f24e30]:
+          - heading "Prueba una app de ejemplo" [level=3] [ref=f24e31]
+          - generic [ref=f24e32]:
+            - button "Prueba una app de planificación de viajes potenciada por IA" [ref=f24e36] [cursor=pointer]:
+              - generic [ref=f24e39]: Implementa una app de ejemplo que use Firestore, Authentication y una entrada multimodal con Firebase AI Logic.
+            - button "Prueba una app de agente de barista" [ref=f24e43] [cursor=pointer]:
+              - generic [ref=f24e46]: Implementa una app de ejemplo que use Firestore, Authentication y la llamada a funciones en Firebase AI Logic.
+        - generic [ref=f24e48]:
+          - generic [ref=f24e50]:
+            - img [ref=f24e51]: search
+            - searchbox "Buscar en todos los proyectos" [ref=f24e52]
+          - generic [ref=f24e53]:
+            - button "Proyectos" [ref=f24e56] [cursor=pointer]:
+              - text: Proyectos
+              - img [ref=f24e57]: arrow_drop_down
+            - list [ref=f24e59]:
+              - listitem [ref=f24e60]:
+                - generic [ref=f24e61]:
+                  - link "Abrir astrolingo" [ref=f24e63] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e64]:
+                      - generic [ref=f24e65]: astrolingo
+                      - generic [ref=f24e67]: astrolingo-96820
+                  - button "Destacar" [ref=f24e69] [cursor=pointer]:
+                    - img [ref=f24e70]: star
+              - listitem [ref=f24e73]:
+                - generic [ref=f24e74]:
+                  - link "Abrir mabelitadelacruz" [ref=f24e76] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e77]:
+                      - generic [ref=f24e78]: mabelitadelacruz
+                      - generic [ref=f24e80]: mabelita-web-josfer-f3125
+                  - button "Destacar" [ref=f24e82] [cursor=pointer]:
+                    - img [ref=f24e83]: star
+              - listitem [ref=f24e86]:
+                - generic [ref=f24e87]:
+                  - link "Abrir Contra la Desinformacion" [ref=f24e89] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e90]:
+                      - generic [ref=f24e91]: Contra la Desinformacion
+                      - generic [ref=f24e93]: contra-desinformacion
+                  - button "Destacar" [ref=f24e95] [cursor=pointer]:
+                    - img [ref=f24e96]: star
+              - listitem [ref=f24e99]:
+                - generic [ref=f24e100]:
+                  - link "Abrir UNYKA" [ref=f24e102] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e103]:
+                      - generic [ref=f24e104]: UNYKA
+                      - generic [ref=f24e106]: unyka-nexhous
+                  - button "Destacar" [ref=f24e108] [cursor=pointer]:
+                    - img [ref=f24e109]: star
+              - listitem [ref=f24e112]:
+                - generic [ref=f24e113]:
+                  - link "Abrir unyka" [ref=f24e115] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e116]:
+                      - generic [ref=f24e117]: unyka
+                      - generic [ref=f24e119]: unykahomes
+                  - button "Destacar" [ref=f24e121] [cursor=pointer]:
+                    - img [ref=f24e122]: star
+              - listitem [ref=f24e125]:
+                - generic [ref=f24e126]:
+                  - link "Abrir Ayuda Emilio Portal" [ref=f24e128] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e129]:
+                      - generic [ref=f24e130]: Ayuda Emilio Portal
+                      - generic [ref=f24e132]: ayuda-emilio-83261
+                  - button "Destacar" [ref=f24e134] [cursor=pointer]:
+                    - img [ref=f24e135]: star
+              - listitem [ref=f24e138]:
+                - generic [ref=f24e139]:
+                  - link "Abrir Analisis Emilio" [ref=f24e141] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e142]:
+                      - generic [ref=f24e143]: Analisis Emilio
+                      - generic [ref=f24e145]: analisis-emilio
+                  - button "Destacar" [ref=f24e147] [cursor=pointer]:
+                    - img [ref=f24e148]: star
+              - listitem [ref=f24e151]:
+                - generic [ref=f24e152]:
+                  - link "Abrir Traderbot" [ref=f24e154] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e155]:
+                      - generic [ref=f24e156]: Traderbot
+                      - generic [ref=f24e158]: traderbot-josfer
+                  - button "Destacar" [ref=f24e160] [cursor=pointer]:
+                    - img [ref=f24e161]: star
+              - listitem [ref=f24e164]:
+                - generic [ref=f24e165]:
+                  - link "Abrir Pecemi" [ref=f24e167] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e168]:
+                      - generic [ref=f24e169]: Pecemi
+                      - generic [ref=f24e171]: pecemi-josfer
+                  - button "Destacar" [ref=f24e173] [cursor=pointer]:
+                    - img [ref=f24e174]: star
+              - listitem [ref=f24e177]:
+                - generic [ref=f24e178]:
+                  - link "Abrir algotradingNEW" [ref=f24e180] [cursor=pointer]:
+                    - /url: "#"
+                    - generic [ref=f24e181]:
+                      - generic [ref=f24e182]: algotradingNEW
+                      - generic [ref=f24e184]: algotradingnew-josfer
+                  - button "Destacar" [ref=f24e186] [cursor=pointer]:
+                    - img [ref=f24e187]: star
+            - group [ref=f24e191]:
+              - generic [ref=f24e194]:
+                - status [ref=f24e195]: 1-10 de 14
+                - button "Página anterior" [disabled] [ref=f24e196]
+                - button "Página siguiente" [ref=f24e201] [cursor=pointer]
+      - generic [ref=f24e207]:
+        - generic [ref=f24e208]:
+          - generic [ref=f24e209]: Idioma
+          - combobox "Idioma español (Latinoamérica)" [ref=f24e210]:
+            - generic [ref=f24e211] [cursor=pointer]: español (Latinoamérica)
+        - list [ref=f24e218]:
+          - listitem [ref=f24e219]:
+            - link "Ver asistencia de Firebase (se abre en pestaña nueva)" [ref=f24e220] [cursor=pointer]:
+              - /url: https://firebase.google.com/support?hl=es-419&authuser=0
+              - text: Asistencia
+          - listitem [ref=f24e221]:
+            - link "Ver las condiciones y los servicios de Firebase (se abre en una pestaña nueva)" [ref=f24e222] [cursor=pointer]:
+              - /url: https://firebase.google.com/terms?hl=es-419&authuser=0
+              - text: Condiciones
+          - listitem [ref=f24e223]:
+            - link "Ver la política de privacidad de Google (se abre en una pestaña nueva)" [ref=f24e224] [cursor=pointer]:
+              - /url: https://www.google.com/policies/privacy/
+              - text: Política de Privacidad
+  - generic "Gemini en Firebase" [ref=f24e225]:
+    - generic [ref=f24e226]:
+      - generic [ref=f24e227]:
+        - 'button "Cuenta de Google: José Fernández (josferestudio@gmail.com)" [ref=f24e235] [cursor=pointer]'
+        - button "Alertas abiertas" [ref=f24e245] [cursor=pointer]:
+          - img [ref=f24e246]: notifications
+        - button "Chatea con Gemini (Alt + G)" [disabled] [ref=f24e254]:
+          - img [ref=f24e256]: spark
+          - tooltip "Gemini en Firebase Selecciona un proyecto para usar Gemini en Firebase" [ref=f24e259]:
+            - generic:
+              - text: Gemini en Firebase
+              - generic [ref=f24e260]: Selecciona un proyecto para usar Gemini en Firebase
+        - button "Ayuda" [ref=f24e263] [cursor=pointer]:
+          - img [ref=f24e264]: contact_support
+        - separator [ref=f24e267]
+        - button "Activar Cloud Shell" [ref=f24e268] [cursor=pointer]:
+          - tooltip "Potencia tu desarrollo. Prueba Cloud Shell para acceder a Firebase CLI integrado y ejecutar los emuladores de Firebase directamente en una máquina virtual." [ref=f24e274]
+        - button "Activar o desactivar el panel de aprendizaje" [disabled]:
+          - img: school
+      - 'button "Tema actual: claro, ajustar tema" [ref=f24e278] [cursor=pointer]':
+        - img [ref=f24e279]: dark_mode

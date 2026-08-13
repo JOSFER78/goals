@@ -59,8 +59,8 @@ export const GOALS_EXPERIENCES: Record<ExperienceId, MiniAppConfig> = {
   },
   astro: {
     id: 'astro',
-    name: 'AstroLingo 3D',
-    shortName: 'Astro 3D',
+    name: 'Cosmos 3D',
+    shortName: 'Cosmos 3D',
     tagline: 'Simulador Espacial NASA',
     badge: 'Astrofísica 3D',
     icon: Orbit,

@@ -1,0 +1,29 @@
+- generic [active] [ref=f17e1]:
+  - img "Loading" [ref=f17e3]
+  - generic [ref=f17e6]:
+    - link "Ir al contenido principal" [ref=f17e7] [cursor=pointer]:
+      - /url: "#main"
+    - banner:
+      - heading [level=1] [ref=f17e10]:
+        - link "Firebase console" [ref=f17e11] [cursor=pointer]:
+          - /url: "#"
+          - img "Logotipo de Firebase" [ref=f17e14]
+    - main [ref=f17e16]:
+      - progressbar [ref=f17e20]
+    - generic "Gemini en Firebase" [ref=f17e35]:
+      - generic [ref=f17e36]:
+        - generic [ref=f17e37]:
+          - 'button "Cuenta de Google: José Fernández (josferestudio@gmail.com)" [ref=f17e45] [cursor=pointer]'
+          - button "Alertas abiertas" [ref=f17e55] [cursor=pointer]:
+            - img [ref=f17e56]: notifications
+          - button "Chatea con Gemini (Alt + G)" [ref=f17e64] [cursor=pointer]:
+            - img [ref=f17e66]: spark
+          - button "Ayuda" [ref=f17e69] [cursor=pointer]:
+            - img [ref=f17e70]: contact_support
+          - separator [ref=f17e73]
+          - button "Activar Cloud Shell" [ref=f17e74] [cursor=pointer]:
+            - tooltip "Potencia tu desarrollo. Prueba Cloud Shell para acceder a Firebase CLI integrado y ejecutar los emuladores de Firebase directamente en una máquina virtual." [ref=f17e80]
+          - button "Activar o desactivar el panel de aprendizaje" [ref=f17e83] [cursor=pointer]:
+            - img [ref=f17e84]: school
+        - 'button "Tema actual: claro, ajustar tema" [ref=f17e88] [cursor=pointer]':
+          - img [ref=f17e89]: dark_mode

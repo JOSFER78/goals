@@ -80,7 +80,7 @@ const MainContent: React.FC = () => {
     });
   };
 
-  const isAuthenticated = isCloud && user && !user.isAnonymous;
+  const isAuthenticated = !!(user && !user.isAnonymous);
   const isApproved = isAdmin || userData?.isApproved === true || user?.isApproved === true;
 
   const handleUpdateGraphicsConfig = (newCfg: Partial<typeof graphicsConfig>) => {

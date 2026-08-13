@@ -1,0 +1,231 @@
+- generic [ref=f17e6]:
+  - link "Ir al contenido principal" [ref=f17e7] [cursor=pointer]:
+    - /url: "#main"
+  - generic [ref=f17e96]:
+    - generic [ref=f17e97]:
+      - navigation "Productos de Firebase console" [ref=f17e99]:
+        - heading [level=2] [ref=f17e100]:
+          - link "Firebase console (Ir a la lista de proyectos)" [ref=f17e101] [cursor=pointer]:
+            - /url: "#"
+            - img "Logotipo de Firebase" [ref=f17e104]
+        - img [ref=f17e109]: search
+        - link "Descripción general del proyecto" [ref=f17e111] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f17e112]: gmp_nav20_overview
+        - menu [ref=f17e113]:
+          - menuitem "Configuración" [ref=f17e114]:
+            - img [ref=f17e116] [cursor=pointer]: settings
+      - separator [ref=f17e117]
+      - group [ref=f17e119]:
+        - link "Hosting" [ref=f17e121] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f17e122]: gmp_nav20_hosting
+        - link "Authentication" [ref=f17e124] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f17e125]: gmp_nav20_auth
+        - link "Firestore" [ref=f17e127] [cursor=pointer]:
+          - /url: "#"
+          - img [ref=f17e128]: gmp_firestore
+      - separator [ref=f17e129]
+    - button "Activar o desactivar la barra lateral de navegación" [ref=f17e132] [cursor=pointer]:
+      - img [ref=f17e133]: chevron_left
+  - banner:
+    - generic [ref=f17e8]:
+      - button "astrolingo (abrir menú de selección de proyecto)" [ref=f17e137] [cursor=pointer]:
+        - text: astrolingo
+        - img [ref=f17e138]: arrow_drop_down
+      - generic [ref=f17e409]:
+        - link "Hosting" [ref=f17e411] [cursor=pointer]:
+          - /url: "#"
+        - generic [ref=f17e412]:
+          - text: chevron_right
+          - link "Administrar sitio" [ref=f17e413] [cursor=pointer]:
+            - /url: "#"
+  - main [ref=f17e16]:
+    - generic [ref=f17e143]:
+      - region "Encabezado del producto" [ref=f17e145]:
+        - generic [ref=f17e146]:
+          - navigation "Rutas de navegación" [ref=f17e148]:
+            - generic [ref=f17e149] [cursor=pointer]:
+              - link "Hosting" [ref=f17e150]
+              - text: chevron_right
+          - generic [ref=f17e151]:
+            - generic [ref=f17e154]:
+              - heading "Administrar sitio" [level=2] [ref=f17e155]
+              - button [ref=f17e158]:
+                - generic [ref=f17e160]:
+                  - img [ref=f17e161]: spark
+                  - text: ¿Necesitas ayuda con Hosting? Preguntarle a Gemini
+            - tablist "Funciones del producto" [ref=f17e167]:
+              - generic [ref=f17e170]:
+                - 'tab "Pestaña seleccionada: Panel" [selected] [ref=f17e171] [cursor=pointer]':
+                  - generic [ref=f17e173]: Panel
+                - tab "Uso" [ref=f17e177] [cursor=pointer]
+      - generic [ref=f17e185]:
+        - generic [ref=f17e187]:
+          - heading "Versión actual" [level=3] [ref=f17e190]
+          - generic [ref=f17e191]:
+            - generic [ref=f17e192]:
+              - generic [ref=f17e194]:
+                - generic [ref=f17e195]: Actual
+                - img [ref=f17e196]: grade
+              - generic [ref=f17e197]:
+                - generic [ref=f17e198]: josferestudio@gmail.com
+                - generic [ref=f17e199]: 12/8/26, 8:35 p.m.
+            - generic [ref=f17e200]: afcd90
+        - generic [ref=f17e203]:
+          - generic [ref=f17e204]: Versiones anteriores
+          - generic [ref=f17e208]:
+            - table [ref=f17e209]:
+              - rowgroup:
+                - row [ref=f17e210]:
+                  - columnheader "Estado" [ref=f17e211]
+                  - columnheader "Implementación" [ref=f17e212]
+                  - columnheader "Hash" [ref=f17e213]
+                  - columnheader "Acciones" [ref=f17e214]
+              - rowgroup [ref=f17e215]:
+                - row [ref=f17e216]:
+                  - cell "Actual" [ref=f17e217]:
+                    - generic [ref=f17e219]:
+                      - generic [ref=f17e220]: Actual
+                      - img [ref=f17e221]: grade
+                  - cell "josferestudio@gmail.com 12/8/26, 8:35 p.m." [ref=f17e222]:
+                    - generic [ref=f17e223]:
+                      - generic [ref=f17e224]: josferestudio@gmail.com
+                      - generic [ref=f17e225]: 12/8/26, 8:35 p.m.
+                  - cell "afcd90" [ref=f17e226]
+                  - cell [ref=f17e231]
+                - row [ref=f17e232]:
+                  - cell "Implementado" [ref=f17e233]:
+                    - generic [ref=f17e235]:
+                      - generic [ref=f17e236]: Implementado
+                      - img [ref=f17e237]: file_upload
+                  - cell "josferestudio@gmail.com 12/8/26, 8:27 p.m." [ref=f17e238]:
+                    - generic [ref=f17e239]:
+                      - generic [ref=f17e240]: josferestudio@gmail.com
+                      - generic [ref=f17e241]: 12/8/26, 8:27 p.m.
+                  - cell "eb6dbf" [ref=f17e242]
+                  - cell [ref=f17e247]:
+                    - button "Abrir el menú de eb6dbf" [ref=f17e249] [cursor=pointer]:
+                      - img [ref=f17e250]: more_vert
+                - row [ref=f17e253]:
+                  - cell "Implementado" [ref=f17e254]:
+                    - generic [ref=f17e256]:
+                      - generic [ref=f17e257]: Implementado
+                      - img [ref=f17e258]: file_upload
+                  - cell "josferestudio@gmail.com 12/8/26, 8:27 p.m." [ref=f17e259]:
+                    - generic [ref=f17e260]:
+                      - generic [ref=f17e261]: josferestudio@gmail.com
+                      - generic [ref=f17e262]: 12/8/26, 8:27 p.m.
+                  - cell "b02428" [ref=f17e263]
+                  - cell [ref=f17e268]:
+                    - button "Abrir el menú de b02428" [ref=f17e270] [cursor=pointer]:
+                      - img [ref=f17e271]: more_vert
+                - row [ref=f17e274]:
+                  - cell "Implementado" [ref=f17e275]:
+                    - generic [ref=f17e277]:
+                      - generic [ref=f17e278]: Implementado
+                      - img [ref=f17e279]: file_upload
+                  - cell "josferestudio@gmail.com 12/8/26, 8:14 p.m." [ref=f17e280]:
+                    - generic [ref=f17e281]:
+                      - generic [ref=f17e282]: josferestudio@gmail.com
+                      - generic [ref=f17e283]: 12/8/26, 8:14 p.m.
+                  - cell "1bb860" [ref=f17e284]
+                  - cell [ref=f17e289]:
+                    - button "Abrir el menú de 1bb860" [ref=f17e291] [cursor=pointer]:
+                      - img [ref=f17e292]: more_vert
+            - generic [ref=f17e295]:
+              - button "Configuración de almacenamiento de actualizaciones" [ref=f17e297]
+              - link "Ver todo el historial" [ref=f17e301] [cursor=pointer]:
+                - /url: "#"
+                - img [ref=f17e302]: arrow_forward
+          - generic [ref=f17e306]: Dominios
+          - generic [ref=f17e310]:
+            - table [ref=f17e312]:
+              - rowgroup:
+                - row [ref=f17e313]:
+                  - columnheader "Dominio" [ref=f17e314]
+                  - columnheader "Estado" [ref=f17e315]
+                  - columnheader "Acciones" [ref=f17e316]
+              - rowgroup [ref=f17e317]:
+                - row [ref=f17e318]:
+                  - cell "astrolingo-96820.web.app (se abre en una pestaña nueva) Predeterminado" [ref=f17e319]:
+                    - generic [ref=f17e320]:
+                      - link "astrolingo-96820.web.app (se abre en una pestaña nueva)" [ref=f17e322] [cursor=pointer]:
+                        - /url: https://astrolingo-96820.web.app
+                        - text: astrolingo-96820.web.app open_in_new
+                      - generic [ref=f17e323]: Predeterminado
+                - row [ref=f17e324]:
+                  - cell "astrolingo-96820.firebaseapp.com (se abre en una pestaña nueva) Predeterminado" [ref=f17e325]:
+                    - generic [ref=f17e326]:
+                      - link "astrolingo-96820.firebaseapp.com (se abre en una pestaña nueva)" [ref=f17e328] [cursor=pointer]:
+                        - /url: https://astrolingo-96820.firebaseapp.com
+                        - text: astrolingo-96820.firebaseapp.com open_in_new
+                      - generic [ref=f17e329]: Predeterminado
+            - generic [ref=f17e330]:
+              - button "Agregar un dominio personalizado" [ref=f17e332]
+              - button "Ver todos los 2 dominios" [ref=f17e336] [cursor=pointer]:
+                - img [ref=f17e337]: arrow_forward
+        - generic [ref=f17e342]:
+          - generic [ref=f17e344]:
+            - heading "Canales de vista previa" [level=3] [ref=f17e345]
+            - button "Beta Actualmente, esta función (Hosting Channels) se encuentra en fase beta" [ref=f17e347] [cursor=pointer]:
+              - generic [ref=f17e348]: Beta
+              - tooltip "Actualmente, esta función (Hosting Channels) se encuentra en fase beta" [ref=f17e349]:
+                - generic [ref=f17e351]:
+                  - generic [ref=f17e352]: Beta
+                  - generic [ref=f17e353]: Actualmente, esta función (Hosting Channels) se encuentra en fase beta
+          - table [ref=f17e359]:
+            - rowgroup:
+              - row [ref=f17e360]:
+                - columnheader "Dominio" [ref=f17e361]
+                - columnheader "Información" [ref=f17e362]
+                - columnheader "Configuración" [ref=f17e363]
+                - columnheader [ref=f17e364]
+                - columnheader [ref=f17e365]
+                - columnheader "Acciones" [ref=f17e366]
+            - rowgroup [ref=f17e367]:
+              - row [ref=f17e368]:
+                - cell [ref=f17e369]:
+                  - img [ref=f17e370]: visibility
+                - cell [ref=f17e371]:
+                  - link "goalskid-v24" [ref=f17e373] [cursor=pointer]:
+                    - /url: "#"
+                - cell [ref=f17e374]:
+                  - button "Hasta el 20/8/26" [ref=f17e377] [cursor=pointer]
+                - cell [ref=f17e378]:
+                  - link "Ver goalskid-v24" [ref=f17e379] [cursor=pointer]:
+                    - /url: https://astrolingo-96820--goalskid-v24-5ljsgubu.web.app
+                    - img [ref=f17e380]: open_in_new
+                    - generic [ref=f17e381]: Ver
+                - cell [ref=f17e384]:
+                  - button "Copiar URL de goalskid-v24" [ref=f17e385]:
+                    - img [ref=f17e386]: content_copy
+                    - generic [ref=f17e387]: Copiar URL
+                - cell [ref=f17e390]:
+                  - button "Abrir menú de goalskid-v24" [ref=f17e392] [cursor=pointer]:
+                    - img [ref=f17e393]: more_vert
+        - generic [ref=f17e397]:
+          - separator [ref=f17e398]
+          - generic [ref=f17e399]:
+            - generic [ref=f17e400]:
+              - heading "Firebase Hosting es compatible con varios sitios" [level=3] [ref=f17e401]
+              - generic [ref=f17e402]: Puedes asociar varios sitios a un proyecto de Firebase. Cada uno de ellos aloja sus propios recursos estáticos únicos, pero los comparte con otros sitios en el mismo proyecto de Firebase.
+            - button "Agregar otro sitio" [ref=f17e403]
+  - generic "Gemini en Firebase" [ref=f17e35]:
+    - generic [ref=f17e36]:
+      - generic [ref=f17e37]:
+        - 'button "Cuenta de Google: José Fernández (josferestudio@gmail.com)" [ref=f17e45] [cursor=pointer]'
+        - button "Alertas abiertas" [ref=f17e55] [cursor=pointer]:
+          - img [ref=f17e56]: notifications
+        - button "Chatea con Gemini (Alt + G)" [ref=f17e64] [cursor=pointer]:
+          - img [ref=f17e66]: spark
+        - button "Ayuda" [ref=f17e69] [cursor=pointer]:
+          - img [ref=f17e70]: contact_support
+        - separator [ref=f17e73]
+        - button "Activar Cloud Shell" [ref=f17e74] [cursor=pointer]:
+          - tooltip "Potencia tu desarrollo. Prueba Cloud Shell para acceder a Firebase CLI integrado y ejecutar los emuladores de Firebase directamente en una máquina virtual." [ref=f17e80]
+        - button "Activar o desactivar el panel de aprendizaje" [ref=f17e83] [cursor=pointer]:
+          - img [ref=f17e84]: school
+      - 'button "Tema actual: claro, ajustar tema" [ref=f17e88] [cursor=pointer]':
+        - img [ref=f17e89]: dark_mode

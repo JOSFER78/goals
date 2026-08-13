@@ -102,59 +102,70 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     return () => unsubscribe();
   }, []);
-
   const signInWithGoogle = async () => {
     setAuthError(null);
     if (!isFirebaseReady() || !auth) {
-      throw new Error("Firebase no está configurado correctamente.");
+      const err = "Firebase Auth no está listo en el cliente.";
+      setAuthError(err);
+      throw new Error(err);
     }
     try {
       if (Capacitor.isNativePlatform()) {
-        try {
-          // Autenticación NATIVA con Google Play Services en Android
-          const res = await FirebaseAuthentication.signInWithGoogle();
-          const idToken = res.credential?.idToken;
-          if (idToken) {
-            const credential = GoogleAuthProvider.credential(idToken);
-            await signInWithCredential(auth, credential);
-            setIsCloud(true);
-            setAuthError(null);
-            return;
-          }
-        } catch (nativeErr: any) {
-          console.warn("Inicio de sesión nativo con Google cancelado o no disponible:", nativeErr);
+        const res = await FirebaseAuthentication.signInWithGoogle();
+        const idToken = res.credential?.idToken;
+        if (idToken) {
+          const credential = GoogleAuthProvider.credential(idToken);
+          await signInWithCredential(auth, credential);
+          setIsCloud(true);
           setAuthError(null);
+          return;
+        } else {
+          throw new Error("No se obtuvo token de credencial de Google.");
         }
       } else {
-        // Autenticación WEB estándar en navegador
         const res = await signInWithPopup(auth, googleProvider);
         if (res.user) {
           setIsCloud(true);
           setAuthError(null);
+          return;
         }
       }
     } catch (err: any) {
-      console.error("Google Auth Error:", err);
-      setAuthError(null);
+      console.error("Firebase Google Auth Error Real:", err);
+      const MAP: Record<string, string> = {
+        'auth/popup-closed-by-user': 'Has cerrado la ventana de inicio de sesión con Google.',
+        'auth/unauthorized-domain': 'Este dominio no está autorizado en la consola de Firebase Auth.',
+        'auth/operation-not-allowed': 'El proveedor de Google no está activado en la consola de Firebase.'
+      };
+      const msg = MAP[err.code] || err.message || 'Error al autenticar con Google en Firebase.';
+      setAuthError(msg);
+      throw err;
     }
   };
 
   const signInWithEmail = async (email: string, pass: string) => {
     setAuthError(null);
+    const cleanEmail = email.trim().toLowerCase();
     if (!isFirebaseReady() || !auth) {
-      throw new Error("Firebase no está activo en este momento.");
+      const err = "El servicio de autenticación de Firebase no está disponible.";
+      setAuthError(err);
+      throw new Error(err);
     }
     try {
-      await signInWithEmailAndPassword(auth, email, pass);
+      await signInWithEmailAndPassword(auth, cleanEmail, pass);
       setIsCloud(true);
+      setAuthError(null);
     } catch (err: any) {
+      console.error("Firebase Email Login Error Real:", err);
       const MAP: Record<string, string> = {
-        'auth/invalid-credential': 'Email o contraseña incorrectos.',
-        'auth/user-not-found': 'No existe cuenta con este correo.',
-        'auth/wrong-password': 'Contraseña incorrecta.',
-        'auth/invalid-email': 'Formato de email no válido.'
+        'auth/invalid-credential': 'Email o contraseña incorrectos en Firebase.',
+        'auth/user-not-found': 'No existe ninguna cuenta registrada con este correo en Firebase.',
+        'auth/wrong-password': 'Contraseña incorrecta para esta cuenta.',
+        'auth/invalid-email': 'Formato de correo electrónico no válido.',
+        'auth/user-disabled': 'Esta cuenta de usuario ha sido desactivada.',
+        'auth/operation-not-allowed': 'El inicio de sesión por Email/Contraseña no está habilitado en la consola de Firebase.'
       };
-      const msg = MAP[err.code] || err.message || 'Error al iniciar sesión.';
+      const msg = MAP[err.code] || err.message || 'Error de autenticación en Firebase.';
       setAuthError(msg);
       throw err;
     }
@@ -162,33 +173,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signUpWithEmail = async (name: string, email: string, pass: string) => {
     setAuthError(null);
-    if (isFirebaseReady() && auth) {
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        await updateProfile(cred.user, { displayName: name });
-        setIsCloud(true);
-      } catch (err: any) {
-        const MAP: Record<string, string> = {
-          'auth/email-already-in-use': 'Este correo ya está registrado.',
-          'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
-          'auth/invalid-email': 'Email no válido.'
-        };
-        const msg = MAP[err.code] || err.message || 'Error al crear la cuenta.';
-        setAuthError(msg);
-        throw err;
-      }
-    } else {
-      const localUser: UserProfile = {
-        uid: 'local_' + Date.now(),
-        displayName: name,
-        email,
-        photoURL: null,
-        isAnonymous: false,
-        providerId: 'local'
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim() || cleanEmail.split('@')[0];
+    if (!isFirebaseReady() || !auth) {
+      const err = "Firebase Auth no está activo para registrar nuevas cuentas.";
+      setAuthError(err);
+      throw new Error(err);
+    }
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, cleanEmail, pass);
+      await updateProfile(cred.user, { displayName: cleanName });
+      setIsCloud(true);
+      setAuthError(null);
+    } catch (err: any) {
+      console.error("Firebase SignUp Error Real:", err);
+      const MAP: Record<string, string> = {
+        'auth/email-already-in-use': 'Este correo electrónico ya está registrado en Firebase.',
+        'auth/weak-password': 'La contraseña debe tener al menos 6 caracteres.',
+        'auth/invalid-email': 'El formato de correo no es válido.',
+        'auth/operation-not-allowed': 'El registro por Email/Contraseña no está activado en Firebase Console.'
       };
-      setUser(localUser);
-      localStorage.setItem('goals_local_user', JSON.stringify(localUser));
-      setIsCloud(false);
+      const msg = MAP[err.code] || err.message || 'Error al crear la cuenta en Firebase.';
+      setAuthError(msg);
+      throw err;
     }
   };
 

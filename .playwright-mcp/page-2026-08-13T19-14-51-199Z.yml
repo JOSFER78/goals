@@ -1,0 +1,261 @@
+- generic [ref=f17e1]:
+  - generic [ref=f17e6]:
+    - link [ref=f17e414] [cursor=pointer]:
+      - /url: "#main"
+      - text: Ir al contenido principal
+    - generic [ref=f17e96]:
+      - generic [ref=f17e97]:
+        - navigation [ref=f17e415]:
+          - heading [level=2] [ref=f17e416]:
+            - link [ref=f17e417] [cursor=pointer]:
+              - /url: "#"
+          - img [ref=f17e109]: search
+          - link [ref=f17e419] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=f17e112]: gmp_nav20_overview
+          - menu [ref=f17e113]:
+            - menuitem [ref=f17e420]:
+              - img [ref=f17e116] [cursor=pointer]: settings
+        - separator [ref=f17e117]
+        - group [ref=f17e119]:
+          - link [ref=f17e421] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=f17e122]: gmp_nav20_hosting
+          - link [ref=f17e422] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=f17e125]: gmp_nav20_auth
+          - link [ref=f17e423] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=f17e128]: gmp_firestore
+        - separator [ref=f17e129]
+      - button [ref=f17e424] [cursor=pointer]:
+        - img [ref=f17e133]: chevron_left
+    - generic [ref=f17e8]:
+      - button [ref=f17e425] [cursor=pointer]:
+        - text: astrolingo
+        - img [ref=f17e138]: arrow_drop_down
+      - generic [ref=f17e409]:
+        - link [ref=f17e426] [cursor=pointer]:
+          - /url: "#"
+          - text: Hosting
+        - generic [ref=f17e412]:
+          - text: chevron_right
+          - link [ref=f17e427] [cursor=pointer]:
+            - /url: "#"
+            - text: Administrar sitio
+    - main [ref=f17e16]:
+      - generic [ref=f17e143]:
+        - region [ref=f17e428]:
+          - generic [ref=f17e146]:
+            - navigation [ref=f17e429]:
+              - generic [ref=f17e149] [cursor=pointer]:
+                - link [ref=f17e430]: Hosting
+                - text: chevron_right
+            - generic [ref=f17e151]:
+              - generic [ref=f17e154]:
+                - heading [level=2] [ref=f17e431]: Administrar sitio
+                - button [ref=f17e432]:
+                  - generic [ref=f17e160]:
+                    - img [ref=f17e161]: spark
+                    - text: ¿Necesitas ayuda con Hosting? Preguntarle a Gemini
+              - tablist [ref=f17e433]:
+                - generic [ref=f17e170]:
+                  - tab [selected] [ref=f17e434] [cursor=pointer]:
+                    - generic [ref=f17e173]: Panel
+                  - tab [ref=f17e435] [cursor=pointer]:
+                    - generic [ref=f17e179]: Uso
+        - generic [ref=f17e185]:
+          - generic [ref=f17e187]:
+            - heading [level=3] [ref=f17e436]: Versión actual
+            - generic [ref=f17e191]:
+              - generic [ref=f17e192]:
+                - generic [ref=f17e194]:
+                  - generic [ref=f17e195]: Actual
+                  - img [ref=f17e196]: grade
+                - generic [ref=f17e197]:
+                  - generic [ref=f17e198]: josferestudio@gmail.com
+                  - generic [ref=f17e199]: 12/8/26, 8:35 p.m.
+              - generic [ref=f17e200]: afcd90
+          - generic [ref=f17e203]:
+            - generic [ref=f17e204]: Versiones anteriores
+            - generic [ref=f17e208]:
+              - table [ref=f17e209]:
+                - row [ref=f17e437]:
+                  - columnheader [ref=f17e438]: Estado
+                  - columnheader [ref=f17e439]: Implementación
+                  - columnheader [ref=f17e440]: Hash
+                  - columnheader [ref=f17e441]: Acciones
+                - rowgroup [ref=f17e215]:
+                  - row [ref=f17e442]:
+                    - cell [ref=f17e443]:
+                      - generic [ref=f17e219]:
+                        - generic [ref=f17e220]: Actual
+                        - img [ref=f17e221]: grade
+                    - cell [ref=f17e444]:
+                      - generic [ref=f17e223]:
+                        - generic [ref=f17e224]: josferestudio@gmail.com
+                        - generic [ref=f17e225]: 12/8/26, 8:35 p.m.
+                    - cell [ref=f17e445]:
+                      - generic [ref=f17e227]: afcd90
+                    - cell [ref=f17e231]
+                  - row [ref=f17e446]:
+                    - cell [ref=f17e447]:
+                      - generic [ref=f17e235]:
+                        - generic [ref=f17e236]: Implementado
+                        - img [ref=f17e237]: file_upload
+                    - cell [ref=f17e448]:
+                      - generic [ref=f17e239]:
+                        - generic [ref=f17e240]: josferestudio@gmail.com
+                        - generic [ref=f17e241]: 12/8/26, 8:27 p.m.
+                    - cell [ref=f17e449]:
+                      - generic [ref=f17e243]: eb6dbf
+                    - cell [ref=f17e450]:
+                      - button [ref=f17e451] [cursor=pointer]:
+                        - img [ref=f17e250]: more_vert
+                  - row [ref=f17e452]:
+                    - cell [ref=f17e453]:
+                      - generic [ref=f17e256]:
+                        - generic [ref=f17e257]: Implementado
+                        - img [ref=f17e258]: file_upload
+                    - cell [ref=f17e454]:
+                      - generic [ref=f17e260]:
+                        - generic [ref=f17e261]: josferestudio@gmail.com
+                        - generic [ref=f17e262]: 12/8/26, 8:27 p.m.
+                    - cell [ref=f17e455]:
+                      - generic [ref=f17e264]: b02428
+                    - cell [ref=f17e456]:
+                      - button [ref=f17e457] [cursor=pointer]:
+                        - img [ref=f17e271]: more_vert
+                  - row [ref=f17e458]:
+                    - cell [ref=f17e459]:
+                      - generic [ref=f17e277]:
+                        - generic [ref=f17e278]: Implementado
+                        - img [ref=f17e279]: file_upload
+                    - cell [ref=f17e460]:
+                      - generic [ref=f17e281]:
+                        - generic [ref=f17e282]: josferestudio@gmail.com
+                        - generic [ref=f17e283]: 12/8/26, 8:14 p.m.
+                    - cell [ref=f17e461]:
+                      - generic [ref=f17e285]: 1bb860
+                    - cell [ref=f17e462]:
+                      - button [ref=f17e463] [cursor=pointer]:
+                        - img [ref=f17e292]: more_vert
+              - generic [ref=f17e295]:
+                - button [ref=f17e464]:
+                  - generic [ref=f17e298]: Configuración de almacenamiento de actualizaciones
+                - link [ref=f17e465] [cursor=pointer]:
+                  - /url: "#"
+                  - img [ref=f17e302]: arrow_forward
+                  - generic [ref=f17e303]: Ver todo el historial
+            - generic [ref=f17e306]: Dominios
+            - generic [ref=f17e310]:
+              - table [ref=f17e312]:
+                - row [ref=f17e466]:
+                  - columnheader [ref=f17e467]: Dominio
+                  - columnheader [ref=f17e468]: Estado
+                  - columnheader [ref=f17e469]: Acciones
+                - rowgroup [ref=f17e317]:
+                  - row [ref=f17e470]:
+                    - cell [ref=f17e471]:
+                      - generic [ref=f17e320]:
+                        - link [ref=f17e472] [cursor=pointer]:
+                          - /url: https://astrolingo-96820.web.app
+                          - text: astrolingo-96820.web.app open_in_new
+                        - generic [ref=f17e323]: Predeterminado
+                  - row [ref=f17e473]:
+                    - cell [ref=f17e474]:
+                      - generic [ref=f17e326]:
+                        - link [ref=f17e475] [cursor=pointer]:
+                          - /url: https://astrolingo-96820.firebaseapp.com
+                          - text: astrolingo-96820.firebaseapp.com open_in_new
+                        - generic [ref=f17e329]: Predeterminado
+              - generic [ref=f17e330]:
+                - button [ref=f17e476]:
+                  - generic [ref=f17e333]: Agregar un dominio personalizado
+                - button [ref=f17e477] [cursor=pointer]:
+                  - img [ref=f17e337]: arrow_forward
+                  - generic [ref=f17e338]: Ver todos los 2 dominios
+          - generic [ref=f17e342]:
+            - generic [ref=f17e344]:
+              - heading [level=3] [ref=f17e478]: Canales de vista previa
+              - button [ref=f17e479] [cursor=pointer]:
+                - generic [ref=f17e348]: Beta
+                - tooltip "Actualmente, esta función (Hosting Channels) se encuentra en fase beta" [ref=f17e349]:
+                  - generic [ref=f17e351]:
+                    - generic [ref=f17e352]: Beta
+                    - generic [ref=f17e353]: Actualmente, esta función (Hosting Channels) se encuentra en fase beta
+            - table [ref=f17e359]:
+              - row [ref=f17e480]:
+                - columnheader [ref=f17e481]: Dominio
+                - columnheader [ref=f17e482]: Información
+                - columnheader [ref=f17e483]: Configuración
+                - columnheader [ref=f17e364]
+                - columnheader [ref=f17e365]
+                - columnheader [ref=f17e484]: Acciones
+              - rowgroup [ref=f17e367]:
+                - row [ref=f17e485]:
+                  - cell [ref=f17e369]:
+                    - img [ref=f17e370]: visibility
+                  - cell [ref=f17e486]:
+                    - link [ref=f17e487] [cursor=pointer]:
+                      - /url: "#"
+                      - text: goalskid-v24
+                  - cell [ref=f17e488]:
+                    - button [ref=f17e489] [cursor=pointer]: Hasta el 20/8/26
+                  - cell [ref=f17e490]:
+                    - link [ref=f17e491] [cursor=pointer]:
+                      - /url: https://astrolingo-96820--goalskid-v24-5ljsgubu.web.app
+                      - img [ref=f17e380]: open_in_new
+                      - generic [ref=f17e381]: Ver
+                  - cell [ref=f17e492]:
+                    - button [ref=f17e493]:
+                      - img [ref=f17e386]: content_copy
+                      - generic [ref=f17e387]: Copiar URL
+                  - cell [ref=f17e494]:
+                    - button [ref=f17e495] [cursor=pointer]:
+                      - img [ref=f17e393]: more_vert
+          - generic [ref=f17e397]:
+            - separator [ref=f17e398]
+            - generic [ref=f17e399]:
+              - generic [ref=f17e400]:
+                - heading [level=3] [ref=f17e496]: Firebase Hosting es compatible con varios sitios
+                - generic [ref=f17e402]: Puedes asociar varios sitios a un proyecto de Firebase. Cada uno de ellos aloja sus propios recursos estáticos únicos, pero los comparte con otros sitios en el mismo proyecto de Firebase.
+              - button [ref=f17e497]:
+                - generic [ref=f17e404]: Agregar otro sitio
+    - generic [ref=f17e36]:
+      - generic [ref=f17e37]:
+        - button [ref=f17e499] [cursor=pointer]
+        - button [ref=f17e500] [cursor=pointer]:
+          - img [ref=f17e56]: notifications
+        - button [ref=f17e501] [cursor=pointer]:
+          - img [ref=f17e66]: spark
+        - button [ref=f17e502] [cursor=pointer]:
+          - img [ref=f17e70]: contact_support
+        - separator [ref=f17e73]
+        - button [ref=f17e503] [cursor=pointer]:
+          - tooltip "Potencia tu desarrollo. Prueba Cloud Shell para acceder a Firebase CLI integrado y ejecutar los emuladores de Firebase directamente en una máquina virtual." [ref=f17e80]
+        - button [ref=f17e504] [cursor=pointer]:
+          - img [ref=f17e84]: school
+      - button [ref=f17e505] [cursor=pointer]:
+        - img [ref=f17e89]: dark_mode
+  - dialog [ref=f17e509]:
+    - generic [ref=f17e513]:
+      - heading "Agrega un dominio personalizado" [active] [level=2] [ref=f17e515]
+      - generic [ref=f17e518]:
+        - generic [ref=f17e519]:
+          - paragraph [ref=f17e520]: Ingresa el nombre de dominio exacto que usará el público para visitar tu sitio. Puede ser un dominio (tudominio.com) o un subdominio (app.tudominio.com).
+          - generic [ref=f17e521]:
+            - generic [ref=f17e522]: Dominio
+            - textbox "Dominio" [ref=f17e523]
+          - generic [ref=f17e526]:
+            - status [ref=f17e527]:
+              - img [ref=f17e528]: star
+              - generic [ref=f17e529]: "tip:"
+              - generic [ref=f17e530]: ¿Necesitas un dominio?
+            - link "Más información para encontrar un dominio (se abre en una pestaña nueva)" [ref=f17e534] [cursor=pointer]:
+              - /url: https://firebase.google.com/docs/hosting/custom-domain?hl=es-419&authuser=0#common-domain-providers
+              - generic [ref=f17e535]: Más información
+              - text: open_in_new
+        - generic [ref=f17e538]:
+          - button "Cancelar" [ref=f17e539]
+          - button "Continuar" [disabled]
