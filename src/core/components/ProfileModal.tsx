@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
-import { X, Zap, Check, Gift, Download, Brain, RefreshCw, CheckCircle2, Sliders, Volume2, Target, Flame, Star, Bot, User, Smartphone, ShieldCheck, Sparkles, Award, BarChart3 } from 'lucide-react';
+import { 
+  X, Zap, Check, Gift, Download, Brain, RefreshCw, CheckCircle2, Sliders, Volume2, 
+  Target, Flame, Star, Bot, User, Smartphone, ShieldCheck, Sparkles, Award, BarChart3,
+  Eye, Headphones, Wrench, BookOpen, Compass, Orbit
+} from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
 import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
 import { MASCOT_SKINS } from '../config/mascotSkins';
@@ -18,16 +22,16 @@ interface ProfileModalProps {
 }
 
 const AVATAR_OPTIONS = [
-  { id: 'astrobot', label: 'AstroBot Cyberpunk', icon: '🤖' },
-  { id: 'astronaut', label: 'Cyber-Astronauta', icon: '🧑‍🚀' },
-  { id: 'dragon', label: 'Dragón Neón', icon: '🐲' },
-  { id: 'owl', label: 'Búho Cuántico', icon: '🦉' },
-  { id: 'cat', label: 'Gato Galáctico', icon: '🐱' },
-  { id: 'ufo', label: 'Piloto Matrix', icon: '🛸' },
-  { id: 'star', label: 'Archonte Estelar', icon: '🌌' },
-  { id: 'rocket', label: 'Cohete Plasma', icon: '🚀' },
-  { id: 'sat', label: 'Sonda Alfa', icon: '🛰️' },
-  { id: 'planet', label: 'Núcleo Cósmico', icon: '🪐' }
+  { id: 'astrobot', label: 'AstroBot', iconComp: Bot, color: 'text-indigo-400 border-indigo-500/40 bg-indigo-500/10' },
+  { id: 'astronaut', label: 'Astronauta', iconComp: User, color: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/10' },
+  { id: 'dragon', label: 'Dragón', iconComp: Sparkles, color: 'text-purple-400 border-purple-500/40 bg-purple-500/10' },
+  { id: 'owl', label: 'Búho', iconComp: Eye, color: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10' },
+  { id: 'compass', label: 'Explorador', iconComp: Compass, color: 'text-amber-400 border-amber-500/40 bg-amber-500/10' },
+  { id: 'orbit', label: 'Cosmos', iconComp: Orbit, color: 'text-blue-400 border-blue-500/40 bg-blue-500/10' },
+  { id: 'zap', label: 'Energía', iconComp: Zap, color: 'text-yellow-400 border-yellow-500/40 bg-yellow-500/10' },
+  { id: 'shield', label: 'Guardián', iconComp: ShieldCheck, color: 'text-teal-400 border-teal-500/40 bg-teal-500/10' },
+  { id: 'star', label: 'Estelar', iconComp: Star, color: 'text-rose-400 border-rose-500/40 bg-rose-500/10' },
+  { id: 'award', label: 'Maestro', iconComp: Award, color: 'text-pink-400 border-pink-500/40 bg-pink-500/10' }
 ];
 
 const WEEKDAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
@@ -43,16 +47,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'stats' | 'ficha_niño' | 'mascota' | 'cuenta' | 'about' | 'admin'>('retos');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
-  // Child Learning Profile State
   const [childProfile, setChildProfileState] = useState<ChildLearningProfile>(() => getChildProfile());
 
   const handleSaveChildProfile = (updated: ChildLearningProfile) => {
     setChildProfileState(updated);
     setChildProfile(updated);
-    showToast('¡Ficha del Alumno guardada e inyectada en la IA!');
+    showToast('Ficha del Alumno guardada e inyectada en la IA');
   };
 
-  // Mascot customization state
   const [customMascotName, setCustomMascotNameState] = useState<string>(() => getCustomMascotName());
   const [mascotSkinId, setMascotSkinId] = useState<MascotSkinId>(() => {
     return (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
@@ -63,7 +65,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [mascotAnimState, setMascotAnimState] = useState<'idle' | 'hover' | 'thinking' | 'speaking' | 'dragging'>('idle');
   const [mascotSoulPrompt, setMascotSoulPrompt] = useState<string>(() => {
     const skinName = MASCOT_SKINS[mascotSkinId]?.name || 'el tutor de GOALS';
-    return localStorage.getItem('goals_mascot_soul') || `Eres ${skinName}, un mentor súper divertido y sabio experto en ciencia, idiomas y tecnología. Explicas conceptos complejos con metáforas emocionantes.`;
+    return localStorage.getItem('goals_mascot_soul') || `Eres ${skinName}, un mentor didáctico y sabio experto en ciencia, idiomas y tecnología. Explicas conceptos complejos con analogías claras.`;
   });
   const [mascotPitch, setMascotPitch] = useState<number>(() => {
     return parseFloat(localStorage.getItem('goals_mascot_pitch') || '1.15');
@@ -89,16 +91,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     setMascotSoulPrompt(prompt);
     localStorage.setItem('goals_mascot_soul', prompt);
     window.dispatchEvent(new CustomEvent('goals_mascot_updated', { detail: { soulPrompt: prompt } }));
-    showToast("Personalidad IA (Soul System Prompt) actualizada");
+    showToast("Personalidad IA actualizada");
   };
 
-  // Update checking state
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
   const [updateInfo, setUpdateInfo] = useState<UpdateInfo | null>(null);
 
-  // Editing Profile State
   const [newDisplayName, setNewDisplayName] = useState(user?.displayName || '');
-  const [selectedAvatar, setSelectedAvatar] = useState(user?.photoURL || '👽');
+  const [selectedAvatar, setSelectedAvatar] = useState(user?.photoURL || 'astrobot');
   const [childAge, setChildAgeState] = useState<number>(() => getChildAge());
 
   const handleAgeChange = (newAge: number) => {
@@ -112,7 +112,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     if (user?.photoURL) setSelectedAvatar(user.photoURL);
   }, [user]);
 
-  // Auth Form State for Guests
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -150,8 +149,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     }
   }, [isOpen, activeTab]);
 
-  if (!isOpen) return null;
-
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -175,27 +172,26 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     if (!newDisplayName.trim()) return;
     try {
       await updateUserProfileData(newDisplayName.trim(), selectedAvatar);
-      showToast("¡Perfil y avatar de usuario actualizados!");
+      showToast("Perfil de usuario actualizado");
     } catch (err) {
       console.error(err);
     }
   };
 
+  if (!isOpen) return null;
+
+  const currentAvatarConfig = AVATAR_OPTIONS.find(a => a.id === selectedAvatar || a.label === selectedAvatar) || AVATAR_OPTIONS[0];
+  const CurrentAvatarIcon = currentAvatarConfig.iconComp;
+
   return (
     <>
-      <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn cursor-pointer font-sans">
-        <div onClick={(e) => e.stopPropagation()} className="bg-slate-950/95 border border-indigo-500/30 rounded-3xl w-full max-w-2xl h-[85vh] max-h-[680px] overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative cursor-default animate-in fade-in zoom-in-95 duration-200">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn font-display">
+        <div className="w-full max-w-lg bg-slate-950 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
           
-          {/* HEADER COMPACTO CON ICONO SVG */}
-          {/* Cabecera del Modal */}
-          <div className="p-4 px-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/60 shrink-0">
+          <div className="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/60 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-lg shadow-md font-bold overflow-hidden">
-                {user?.photoURL && (user.photoURL.startsWith('http') || user.photoURL.startsWith('/') || user.photoURL.startsWith('data:')) ? (
-                  <img src={user.photoURL} alt="Avatar" className="w-full h-full object-cover" />
-                ) : (
-                  <span>{user?.photoURL || '👽'}</span>
-                )}
+              <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center ${currentAvatarConfig.color} shadow-sm shrink-0`}>
+                <CurrentAvatarIcon className="w-5 h-5" />
               </div>
               <div>
                 <h2 className="font-extrabold text-sm text-white flex items-center gap-2">
@@ -220,49 +216,47 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </button>
           </div>
 
-          {/* Contenido principal */}
-          <div className="p-4 flex-1 overflow-y-auto hide-scrollbar space-y-4">
+          <div className="p-4 flex-1 overflow-y-auto space-y-4">
             
-            {/* NAVEGACIÓN DE PESTAÑAS (Accesibles para la experiencia de todos los usuarios) */}
-            <div className="flex items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-extrabold overflow-x-auto hide-scrollbar shrink-0">
+            <div className="flex items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-bold overflow-x-auto scrollbar-none shrink-0">
               <button 
                 onClick={() => setActiveTab('retos')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'retos' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'retos' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
                 <Target className="w-4 h-4 text-amber-400" />
                 <span>Retos</span>
               </button>
               <button 
                 onClick={() => setActiveTab('racha')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'racha' ? 'bg-rose-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'racha' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
                 <Flame className="w-4 h-4 text-orange-400" />
                 <span>Racha</span>
               </button>
               <button 
                 onClick={() => setActiveTab('stats')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'stats' ? 'bg-amber-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'stats' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
                 <BarChart3 className="w-4 h-4 text-amber-300" />
                 <span>Estadísticas</span>
               </button>
               <button 
                 onClick={() => setActiveTab('mascota')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'mascota' ? 'bg-purple-600 text-white shadow' : 'text-slate-400 hover:text-white'}`}
+                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'mascota' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
                 <Bot className="w-4 h-4 text-purple-300" />
                 <span>Mascota</span>
               </button>
               <button 
                 onClick={() => setActiveTab('ficha_niño')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'ficha_niño' ? 'bg-pink-600 text-white shadow' : 'text-pink-300 hover:text-white'}`}
+                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'ficha_niño' ? 'bg-pink-600 text-white shadow-sm' : 'text-pink-300 hover:text-white'}`}
               >
                 <Brain className="w-4 h-4 text-pink-300" />
-                <span>Ficha Alumno 👧</span>
+                <span>Ficha Alumno</span>
               </button>
               <button 
                 onClick={() => setActiveTab('cuenta')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 ${activeTab === 'cuenta' ? 'bg-cyan-600 text-white shadow' : 'text-cyan-300 hover:text-white'}`}
+                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'cuenta' ? 'bg-cyan-600 text-white shadow-sm' : 'text-cyan-300 hover:text-white'}`}
               >
                 <User className="w-4 h-4 text-cyan-300" />
                 <span>Perfil</span>
@@ -270,7 +264,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               {user?.email === 'josferestudio@gmail.com' && (
                 <button 
                   onClick={() => { onClose(); onOpenAdminDashboard(); }}
-                  className="px-3 py-2 rounded-xl transition-all whitespace-nowrap text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center gap-1.5 ml-auto"
+                  className="px-3 py-2 rounded-xl transition-all whitespace-nowrap text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center gap-1.5 ml-auto cursor-pointer"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>Admin</span>
@@ -279,17 +273,16 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </div>
 
             {isGuest ? (
-               /* VISTA INVITADO */
-               <div className="bg-slate-900/50 border border-indigo-500/30 rounded-2xl p-4 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-2xl mx-auto border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
-                    🚀
+               <div className="bg-slate-900/50 border border-indigo-500/30 rounded-2xl p-5 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center mx-auto border border-indigo-500/40 text-indigo-400 shadow-sm">
+                    <Sparkles className="w-6 h-6" />
                   </div>
                   <div>
                     <h3 className="font-extrabold text-base text-white mb-0.5">
                       {authMode === 'login' ? 'Iniciar Sesión en GOALS' : 'Crear tu Cuenta GOALS'}
                     </h3>
                     <p className="text-[11px] text-slate-400 leading-tight">
-                      Guarda tus estrellas, racha y XP en la nube en todas tus aplicaciones.
+                      Guarda tus estrellas, racha y XP en la nube en todo el ecosistema.
                     </p>
                   </div>
 
@@ -331,7 +324,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
                     <button
                       type="submit" disabled={isSubmitting}
-                      className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-lg shadow-indigo-600/30 disabled:opacity-50 active:scale-95"
+                      className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm disabled:opacity-50 active:scale-95 cursor-pointer"
                     >
                       {isSubmitting ? 'Procesando...' : authMode === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
                     </button>
@@ -339,7 +332,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
                   <div className="relative py-0.5">
                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800"></div></div>
-                    <div className="relative flex justify-center text-[9px] uppercase text-slate-500 font-bold bg-[#0b0f19] px-2">o bien</div>
+                    <div className="relative flex justify-center text-[9px] uppercase text-slate-500 font-bold bg-slate-950 px-2">o bien</div>
                   </div>
 
                   <button
@@ -350,13 +343,12 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         await signInWithGoogle();
                         showToast("Sesión iniciada con Google");
                       } catch (e) {
-                        // Handled by context
                       } finally {
                         setIsSubmitting(false);
                       }
                     }}
                     disabled={isSubmitting}
-                    className="w-full py-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 active:scale-95"
+                    className="w-full py-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 active:scale-95 cursor-pointer"
                   >
                     <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                       <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -371,22 +363,20 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     <button
                       type="button"
                       onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthError(null); }}
-                      className="text-indigo-400 hover:text-indigo-300 font-bold text-xs"
+                      className="text-indigo-400 hover:text-indigo-300 font-bold text-xs cursor-pointer"
                     >
                       {authMode === 'login' ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión aquí'}
                     </button>
                   </div>
                </div>
             ) : (
-              /* VISTAS DE USUARIO REGISTRADO */
               <>
-                {/* TAB ⚡ RETOS DIARIOS */}
                 {activeTab === 'retos' && (
                   <div className="space-y-3 animate-fadeIn">
-                    <div className="bg-gradient-to-r from-amber-950/60 via-slate-900 to-indigo-950/60 border border-amber-500/30 rounded-2xl p-3 text-center relative overflow-hidden">
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span className="font-extrabold text-amber-300 flex items-center gap-1">
-                          <Zap className="w-3.5 h-3.5 fill-amber-400" /> {userData.xp} XP Acumulados
+                    <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-3.5 text-center relative overflow-hidden">
+                      <div className="flex items-center justify-between text-xs mb-1.5">
+                        <span className="font-bold text-amber-300 flex items-center gap-1">
+                          <Zap className="w-3.5 h-3.5 text-amber-400" /> {userData.xp} XP Acumulados
                         </span>
                         <span className="font-bold text-indigo-300 text-[10px]">
                           Nivel {rank.level}: {rank.title}
@@ -395,51 +385,53 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
                       <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
                         <div 
-                          className="bg-gradient-to-r from-amber-400 via-amber-500 to-indigo-500 h-full transition-all duration-500" 
+                          className="bg-gradient-to-r from-amber-400 via-amber-500 to-indigo-500 h-full transition-all duration-500 rounded-full" 
                           style={{ width: `${Math.min(100, (userData.xp / rank.nextXp) * 100)}%` }}
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-[11px] font-extrabold text-slate-300 uppercase tracking-wider px-1">
-                        <span>Misiones Espaciales del Día</span>
-                        <span className="text-amber-400 text-[10px]">¡Reclama tu XP!</span>
+                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-300 uppercase tracking-wider px-1">
+                        <span>Misiones del Día</span>
+                        <span className="text-amber-400 text-[10px]">Reclamar XP</span>
                       </div>
 
                       {retosList.map((r) => (
                         <div 
                           key={r.id}
-                          className={`p-2.5 rounded-xl border flex items-center justify-between gap-2.5 transition-all ${
+                          className={`p-3 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
                             r.claimed
-                              ? 'bg-slate-950/50 border-slate-800 opacity-60'
+                              ? 'bg-slate-950/40 border-slate-800/60 opacity-60'
                               : r.cond
-                              ? 'bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
-                              : 'bg-slate-900/60 border-slate-800'
+                              ? 'bg-slate-900/80 border-emerald-500/40 shadow-sm'
+                              : 'bg-slate-900/60 border-slate-800/80'
                           }`}
                         >
-                          <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                            <span className="text-2xl p-1.5 rounded-lg bg-slate-950 border border-slate-800 shrink-0">{r.icon}</span>
+                          <div className="flex items-center gap-3 min-w-0 flex-1">
+                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-indigo-400 shrink-0">
+                              <Sparkles className="w-4 h-4" />
+                            </div>
                             <div className="min-w-0 flex-1">
-                              <h4 className="font-extrabold text-xs text-white truncate">{r.title}</h4>
+                              <h4 className="font-bold text-xs text-white truncate">{r.title}</h4>
                               <p className="text-[10px] text-slate-400 line-clamp-1">{r.desc}</p>
                             </div>
                           </div>
 
                           <div className="shrink-0">
                             {r.claimed ? (
-                              <span className="px-2 py-1 rounded-lg bg-slate-800 text-slate-400 font-bold text-[10px] flex items-center gap-1">
+                              <span className="px-2.5 py-1 rounded-xl bg-slate-800 text-slate-400 font-bold text-[10px] flex items-center gap-1">
                                 <Check className="w-3 h-3 text-emerald-400" /> Reclamado
                               </span>
                             ) : r.cond ? (
                               <button
                                 onClick={() => claimReto(r.id, r.xp)}
-                                className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] uppercase tracking-wider transition-all shadow-md shadow-emerald-500/30 active:scale-95 flex items-center gap-1 animate-pulse"
+                                className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center gap-1 cursor-pointer"
                               >
                                 <Gift className="w-3 h-3" /> +{r.xp} XP
                               </button>
                             ) : (
-                              <span className="px-2 py-1 rounded-lg bg-slate-950 border border-slate-800 text-amber-400/70 font-bold text-[10px]">
+                              <span className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-amber-400/80 font-bold text-[10px]">
                                 +{r.xp} XP
                               </span>
                             )}
@@ -450,33 +442,32 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   </div>
                 )}
 
-                {/* TAB 🔥 RACHA DIARIA */}
                 {activeTab === 'racha' && (
                   <div className="space-y-3 animate-fadeIn">
-                    <div className="bg-gradient-to-br from-rose-950/60 via-slate-900 to-amber-950/60 border border-rose-500/30 rounded-2xl p-4 text-center space-y-2">
-                      <div className="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/40 flex items-center justify-center text-3xl mx-auto shadow-[0_0_20px_rgba(244,63,94,0.3)]">
-                        🔥
+                    <div className="bg-slate-900/60 border border-rose-500/20 rounded-2xl p-5 text-center space-y-3">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mx-auto shadow-sm">
+                        <Flame className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-black text-2xl text-white">{userData.streak} Días de Racha</h3>
-                        <p className="text-xs text-slate-300">¡Conéctate mañana para mantener encendida tu llama astronómica!</p>
+                        <h3 className="font-extrabold text-2xl text-white">{userData.streak} Días de Racha</h3>
+                        <p className="text-xs text-slate-400">Conéctate diariamente para mantener tu racha activa.</p>
                       </div>
 
-                      <div className="pt-2 border-t border-white/5">
+                      <div className="pt-3 border-t border-slate-800">
                         <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Actividad de la Semana</div>
                         <div className="flex justify-center gap-2">
                           {WEEKDAYS.map((day, idx) => {
                             const active = userData.weeklyActivity?.[idx];
                             return (
                               <div key={day} className="flex flex-col items-center gap-1">
-                                <div className={`w-8 h-8 rounded-xl border flex items-center justify-center text-xs font-black transition-all ${
+                                <div className={`w-8 h-8 rounded-xl border flex items-center justify-center text-xs font-bold transition-all ${
                                   active 
-                                    ? 'bg-rose-500/20 border-rose-500 text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.4)]' 
+                                    ? 'bg-rose-500/20 border-rose-500/50 text-rose-300' 
                                     : 'bg-slate-950 border-slate-800 text-slate-600'
                                 }`}>
-                                  {active ? '🔥' : day}
+                                  {active ? <Flame className="w-4 h-4 text-rose-400" /> : day}
                                 </div>
-                                <span className="text-[9px] text-slate-500 font-bold">{day}</span>
+                                <span className="text-[9px] text-slate-500 font-medium">{day}</span>
                               </div>
                             );
                           })}
@@ -484,60 +475,59 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="bg-slate-900/60 border border-amber-500/30 rounded-2xl p-3.5 flex items-center justify-between">
+                    <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <span className="text-3xl p-2 rounded-xl bg-slate-950 border border-slate-800">⭐</span>
+                        <div className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-amber-400">
+                          <Star className="w-5 h-5" />
+                        </div>
                         <div>
-                          <h4 className="font-extrabold text-sm text-white">{currentStars} / {maxPossibleStars} Estrellas</h4>
-                          <p className="text-[10px] text-slate-400">Consigue 3 estrellas completando tests al 100%</p>
+                          <h4 className="font-bold text-xs text-white">{currentStars} / {maxPossibleStars} Estrellas</h4>
+                          <p className="text-[10px] text-slate-400">Consigue estrellas completando evaluaciones formativas</p>
                         </div>
                       </div>
-                      <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/30 text-xs font-black">
+                      <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-400/20 text-xs font-bold">
                         {Math.round((currentStars / (maxPossibleStars || 1)) * 100)}%
                       </span>
                     </div>
                   </div>
                 )}
 
-                {/* TAB 📊 ESTADÍSTICAS GLOBALES DE MINI APPS */}
                 {activeTab === 'stats' && (
                   <div className="space-y-3 animate-fadeIn">
-                    {/* Resumen Global */}
-                    <div className="bg-gradient-to-r from-indigo-950/80 via-slate-900 to-purple-950/80 border border-indigo-500/30 rounded-2xl p-4 text-center space-y-2">
-                      <h3 className="font-black text-sm text-white flex items-center justify-center gap-2">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 text-center space-y-2.5">
+                      <h3 className="font-bold text-sm text-white flex items-center justify-center gap-2">
                         <BarChart3 className="w-4 h-4 text-indigo-400" />
-                        <span>Ecosistema GOALS — Métricas Globales</span>
+                        <span>Métricas del Ecosistema</span>
                       </h3>
-                      <p className="text-[11px] text-slate-300">
-                        Puntos de Experiencia (XP), racha y estrellas agregadas en tiempo real.
+                      <p className="text-[11px] text-slate-400">
+                        Experiencia acumulada, días de racha y progreso en tiempo real.
                       </p>
 
-                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 text-center">
-                        <div className="bg-slate-950/60 p-2 rounded-xl border border-amber-500/30">
-                          <p className="text-[10px] text-slate-400 font-bold">XP Total</p>
-                          <p className="font-extrabold text-sm text-amber-400 flex items-center justify-center gap-1">
-                            <Zap className="w-3.5 h-3.5 fill-amber-400" /> {userData.xp}
+                      <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 text-center">
+                        <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                          <p className="text-[10px] text-slate-400 font-medium">XP Total</p>
+                          <p className="font-bold text-sm text-amber-400 flex items-center justify-center gap-1 mt-0.5">
+                            <Zap className="w-3.5 h-3.5 text-amber-400" /> {userData.xp}
                           </p>
                         </div>
-                        <div className="bg-slate-950/60 p-2 rounded-xl border border-rose-500/30">
-                          <p className="text-[10px] text-slate-400 font-bold">Racha</p>
-                          <p className="font-extrabold text-sm text-rose-400 flex items-center justify-center gap-1">
-                            <Flame className="w-3.5 h-3.5 fill-rose-400" /> {userData.streak} D
+                        <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                          <p className="text-[10px] text-slate-400 font-medium">Racha</p>
+                          <p className="font-bold text-sm text-rose-400 flex items-center justify-center gap-1 mt-0.5">
+                            <Flame className="w-3.5 h-3.5 text-rose-400" /> {userData.streak} D
                           </p>
                         </div>
-                        <div className="bg-slate-950/60 p-2 rounded-xl border border-yellow-500/30">
-                          <p className="text-[10px] text-slate-400 font-bold">Estrellas</p>
-                          <p className="font-extrabold text-sm text-yellow-400 flex items-center justify-center gap-1">
-                            <Star className="w-3.5 h-3.5 fill-yellow-400" /> {totalStars()}
+                        <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                          <p className="text-[10px] text-slate-400 font-medium">Estrellas</p>
+                          <p className="font-bold text-sm text-yellow-400 flex items-center justify-center gap-1 mt-0.5">
+                            <Star className="w-3.5 h-3.5 text-yellow-400" /> {totalStars()}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    {/* Desglose por Mini App */}
                     <div className="space-y-2">
-                      <h4 className="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider px-1">
-                        Desglose por Mini App
+                      <h4 className="text-[11px] font-bold text-slate-300 uppercase tracking-wider px-1">
+                        Progreso por Área
                       </h4>
 
                       {Object.values(GOALS_EXPERIENCES).map((exp) => {
@@ -546,24 +536,24 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         return (
                           <div 
                             key={exp.id} 
-                            className={`p-3 rounded-2xl bg-gradient-to-r ${exp.bgGradientClass} border ${exp.borderClass} shadow-md flex items-center justify-between gap-3`}
+                            className="p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80 flex items-center justify-between gap-3"
                           >
                             <div className="flex items-center gap-3">
                               <div className={`p-2 rounded-xl bg-slate-950 border border-slate-800 ${exp.iconColorClass}`}>
-                                <IconComp className="w-5 h-5" />
+                                <IconComp className="w-4 h-4" />
                               </div>
                               <div>
-                                <h5 className="font-extrabold text-xs text-white">{exp.name}</h5>
+                                <h5 className="font-bold text-xs text-white">{exp.name}</h5>
                                 <p className="text-[10px] text-slate-400">{exp.tagline}</p>
                               </div>
                             </div>
 
-                            <div className="text-right space-y-1">
-                              <span className={`px-2 py-0.5 rounded-full border text-[9px] font-bold ${exp.badgeClass}`}>
+                            <div className="text-right space-y-0.5">
+                              <span className={`px-2 py-0.5 rounded-md border text-[9px] font-bold ${exp.badgeClass}`}>
                                 {exp.badge}
                               </span>
                               <div className="flex items-center gap-1 text-amber-400 font-bold text-xs justify-end">
-                                <Zap className="w-3 h-3 fill-amber-400" />
+                                <Zap className="w-3 h-3 text-amber-400" />
                                 <span>{expXp} XP</span>
                               </div>
                             </div>
@@ -574,24 +564,20 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   </div>
                 )}
 
-                {/* TAB 🐾 MASCOTA PET (CONFIGURACIÓN COMPLETA DE SOUL PROMPT, ESCALA, VOZ Y ANIMACIÓN) */}
                 {activeTab === 'mascota' && (
                   <div className="space-y-4 animate-fadeIn">
-                    {/* Tarjeta de Previsualización Centrada y Nítida */}
-                    <div className="bg-gradient-to-b from-purple-950/40 to-slate-900 border border-purple-500/30 rounded-3xl p-5 text-center space-y-3 relative overflow-hidden shadow-xl">
+                    <div className="bg-slate-900/60 border border-purple-500/20 rounded-2xl p-5 text-center space-y-3 relative overflow-hidden">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Bot className="w-5 h-5 text-purple-400" />
-                          <h3 className="font-extrabold text-sm text-white">Vista Previa de Mascota en Vivo</h3>
+                          <Bot className="w-4 h-4 text-purple-400" />
+                          <h3 className="font-bold text-xs text-white">Vista Previa de Mascota</h3>
                         </div>
-                        <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold border border-purple-500/30">
+                        <span className="px-2 py-0.5 rounded-lg bg-purple-500/10 text-purple-300 text-[10px] font-bold border border-purple-500/20">
                           {MASCOT_SKINS[mascotSkinId]?.name}
                         </span>
                       </div>
 
-                      {/* Pedestal Luminoso Centrado para la Mascota */}
-                      <div className="w-36 h-36 rounded-full bg-slate-950/80 border-2 border-purple-500/40 shadow-[0_0_30px_rgba(168,85,247,0.35)] flex items-center justify-center mx-auto relative group">
-                        <div className="absolute inset-0 rounded-full bg-purple-500/10 animate-pulse opacity-30 pointer-events-none" />
+                      <div className="w-32 h-32 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-center mx-auto relative group">
                         <MascotPet skinId={mascotSkinId} animState={mascotAnimState} scale={mascotScale} />
                       </div>
 
@@ -599,17 +585,16 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         {MASCOT_SKINS[mascotSkinId]?.subtitle}
                       </p>
 
-                      {/* Probador de Estados de Animación */}
                       <div className="flex items-center justify-center gap-1.5 pt-1">
                         {(['idle', 'hover', 'thinking', 'speaking', 'dragging'] as const).map((st) => (
                           <button
                             key={st}
                             type="button"
                             onClick={() => setMascotAnimState(st)}
-                            className={`px-2 py-0.5 rounded-md text-[9px] font-mono font-bold capitalize transition-all cursor-pointer ${
+                            className={`px-2 py-0.5 rounded-lg text-[9px] font-mono font-bold capitalize transition-all cursor-pointer ${
                               mascotAnimState === st
                                 ? 'bg-purple-600 text-white shadow-sm'
-                                : 'bg-slate-950/80 text-slate-400 hover:text-white border border-slate-800'
+                                : 'bg-slate-950 text-slate-400 hover:text-white border border-slate-800'
                             }`}
                           >
                             {st}
@@ -618,20 +603,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Nombre Personalizado de la Mascota */}
-                    <div className="bg-slate-900/60 border border-purple-500/40 rounded-2xl p-4 space-y-2.5">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-extrabold text-purple-300 flex items-center gap-1.5">
-                          <Bot className="w-4 h-4 text-purple-400" />
-                          <span>Nombre Personalizado de tu Mascota</span>
+                        <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <Bot className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Nombre de tu Mascota</span>
                         </h4>
-                        <span className="text-[9px] font-mono text-purple-300 bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30">
-                          Nombre Propio
-                        </span>
                       </div>
-                      <p className="text-[10px] text-slate-400">
-                        Escribe el nombre con el que tu mascota se presentará y te hablará de viva voz:
-                      </p>
                       <input
                         type="text"
                         value={customMascotName}
@@ -640,50 +618,34 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           setCustomMascotNameState(val);
                           setCustomMascotName(val);
                         }}
-                        placeholder="Ej. Búho Sabio, Sabiondo, Toby, AstroBot..."
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-purple-500/40 text-xs font-black text-white focus:border-purple-400 outline-none transition-all"
+                        placeholder="Ej. Búho Sabio, AstroBot..."
+                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-white focus:border-purple-400 outline-none transition-colors"
                       />
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {['🦉 Búho Sabio', '🤖 AstroBot', '🐲 Dragón Cósmico', '🐱 Gatito Galáctico'].map((preset) => (
-                          <button
-                            key={preset}
-                            type="button"
-                            onClick={() => {
-                              const clean = preset.split(' ').slice(1).join(' ');
-                              setCustomMascotNameState(clean);
-                              setCustomMascotName(clean);
-                              showToast(`Nombre ajustado a ${clean}`);
-                            }}
-                            className="px-2.5 py-1 rounded-xl bg-purple-950/60 border border-purple-500/30 text-purple-300 text-[10px] font-extrabold hover:bg-purple-900/50 transition-all cursor-pointer"
-                          >
-                            {preset}
-                          </button>
-                        ))}
-                      </div>
                     </div>
 
-                    {/* Selector de Skins en Grilla */}
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 space-y-3">
-                      <h4 className="text-xs font-extrabold text-white flex items-center gap-1.5">
-                        <Sparkles className="w-4 h-4 text-purple-400" />
-                        <span>Elige tu Especie / Avatar 3D</span>
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
+                      <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                        <span>Selecciona Skin de Mascota</span>
                       </h4>
 
-                      <div className="grid grid-cols-2 gap-2.5">
+                      <div className="grid grid-cols-2 gap-2">
                         {Object.values(MASCOT_SKINS).map((skin) => (
                           <button
                             key={skin.id}
                             type="button"
                             onClick={() => handleSelectMascotSkin(skin.id as MascotSkinId)}
-                            className={`p-3 rounded-2xl border text-left flex items-center gap-3 transition-all cursor-pointer ${
+                            className={`p-2.5 rounded-xl border text-left flex items-center gap-2.5 transition-all cursor-pointer ${
                               mascotSkinId === skin.id
-                                ? 'bg-purple-950/70 border-purple-400 shadow-[0_0_20px_rgba(168,85,247,0.4)] scale-[1.02]'
-                                : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+                                ? 'bg-purple-950/40 border-purple-500/80 shadow-sm'
+                                : 'bg-slate-950 border-slate-800 hover:border-slate-700 opacity-80 hover:opacity-100'
                             }`}
                           >
-                            <span className="text-2xl p-1.5 bg-slate-900 rounded-xl border border-white/5 shrink-0">{skin.avatarIcon}</span>
+                            <div className="p-1.5 bg-slate-900 rounded-lg border border-slate-800 text-purple-400 shrink-0">
+                              <Bot className="w-4 h-4" />
+                            </div>
                             <div className="min-w-0 flex-1">
-                              <h5 className="font-extrabold text-xs text-white truncate">{skin.name}</h5>
+                              <h5 className="font-bold text-xs text-white truncate">{skin.name}</h5>
                               <p className="text-[9px] text-slate-400 truncate">{skin.subtitle}</p>
                             </div>
                           </button>
@@ -691,70 +653,30 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Personalización del Soul System Prompt de la IA */}
-                    <div className="bg-slate-900/50 border border-indigo-500/30 rounded-2xl p-4 space-y-3">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-extrabold text-indigo-300 flex items-center gap-1.5">
-                          <Brain className="w-4 h-4 text-indigo-400" />
-                          <span>Soul & Personalidad IA (System Prompt)</span>
+                        <h4 className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                          <Brain className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>Personalidad IA (System Prompt)</span>
                         </h4>
-                        <span className="text-[9px] font-mono text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/30">
-                          model: "auto"
-                        </span>
                       </div>
-
-                      <p className="text-[10px] text-slate-400 leading-relaxed">
-                        Define la personalidad y el tono didáctico con el que la Mascota IA te guiará en GOALS:
-                      </p>
 
                       <textarea
                         rows={3}
                         value={mascotSoulPrompt}
                         onChange={(e) => handleSoulPromptChange(e.target.value)}
-                        placeholder="Escribe el System Prompt o tono de personalidad de tu Mascota IA..."
-                        className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-600 focus:border-indigo-500 outline-none font-mono"
+                        placeholder="Escribe el tono de personalidad de tu Mascota IA..."
+                        className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-200 placeholder-slate-600 focus:border-indigo-500 outline-none font-sans"
                       />
-
-                      <div className="flex flex-wrap gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => handleSoulPromptChange("Eres AstroBot, un mentor espacial súper divertido y sabio experto en ciencia, física y programación. Explicas conceptos complejos con metáforas espaciales emocionantes.")}
-                          className="px-2 py-1 rounded-lg bg-cyan-950/60 border border-cyan-500/30 text-cyan-300 text-[9px] font-extrabold hover:bg-cyan-900/50 transition-all cursor-pointer"
-                        >
-                          🤖 AstroBot STEM
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleSoulPromptChange("Eres el Búho Sabio. Tu tono es calmado, motivador y sumamente didáctico. Valoras la verificación empírica y la curiosidad de investigación.")}
-                          className="px-2 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-[9px] font-extrabold hover:bg-emerald-900/50 transition-all cursor-pointer"
-                        >
-                          🦉 Búho Sabio
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleSoulPromptChange("Eres el Dragón Cósmico. Tu misión es animar al estudiante a mantener su racha de conexión, superar sus misiones y alcanzar el rango máximo.")}
-                          className="px-2 py-1 rounded-lg bg-blue-950/60 border border-blue-500/30 text-blue-300 text-[9px] font-extrabold hover:bg-blue-900/50 transition-all cursor-pointer"
-                        >
-                          🐲 Dragón Metas
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleSoulPromptChange("Eres el Gatito Galáctico. Hablas con energía contagiosa y ayudas al estudiante a practicar fluidez verbal en inglés y otros idiomas.")}
-                          className="px-2 py-1 rounded-lg bg-pink-950/60 border border-pink-500/30 text-pink-300 text-[9px] font-extrabold hover:bg-pink-900/50 transition-all cursor-pointer"
-                        >
-                          🐱 Gatito Idiomas
-                        </button>
-                      </div>
                     </div>
 
-                    {/* Slider de Tamaño de la Mascota */}
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 space-y-2.5">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
                       <div className="flex items-center justify-between text-xs font-bold text-slate-200">
                         <span className="flex items-center gap-1.5">
                           <Sliders className="w-3.5 h-3.5 text-purple-400" />
-                          <span>Escala de Pantalla (Tamaño de la Mascota)</span>
+                          <span>Tamaño en Pantalla</span>
                         </span>
-                        <span className="font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/30">{mascotScale.toFixed(1)}x</span>
+                        <span className="font-mono text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md border border-purple-500/20 text-[10px]">{mascotScale.toFixed(1)}x</span>
                       </div>
                       <input
                         type="range"
@@ -763,21 +685,15 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         step={0.1}
                         value={mascotScale}
                         onChange={(e) => handleScaleChange(parseFloat(e.target.value))}
-                        className="w-full h-2 accent-purple-500 cursor-pointer"
+                        className="w-full h-1.5 accent-purple-500 cursor-pointer"
                       />
-                      <div className="flex items-center justify-between text-[9px] text-slate-500 font-mono">
-                        <span>0.6x (Compacto)</span>
-                        <span>1.5x (Estándar)</span>
-                        <span>2.5x (Gigante)</span>
-                      </div>
                     </div>
 
-                    {/* Control de Sintetizador de Voz TTS */}
-                    <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 space-y-3">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-extrabold text-white flex items-center gap-1.5">
-                          <Volume2 className="w-4 h-4 text-purple-400" />
-                          <span>Sintetizador de Voz (TTS)</span>
+                        <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                          <Volume2 className="w-3.5 h-3.5 text-purple-400" />
+                          <span>Sintetizador de Voz</span>
                         </h4>
                         <button
                           type="button"
@@ -787,7 +703,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                               const skin = MASCOT_SKINS[mascotSkinId];
                               const nameToSay = customMascotName || skin.name;
                               const greetingName = childProfile.childName ? ` ${childProfile.childName}` : '';
-                              const utt = new SpeechSynthesisUtterance(`¡Hola${greetingName}! Soy ${nameToSay}. Estoy listo para guiarte en GOALS.`);
+                              const utt = new SpeechSynthesisUtterance(`Hola${greetingName}. Soy ${nameToSay}.`);
                               utt.lang = 'es-ES';
                               utt.pitch = mascotPitch;
                               utt.rate = mascotRate;
@@ -796,16 +712,16 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                               window.speechSynthesis.speak(utt);
                             }
                           }}
-                          className="px-3 py-1 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
+                          className="px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
                         >
-                          <Volume2 className="w-3.5 h-3.5" />
+                          <Volume2 className="w-3 h-3" />
                           <span>Probar Voz</span>
                         </button>
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Tono de Voz: {mascotPitch.toFixed(2)}</label>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Tono: {mascotPitch.toFixed(2)}</label>
                           <input
                             type="range"
                             min={0.5}
@@ -820,7 +736,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                             className="w-full h-1.5 accent-purple-500 cursor-pointer"
                           />
                         </div>
-
                         <div>
                           <label className="block text-[10px] font-bold text-slate-300 mb-1">Velocidad: {mascotRate.toFixed(2)}x</label>
                           <input
@@ -839,41 +754,36 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         </div>
                       </div>
                     </div>
-
                   </div>
                 )}
 
-                {/* TAB 👧 FICHA COMPLETA DEL ALUMNO / NIÑO */}
                 {activeTab === 'ficha_niño' && (
-                  <div className="space-y-4 animate-fadeIn">
-                    
-                    {/* Banner Explicativo */}
-                    <div className="bg-gradient-to-r from-pink-950/80 via-slate-900 to-purple-950/80 border border-pink-500/30 rounded-2xl p-4 space-y-1.5 shadow-lg">
-                      <h3 className="font-extrabold text-sm text-white flex items-center gap-2">
+                  <div className="space-y-3.5 animate-fadeIn">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-1.5">
+                      <h3 className="font-bold text-xs text-white flex items-center gap-2">
                         <Brain className="w-4 h-4 text-pink-400" />
-                        <span>Expediente & Ficha Personal del Alumno</span>
+                        <span>Ficha y Preferencias de Aprendizaje</span>
                       </h3>
-                      <p className="text-[11px] text-slate-300 leading-relaxed font-medium">
-                        Esta información se inyecta directamente en el <b>System Prompt</b> de la Mascota IA para adaptar las metáforas, el tono y las explicaciones a sus intereses y necesidades reales.
+                      <p className="text-[11px] text-slate-400 leading-relaxed">
+                        Esta información personaliza el tono, las analogías y los ejemplos prácticos de la IA en todas las asignaturas.
                       </p>
                     </div>
 
-                    {/* 1. Datos Personales y Escolares */}
-                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-3">
-                      <h4 className="text-xs font-extrabold text-pink-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
+                      <h4 className="text-xs font-bold text-pink-300 uppercase tracking-wider flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5 text-pink-400" />
-                        <span>1. Datos del Estudiante & Colegio</span>
+                        <span>1. Datos del Estudiante</span>
                       </h4>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Nombre del Alumno/a</label>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Nombre</label>
                           <input
                             type="text"
                             value={childProfile.childName}
                             onChange={(e) => setChildProfileState({ ...childProfile, childName: e.target.value })}
-                            placeholder="Ej. Mateo, Sofía..."
-                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-pink-500 outline-none transition-all font-semibold"
+                            placeholder="Ej. Mateo..."
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-pink-500 outline-none transition-colors font-medium"
                           />
                         </div>
 
@@ -882,7 +792,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           <select
                             value={childProfile.age}
                             onChange={(e) => setChildProfileState({ ...childProfile, age: parseInt(e.target.value, 10) })}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-amber-200 font-bold focus:border-pink-500 outline-none transition-all cursor-pointer"
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-amber-300 font-bold focus:border-pink-500 outline-none transition-colors cursor-pointer"
                           >
                             {Array.from({ length: 11 }, (_, i) => i + 6).map((a) => (
                               <option key={a} value={a} className="bg-slate-900 text-white">
@@ -893,22 +803,22 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Colegio / Centro Educativo</label>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Centro Educativo</label>
                           <input
                             type="text"
                             value={childProfile.schoolName}
                             onChange={(e) => setChildProfileState({ ...childProfile, schoolName: e.target.value })}
-                            placeholder="Ej. CEIP San José, Colegio Montserrat..."
-                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-pink-500 outline-none transition-all font-semibold"
+                            placeholder="Ej. CEIP..."
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-pink-500 outline-none transition-colors font-medium"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Curso Escolar Actual</label>
+                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Curso Actual</label>
                           <select
                             value={childProfile.grade}
                             onChange={(e) => setChildProfileState({ ...childProfile, grade: e.target.value })}
-                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-indigo-300 font-bold focus:border-pink-500 outline-none transition-all cursor-pointer"
+                            className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-indigo-300 font-bold focus:border-pink-500 outline-none transition-colors cursor-pointer"
                           >
                             {AVAILABLE_GRADES.map((g) => (
                               <option key={g} value={g} className="bg-slate-900 text-white">
@@ -920,13 +830,11 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       </div>
                     </div>
 
-                    {/* 2. Asignaturas Favoritas ⭐ */}
                     <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-                      <h4 className="text-xs font-extrabold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <Star className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
+                      <h4 className="text-xs font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <Star className="w-3.5 h-3.5 text-emerald-400" />
                         <span>2. Asignaturas Favoritas</span>
                       </h4>
-                      <p className="text-[10px] text-slate-400">Toca para marcar las materias que más le gustan:</p>
                       
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         {AVAILABLE_SUBJECTS.map((sub) => {
@@ -944,23 +852,21 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                               className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
                                 isSelected
                                   ? 'bg-emerald-500/20 border border-emerald-500/60 text-emerald-300 shadow-sm'
-                                  : 'bg-slate-950/60 border border-slate-800 text-slate-400 hover:text-white'
+                                  : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
                               }`}
                             >
-                              {isSelected ? '⭐ ' : ''}{sub}
+                              {sub}
                             </button>
                           );
                         })}
                       </div>
                     </div>
 
-                    {/* 3. Asignaturas a Reforzar 🎯 */}
                     <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-                      <h4 className="text-xs font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                      <h4 className="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
                         <Target className="w-3.5 h-3.5 text-amber-400" />
-                        <span>3. Asignaturas a Reforzar (Le Cuentan Más)</span>
+                        <span>3. Asignaturas a Reforzar</span>
                       </h4>
-                      <p className="text-[10px] text-slate-400">La IA será especialmente paciente y explicativa en estas materias:</p>
                       
                       <div className="flex flex-wrap gap-1.5 pt-1">
                         {AVAILABLE_SUBJECTS.map((sub) => {
@@ -978,143 +884,75 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                               className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
                                 isSelected
                                   ? 'bg-amber-500/20 border border-amber-500/60 text-amber-300 shadow-sm'
-                                  : 'bg-slate-950/60 border border-slate-800 text-slate-400 hover:text-white'
+                                  : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
                               }`}
                             >
-                              {isSelected ? '🎯 ' : ''}{sub}
+                              {sub}
                             </button>
                           );
                         })}
                       </div>
                     </div>
 
-                    {/* 4. Actividades Extraescolares */}
                     <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-                      <h4 className="text-xs font-extrabold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <Zap className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>4. Actividades Extraescolares</span>
-                      </h4>
-                      
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {AVAILABLE_EXTRACURRICULARS.map((ext) => {
-                          const isSelected = childProfile.extracurriculars.includes(ext);
-                          return (
-                            <button
-                              key={ext}
-                              type="button"
-                              onClick={() => {
-                                const next = isSelected
-                                  ? childProfile.extracurriculars.filter((e) => e !== ext)
-                                  : [...childProfile.extracurriculars, ext];
-                                setChildProfileState({ ...childProfile, extracurriculars: next });
-                              }}
-                              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-cyan-500/20 border border-cyan-500/60 text-cyan-300 shadow-sm'
-                                  : 'bg-slate-950/60 border border-slate-800 text-slate-400 hover:text-white'
-                              }`}
-                            >
-                              {ext}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* 5. Intereses & Hobbies Personales 🚀🎮 */}
-                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-                      <h4 className="text-xs font-extrabold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                        <span>5. Intereses & Hobbies (Para Analogías de la IA)</span>
-                      </h4>
-                      <p className="text-[10px] text-slate-400">La IA usará estos temas para ponerle ejemplos divertidos:</p>
-                      
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {AVAILABLE_INTERESTS.map((inte) => {
-                          const isSelected = childProfile.interests.includes(inte);
-                          return (
-                            <button
-                              key={inte}
-                              type="button"
-                              onClick={() => {
-                                const next = isSelected
-                                  ? childProfile.interests.filter((i) => i !== inte)
-                                  : [...childProfile.interests, inte];
-                                setChildProfileState({ ...childProfile, interests: next });
-                              }}
-                              className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer ${
-                                isSelected
-                                  ? 'bg-purple-500/20 border border-purple-500/60 text-purple-300 shadow-sm'
-                                  : 'bg-slate-950/60 border border-slate-800 text-slate-400 hover:text-white'
-                              }`}
-                            >
-                              {inte}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    {/* 6. Estilo de Aprendizaje */}
-                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2">
-                      <h4 className="text-xs font-extrabold text-pink-300 uppercase tracking-wider">
-                        6. Estilo de Aprendizaje
+                      <h4 className="text-xs font-bold text-pink-300 uppercase tracking-wider">
+                        4. Estilo de Aprendizaje
                       </h4>
                       <div className="grid grid-cols-4 gap-2">
                         {[
-                          { id: 'visual', label: 'Visual 🎨' },
-                          { id: 'auditivo', label: 'Auditivo 🎧' },
-                          { id: 'practico', label: 'Práctico 🛠️' },
-                          { id: 'general', label: 'General 📚' }
-                        ].map((st) => (
-                          <button
-                            key={st.id}
-                            type="button"
-                            onClick={() => setChildProfileState({ ...childProfile, learningStyle: st.id as any })}
-                            className={`py-2 rounded-xl text-[10px] font-extrabold transition-all cursor-pointer ${
-                              childProfile.learningStyle === st.id
-                                ? 'bg-pink-600 text-white shadow-md'
-                                : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
-                            }`}
-                          >
-                            {st.label}
-                          </button>
-                        ))}
+                          { id: 'visual', label: 'Visual', icon: Eye },
+                          { id: 'auditivo', label: 'Auditivo', icon: Headphones },
+                          { id: 'practico', label: 'Práctico', icon: Wrench },
+                          { id: 'general', label: 'General', icon: BookOpen }
+                        ].map((st) => {
+                          const StyleIcon = st.icon;
+                          return (
+                            <button
+                              key={st.id}
+                              type="button"
+                              onClick={() => setChildProfileState({ ...childProfile, learningStyle: st.id as any })}
+                              className={`py-2 rounded-xl text-[10px] font-bold flex flex-col items-center gap-1 transition-all cursor-pointer ${
+                                childProfile.learningStyle === st.id
+                                  ? 'bg-pink-600 text-white shadow-sm'
+                                  : 'bg-slate-950 border border-slate-800 text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              <StyleIcon className="w-3.5 h-3.5" />
+                              <span>{st.label}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
-                    {/* Botón de Guardado Prominente */}
                     <button
                       type="button"
                       onClick={() => handleSaveChildProfile(childProfile)}
-                      className="w-full py-3 rounded-2xl bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 hover:from-pink-500 hover:to-indigo-500 text-white font-black text-xs transition-all shadow-xl shadow-pink-600/30 flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                      className="w-full py-2.5 rounded-xl bg-pink-600 hover:bg-pink-500 text-white font-bold text-xs transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer active:scale-95"
                     >
                       <CheckCircle2 className="w-4 h-4" />
-                      <span>Guardar Ficha e Inyectar Contexto en la IA 👧✨</span>
+                      <span>Guardar Ficha del Alumno</span>
                     </button>
-
                   </div>
                 )}
 
-                {/* TAB 👤 PERFIL & AVATARES DE ALTA TECNOLOGÍA */}
                 {activeTab === 'cuenta' && (
                   <div className="space-y-3.5 animate-fadeIn">
-                    <div className="bg-slate-900/50 border border-indigo-500/30 rounded-2xl p-4 flex items-center gap-3.5">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-900 to-slate-950 border-2 border-indigo-500 flex items-center justify-center text-3xl shrink-0 shadow-[0_0_20px_rgba(99,102,241,0.5)] relative overflow-hidden">
-                        {selectedAvatar}
-                        <div className="absolute inset-0 bg-indigo-500/10 pointer-events-none" />
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex items-center gap-3.5">
+                      <div className={`w-12 h-12 rounded-2xl border flex items-center justify-center ${currentAvatarConfig.color} shrink-0`}>
+                        <CurrentAvatarIcon className="w-6 h-6" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-extrabold text-base text-white truncate">{user?.displayName || 'Estudiante GOALS'}</h3>
+                        <h3 className="font-bold text-sm text-white truncate">{user?.displayName || 'Estudiante GOALS'}</h3>
                         <p className="text-[11px] text-slate-400 truncate">{user?.email}</p>
-                        <p className={`text-[10px] font-extrabold ${rank.color} mt-0.5`}>{rank.title}</p>
+                        <p className={`text-[10px] font-bold ${rank.color} mt-0.5`}>{rank.title}</p>
                       </div>
                     </div>
 
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-3.5 space-y-3">
-                      <h4 className="text-[10px] font-extrabold text-indigo-300 uppercase tracking-widest flex items-center gap-1.5">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-3">
+                      <h4 className="text-[10px] font-bold text-indigo-300 uppercase tracking-widest flex items-center gap-1.5">
                         <User className="w-3.5 h-3.5 text-indigo-400" />
-                        <span>Datos del Perfil Único</span>
+                        <span>Datos de la Cuenta</span>
                       </h4>
                       <div>
                         <label className="block text-[10px] font-bold text-slate-300 mb-1">Nombre de Usuario</label>
@@ -1122,24 +960,21 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           type="text" 
                           value={newDisplayName}
                           onChange={(e) => setNewDisplayName(e.target.value)}
-                          placeholder="Tu nombre o apodo de astronauta..."
-                          className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-indigo-500 outline-none transition-all font-semibold"
+                          placeholder="Tu nombre..."
+                          className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white focus:border-indigo-500 outline-none transition-colors font-medium"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[10px] font-bold text-amber-300 mb-1 flex items-center justify-between">
-                          <span>Edad del Estudiante / Niño</span>
-                          <span className="text-[9px] text-slate-400 font-normal">Ajusta el lenguaje de la IA</span>
-                        </label>
+                        <label className="block text-[10px] font-bold text-slate-300 mb-1">Edad Adaptativa</label>
                         <select
                           value={childAge}
                           onChange={(e) => handleAgeChange(parseInt(e.target.value, 10))}
-                          className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-amber-500/40 text-xs text-amber-200 font-bold focus:border-amber-400 outline-none transition-all cursor-pointer"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-amber-200 font-bold focus:border-indigo-500 outline-none transition-colors cursor-pointer"
                         >
                           {Array.from({ length: 11 }, (_, i) => i + 6).map((age) => (
                             <option key={age} value={age} className="bg-slate-900 text-white">
-                              {age} Años {age <= 9 ? '(Primaria Inicial - Frases sencillas)' : age <= 13 ? '(Primaria / ESO - Dinámico)' : '(Secundaria - Analítico y Conciso)'}
+                              {age} Años
                             </option>
                           ))}
                         </select>
@@ -1147,54 +982,53 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
                       <button 
                         onClick={handleSaveProfile}
-                        className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs transition-all active:scale-95 shadow-md shadow-indigo-600/30 cursor-pointer"
+                        className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all active:scale-95 shadow-sm cursor-pointer"
                       >
-                        Guardar Cambios de Perfil
+                        Guardar Cambios
                       </button>
                     </div>
 
-                    {/* Galería de Avatares Futuristas Cyberpunk */}
-                    <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
-                      <h4 className="text-[10px] font-extrabold text-cyan-300 uppercase tracking-widest flex items-center gap-1.5">
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
+                      <h4 className="text-[10px] font-bold text-cyan-300 uppercase tracking-widest flex items-center gap-1.5">
                         <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                        <span>Colección de Avatares Cyberpunk & Galácticos</span>
+                        <span>Colección de Avatares</span>
                       </h4>
-                      <p className="text-[10px] text-slate-400">
-                        Selecciona un avatar futurista para que sustituya tu foto de perfil en toda la plataforma:
-                      </p>
                       <div className="grid grid-cols-5 gap-2">
-                        {AVATAR_OPTIONS.map((av) => (
-                          <button
-                            key={av.id}
-                            type="button"
-                            onClick={() => {
-                              setSelectedAvatar(av.icon);
-                              updateUserProfileData(newDisplayName.trim() || 'Estudiante', av.icon);
-                              showToast(`Avatar ${av.label} seleccionado`);
-                            }}
-                            title={av.label}
-                            className={`p-2 rounded-2xl bg-slate-950 border flex flex-col items-center justify-center text-xl transition-all cursor-pointer group ${
-                              selectedAvatar === av.icon 
-                                ? 'border-cyan-400 bg-cyan-950/40 shadow-[0_0_15px_rgba(34,211,238,0.5)] scale-105' 
-                                : 'border-slate-800 hover:border-slate-600 opacity-70 hover:opacity-100'
-                            }`}
-                          >
-                            <span>{av.icon}</span>
-                            <span className="text-[8px] font-bold text-slate-400 group-hover:text-white truncate w-full text-center mt-1">{av.label.split(' ')[0]}</span>
-                          </button>
-                        ))}
+                        {AVATAR_OPTIONS.map((av) => {
+                          const IconC = av.iconComp;
+                          const isSelected = selectedAvatar === av.id || selectedAvatar === av.label;
+                          return (
+                            <button
+                              key={av.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedAvatar(av.id);
+                                updateUserProfileData(newDisplayName.trim() || 'Estudiante', av.id);
+                                showToast(`Avatar ${av.label} seleccionado`);
+                              }}
+                              title={av.label}
+                              className={`p-2 rounded-xl bg-slate-950 border flex flex-col items-center justify-center transition-all cursor-pointer group ${
+                                isSelected 
+                                  ? 'border-cyan-400 bg-cyan-950/40 shadow-sm scale-105' 
+                                  : 'border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+                              }`}
+                            >
+                              <IconC className={`w-5 h-5 ${av.color.split(' ')[0]}`} />
+                              <span className="text-[8px] font-bold text-slate-400 group-hover:text-white truncate w-full text-center mt-1">{av.label}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
                     <button
                       onClick={signOut}
-                      className="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 font-bold text-xs transition-all cursor-pointer"
+                      className="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 font-bold text-xs transition-all cursor-pointer"
                     >
                       Cerrar Sesión
                     </button>
                   </div>
                 )}
-
               </>
             )}
 
@@ -1202,7 +1036,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
       </div>
 
-      {/* Modal Explicativo de Instalación en Android */}
       <ApkDownloadGuideModal
         isOpen={isGuideOpen}
         onClose={() => setIsGuideOpen(false)}

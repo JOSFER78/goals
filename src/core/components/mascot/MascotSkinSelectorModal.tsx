@@ -58,9 +58,16 @@ export const MascotSkinSelectorModal: React.FC<MascotSkinSelectorModalProps> = (
                 )}
 
                 <div className="flex items-center gap-3.5 mb-3">
-                  <span className="text-4xl group-hover:scale-110 transition-transform">
-                    {skin.avatarIcon}
-                  </span>
+                  <div 
+                    className="w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
+                    style={{ 
+                      backgroundColor: `${skin.primaryColor}15`, 
+                      borderColor: `${skin.primaryColor}30`,
+                      color: skin.primaryColor 
+                    }}
+                  >
+                    <Sparkles className="w-6 h-6" />
+                  </div>
                   <div>
                     <h3 className="font-bold text-sm text-white">{skin.name}</h3>
                     <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-md border mt-1 ${skin.badgeBg}`}>
@@ -74,8 +81,8 @@ export const MascotSkinSelectorModal: React.FC<MascotSkinSelectorModalProps> = (
                     <Volume2 className="w-3.5 h-3.5 text-indigo-400" />
                     Tono de voz: {skin.speechPitch}x
                   </span>
-                  <span className="text-indigo-400 font-bold group-hover:underline">
-                    {isSelected ? 'Activo ✓' : 'Seleccionar →'}
+                  <span className="text-indigo-400 font-bold">
+                    {isSelected ? 'Activo' : 'Seleccionar'}
                   </span>
                 </div>
               </button>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { defaultFirebaseConfig, getStoredFirebaseConfig, db, collection, getDocs, doc, setDoc, deleteDoc, onSnapshot } from '../config/firebase';
-import { X, Shield, Sliders, Users, BarChart3, Key, CheckCircle2, AlertTriangle, Check, UserX, Clock, RefreshCw, Trash2, Bot, Mic, Sparkles } from 'lucide-react';
+import { X, Shield, Sliders, Users, BarChart3, Key, CheckCircle2, AlertTriangle, Check, UserX, Clock, RefreshCw, Trash2, Bot, Mic, Sparkles, Crown } from 'lucide-react';
 import { UserData } from '../types';
 import { getAdminAiApiKey, setAdminAiApiKey } from '../services/aiService';
 
@@ -111,7 +111,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           await setDoc(doc(db, 'users', u.uid), { isApproved: true, status: 'approved' }, { merge: true });
         }
       }
-      showToast(`🟢 ¡Aprobados los ${pendingUsers.length} usuarios pendientes!`);
+      showToast(`Aprobados los ${pendingUsers.length} usuarios pendientes`);
     } catch (e) {
       showToast("Error al aprobar usuarios");
     }
@@ -119,7 +119,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const handleRefreshUsers = () => {
     setLoadingUsers(true);
-    showToast("🔄 Sincronizando usuarios en tiempo real...");
+    showToast("Sincronizando usuarios en tiempo real...");
     setTimeout(() => setLoadingUsers(false), 600);
   };
 
@@ -131,7 +131,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-rose-500/30 rounded-2xl p-6 text-center max-w-sm space-y-3 font-display cursor-default">
           <AlertTriangle className="w-10 h-10 text-rose-400 mx-auto" />
           <h3 className="font-bold text-base text-white">Acceso Restringido</h3>
-          <p className="text-xs text-slate-400">Este panel de administración es exclusivo para el Super Admin (josferestudio@gmail.com).</p>
+          <p className="text-xs text-slate-400">Este panel de administración es exclusivo para el Super Admin.</p>
           <button onClick={onClose} className="w-full py-2 rounded-xl bg-slate-800 text-xs font-semibold text-white">Cerrar</button>
         </div>
       </div>
@@ -147,7 +147,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       setUsersList((prev) =>
         prev.map((u) => (u.uid === targetUid ? { ...u, isApproved: nextApproved } : u))
       );
-      showToast(nextApproved ? "🟢 Usuario APROBADO correctamente" : "🔴 Autorización revocada");
+      showToast(nextApproved ? "Usuario aprobado correctamente" : "Autorización revocada");
     } catch (e) {
       showToast("Error al actualizar estado en Firestore");
     }
@@ -160,14 +160,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         await deleteDoc(doc(db, 'users', targetUid));
       }
       setUsersList((prev) => prev.filter((u) => u.uid !== targetUid));
-      showToast("🗑️ Registro de usuario eliminado de la base de datos");
+      showToast("Registro de usuario eliminado de la base de datos");
     } catch (e) {
       showToast("Error al eliminar el registro en Firestore");
     }
   };
 
   const handlePurgeAllTestUsers = async () => {
-    if (!window.confirm("⚠️ ATENCIÓN: ¿Seguro que deseas BORRAR TODOS los registros de prueba de la base de datos Firestore excepto el Super Admin?")) return;
+    if (!window.confirm("¿Seguro que deseas borrar todos los registros de prueba excepto el Super Admin?")) return;
     try {
       if (db) {
         const toDelete = usersList.filter(u => u.email !== 'josferestudio@gmail.com');
@@ -176,7 +176,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         }
       }
       setUsersList((prev) => prev.filter(u => u.email === 'josferestudio@gmail.com'));
-      showToast("🧹 Base de datos purgada. Se han eliminado todos los usuarios de prueba.");
+      showToast("Base de datos purgada. Usuarios de prueba eliminados.");
     } catch (e) {
       showToast("Error al purgar registros de la base de datos");
     }
@@ -202,44 +202,44 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const pendingCount = usersList.filter(u => !u.isApproved && u.email !== 'josferestudio@gmail.com').length;
 
   return (
-    <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn font-sans cursor-pointer">
-      <div onClick={(e) => e.stopPropagation()} className="bg-slate-950/95 border border-amber-500/30 rounded-3xl w-full max-w-2xl h-[85vh] max-h-[680px] overflow-hidden shadow-2xl backdrop-blur-xl flex flex-col relative cursor-default animate-in fade-in zoom-in-95 duration-200">
+    <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn font-display cursor-pointer">
+      <div onClick={(e) => e.stopPropagation()} className="bg-slate-950 border border-slate-800 rounded-3xl w-full max-w-2xl h-[85vh] max-h-[680px] overflow-hidden shadow-2xl flex flex-col relative cursor-default">
         
         {/* Header del Admin Dashboard */}
-        <div className="p-4 px-5 border-b border-slate-800 bg-slate-950/90 flex items-center justify-between shrink-0">
+        <div className="p-4 px-5 border-b border-slate-800/80 bg-slate-900/60 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
               <Shield className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="font-bold text-base text-white flex items-center gap-2">
-                <span>Panel de Autorización & Super Admin</span>
+              <h2 className="font-bold text-sm text-white flex items-center gap-2">
+                <span>Panel de Autorización & Admin</span>
                 <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-mono">
                   josferestudio@gmail.com
                 </span>
               </h2>
-              <p className="text-[10px] text-slate-400">Gestión de accesos, aprobación de cuentas registradas y analíticas</p>
+              <p className="text-[10px] text-slate-400">Gestión de accesos, aprobación de cuentas y analíticas</p>
             </div>
           </div>
 
-          <button onClick={onClose} className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Banner Alerta de Solicitudes Pendientes */}
         {pendingCount > 0 && (
-          <div className="bg-amber-500/15 border-b border-amber-500/30 p-3 px-5 flex items-center justify-between animate-pulse">
+          <div className="bg-amber-500/10 border-b border-amber-500/20 p-3 px-5 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
               <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>🔔 Hay <b>{pendingCount}</b> {pendingCount === 1 ? 'solicitud de usuario esperando' : 'solicitudes de usuarios esperando'} autorización.</span>
+              <span>Hay <b>{pendingCount}</b> {pendingCount === 1 ? 'solicitud de usuario esperando' : 'solicitudes de usuarios esperando'} autorización.</span>
             </div>
             <button
               onClick={handleApproveAllPending}
-              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition-all shadow-md active:scale-95 flex items-center gap-1 shrink-0"
+              className="px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center gap-1 shrink-0 cursor-pointer"
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Aprobar a Todos ({pendingCount})</span>
+              <span>Aprobar Todos ({pendingCount})</span>
             </button>
           </div>
         )}
@@ -248,14 +248,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <div className="flex border-b border-slate-800 bg-slate-950/60 text-xs font-bold">
           <button
             onClick={() => setActiveTab('users')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'users' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <Users className="w-4 h-4" />
-            <span>Autorización de Usuarios</span>
+            <span>Usuarios</span>
             {pendingCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-slate-950 text-[9px] font-black animate-pulse">
+              <span className="px-1.5 py-0.5 rounded-full bg-amber-500 text-slate-950 text-[9px] font-bold">
                 {pendingCount}
               </span>
             )}
@@ -263,17 +263,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             onClick={() => setActiveTab('apps')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'apps' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <Sliders className="w-4 h-4" />
-            <span>Apps & Ajustes 3D</span>
+            <span>Apps & 3D</span>
           </button>
 
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'analytics' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -283,7 +283,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             onClick={() => setActiveTab('firebase')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'firebase' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -293,7 +293,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             onClick={() => setActiveTab('ai_voice')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 ${
+            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'ai_voice' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -305,27 +305,27 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* Contenido del Panel Admin */}
         <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
           
-          {/* TAB 1: AUTORIZACIÓN DE USUARIOS Y GESTIÓN */}
+          {/* TAB 1: AUTORIZACIÓN DE USUARIOS */}
           {activeTab === 'users' && (
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-xs text-white">Solicitudes de Registro & Control de Acceso</h3>
-                  <p className="text-[10px] text-slate-400">Los usuarios registrados deben ser autorizados por ti para poder entrar.</p>
+                  <p className="text-[10px] text-slate-400">Los usuarios registrados deben ser autorizados para acceder.</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePurgeAllTestUsers}
-                    className="px-2.5 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95"
-                    title="Borrar todos los usuarios de prueba excepto el Admin"
+                    className="px-2.5 py-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
+                    title="Borrar registros de prueba excepto el Admin"
                   >
                     <Trash2 className="w-3.5 h-3.5 text-rose-400" />
-                    <span>Limpiar BD Pruebas</span>
+                    <span>Limpiar BD</span>
                   </button>
                   <button
                     onClick={handleRefreshUsers}
                     disabled={loadingUsers}
-                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
+                    className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin' : ''}`} />
                     <span>Refrescar</span>
@@ -333,14 +333,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
 
-              <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/80 shadow-inner">
+              <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/80">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-950 border-b border-slate-800 text-[10px] uppercase text-slate-400 font-extrabold">
+                  <thead className="bg-slate-900/60 border-b border-slate-800 text-[10px] uppercase text-slate-400 font-bold">
                     <tr>
                       <th className="p-3">Usuario / Email</th>
-                      <th className="p-3">Estado de Acceso</th>
+                      <th className="p-3">Estado</th>
                       <th className="p-3">Progreso</th>
-                      <th className="p-3 text-right">Acción de Admin</th>
+                      <th className="p-3 text-right">Acción</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/80 text-slate-300">
@@ -354,16 +354,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </td>
                           <td className="p-3">
                             {isSuperAdmin ? (
-                              <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
-                                👑 Super Admin
+                              <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
+                                <Crown className="w-3 h-3 text-amber-400" /> Super Admin
                               </span>
                             ) : u.isApproved ? (
-                              <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold flex items-center gap-1 w-fit">
+                              <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
                                 <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Aprobado
                               </span>
                             ) : (
-                              <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold flex items-center gap-1 w-fit animate-pulse">
-                                <Clock className="w-3 h-3 text-amber-400" /> ⏳ Pendiente
+                              <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
+                                <Clock className="w-3 h-3 text-amber-400" /> Pendiente
                               </span>
                             )}
                           </td>
@@ -373,15 +373,15 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </td>
                           <td className="p-3 text-right">
                             {isSuperAdmin ? (
-                              <span className="text-[10px] text-slate-500 italic">Autorizado siempre</span>
+                              <span className="text-[10px] text-slate-500 italic">Super Admin</span>
                             ) : (
                               <div className="flex items-center justify-end gap-1.5">
                                 <button
                                   onClick={() => handleToggleUserApproval(u.uid, u.isApproved)}
-                                  className={`px-2.5 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95 ${
+                                  className={`px-2.5 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95 cursor-pointer ${
                                     u.isApproved
-                                      ? 'bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300'
-                                      : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-md shadow-emerald-500/30 font-black'
+                                      ? 'bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300'
+                                      : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-sm'
                                   }`}
                                 >
                                   {u.isApproved ? (
@@ -398,8 +398,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 </button>
                                 <button
                                   onClick={() => handleDeleteUserDoc(u.uid, u.email)}
-                                  className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 text-rose-400 transition-all active:scale-95"
-                                  title="Eliminar registro de usuario de Firestore"
+                                  className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 transition-all active:scale-95 cursor-pointer"
+                                  title="Eliminar registro"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
@@ -436,7 +436,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         }));
                         showToast(`Estado de ${app.name} actualizado`);
                       }}
-                      className={`px-3 py-1 rounded-xl text-[10px] font-bold border transition-all ${
+                      className={`px-3 py-1 rounded-xl text-[10px] font-bold border transition-all cursor-pointer ${
                         app.active
                           ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                           : 'bg-slate-800 text-slate-400 border-slate-700'
@@ -462,7 +462,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       step="0.1"
                       value={graphicsConfig.sunIntensity}
                       onChange={(e) => onUpdateGraphicsConfig({ sunIntensity: parseFloat(e.target.value) })}
-                      className="w-full"
+                      className="w-full accent-cyan-500"
                     />
                   </div>
 
@@ -475,7 +475,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       step="0.2"
                       value={graphicsConfig.rotationSpeed}
                       onChange={(e) => onUpdateGraphicsConfig({ rotationSpeed: parseFloat(e.target.value) })}
-                      className="w-full"
+                      className="w-full accent-cyan-500"
                     />
                   </div>
                 </div>
@@ -493,11 +493,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <p className="font-bold text-xl text-indigo-400">{usersList.length}</p>
                 </div>
                 <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 text-center">
-                  <p className="text-[10px] text-slate-400">Pendientes de Autorización</p>
+                  <p className="text-[10px] text-slate-400">Pendientes</p>
                   <p className="font-bold text-xl text-amber-400">{pendingCount}</p>
                 </div>
                 <div className="bg-slate-950/60 border border-slate-800 rounded-2xl p-4 text-center">
-                  <p className="text-[10px] text-slate-400">Usuarios Aprobados</p>
+                  <p className="text-[10px] text-slate-400">Aprobados</p>
                   <p className="font-bold text-xl text-emerald-400">{usersList.filter(u => u.isApproved).length}</p>
                 </div>
               </div>
@@ -526,44 +526,43 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
               <button
                 onClick={handleSaveFirebaseConfig}
-                className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all shadow-md mt-2 cursor-pointer"
+                className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all shadow-sm mt-2 cursor-pointer"
               >
                 Guardar Configuración
               </button>
             </div>
           )}
 
-          {/* TAB 5: IA & CUOTAS DE VOZ POR USUARIO */}
+          {/* TAB 5: IA & CUOTAS */}
           {activeTab === 'ai_voice' && (
             <div className="space-y-4 animate-fadeIn">
-              {/* Sección API Key Privada */}
-              <div className="bg-slate-900/60 border border-indigo-500/30 rounded-2xl p-4 space-y-3">
+              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Bot className="w-5 h-5 text-indigo-400" />
                     <div>
-                      <h4 className="font-extrabold text-sm text-white">API Key Privada de IA</h4>
-                      <p className="text-[10px] text-slate-400">Servidor de inferencia y proxy de voz agéntico unificado</p>
+                      <h4 className="font-bold text-xs text-white">API Key Privada de IA</h4>
+                      <p className="text-[10px] text-slate-400">Servidor de inferencia y proxy unificado</p>
                     </div>
                   </div>
-                  <span className="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-mono font-bold">
+                  <span className="px-2 py-0.5 rounded-lg bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 text-[10px] font-mono font-bold">
                     Proxy Activo
                   </span>
                 </div>
 
                 <div className="space-y-2">
                   <label className="block text-[10px] font-bold text-slate-300 uppercase tracking-wider">
-                    API Key Privada del Administrador
+                    API Key del Administrador
                   </label>
                   <input
                     type="password"
                     value={customAiApiKey}
                     onChange={(e) => setCustomAiApiKey(e.target.value)}
                     placeholder="freellmapi-..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-indigo-500 outline-none transition-all"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white font-mono focus:border-indigo-500 outline-none transition-colors"
                   />
                   <p className="text-[10px] text-slate-500">
-                    🔒 Esta clave se guarda de forma segura y se utiliza para todas las peticiones de voz e inferencia didáctica de los alumnos.
+                    Esta clave se guarda de forma segura y se utiliza para todas las peticiones de inferencia de los alumnos.
                   </p>
                 </div>
 
@@ -571,9 +570,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   type="button"
                   onClick={() => {
                     setAdminAiApiKey(customAiApiKey);
-                    showToast("🔑 API Key Privada de IA actualizada correctamente");
+                    showToast("API Key Privada de IA actualizada correctamente");
                   }}
-                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all shadow-sm active:scale-95 cursor-pointer"
                 >
                   Guardar API Key de IA
                 </button>
@@ -585,11 +584,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <div className="flex items-center gap-2">
                     <Mic className="w-5 h-5 text-amber-400" />
                     <div>
-                      <h4 className="font-extrabold text-sm text-white">Matriz de Cuotas de Voz e IA por Estudiante</h4>
+                      <h4 className="font-bold text-xs text-white">Matriz de Cuotas por Estudiante</h4>
                       <p className="text-[10px] text-slate-400">Control de consumo diario de consultas y minutos de voz</p>
                     </div>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                  <span className="px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-bold">
                     Límite: 50/día
                   </span>
                 </div>
@@ -601,7 +600,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       className="bg-slate-950/80 border border-slate-800/80 rounded-xl p-3 flex items-center justify-between text-xs"
                     >
                       <div className="min-w-0 pr-2">
-                        <p className="font-extrabold text-white truncate">{u.displayName}</p>
+                        <p className="font-bold text-white truncate">{u.displayName}</p>
                         <p className="text-[10px] text-slate-400 font-mono truncate">{u.email}</p>
                       </div>
 
@@ -616,7 +615,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                         <button
                           type="button"
                           onClick={() => showToast(`Cuota de ${u.displayName} recargada (+10 consultas)`)}
-                          className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-bold text-[10px] transition-all cursor-pointer"
+                          className="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300 font-bold text-[10px] transition-all cursor-pointer"
                         >
                           +10 Recargar
                         </button>

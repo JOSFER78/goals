@@ -264,7 +264,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     } catch (err: any) {
       setMessages([
         ...newMessages,
-        { role: 'assistant', content: `⚠️ Error: ${err.message}` }
+        { role: 'assistant', content: `Error: ${err.message}` }
       ]);
     } finally {
       setIsLoading(false);
