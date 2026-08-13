@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Download, Shield, Globe, BookOpen, Orbit, RefreshCw, ChevronUp, HelpCircle, CheckCircle2, Smartphone } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
-import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
+import { checkForApkUpdate, isNativeApp, UpdateInfo } from '../services/updateService';
 import { useProgress } from '../context/ProgressContext';
 import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
 
@@ -136,36 +136,38 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                     <span>Descargar goalskid_2.3.zip</span>
                   </a>
 
-                  {/* Acciones Secundarias en Grilla */}
-                  <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80">
+                  {/* Acciones Secundarias */}
+                  <div className={isNativeApp() ? "grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80" : "pt-1 border-t border-slate-800/80"}>
                     
-                    {/* Buscar Actualización */}
-                    <button
-                      type="button"
-                      onClick={handleCheckUpdates}
-                      disabled={isCheckingUpdate}
-                      className="py-1.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-[10px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-                    >
-                      <RefreshCw className={`w-3 h-3 text-indigo-400 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
-                      <span>{isCheckingUpdate ? 'Consultando...' : 'Comprobar'}</span>
-                    </button>
+                    {/* Buscar Actualización (Sólo visible en la APK Nativa Móvil) */}
+                    {isNativeApp() && (
+                      <button
+                        type="button"
+                        onClick={handleCheckUpdates}
+                        disabled={isCheckingUpdate}
+                        className="py-1.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 text-[10px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+                      >
+                        <RefreshCw className={`w-3 h-3 text-indigo-400 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
+                        <span>{isCheckingUpdate ? 'Consultando...' : 'Comprobar'}</span>
+                      </button>
+                    )}
 
                     {/* Guía de Instalación */}
                     <button
                       type="button"
                       onClick={() => { setIsGuideOpen(true); setIsDropdownOpen(false); }}
-                      className="py-1.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-400 text-[10px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
+                      className="w-full py-1.5 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-amber-400 text-[10px] font-bold flex items-center justify-center gap-1 transition-all active:scale-95 cursor-pointer"
                     >
                       <HelpCircle className="w-3 h-3 text-amber-400" />
                       <span>Guía Paso a Paso</span>
                     </button>
                   </div>
 
-                  {/* Resultado de Verificación si fue pulsado */}
-                  {updateInfo && (
+                  {/* Resultado de Verificación dinámico si fue pulsado en la APK */}
+                  {updateInfo && isNativeApp() && (
                     <div className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-[10px] text-slate-300 flex items-center gap-1.5">
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                      <span>{updateInfo.hasUpdate ? `¡Versión v${updateInfo.latestVersion} disponible!` : 'App actualizada a v2.1.0'}</span>
+                      <span>{updateInfo.hasUpdate ? `¡Versión v${updateInfo.latestVersion} disponible!` : `App actualizada (v${updateInfo.currentVersion})`}</span>
                     </div>
                   )}
 
