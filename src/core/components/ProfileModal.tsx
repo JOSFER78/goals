@@ -102,8 +102,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-        <div className="bg-[#0b0f19] border border-indigo-500/30 rounded-3xl w-full max-w-md max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col relative hide-scrollbar font-display">
+      <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn cursor-pointer">
+        <div onClick={(e) => e.stopPropagation()} className="bg-[#0b0f19] border border-indigo-500/30 rounded-3xl w-full max-w-md max-h-[92vh] overflow-y-auto shadow-2xl flex flex-col relative hide-scrollbar font-display cursor-default">
           
           {/* HEADER COMPACTO */}
           <div className="p-3.5 border-b border-white/5 flex items-center justify-between sticky top-0 bg-[#0b0f19]/95 backdrop-blur-md z-20">
@@ -150,8 +150,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   📲 Actualizaciones
                 </button>
                 <button 
-                  onClick={() => { setActiveTab('admin'); onOpenAdminDashboard(); }}
-                  className={`px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap ${activeTab === 'admin' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}
+                  onClick={() => { onClose(); onOpenAdminDashboard(); }}
+                  className="px-2.5 py-1.5 rounded-lg transition-all whitespace-nowrap text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30"
                 >
                   ⚙️ Admin
                 </button>

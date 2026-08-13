@@ -115,12 +115,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  const handleRefreshUsers = () => {
+    setLoadingUsers(true);
+    showToast("🔄 Sincronizando usuarios en tiempo real...");
+    setTimeout(() => setLoadingUsers(false), 600);
+  };
+
   if (!isOpen) return null;
 
   if (!isAdmin) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-        <div className="bg-slate-900 border border-rose-500/30 rounded-2xl p-6 text-center max-w-sm space-y-3 font-display">
+      <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md cursor-pointer">
+        <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-rose-500/30 rounded-2xl p-6 text-center max-w-sm space-y-3 font-display cursor-default">
           <AlertTriangle className="w-10 h-10 text-rose-400 mx-auto" />
           <h3 className="font-bold text-base text-white">Acceso Restringido</h3>
           <p className="text-xs text-slate-400">Este panel de administración es exclusivo para el Super Admin (josferestudio@gmail.com).</p>
@@ -194,8 +200,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const pendingCount = usersList.filter(u => !u.isApproved && u.email !== 'josferestudio@gmail.com').length;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn font-display">
-      <div className="bg-slate-900 border border-amber-500/30 rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+    <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fadeIn font-display cursor-pointer">
+      <div onClick={(e) => e.stopPropagation()} className="bg-slate-900 border border-amber-500/30 rounded-3xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh] cursor-default">
         
         {/* Header del Admin Dashboard */}
         <div className="p-4 border-b border-slate-800 bg-slate-950 flex items-center justify-between">
@@ -305,9 +311,9 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <span>Limpiar BD Pruebas</span>
                   </button>
                   <button
-                    onClick={fetchUsersFromFirestore}
+                    onClick={handleRefreshUsers}
                     disabled={loadingUsers}
-                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95"
+                    className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95 cursor-pointer"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin' : ''}`} />
                     <span>Refrescar</span>
