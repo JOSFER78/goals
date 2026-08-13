@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Shield, Globe, BookOpen, Orbit, RefreshCw, ChevronUp, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { Download, Shield, Globe, BookOpen, Orbit, RefreshCw, ChevronUp, HelpCircle, CheckCircle2, Smartphone } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
 import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
 import { useProgress } from '../context/ProgressContext';
@@ -85,7 +85,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
               </div>
             </div>
 
-            {/* Columna 3: ÚNICO BOTÓN ELEGANTE ANDROID APK / ZIP CON MINI DESPLEGABLE */}
+            {/* Columna 3: ÚNICO BOTÓN ELEGANTE CON ICONO OFICIAL ANDROID / MÓVIL Y DESPLEGABLE */}
             <div className="sm:text-right flex sm:justify-end relative" ref={dropdownRef}>
               
               {/* Botón Principal Único de Android */}
@@ -94,7 +94,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="px-3.5 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-emerald-500/40 hover:border-emerald-400 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-lg active:scale-95 cursor-pointer group"
               >
-                <span className="text-base group-hover:scale-110 transition-transform">🤖</span>
+                <img src="/android-logo.png" alt="Android" className="w-4 h-4 object-contain group-hover:scale-110 transition-transform" />
                 <span className="text-emerald-400 font-mono">v2.1</span>
                 <ChevronUp className={`w-3.5 h-3.5 text-emerald-400 transition-transform duration-200 ${isDropdownOpen ? '' : 'rotate-180'}`} />
               </button>
@@ -106,10 +106,13 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                   {/* Cabecera del desplegable */}
                   <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">🤖</span>
+                      <img src="/android-logo.png" alt="Android Logo" className="w-5 h-5 object-contain" />
                       <div>
-                        <h4 className="font-extrabold text-xs text-white leading-tight">Android App v2.1.0</h4>
-                        <p className="text-[9px] text-emerald-400 font-mono">goalskid2.1.zip</p>
+                        <h4 className="font-extrabold text-xs text-white leading-tight flex items-center gap-1">
+                          <span>Android App</span>
+                          <span className="text-emerald-400 font-mono">v2.1.0</span>
+                        </h4>
+                        <p className="text-[9px] text-slate-400 font-mono">goalskid2.1.zip</p>
                       </div>
                     </div>
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
