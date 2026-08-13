@@ -19,6 +19,7 @@ import { AstroExperience } from './experiences/astro/AstroExperience';
 import { PendingApprovalView } from './core/views/PendingApprovalView';
 import { CookieBanner } from './core/components/CookieBanner';
 import { ApkDownloadGuideModal } from './core/components/ApkDownloadGuideModal';
+import { FloatingAIContextWidget } from './core/components/FloatingAIContextWidget';
 
 const StarField: React.FC = () => {
   useEffect(() => {
@@ -176,6 +177,15 @@ const MainContent: React.FC = () => {
 
       {/* Banner Global de Consentimiento de Cookies */}
       <CookieBanner />
+
+      {/* Copilot IA Contextual Flotante Continuo (Lee la pantalla activa) */}
+      <FloatingAIContextWidget
+        activeExperience={activeExperience}
+        onOpenAuth={(mode) => {
+          setAuthViewMode(mode);
+          setIsAuthViewOpen(true);
+        }}
+      />
 
     </div>
   );
