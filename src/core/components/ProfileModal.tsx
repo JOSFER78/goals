@@ -272,175 +272,77 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               )}
             </div>
 
-            {isGuest ? (
-               <div className="bg-slate-900/50 border border-indigo-500/30 rounded-2xl p-5 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-500/20 flex items-center justify-center mx-auto border border-indigo-500/40 text-indigo-400 shadow-sm">
-                    <Sparkles className="w-6 h-6" />
+            {/* PESTAÑA 1: RETOS Y MISIONES */}
+            {activeTab === 'retos' && (
+              <div className="space-y-3 animate-fadeIn">
+                <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-3.5 text-center relative overflow-hidden">
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="font-bold text-amber-300 flex items-center gap-1">
+                      <Zap className="w-3.5 h-3.5 text-amber-400" /> {userData.xp} XP Acumulados
+                    </span>
+                    <span className="font-bold text-indigo-300 text-[10px]">
+                      Nivel {rank.level}: {rank.title}
+                    </span>
                   </div>
-                  <div>
-                    <h3 className="font-extrabold text-base text-white mb-0.5">
-                      {authMode === 'login' ? 'Iniciar Sesión en GOALS' : 'Crear tu Cuenta GOALS'}
-                    </h3>
-                    <p className="text-[11px] text-slate-400 leading-tight">
-                      Guarda tus estrellas, racha y XP en la nube en todo el ecosistema.
-                    </p>
+
+                  <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
+                    <div 
+                      className="bg-gradient-to-r from-amber-400 via-amber-500 to-indigo-500 h-full transition-all duration-500 rounded-full" 
+                      style={{ width: `${Math.min(100, (userData.xp / rank.nextXp) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-[11px] font-bold text-slate-300 uppercase tracking-wider px-1">
+                    <span>Misiones del Día</span>
+                    <span className="text-amber-400 text-[10px]">Reclamar XP</span>
                   </div>
 
-                  {authError && (
-                    <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[11px] font-bold text-center">
-                      {authError}
-                    </div>
-                  )}
-
-                  <form onSubmit={handleAuthSubmit} className="space-y-2.5 text-left">
-                    {authMode === 'signup' && (
-                      <div>
-                        <label className="block text-[9px] font-bold text-slate-300 mb-1 uppercase tracking-wider">Nombre Completo</label>
-                        <input
-                          type="text" required value={signupName} onChange={(e) => setSignupName(e.target.value)}
-                          placeholder="Tu nombre"
-                          className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none transition-all"
-                        />
-                      </div>
-                    )}
-
-                    <div>
-                      <label className="block text-[9px] font-bold text-slate-300 mb-1 uppercase tracking-wider">Correo Electrónico</label>
-                      <input
-                        type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                        placeholder="estudiante@email.com"
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none transition-all"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[9px] font-bold text-slate-300 mb-1 uppercase tracking-wider">Contraseña</label>
-                      <input
-                        type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-600 focus:border-indigo-500 outline-none transition-all"
-                      />
-                    </div>
-
-                    <button
-                      type="submit" disabled={isSubmitting}
-                      className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-sm disabled:opacity-50 active:scale-95 cursor-pointer"
+                  {retosList.map((r) => (
+                    <div 
+                      key={r.id}
+                      className={`p-3 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
+                        r.claimed
+                          ? 'bg-slate-950/40 border-slate-800/60 opacity-60'
+                          : r.cond
+                          ? 'bg-slate-900/80 border-emerald-500/40 shadow-sm'
+                          : 'bg-slate-900/60 border-slate-800/80'
+                      }`}
                     >
-                      {isSubmitting ? 'Procesando...' : authMode === 'login' ? 'Iniciar Sesión' : 'Registrarse'}
-                    </button>
-                  </form>
-
-                  <div className="relative py-0.5">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-slate-800"></div></div>
-                    <div className="relative flex justify-center text-[9px] uppercase text-slate-500 font-bold bg-slate-950 px-2">o bien</div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      setIsSubmitting(true);
-                      try {
-                        await signInWithGoogle();
-                        showToast("Sesión iniciada con Google");
-                      } catch (e) {
-                      } finally {
-                        setIsSubmitting(false);
-                      }
-                    }}
-                    disabled={isSubmitting}
-                    className="w-full py-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 active:scale-95 cursor-pointer"
-                  >
-                    <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
-                    <span>{authMode === 'login' ? 'Iniciar sesión con Google' : 'Registrarme con Google'}</span>
-                  </button>
-
-                  <div className="pt-0.5 text-center">
-                    <button
-                      type="button"
-                      onClick={() => { setAuthMode(authMode === 'login' ? 'signup' : 'login'); setAuthError(null); }}
-                      className="text-indigo-400 hover:text-indigo-300 font-bold text-xs cursor-pointer"
-                    >
-                      {authMode === 'login' ? '¿No tienes cuenta? Regístrate aquí' : '¿Ya tienes cuenta? Inicia sesión aquí'}
-                    </button>
-                  </div>
-               </div>
-            ) : (
-              <>
-                {activeTab === 'retos' && (
-                  <div className="space-y-3 animate-fadeIn">
-                    <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-3.5 text-center relative overflow-hidden">
-                      <div className="flex items-center justify-between text-xs mb-1.5">
-                        <span className="font-bold text-amber-300 flex items-center gap-1">
-                          <Zap className="w-3.5 h-3.5 text-amber-400" /> {userData.xp} XP Acumulados
-                        </span>
-                        <span className="font-bold text-indigo-300 text-[10px]">
-                          Nivel {rank.level}: {rank.title}
-                        </span>
-                      </div>
-
-                      <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
-                        <div 
-                          className="bg-gradient-to-r from-amber-400 via-amber-500 to-indigo-500 h-full transition-all duration-500 rounded-full" 
-                          style={{ width: `${Math.min(100, (userData.xp / rank.nextXp) * 100)}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-[11px] font-bold text-slate-300 uppercase tracking-wider px-1">
-                        <span>Misiones del Día</span>
-                        <span className="text-amber-400 text-[10px]">Reclamar XP</span>
-                      </div>
-
-                      {retosList.map((r) => (
-                        <div 
-                          key={r.id}
-                          className={`p-3 rounded-2xl border flex items-center justify-between gap-3 transition-all ${
-                            r.claimed
-                              ? 'bg-slate-950/40 border-slate-800/60 opacity-60'
-                              : r.cond
-                              ? 'bg-slate-900/80 border-emerald-500/40 shadow-sm'
-                              : 'bg-slate-900/60 border-slate-800/80'
-                          }`}
-                        >
-                          <div className="flex items-center gap-3 min-w-0 flex-1">
-                            <div className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-indigo-400 shrink-0">
-                              <Sparkles className="w-4 h-4" />
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <h4 className="font-bold text-xs text-white truncate">{r.title}</h4>
-                              <p className="text-[10px] text-slate-400 line-clamp-1">{r.desc}</p>
-                            </div>
-                          </div>
-
-                          <div className="shrink-0">
-                            {r.claimed ? (
-                              <span className="px-2.5 py-1 rounded-xl bg-slate-800 text-slate-400 font-bold text-[10px] flex items-center gap-1">
-                                <Check className="w-3 h-3 text-emerald-400" /> Reclamado
-                              </span>
-                            ) : r.cond ? (
-                              <button
-                                onClick={() => claimReto(r.id, r.xp)}
-                                className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center gap-1 cursor-pointer"
-                              >
-                                <Gift className="w-3 h-3" /> +{r.xp} XP
-                              </button>
-                            ) : (
-                              <span className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-amber-400/80 font-bold text-[10px]">
-                                +{r.xp} XP
-                              </span>
-                            )}
-                          </div>
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="p-2 rounded-xl bg-slate-950 border border-slate-800 text-indigo-400 shrink-0">
+                          <Sparkles className="w-4 h-4" />
                         </div>
-                      ))}
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-bold text-xs text-white truncate">{r.title}</h4>
+                          <p className="text-[10px] text-slate-400 line-clamp-1">{r.desc}</p>
+                        </div>
+                      </div>
+
+                      <div className="shrink-0">
+                        {r.claimed ? (
+                          <span className="px-2.5 py-1 rounded-xl bg-slate-800 text-slate-400 font-bold text-[10px] flex items-center gap-1">
+                            <Check className="w-3 h-3 text-emerald-400" /> Reclamado
+                          </span>
+                        ) : r.cond ? (
+                          <button
+                            onClick={() => claimReto(r.id, r.xp)}
+                            className="px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-[10px] uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center gap-1 cursor-pointer"
+                          >
+                            <Gift className="w-3 h-3" /> +{r.xp} XP
+                          </button>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-xl bg-slate-950 border border-slate-800 text-amber-400/80 font-bold text-[10px]">
+                            +{r.xp} XP
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  ))}
+                </div>
+              </div>
+            )}
 
                 {activeTab === 'racha' && (
                   <div className="space-y-3 animate-fadeIn">
@@ -1021,16 +923,40 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       </div>
                     </div>
 
-                    <button
-                      onClick={signOut}
-                      className="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 font-bold text-xs transition-all cursor-pointer"
-                    >
-                      Cerrar Sesión
-                    </button>
+                    {isGuest ? (
+                      <div className="pt-2 border-t border-slate-800 space-y-2">
+                        <p className="text-[10px] text-slate-400 text-center">Inicia sesión para sincronizar tus estrellas y racha en la nube:</p>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await signInWithGoogle();
+                              showToast("Sesión iniciada con Google");
+                            } catch (e) {
+                              // error
+                            }
+                          }}
+                          className="w-full py-2.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
+                        >
+                          <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                          </svg>
+                          <span>Sincronizar con Google</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={signOut}
+                        className="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 font-bold text-xs transition-all cursor-pointer"
+                      >
+                        Cerrar Sesión
+                      </button>
+                    )}
                   </div>
                 )}
-              </>
-            )}
 
           </div>
         </div>

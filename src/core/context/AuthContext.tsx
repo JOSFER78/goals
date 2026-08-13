@@ -111,16 +111,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     try {
       if (Capacitor.isNativePlatform()) {
-        const res = await FirebaseAuthentication.signInWithGoogle();
-        const idToken = res.credential?.idToken;
-        if (idToken) {
-          const credential = GoogleAuthProvider.credential(idToken);
-          await signInWithCredential(auth, credential);
-          setIsCloud(true);
-          setAuthError(null);
-          return;
-        } else {
-          throw new Error("No se obtuvo token de credencial de Google.");
+        try {
+          const res = await Promise.race([
+            FirebaseAuthentication.signInWithGoogle(),
+            new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Tiempo de espera agotado al conectar con Google Play")), 12000))
+          ]);
+          const idToken = res.credential?.idToken;
+          if (idToken) {
+            const credential = GoogleAuthProvider.credential(idToken);
+            await signInWithCredential(auth, credential);
+            setIsCloud(true);
+            setAuthError(null);
+            return;
+          }
+        } catch (nativeErr: any) {
+          console.warn("Fallo o timeout en Google Auth nativo de Android, reintentando con popup web:", nativeErr);
+          const res = await signInWithPopup(auth, googleProvider);
+          if (res.user) {
+            setIsCloud(true);
+            setAuthError(null);
+            return;
+          }
         }
       } else {
         const res = await signInWithPopup(auth, googleProvider);

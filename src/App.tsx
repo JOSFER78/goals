@@ -121,15 +121,29 @@ const MainContent: React.FC = () => {
               onOpenDownloadGuide={() => setIsGuideOpen(true)}
             />
           ) : !isAuthenticated && !activeExperience ? (
-            /* Landing Page Pública Scrollable con Navegación Libre */
+            /* Landing Page Pública Scrollable con Bloqueo de Acceso a No Registrados */
             <GoalsLanding
               onOpenAuth={(mode) => {
                 setAuthViewMode(mode);
                 setIsAuthViewOpen(true);
               }}
-              onSelectExperience={(expId) => {
-                setActiveExperience(expId);
+              onSelectExperience={() => {
+                setAuthViewMode('signup');
+                setIsAuthViewOpen(true);
               }}
+            />
+          ) : !isAuthenticated ? (
+            /* Si no está registrado y trata de navegar directamente, mostrar Pantalla de Invitación / Registro */
+            <AuthView
+              initialMode="signup"
+              onBackToLanding={() => {
+                setActiveExperience(null);
+                setIsAuthViewOpen(false);
+              }}
+              onSuccess={() => {
+                setIsAuthViewOpen(false);
+              }}
+              onOpenDownloadGuide={() => setIsGuideOpen(true)}
             />
           ) : !activeExperience ? (
             /* Dashboard Principal para Usuario Registrado */

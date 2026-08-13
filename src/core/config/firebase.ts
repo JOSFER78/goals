@@ -18,7 +18,7 @@ import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteD
 
 export const defaultFirebaseConfig = {
   apiKey: "AIzaSyBsaRLUUFG1QdSjMMzxzOVmzW4aqrN0TbM",
-  authDomain: "goalskid-app.firebaseapp.com",
+  authDomain: "appgoals.web.app",
   projectId: "goalskid-app",
   storageBucket: "goalskid-app.firebasestorage.app",
   messagingSenderId: "828956321348",
