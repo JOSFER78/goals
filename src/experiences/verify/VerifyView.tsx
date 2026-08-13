@@ -64,21 +64,21 @@ export const VerifyView: React.FC<VerifyViewProps> = ({ onOpenAuth }) => {
       )}
 
       {/* Header de la Mini App Verifica */}
-      <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-3 backdrop-blur-md">
+      <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-3.5 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400">
+            <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-sm">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-extrabold text-lg sm:text-xl text-white">Verifica GOALS</h2>
-                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20 flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                  <span>IA Conectada</span>
+                <h2 className="font-extrabold text-lg sm:text-xl text-white tracking-tight">Verifica & Rigor Científico</h2>
+                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/20 flex items-center gap-1.5 font-mono">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span>FUENTES OFICIALES</span>
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Educación Crítica: Detección de Bulos, Rumores y Contrastación de Fuentes</p>
+              <p className="text-xs text-slate-400">Educación Crítica: Detección de Bulos, Rumores y Contrastación contra Publicaciones Académicas</p>
             </div>
           </div>
         </div>
@@ -98,26 +98,45 @@ export const VerifyView: React.FC<VerifyViewProps> = ({ onOpenAuth }) => {
                 required
                 value={headline}
                 onChange={(e) => setHeadline(e.target.value)}
-                placeholder="Ej. 'He visto un vídeo que dice que cancelan los exámenes la semana que viene...'"
-                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-amber-500/80 transition-colors outline-none font-sans"
+                placeholder="Ej. 'La NASA cancela la misión Artemis' o 'Descubren vida en Marte'..."
+                className="w-full pl-10 pr-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-amber-500/80 transition-colors outline-none font-sans font-medium"
               />
             </div>
           </div>
 
+          {/* Sugerencias Rápidas */}
+          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Ejemplos:</span>
+            {[
+              '¿Es verdad que el cometa pasará a simple vista?',
+              '¿El telescopio James Webb detectó señales alienígenas?',
+              '¿Se cancelan los exámenes oficiales de junio?'
+            ].map((sug, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setHeadline(sug)}
+                className="px-2.5 py-1 rounded-lg bg-slate-950/90 hover:bg-slate-800 border border-slate-800 text-[10px] font-medium text-slate-300 hover:text-white transition-all cursor-pointer truncate max-w-[280px]"
+              >
+                {sug}
+              </button>
+            ))}
+          </div>
+
           <button
             type="submit"
-            disabled={isVerifying}
-            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold text-xs transition-all shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 cursor-pointer"
+            disabled={isVerifying || !headline.trim()}
+            className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-extrabold text-xs transition-all shadow-md shadow-amber-600/20 flex items-center justify-center gap-2 disabled:opacity-50 active:scale-95 cursor-pointer"
           >
             {isVerifying ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Analizando Fuentes y Evidencias...</span>
+                <span>Analizando Fuentes y Publicaciones Científicas...</span>
               </>
             ) : (
               <>
                 <ShieldCheck className="w-4 h-4" />
-                <span>Verificar Noticia con IA</span>
+                <span>Auditar Titular con IA Real</span>
               </>
             )}
           </button>
@@ -134,16 +153,16 @@ export const VerifyView: React.FC<VerifyViewProps> = ({ onOpenAuth }) => {
               }`}>
                 {auditResult.verdict}
               </span>
-              <span className="text-xs font-bold text-amber-400">Nivel de Confianza: {auditResult.trustScore}</span>
+              <span className="text-xs font-mono font-bold text-amber-400">Nivel de Confianza: {auditResult.trustScore}</span>
             </div>
 
             <p className="text-xs text-slate-200 leading-relaxed font-sans">{auditResult.summary}</p>
 
             {auditResult.sources && auditResult.sources.length > 0 && (
               <div className="pt-2 border-t border-slate-800/80 space-y-1">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Evidencias y Fuentes Oficiales:</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Evidencias y Fuentes Oficiales Consultadas:</p>
                 {auditResult.sources.map((src: string, idx: number) => (
-                  <div key={idx} className="flex items-center gap-1.5 text-xs text-amber-300/90">
+                  <div key={idx} className="flex items-center gap-1.5 text-xs text-amber-300/90 font-medium">
                     <CheckCircle2 className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     <span>{src}</span>
                   </div>

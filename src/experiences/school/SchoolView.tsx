@@ -94,21 +94,21 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
       )}
 
       {/* Header de la Mini App Escuela */}
-      <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-3 backdrop-blur-md">
+      <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-3.5 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+            <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-sm">
               <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-extrabold text-lg sm:text-xl text-white">Escuela GOALS</h2>
-                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center gap-1.5">
+                <h2 className="font-extrabold text-lg sm:text-xl text-white tracking-tight">Escuela IA Multimodal</h2>
+                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 flex items-center gap-1.5 font-mono">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>IA Conectada</span>
+                  <span>TUTOR ACTIVO</span>
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Tutoría Inteligente & Resolución Didáctica de Apuntes</p>
+              <p className="text-xs text-slate-400">Tutoría Inteligente & Reconocimiento Didáctico de Apuntes Manuscritos</p>
             </div>
           </div>
         </div>
@@ -119,59 +119,62 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
             onClick={() => setActiveTab('tutor')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'tutor'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20 font-extrabold'
                 : 'bg-slate-900/80 text-slate-300 border border-slate-800 hover:text-white'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Tutor IA Real</span>
+            <span>Tutor Socrático</span>
           </button>
 
           <button
             onClick={() => setActiveTab('ocr')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'ocr'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20 font-extrabold'
                 : 'bg-slate-900/80 text-slate-300 border border-slate-800 hover:text-white'
             }`}
           >
             <Camera className="w-3.5 h-3.5" />
-            <span>Foto de Apuntes OCR</span>
+            <span>Escáner OCR Manuscritos</span>
           </button>
 
           <button
             onClick={() => setActiveTab('map')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'map'
-                ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/20 font-extrabold'
                 : 'bg-slate-900/80 text-slate-300 border border-slate-800 hover:text-white'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Mapa Académico</span>
+            <span>Mapa Curricular</span>
           </button>
         </div>
       </div>
 
-      {/* Asignaturas Principales */}
+      {/* Asignaturas Principales con Micro-Elevación */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         {SUBJECTS.map((sub) => {
           const SubIcon = sub.icon;
+          const isSel = selectedSubject === sub.name;
           return (
             <div 
               key={sub.id} 
               onClick={() => setSelectedSubject(sub.name)}
-              className={`bg-slate-900/80 border rounded-2xl p-3.5 space-y-2.5 cursor-pointer transition-all ${
-                selectedSubject === sub.name ? 'border-emerald-500/80 bg-slate-900 shadow-md shadow-emerald-500/10' : 'border-slate-800/80 hover:border-slate-700'
+              className={`bg-slate-900/80 border rounded-2xl p-3.5 space-y-2.5 cursor-pointer transition-all duration-300 hover:-translate-y-0.5 ${
+                isSel 
+                  ? 'border-emerald-500/80 bg-slate-900 shadow-[0_0_20px_rgba(16,185,129,0.15)]' 
+                  : 'border-slate-800/80 hover:border-slate-700'
               }`}
             >
               <div className="flex items-center justify-between">
-                <div className={`p-1.5 rounded-lg bg-slate-950 border border-slate-800 ${sub.iconColor}`}>
+                <div className={`p-2 rounded-xl bg-slate-950 border border-slate-800 ${sub.iconColor}`}>
                   <SubIcon className="w-4 h-4" />
                 </div>
-                <span className="text-[11px] font-bold text-emerald-400">{sub.progress}</span>
+                <span className="text-[11px] font-mono font-bold text-emerald-400">{sub.progress}</span>
               </div>
-              <p className="font-bold text-xs text-white leading-tight">{sub.name}</p>
+              <p className="font-extrabold text-xs text-white leading-tight">{sub.name}</p>
               <div className="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-800/50">
                 <div className={`h-full bg-gradient-to-r ${sub.color} rounded-full`} style={{ width: sub.progress }} />
               </div>

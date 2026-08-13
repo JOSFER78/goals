@@ -61,21 +61,21 @@ export const LanguagesView: React.FC<LanguagesViewProps> = ({ onOpenAuth }) => {
       )}
 
       {/* Header de la Mini App Idiomas */}
-      <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-3 backdrop-blur-md">
+      <div className="bg-slate-950/80 border border-slate-800/80 rounded-2xl p-5 shadow-xl relative overflow-hidden space-y-3.5 backdrop-blur-md">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+            <div className="p-2.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 shadow-sm">
               <Globe className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="font-extrabold text-lg sm:text-xl text-white">Idiomas GOALS</h2>
-                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center gap-1.5">
+                <h2 className="font-extrabold text-lg sm:text-xl text-white tracking-tight">Idiomas & Voz IA</h2>
+                <span className="px-2 py-0.5 rounded-lg text-[10px] font-bold bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex items-center gap-1.5 font-mono">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
-                  <span>IA Conectada</span>
+                  <span>VOZ EN VIVO</span>
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Conversación en Tiempo Real & Práctica de Pronunciación</p>
+              <p className="text-xs text-slate-400">Conversación en Tiempo Real, Inmersión Científica & Práctica Fonética</p>
             </div>
           </div>
         </div>
@@ -86,7 +86,7 @@ export const LanguagesView: React.FC<LanguagesViewProps> = ({ onOpenAuth }) => {
             onClick={() => setActiveTab('voice')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'voice'
-                ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20 font-extrabold'
                 : 'bg-slate-900/80 text-slate-300 border border-slate-800 hover:text-white'
             }`}
           >
@@ -98,7 +98,7 @@ export const LanguagesView: React.FC<LanguagesViewProps> = ({ onOpenAuth }) => {
             onClick={() => setActiveTab('science')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'science'
-                ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20 font-extrabold'
                 : 'bg-slate-900/80 text-slate-300 border border-slate-800 hover:text-white'
             }`}
           >
@@ -110,12 +110,12 @@ export const LanguagesView: React.FC<LanguagesViewProps> = ({ onOpenAuth }) => {
             onClick={() => setActiveTab('pronunciation')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'pronunciation'
-                ? 'bg-cyan-500 text-slate-950 shadow-sm'
+                ? 'bg-cyan-500 text-slate-950 shadow-md shadow-cyan-500/20 font-extrabold'
                 : 'bg-slate-900/80 text-slate-300 border border-slate-800 hover:text-white'
             }`}
           >
             <Volume2 className="w-3.5 h-3.5" />
-            <span>Pronunciación</span>
+            <span>Fonética & Pronunciación</span>
           </button>
         </div>
       </div>
@@ -123,20 +123,32 @@ export const LanguagesView: React.FC<LanguagesViewProps> = ({ onOpenAuth }) => {
       {/* Contenido de Voz / Texto IA Real */}
       {activeTab === 'voice' && (
         <div className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-5 space-y-4 shadow-xl backdrop-blur-md">
-          <div className="space-y-1">
-            <h3 className="font-bold text-sm text-white">Tutor de Conversación e Idiomas</h3>
-            <p className="text-xs text-slate-400">Escribe o formula tu frase en el idioma seleccionado para recibir corrección inmediata.</p>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h3 className="font-extrabold text-sm text-white">Tutor de Conversación e Idiomas</h3>
+              <p className="text-xs text-slate-400">Escribe o formula tu frase en el idioma seleccionado para recibir corrección inmediata.</p>
+            </div>
+            
+            {/* Ecualizador de Audio Decorativo */}
+            <div className="hidden sm:flex items-center gap-0.5 h-5 px-3 py-1 bg-slate-950 border border-cyan-500/30 rounded-xl">
+              <div className="w-0.5 bg-cyan-400 rounded-full h-2 animate-bounce"></div>
+              <div className="w-0.5 bg-cyan-400 rounded-full h-4 animate-bounce delay-75"></div>
+              <div className="w-0.5 bg-cyan-400 rounded-full h-3 animate-bounce delay-150"></div>
+              <div className="w-0.5 bg-cyan-400 rounded-full h-4.5 animate-bounce delay-100"></div>
+              <div className="w-0.5 bg-cyan-400 rounded-full h-2 animate-bounce"></div>
+              <span className="ml-1.5 text-[9px] font-mono text-cyan-300 font-bold">LIVE AUDIO</span>
+            </div>
           </div>
 
           <div className="flex gap-2 mb-2 flex-wrap">
-            {['Inglés', 'Francés', 'Alemán', 'Italiano'].map((lang) => (
+            {['Inglés', 'Francés', 'Alemán', 'Italiano', 'Chino Mandarín'].map((lang) => (
               <button
                 key={lang}
                 type="button"
                 onClick={() => setTargetLanguage(lang)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer active:scale-95 ${
                   targetLanguage === lang
-                    ? 'bg-cyan-500 text-slate-950 border-cyan-400 shadow-sm'
+                    ? 'bg-cyan-500 text-slate-950 border-cyan-400 shadow-md shadow-cyan-500/20 font-extrabold'
                     : 'bg-slate-950/80 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
                 }`}
               >
