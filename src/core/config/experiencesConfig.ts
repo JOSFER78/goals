@@ -8,7 +8,7 @@ export interface MiniAppConfig {
   tagline: string;
   badge: string;
   icon: LucideIcon;
-  logoUrl: string;
+  logoUrl?: string;
   primaryHex: string;
   secondaryHex: string;
   colorClass: string;

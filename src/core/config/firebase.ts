@@ -17,12 +17,12 @@ import {
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, onSnapshot, Firestore } from 'firebase/firestore';
 
 export const defaultFirebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAbkl4eCQ2M0E6XMwR52vwB_Um4hWt8q8Y",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "goalskid-app-4c276.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "goalskid-app",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "goalskid-app.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "828956321348",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:828956321348:web:babec7f340ae5c7f823e11"
+  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || "AIzaSyAbkl4eCQ2M0E6XMwR52vwB_Um4hWt8q8Y",
+  authDomain: (import.meta as any).env?.VITE_FIREBASE_AUTH_DOMAIN || "goalskid-app-4c276.firebaseapp.com",
+  projectId: (import.meta as any).env?.VITE_FIREBASE_PROJECT_ID || "goalskid-app",
+  storageBucket: (import.meta as any).env?.VITE_FIREBASE_STORAGE_BUCKET || "goalskid-app.firebasestorage.app",
+  messagingSenderId: (import.meta as any).env?.VITE_FIREBASE_MESSAGING_SENDER_ID || "828956321348",
+  appId: (import.meta as any).env?.VITE_FIREBASE_APP_ID || "1:828956321348:web:babec7f340ae5c7f823e11"
 };
 
 export function getStoredFirebaseConfig() {

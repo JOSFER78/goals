@@ -178,8 +178,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           });
         }
       } else {
-        if (userDocUnsub) {
-          userDocUnsub();
+        if (typeof userDocUnsub === 'function') {
+          (userDocUnsub as any)();
           userDocUnsub = null;
         }
         const explicitLogout = localStorage.getItem('goals_explicit_logout') === 'true';
