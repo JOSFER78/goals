@@ -25,6 +25,7 @@ import { UserProfile } from '../types';
 interface AuthContextType {
   user: UserProfile | null;
   fbUser: User | null;
+  isAuthenticated: boolean;
   isCloud: boolean;
   isAdmin: boolean;
   loading: boolean;
@@ -171,9 +172,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return updated;
               });
             }
+          }, (err) => {
+            // Manejo seguro de revocación de permisos al cerrar sesión
+            console.debug("[AuthContext] Listener de usuario desconectado:", err.code);
           });
         }
       } else {
+        if (userDocUnsub) {
+          userDocUnsub();
+          userDocUnsub = null;
+        }
         const explicitLogout = localStorage.getItem('goals_explicit_logout') === 'true';
         if (explicitLogout) {
           setUser(null);
@@ -223,27 +231,39 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     try {
       if (Capacitor.isNativePlatform()) {
+        let idToken: string | undefined;
         try {
-          const res = await Promise.race([
-            FirebaseAuthentication.signInWithGoogle(),
-            new Promise<any>((_, reject) => setTimeout(() => reject(new Error("Tiempo de espera agotado al conectar con Google Play")), 12000))
-          ]);
-          const idToken = res.credential?.idToken;
-          if (idToken) {
-            const credential = GoogleAuthProvider.credential(idToken);
-            await signInWithCredential(auth, credential);
-            setIsCloud(true);
-            setAuthError(null);
-            return;
+          // 1. Intentar con Credential Manager moderno de Google Play Services
+          const res = await FirebaseAuthentication.signInWithGoogle();
+          idToken = res.credential?.idToken;
+          if (!idToken && res.user) {
+            const tokenRes = await FirebaseAuthentication.getIdToken();
+            idToken = tokenRes.token;
           }
-        } catch (nativeErr: any) {
-          console.warn("Fallo o timeout en Google Auth nativo de Android, reintentando con popup web:", nativeErr);
-          const res = await signInWithPopup(auth, googleProvider);
-          if (res.user) {
-            setIsCloud(true);
-            setAuthError(null);
-            return;
+        } catch (credErr: any) {
+          console.warn("Intento 1 con CredentialManager no completado, probando selector nativo clásico de Google:", credErr);
+          try {
+            // 2. Fallback nativo: Selector clásico de Google Play dentro de la APK (sin abrir navegador)
+            const resLegacy = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false } as any);
+            idToken = resLegacy.credential?.idToken;
+            if (!idToken && resLegacy.user) {
+              const tokenRes = await FirebaseAuthentication.getIdToken();
+              idToken = tokenRes.token;
+            }
+          } catch (legacyErr: any) {
+            console.error("Fallo en selector nativo de Google Play:", legacyErr);
+            throw new Error(legacyErr.message || "No se pudo iniciar sesión con Google en este dispositivo.");
           }
+        }
+
+        if (idToken) {
+          const credential = GoogleAuthProvider.credential(idToken);
+          await signInWithCredential(auth, credential);
+          setIsCloud(true);
+          setAuthError(null);
+          return;
+        } else {
+          throw new Error("No se recibió credencial válida de Google Play.");
         }
       } else {
         const res = await signInWithPopup(auth, googleProvider);
@@ -397,6 +417,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider value={{
       user,
       fbUser,
+      isAuthenticated: Boolean(user && !user.isAnonymous),
       isCloud,
       isAdmin,
       loading,

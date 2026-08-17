@@ -12,12 +12,19 @@ public/downloads/*.zip
 dist/downloads/*.apk
 dist/downloads/*.zip
 
-# Firebase & Local config
+# Firebase & Local config / Secrets
 .firebase
 .DS_Store
 *.log
 .env
+.env.*
 .env.local
+*.keystore
+*.jks
+google-services.json
+android/app/google-services.json
+service-account*.json
+*credentials*.json
 
 # Gemini / Antigravity local files
 .gemini

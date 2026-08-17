@@ -115,7 +115,7 @@ export function triggerApkInstall(downloadUrl?: string): void {
   const url = downloadUrl || DEFAULT_APK_URL;
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'goalskid_2.4.apk';
+  a.download = 'goalskid_2.5.zip';
   a.target = '_blank';
   a.rel = 'noopener noreferrer';
   document.body.appendChild(a);

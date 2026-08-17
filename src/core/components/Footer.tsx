@@ -58,11 +58,11 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <img 
-                  src="/goals_platform_logo.png" 
-                  alt="GOALS Platform Logo" 
-                  className="w-7 h-7 rounded-lg border border-indigo-500/40 shadow-sm object-cover shrink-0" 
+                  src="/goalskid_logo.png" 
+                  alt="Goalskid Platform Logo" 
+                  className="w-8 h-8 rounded-xl border border-indigo-500/40 shadow-sm object-cover shrink-0" 
                 />
-                <span className="font-extrabold text-white text-sm tracking-tight">GOALS Platform</span>
+                <span className="font-extrabold text-white text-sm tracking-tight">Goalskid Platform</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
                 Plataforma Educativa Adaptativa con IA Multimodal, Astrofísica 3D y Aprendizaje Guiado.
@@ -130,7 +130,7 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                     className="w-full py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Descargar APK</span>
+                    <span>Descargar App (ZIP)</span>
                   </a>
 
                   {/* Acciones Secundarias */}

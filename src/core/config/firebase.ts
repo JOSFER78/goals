@@ -17,12 +17,12 @@ import {
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, onSnapshot, Firestore } from 'firebase/firestore';
 
 export const defaultFirebaseConfig = {
-  apiKey: "AIzaSyCucHoxxH6GXuEf_Gls397E98v4R2IXl-U",
-  authDomain: "desinformacion-app.firebaseapp.com",
-  projectId: "desinformacion-app",
-  storageBucket: "desinformacion-app.firebasestorage.app",
-  messagingSenderId: "607853319788",
-  appId: "1:607853319788:web:0d2187ead98e5a99deaa49"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAbkl4eCQ2M0E6XMwR52vwB_Um4hWt8q8Y",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "goalskid-app-4c276.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "goalskid-app",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "goalskid-app.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "828956321348",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:828956321348:web:babec7f340ae5c7f823e11"
 };
 
 export function getStoredFirebaseConfig() {

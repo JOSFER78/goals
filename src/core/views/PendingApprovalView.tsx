@@ -26,6 +26,8 @@ export const PendingApprovalView: React.FC<PendingApprovalViewProps> = ({ onClos
           }, 800);
         }
       }
+    }, (err) => {
+      console.debug("[PendingApprovalView] User snapshot listener closed:", err.code);
     });
 
     return () => unsub();

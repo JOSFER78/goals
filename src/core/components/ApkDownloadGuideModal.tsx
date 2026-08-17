@@ -29,7 +29,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
           </div>
           <div>
             <h3 className="font-extrabold text-sm text-white leading-tight">Guía de Instalación en Móvil</h3>
-            <p className="text-[11px] text-emerald-400 font-mono">goalskid_{CURRENT_APP_VERSION}.apk (v{CURRENT_APP_VERSION} Native Android)</p>
+            <p className="text-[11px] text-emerald-400 font-mono">goalskid_{CURRENT_APP_VERSION}.zip (Paquete APK Native Android)</p>
           </div>
         </div>
 
@@ -45,9 +45,9 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
             <div className="bg-slate-900/60 p-3 rounded-2xl border border-slate-800 flex items-start gap-2.5">
               <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px] flex items-center justify-center shrink-0 border border-emerald-500/30">1</span>
               <div>
-                <h4 className="font-bold text-white text-xs">Descargar el archivo APK</h4>
+                <h4 className="font-bold text-white text-xs">Descargar archivo ZIP</h4>
                 <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Pulsa el botón inferior para descargar el paquete de instalación.
+                  Pulsa el botón inferior para descargar <strong className="text-emerald-400">goalskid_{CURRENT_APP_VERSION}.zip</strong>.
                 </p>
               </div>
             </div>
@@ -56,9 +56,9 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
             <div className="bg-slate-900/60 p-3 rounded-2xl border border-slate-800 flex items-start gap-2.5">
               <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-400 font-bold text-[10px] flex items-center justify-center shrink-0 border border-cyan-500/30">2</span>
               <div>
-                <h4 className="font-bold text-white text-xs">Abrir e Iniciar Instalación</h4>
+                <h4 className="font-bold text-white text-xs">Extraer y Abrir el APK</h4>
                 <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Abre las Descargas de tu teléfono y toca sobre el archivo APK descargado.
+                  Abre las Descargas de tu teléfono, extrae el archivo ZIP y toca sobre el APK para iniciar la instalación.
                 </p>
               </div>
             </div>
@@ -69,7 +69,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
               <div>
                 <h4 className="font-bold text-white text-xs">Autorizar Instalación</h4>
                 <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Si Android muestra la pantalla de Play Protect, selecciona la opción <strong className="text-emerald-400 font-medium">"Instalar sin analizar"</strong>.
+                  Si Android muestra la pantalla de Play Protect, selecciona la opción <strong className="text-emerald-400 font-medium">"Instalar de todas formas / Instalar sin analizar"</strong>.
                 </p>
               </div>
             </div>
@@ -88,7 +88,7 @@ export const ApkDownloadGuideModal: React.FC<ApkDownloadGuideModalProps> = ({ is
             className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
           >
             <Download className="w-4 h-4" />
-            <span>Descargar APK v{CURRENT_APP_VERSION}</span>
+            <span>Descargar App (ZIP con APK v{CURRENT_APP_VERSION})</span>
           </a>
         </div>
 

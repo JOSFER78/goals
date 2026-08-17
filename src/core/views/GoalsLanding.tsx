@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowRight, Sparkles, ChevronLeft, ChevronRight, CheckCircle2, 
-  Cpu, Zap, Flame, Shield, Globe, Orbit, ArrowDown, 
-  Brain, Check, Star, Terminal, ShieldCheck, GraduationCap, Lock
+  Globe, Orbit, ArrowDown, Brain, Star, ShieldCheck, GraduationCap,
+  BookOpen, Compass, Layers, Activity, Eye, Sliders, BarChart3, ScanLine, 
+  Volume2, Mic, FileText, Cpu, Terminal
 } from 'lucide-react';
 import { ExperienceId } from '../types';
+import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
+import { useTheme } from '../context/ThemeContext';
 
 interface GoalsLandingProps {
   onOpenAuth: (mode: 'login' | 'signup') => void;
   onSelectExperience: (id: ExperienceId) => void;
+}
+
+interface FeatureDetail {
+  title: string;
+  desc: string;
+  tag: string;
+  icon: React.ElementType;
 }
 
 interface MiniAppSlide {
@@ -17,574 +27,855 @@ interface MiniAppSlide {
   icon: React.ElementType;
   tagline: string;
   badgeTag: string;
-  badgeBg: string;
-  btnBg: string;
   heading: string;
   description: string;
   image: string;
-  bullets: string[];
+  features: FeatureDetail[];
 }
 
 export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelectExperience }) => {
+  const { isDark } = useTheme();
   const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
-  const [activeTab, setActiveTab] = useState<number>(1);
+  const [activeFeatureIndex, setActiveFeatureIndex] = useState<number>(0);
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const SLIDES: MiniAppSlide[] = [
     {
       id: 'school',
       name: 'Escuela IA',
       icon: GraduationCap,
-      tagline: 'Tutor IA Multimodal & OCR de Cuadernos Manuscritos',
+      tagline: 'Tutor IA Multimodal & OCR de Cuadernos',
       badgeTag: 'Tutor & OCR',
-      badgeBg: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30',
-      btnBg: 'bg-emerald-600 hover:bg-emerald-500 text-white font-bold',
       heading: 'Reconocimiento Didáctico de Cuadernos y Ejercicios Manuscritos',
-      description: 'Captura tus ejercicios o apuntes con la cámara. El motor OCR analiza tu caligrafía y razonamiento, orientándote paso a paso sin dar respuestas directas.',
-      image: 'https://images.unsplash.com/photo-1555421689-d68471e189f2?q=80&w=800&auto=format&fit=crop',
-      bullets: [
-        'OCR multimodal especializado en texto manuscrito y expresiones algebraicas',
-        'Explicaciones socráticas adaptadas a primaria, secundaria y bachillerato',
-        'Mapa conceptual interactivo que identifica los puntos débiles a reforzar',
-        'Generación automática de exámenes de práctica personalizados'
+      description: 'Captura tus ejercicios manuscritos con la cámara. El motor OCR analiza tu razonamiento y te orienta paso a paso mediante método socrático.',
+      image: '/assets/previews/school_preview.jpg',
+      features: [
+        {
+          title: 'OCR de Cuadernos Manuscritos',
+          desc: 'Escanea texto escrito a mano y expresiones matemáticas con 99.4% de precisión.',
+          tag: 'Visión',
+          icon: ScanLine
+        },
+        {
+          title: 'Tutoría Socrática Adaptativa',
+          desc: 'Pistas pedagógicas calibradas al nivel del estudiante sin dar la solución directa.',
+          tag: 'Pedagogía',
+          icon: Brain
+        },
+        {
+          title: 'Mapa Conceptual de Refuerzo',
+          desc: 'Detecta lagunas conceptuales previas y sugiere repasos específicos.',
+          tag: 'Diagnóstico',
+          icon: Compass
+        },
+        {
+          title: 'Exámenes de Práctica a Medida',
+          desc: 'Genera simulacros de examen adaptados con corrección explicada inmediata.',
+          tag: 'Evaluación',
+          icon: FileText
+        }
       ]
     },
     {
       id: 'languages',
       name: 'Idiomas Voz',
       icon: Globe,
-      tagline: 'AstroLingo Conversacional & Profesor de Voz en Tiempo Real',
-      badgeTag: 'Voz & Memoria IA',
-      badgeBg: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
-      btnBg: 'bg-cyan-600 hover:bg-cyan-500 text-white font-bold',
-      heading: 'Profesor de Voz IA en Directo con Memoria de Sesión',
-      description: 'Mantén conversaciones en tiempo real con un tutor que recuerda tu vocabulario objetivo, analiza tu fluidez y corrige amablemente la pronunciación.',
-      image: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop',
-      bullets: [
-        'Diálogo por voz bidireccional fluido sin latencia perceptible',
-        'Inmersión práctica en vocabulario técnico y científico aplicado',
-        'Evaluación continua de precisión fonética y estructura gramatical',
-        'Adaptación dinámica del ritmo y dificultad según el nivel del alumno'
+      tagline: 'Profesor Particular de Voz en Tiempo Real',
+      badgeTag: 'Voz & Memoria',
+      heading: 'Inmersión Conversacional por Voz en Directo',
+      description: 'Mantén diálogos naturales con un tutor IA que recuerda tu vocabulario, evalúa tu fluidez verbal y perfecciona tu pronunciación.',
+      image: '/assets/previews/languages_preview.jpg',
+      features: [
+        {
+          title: 'Conversación en Tiempo Real',
+          desc: 'Diálogos fluidos y bidireccionales sin latencia, adaptados a tu ritmo.',
+          tag: 'Voz en Vivo',
+          icon: Mic
+        },
+        {
+          title: 'Evaluación Fonética de Acento',
+          desc: 'Análisis acústico que orienta sobre entonación, ritmo y fonética.',
+          tag: 'Fonética',
+          icon: Volume2
+        },
+        {
+          title: 'Memoria de Progreso y Sesión',
+          desc: 'El tutor recuerda expresiones complejas y las refuerza orgánicamente.',
+          tag: 'Memoria',
+          icon: Layers
+        },
+        {
+          title: 'Escenarios Temáticos Reales',
+          desc: 'Práctica inmersiva en viajes, ciencia, negocios y vida cotidiana.',
+          tag: 'Inmersión',
+          icon: Globe
+        }
       ]
     },
     {
       id: 'astro',
       name: 'Cosmos 3D',
       icon: Orbit,
-      tagline: 'Astrofísica, Misiones Espaciales & Simulador 3D NASA',
+      tagline: 'Simulador Astrofísico con Datos NASA',
       badgeTag: 'Visor 3D NASA',
-      badgeBg: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30',
-      btnBg: 'bg-indigo-600 hover:bg-indigo-500 text-white font-bold',
-      heading: 'Simulador 3D Interactivo con Datos de la NASA y la ESA',
-      description: 'Explora el Sistema Solar en tiempo real a escala fotorrealista. Estudia la mecánica celeste de eclipses, oblicuidad terrestre y misiones espaciales.',
-      image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&auto=format&fit=crop',
-      bullets: [
-        'Renderizado 3D de alta precisión con 8 escalas celestes navegables',
-        'Simulación física de la inclinación orbital de 5.14° y rotación planetaria de 24h',
-        '18 lecciones interactivas basadas en misiones Artemis, James Webb y Mars 2020',
-        'Evaluación mediante tests gamificados con obtención de estrellas e insignias'
+      heading: 'Simulador 3D Interactivo con Datos Oficiales',
+      description: 'Explora el Sistema Solar a escala fotorrealista. Estudia la mecánica celeste de eclipses, órbitas reales y misiones espaciales oficiales.',
+      image: '/assets/previews/cosmos_preview.jpg',
+      features: [
+        {
+          title: 'Motor 3D de 12 Escalas',
+          desc: 'Navegación fotorrealista desde órbita terrestre hasta galaxias lejanas.',
+          tag: 'Motor 3D',
+          icon: Orbit
+        },
+        {
+          title: 'Mecánica Celeste & Física Real',
+          desc: 'Datos orbitales oficiales de la NASA, inclinación terrestre e iluminación solar.',
+          tag: 'Física NASA',
+          icon: Activity
+        },
+        {
+          title: '18 Misiones Espaciales Guiadas',
+          desc: 'Trayectorias de las misiones Artemis II, James Webb y Perseverance.',
+          tag: 'Misiones',
+          icon: Compass
+        },
+        {
+          title: 'Retos Gamificados con XP',
+          desc: 'Tests interactivos para desbloquear rangos, estrellas y puntos de progreso.',
+          tag: 'Gamificación',
+          icon: Star
+        }
       ]
     },
     {
       id: 'verify',
       name: 'Criterio',
       icon: ShieldCheck,
-      tagline: 'Alfabetización Informativa, Algoritmos & Seguridad en IA',
-      badgeTag: 'Pensamiento Crítico & IA',
-      badgeBg: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-      btnBg: 'bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold',
-      heading: 'Aprende a Informarte en la Era de los Algoritmos y la IA',
-      description: 'Descubre cómo los algoritmos de recomendación moldean lo que ves, detecta alucinaciones de la IA, audita deepfakes y contrasta con fuentes científicas oficiales.',
-      image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
-      bullets: [
-        'Comprensión real de la economía de la atención y cámaras de eco',
-        'Laboratorio forense para cazar alucinaciones y medios sintéticos',
-        'Método PAUSA y 60 misiones cotidianas con dificultad adaptativa',
-        'Estación de análisis estructurado MATIZA en 4 capas de rigor'
+      tagline: 'Pensamiento Crítico & Alfabetización en IA',
+      badgeTag: 'Criterio & Rigor',
+      heading: 'Aprende a Informarte en la Era de los Algoritmos',
+      description: 'Comprende el funcionamiento de los algoritmos de recomendación, audita sesgos y contrasta información con fuentes científicas oficiales.',
+      image: '/assets/previews/criterio_preview.jpg',
+      features: [
+        {
+          title: 'Contraste con Fuentes Oficiales',
+          desc: 'Verificación directa frente a publicaciones de NASA, ESA, CSIC y BOE.',
+          tag: 'Fuentes 100%',
+          icon: ShieldCheck
+        },
+        {
+          title: 'Detección de Sesgos y Alucinaciones',
+          desc: 'Laboratorio para identificar textos sintéticos, deepfakes y desinformación.',
+          tag: 'Auditoría IA',
+          icon: Eye
+        },
+        {
+          title: 'Método PAUSA en 60 Misiones',
+          desc: 'Entrenamiento cognitivo para verificar antes de compartir en redes sociales.',
+          tag: 'Método PAUSA',
+          icon: ShieldCheck
+        },
+        {
+          title: 'Estación de Análisis MATIZA',
+          desc: 'Evaluación en 4 capas de rigor para analizar debates y noticias complejas.',
+          tag: 'Rigor Crítico',
+          icon: Sliders
+        }
       ]
     },
     {
       id: 'ai-lab',
       name: 'IA Lab',
       icon: Brain,
-      tagline: 'Laboratorio de Inteligencia Artificial: Redes, Tokens, Visión & Ética',
+      tagline: 'Laboratorio Práctico de Inteligencia Artificial',
       badgeTag: 'Laboratorio de IA',
-      badgeBg: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
-      btnBg: 'bg-purple-600 hover:bg-purple-500 text-white font-bold',
-      heading: 'Descubre, Entiende, Experimenta y Crea con Inteligencia Artificial',
-      description: 'Entrena redes neuronales 2D en tiempo real, comprende la tokenización y probabilidad de los LLMs, aplica filtros de convolución sobre píxeles y audita alucinaciones forenses.',
-      image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800&auto=format&fit=crop',
-      bullets: [
-        'Simulador 2D interactivo de redes neuronales y fronteras de decisión',
-        'Explorador en vivo de tokens, embeddings y temperatura en LLMs',
-        'Laboratorio de convoluciones 3x3 y visión artificial celda a celda',
-        'Arena de sesgos algorítmicos, privacidad y Ley de IA de la UE'
+      heading: 'Entiende y Experimenta con Redes Neuronales y LLMs',
+      description: 'Visualiza el entrenamiento de redes 2D, comprende la tokenización de los modelos de lenguaje y aplica filtros de visión artificial.',
+      image: '/assets/previews/ialab_preview.jpg',
+      features: [
+        {
+          title: 'Simulador 2D de Redes Neuronales',
+          desc: 'Ajusta capas y tasas de aprendizaje mientras ves la frontera de decisión en vivo.',
+          tag: 'Redes 2D',
+          icon: Brain
+        },
+        {
+          title: 'Explorador de Tokens y Probabilidad',
+          desc: 'Inspecciona cómo los LLMs predicen la siguiente palabra según la temperatura.',
+          tag: 'LLM Tokens',
+          icon: Terminal
+        },
+        {
+          title: 'Convolución y Visión Artificial',
+          desc: 'Aplica matrices de filtro 3x3 celda a celda para entender la visión por computador.',
+          tag: 'Visión IA',
+          icon: Cpu
+        },
+        {
+          title: 'Ética y Ley de IA Europea',
+          desc: 'Casos interactivos para auditar sesgos algorítmicos y privacidad de datos.',
+          tag: 'Ética & Ley',
+          icon: BarChart3
+        }
       ]
     }
   ];
 
   const currentSlide = SLIDES[currentSlideIndex];
+  const activeFeature = currentSlide.features[activeFeatureIndex] || currentSlide.features[0];
 
   const handlePrevSlide = () => {
     setCurrentSlideIndex((prev) => (prev === 0 ? SLIDES.length - 1 : prev - 1));
+    setActiveFeatureIndex(0);
   };
 
   const handleNextSlide = () => {
     setCurrentSlideIndex((prev) => (prev === SLIDES.length - 1 ? 0 : prev + 1));
+    setActiveFeatureIndex(0);
   };
 
-  const scrollToSection = (secNumber: number) => {
-    setActiveTab(secNumber);
-    const el = document.getElementById(`section-snap-${secNumber}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+  const handlePrevFeature = () => {
+    if (activeFeatureIndex > 0) {
+      setActiveFeatureIndex(prev => prev - 1);
+    } else {
+      const prevSlide = currentSlideIndex === 0 ? SLIDES.length - 1 : currentSlideIndex - 1;
+      setCurrentSlideIndex(prevSlide);
+      setActiveFeatureIndex(SLIDES[prevSlide].features.length - 1);
     }
   };
 
+  const handleNextFeature = () => {
+    if (activeFeatureIndex < currentSlide.features.length - 1) {
+      setActiveFeatureIndex(prev => prev + 1);
+    } else {
+      const nextSlide = currentSlideIndex === SLIDES.length - 1 ? 0 : currentSlideIndex + 1;
+      setCurrentSlideIndex(nextSlide);
+      setActiveFeatureIndex(0);
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (document.activeElement?.tagName === 'INPUT' || document.activeElement?.tagName === 'TEXTAREA') return;
+      if (e.key === 'ArrowLeft') handlePrevFeature();
+      if (e.key === 'ArrowRight') handleNextFeature();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentSlideIndex, activeFeatureIndex]);
+
+  const scrollToSection = (secId: string) => {
+    const el = document.getElementById(secId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const FAQS = [
+    {
+      q: '¿Qué es Goalskid y a quién está dirigido?',
+      a: 'Goalskid es una plataforma educativa adaptativa diseñada para estudiantes de Primaria, Secundaria y Bachillerato (6 a 18 años). Integra tutoría OCR de cuadernos, práctica conversacional de idiomas por voz, simulador 3D del Sistema Solar NASA, pensamiento crítico y laboratorio interactivo de IA.'
+    },
+    {
+      q: '¿Cómo funciona la tutoría con OCR de cuadernos?',
+      a: 'El alumno captura una foto de su cuaderno o ejercicio manuscrito. Goalskid reconoce el texto y las fórmulas matemáticas, evalúa el razonamiento y proporciona pistas pedagógicas orientativas paso a paso mediante método socrático, sin resolver el ejercicio directamente.'
+    },
+    {
+      q: '¿Se puede acceder en modo visita sin registrarse?',
+      a: 'Sí. Todos los visitantes pueden explorar libremente las 5 MiniApps y probar los módulos en modo lectura/visita. Al crear una cuenta gratuita, la plataforma guarda el progreso personal, estrellas conseguidas y calibración de nivel.'
+    },
+    {
+      q: '¿Dispone de aplicación móvil para Android?',
+      a: 'Sí. Goalskid cuenta con una APK nativa optimizada para Android con aceleración 3D por hardware y controles táctiles de dos dedos.'
+    }
+  ];
+
   return (
-    <div className="relative w-full text-slate-100 font-display">
-      <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+    <div className={`relative w-full font-display transition-colors duration-300 ${
+      isDark ? 'text-slate-100' : 'text-slate-900'
+    }`}>
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 sm:space-y-16 py-8">
 
         {/* ========================================================================= */}
-        {/* BLOQUE 1: HERO PRINCIPAL ELEGANTE */}
+        {/* BLOQUE 1: HERO PRINCIPAL ELEGANTE Y SOBERBIO */}
         {/* ========================================================================= */}
-        <section 
-          id="section-snap-1" 
-          className="h-[calc(100vh-89px)] min-h-[480px] snap-start flex flex-col justify-center items-center py-1 relative overflow-hidden"
-        >
-          <div className="w-full h-full bg-slate-950/80 border border-slate-800/80 rounded-3xl p-4 sm:p-6 shadow-xl relative overflow-hidden flex flex-col justify-between items-center text-center backdrop-blur-md">
-            
-            {/* Header del Hero */}
-            <div className="flex flex-col items-center gap-3 z-10 max-w-2xl my-auto">
-              
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-[11px] font-semibold tracking-wide shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Plataforma Educativa Adaptativa v2.5.0</span>
-                <span className="text-slate-500">|</span>
-                <span className="text-slate-400">Inferencia Multimodal en Tiempo Real</span>
-              </div>
+        <section id="hero-section" className="relative flex flex-col items-center justify-center text-center pt-4 pb-6">
+          
+          {/* Badge de Versión Sobrio */}
+          <div className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wide mb-5 transition-colors ${
+            isDark 
+              ? 'bg-slate-900 border border-slate-800 text-slate-300' 
+              : 'bg-white border border-slate-200 text-slate-700 shadow-sm'
+          }`}>
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span className="font-semibold">Goalskid v2.5.0</span>
+            <span className="text-slate-400">·</span>
+            <span className="text-slate-400">Ecosistema Educativo Adaptativo</span>
+          </div>
 
-              <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                El Futuro del Aprendizaje <br className="hidden sm:inline" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-cyan-300 to-emerald-300">
-                  Multimodal e Interactivo
+          {/* Título Principal */}
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15] max-w-3xl mx-auto">
+            Aprende con Claridad, <br className="hidden sm:inline" />
+            <span className={isDark ? 'text-slate-200' : 'text-indigo-600'}>
+              IA Multimodal y Visión 3D
+            </span>
+          </h1>
+
+          <p className={`text-sm sm:text-base max-w-2xl mx-auto leading-relaxed mt-4 font-sans ${
+            isDark ? 'text-slate-400' : 'text-slate-600'
+          }`}>
+            Resolución guiada de cuadernos manuscritos por OCR, tutor conversacional de idiomas por voz, simulador espacial NASA y laboratorio de IA en una experiencia unificada y sin distracciones.
+          </p>
+
+          {/* Botones de Acción */}
+          <div className="flex flex-wrap justify-center items-center gap-3.5 mt-7">
+            <button
+              onClick={() => onOpenAuth('signup')}
+              className="px-6 sm:px-7 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center gap-2 cursor-pointer"
+            >
+              <span>Comenzar Gratis</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => scrollToSection('carousel-section')}
+              className={`px-5 sm:px-6 py-3 rounded-xl border font-medium text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer ${
+                isDark 
+                  ? 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300' 
+                  : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 shadow-sm'
+              }`}
+            >
+              <span>Ver Demostración</span>
+              <ArrowDown className="w-4 h-4 text-slate-400" />
+            </button>
+          </div>
+
+          {/* ========================================================================= */}
+          {/* BENTO GRID DE LAS 5 MINIAPPS (LIMPIO Y SIN SATURACIÓN) */}
+          {/* ========================================================================= */}
+          <div id="miniapps-bento" className="w-full mt-10 pt-4">
+            <div className="flex items-center justify-between mb-4 text-left">
+              <div>
+                <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+                  Módulos de Aprendizaje
                 </span>
-              </h1>
-              
-              <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed font-sans">
-                Resolución de ejercicios manuscritos por OCR, práctica conversacional de idiomas por voz, laboratorio 3D NASA y contraste de rigor científico en una sola experiencia unificada.
-              </p>
-
-              <div className="flex flex-wrap justify-center items-center gap-3 pt-1">
-                <button
-                  onClick={() => onOpenAuth('signup')}
-                  className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 text-white font-extrabold text-xs uppercase tracking-wider transition-all shadow-lg shadow-indigo-600/30 active:scale-95 flex items-center gap-2 cursor-pointer"
-                >
-                  <span>Comenzar Ahora Gratis</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => scrollToSection(2)}
-                  className="px-5 py-3 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white font-bold text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
-                >
-                  <span>Ver Módulos & Demos</span>
-                  <ArrowDown className="w-3.5 h-3.5" />
-                </button>
+                <h2 className={`text-xl sm:text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  5 Experiencias Integradas
+                </h2>
               </div>
+              <span className="text-xs text-slate-400 hidden sm:inline">Selecciona cualquier módulo para explorar</span>
             </div>
 
-            {/* BENTO GRID ASIMÉTRICO CON MICRO-DEMOS EN TIEMPO REAL */}
-            <div className="w-full my-auto py-2 relative z-10">
-              <div className="max-w-4xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-left">
-                
-                {/* BENTO 1 (Doble Ancho): ESCUELA IA & OCR SCANNER */}
-                <div 
-                  onClick={() => onSelectExperience('school')}
-                  className="sm:col-span-2 group cursor-pointer bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-slate-950 border border-emerald-500/30 hover:border-emerald-400/60 p-4 rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:-translate-y-0.5 flex flex-col justify-between"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                        <GraduationCap className="w-4 h-4" />
-                      </div>
-                      <div>
-                        <div className="font-extrabold text-sm text-white flex items-center gap-1.5">
-                          <span>Escuela IA</span>
-                          <span className="px-1.5 py-0.5 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-mono">OCR LIVE</span>
-                        </div>
-                        <div className="text-[10px] text-slate-400">Tutor de Cuadernos & Manuscritos</div>
-                      </div>
-                    </div>
-                    <span className="text-emerald-400 font-extrabold text-xs opacity-0 group-hover:opacity-100 transition-opacity">Entrar →</span>
-                  </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3.5 text-left">
 
-                  {/* Micro-Demo OCR Live */}
-                  <div className="bg-slate-950/80 border border-emerald-500/20 rounded-xl p-2.5 space-y-1.5 font-mono text-[10px] relative overflow-hidden">
-                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-400 to-transparent animate-pulse"></div>
-                    <div className="flex items-center justify-between text-slate-400">
-                      <span className="text-emerald-300 font-bold">● Reconocimiento Activo</span>
-                      <span>Confianza: 99.4%</span>
-                    </div>
-                    <div className="text-white text-[11px] font-sans font-medium flex items-center justify-between">
-                      <span>"2x² - 8 = 0 ➔ Factorización guiada"</span>
-                      <span className="text-[9px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-mono">Paso a paso</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* BENTO 2: IDIOMAS VOZ */}
-                <div 
-                  onClick={() => onSelectExperience('languages')}
-                  className="group cursor-pointer bg-gradient-to-br from-cyan-950/40 via-slate-900/90 to-slate-950 border border-cyan-500/30 hover:border-cyan-400/60 p-4 rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)] hover:-translate-y-0.5 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="w-8 h-8 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                        <Globe className="w-4 h-4" />
-                      </div>
-                      <span className="text-cyan-400 font-extrabold text-xs opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                    </div>
-                    <div className="font-extrabold text-sm text-white">Idiomas Voz</div>
-                    <div className="text-[10px] text-slate-400">Profesor Particular de Voz</div>
-                  </div>
-
-                  {/* Micro-Demo Waveform */}
-                  <div className="bg-slate-950/80 border border-cyan-500/20 rounded-xl p-2 mt-2 flex items-center justify-between">
-                    <div className="flex items-center gap-0.5 h-4 text-cyan-400">
-                      <div className="w-0.5 bg-cyan-400 rounded-full h-1.5 animate-bounce"></div>
-                      <div className="w-0.5 bg-cyan-400 rounded-full h-3.5 animate-bounce delay-75"></div>
-                      <div className="w-0.5 bg-cyan-400 rounded-full h-2 animate-bounce delay-150"></div>
-                      <div className="w-0.5 bg-cyan-400 rounded-full h-4 animate-bounce delay-100"></div>
-                      <div className="w-0.5 bg-cyan-400 rounded-full h-2.5 animate-bounce"></div>
-                    </div>
-                    <span className="text-[9px] font-mono text-cyan-300 font-bold">98% Fluidez</span>
-                  </div>
-                </div>
-
-                {/* BENTO 3: COSMOS 3D */}
-                <div 
-                  onClick={() => onSelectExperience('astro')}
-                  className="group cursor-pointer bg-gradient-to-br from-indigo-950/40 via-slate-900/90 to-slate-950 border border-indigo-500/30 hover:border-indigo-400/60 p-4 rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(99,102,241,0.2)] hover:-translate-y-0.5 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-105 transition-transform">
-                        <Orbit className="w-4 h-4" />
-                      </div>
-                      <span className="text-indigo-400 font-extrabold text-xs opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                    </div>
-                    <div className="font-extrabold text-sm text-white">Cosmos 3D</div>
-                    <div className="text-[10px] text-slate-400">Simulador Astrofísico NASA</div>
-                  </div>
-
-                  {/* Micro-Demo Telemetría */}
-                  <div className="bg-slate-950/80 border border-indigo-500/20 rounded-xl p-2 mt-2 flex items-center justify-between font-mono text-[9px] text-indigo-300">
-                    <span>ALT: 408 KM</span>
-                    <span>VEL: 7.66 KM/S</span>
-                  </div>
-                </div>
-
-                {/* BENTO 4 (Fila inferior complementaria): VERIFICA */}
-                <div 
-                  onClick={() => onSelectExperience('verify')}
-                  className="sm:col-span-2 lg:col-span-4 group cursor-pointer bg-gradient-to-r from-amber-950/30 via-slate-900/90 to-slate-950 border border-amber-500/30 hover:border-amber-400/60 p-3.5 rounded-2xl transition-all duration-300 hover:shadow-[0_0_30px_rgba(245,158,11,0.15)] hover:-translate-y-0.5 flex items-center justify-between"
-                >
+              {/* CARD 1: Escuela IA */}
+              <div 
+                onClick={() => { setCurrentSlideIndex(0); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                className={`lg:col-span-2 group cursor-pointer p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
+                  isDark 
+                    ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
+                    : 'bg-white hover:bg-slate-50/80 border-slate-200 hover:border-slate-300 shadow-sm'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
+                    <img 
+                      src="/assets/miniapps/school_logo.png" 
+                      alt="Escuela IA" 
+                      className="w-11 h-11 rounded-xl object-cover border border-slate-700/50 shadow-sm" 
+                    />
                     <div>
-                      <div className="font-extrabold text-xs sm:text-sm text-white flex items-center gap-2">
-                        <span>Verifica · Auditor de Evidencia Científica</span>
-                        <span className="px-1.5 py-0.2 rounded text-[9px] bg-emerald-500/20 text-emerald-300 font-mono">100% Fuentes Oficiales</span>
-                      </div>
-                      <div className="text-[10px] text-slate-400">Contraste de rigor académico contra publicaciones de NASA, ESA, CSIC y BOE.</div>
+                      <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        Escuela IA
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">Tutor OCR de Cuadernos</p>
                     </div>
                   </div>
-                  <span className="text-amber-400 font-extrabold text-xs opacity-0 group-hover:opacity-100 transition-opacity shrink-0">Explorar →</span>
+                  <span className="text-xs font-semibold text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
                 </div>
-
+                <div className={`mt-3 p-2.5 rounded-xl border text-xs font-sans ${
+                  isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
+                }`}>
+                  Reconocimiento manuscrito y orientación socrática paso a paso.
+                </div>
               </div>
-            </div>
 
-            {/* Métricas Inferiores de Respaldo */}
-            <div className="z-10 w-full pt-1 border-t border-slate-800/80 flex items-center justify-around text-[10px] text-slate-400">
-              <span className="flex items-center gap-1 text-slate-300 font-semibold"><Zap className="w-3 h-3 text-amber-400" /> Sincronización en la Nube</span>
-              <span className="flex items-center gap-1 text-slate-300 font-semibold"><Star className="w-3 h-3 text-cyan-400" /> 18 Módulos Interactivos</span>
-              <span className="flex items-center gap-1 text-slate-300 font-semibold"><Flame className="w-3 h-3 text-rose-400" /> Racha Gamificada</span>
-            </div>
+              {/* CARD 2: Idiomas Voz */}
+              <div 
+                onClick={() => { setCurrentSlideIndex(1); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                className={`lg:col-span-2 group cursor-pointer p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
+                  isDark 
+                    ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
+                    : 'bg-white hover:bg-slate-50/80 border-slate-200 hover:border-slate-300 shadow-sm'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src="/assets/miniapps/languages_logo.png" 
+                      alt="Idiomas Voz" 
+                      className="w-11 h-11 rounded-xl object-cover border border-slate-700/50 shadow-sm" 
+                    />
+                    <div>
+                      <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        Idiomas Voz
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">Profesor Particular de Voz</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                </div>
+                <div className={`mt-3 p-2.5 rounded-xl border text-xs font-sans ${
+                  isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
+                }`}>
+                  Práctica conversacional en directo con corrección fonética amable.
+                </div>
+              </div>
 
+              {/* CARD 3: Cosmos 3D */}
+              <div 
+                onClick={() => { setCurrentSlideIndex(2); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                className={`lg:col-span-2 group cursor-pointer p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
+                  isDark 
+                    ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
+                    : 'bg-white hover:bg-slate-50/80 border-slate-200 hover:border-slate-300 shadow-sm'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src="/assets/miniapps/cosmos_logo.png" 
+                      alt="Cosmos 3D" 
+                      className="w-11 h-11 rounded-xl object-cover border border-slate-700/50 shadow-sm" 
+                    />
+                    <div>
+                      <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        Cosmos 3D
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">Simulador Espacial NASA</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                </div>
+                <div className={`mt-3 p-2.5 rounded-xl border text-xs font-sans ${
+                  isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
+                }`}>
+                  Visualización tridimensional fotorrealista con mecánica celeste oficial.
+                </div>
+              </div>
+
+              {/* CARD 4: Criterio */}
+              <div 
+                onClick={() => { setCurrentSlideIndex(3); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                className={`lg:col-span-3 group cursor-pointer p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
+                  isDark 
+                    ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
+                    : 'bg-white hover:bg-slate-50/80 border-slate-200 hover:border-slate-300 shadow-sm'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src="/assets/miniapps/criterio_logo.png" 
+                      alt="Criterio" 
+                      className="w-11 h-11 rounded-xl object-cover border border-slate-700/50 shadow-sm" 
+                    />
+                    <div>
+                      <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        Criterio
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">Pensamiento Crítico & IA</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                </div>
+                <div className={`mt-3 p-2.5 rounded-xl border text-xs font-sans ${
+                  isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
+                }`}>
+                  Auditoría de afirmaciones y contraste con fuentes científicas oficiales.
+                </div>
+              </div>
+
+              {/* CARD 5: IA Lab */}
+              <div 
+                onClick={() => { setCurrentSlideIndex(4); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                className={`lg:col-span-3 group cursor-pointer p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
+                  isDark 
+                    ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
+                    : 'bg-white hover:bg-slate-50/80 border-slate-200 hover:border-slate-300 shadow-sm'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src="/assets/miniapps/ialab_logo.png" 
+                      alt="IA Lab" 
+                      className="w-11 h-11 rounded-xl object-cover border border-slate-700/50 shadow-sm" 
+                    />
+                    <div>
+                      <h3 className={`font-bold text-sm sm:text-base ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        IA Lab
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">Laboratorio de Inteligencia Artificial</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-semibold text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                </div>
+                <div className={`mt-3 p-2.5 rounded-xl border text-xs font-sans ${
+                  isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
+                }`}>
+                  Simulación de redes neuronales 2D, tokenización y visión artificial.
+                </div>
+              </div>
+
+            </div>
           </div>
         </section>
 
         {/* ========================================================================= */}
-        {/* BLOQUE 2: CARRUSEL DE MINI APPS */}
+        {/* BLOQUE 2: CARRUSEL SOBERBIO Y NAVEGABLE (CON FLECHAS ACTIVAS) */}
         {/* ========================================================================= */}
-        <section 
-          id="section-snap-2" 
-          className="h-[calc(100vh-89px)] min-h-[480px] snap-start flex flex-col justify-center py-1 relative overflow-hidden"
-        >
-          <div className="w-full h-full bg-slate-950/80 border border-slate-800/80 rounded-3xl p-4 sm:p-5 flex flex-col justify-between relative overflow-hidden shadow-xl backdrop-blur-md">
+        <section id="carousel-section" className="relative py-2">
+          <div className={`w-full rounded-3xl p-5 sm:p-7 border transition-colors ${
+            isDark 
+              ? 'bg-[#0c101c] border-slate-800/90 shadow-xl' 
+              : 'bg-white border-slate-200 shadow-md'
+          }`}>
             
-            {/* Header del Carrusel */}
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-white">
-                  <currentSlide.icon className="w-5 h-5" />
-                </div>
+            {/* Header del Carrusel: Selector y Controles */}
+            <div className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b pb-4 ${
+              isDark ? 'border-slate-800' : 'border-slate-100'
+            }`}>
+              
+              <div className="flex items-center gap-3">
+                <img 
+                  src={GOALS_EXPERIENCES[currentSlide.id]?.logoUrl} 
+                  alt={currentSlide.name} 
+                  className="w-10 h-10 rounded-xl object-cover border border-slate-700/40 shadow-sm" 
+                />
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="font-bold text-base text-white">{currentSlide.name}</h2>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${currentSlide.badgeBg}`}>
+                    <h2 className={`font-bold text-lg sm:text-xl ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                      {currentSlide.name}
+                    </h2>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                      isDark ? 'bg-slate-800 border-slate-700 text-slate-300' : 'bg-slate-100 border-slate-200 text-slate-700'
+                    }`}>
                       {currentSlide.badgeTag}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 font-medium leading-tight mt-0.5">{currentSlide.tagline}</p>
+                  <p className="text-xs text-slate-400 mt-0.5">{currentSlide.tagline}</p>
                 </div>
               </div>
 
-              {/* Selector de diapositivas */}
-              <div className="flex items-center gap-1.5">
-                {SLIDES.map((s, idx) => (
+              {/* Selector de Pestañas y Flechas */}
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                <div className={`flex items-center gap-1 p-1 rounded-xl border overflow-x-auto scrollbar-none ${
+                  isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+                }`}>
+                  {SLIDES.map((s, idx) => (
+                    <button
+                      key={s.id}
+                      onClick={() => { setCurrentSlideIndex(idx); setActiveFeatureIndex(0); }}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                        currentSlideIndex === idx 
+                          ? isDark ? 'bg-slate-800 text-white shadow-sm' : 'bg-white text-slate-900 shadow-sm'
+                          : 'text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {s.name}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Flechas de Navegación de Módulo */}
+                <div className="flex items-center gap-1 shrink-0">
                   <button
-                    key={s.id}
-                    onClick={() => setCurrentSlideIndex(idx)}
-                    className={`h-2 rounded-full transition-all ${
-                      currentSlideIndex === idx ? 'w-6 bg-indigo-500' : 'w-2 bg-slate-700 hover:bg-slate-500'
+                    onClick={handlePrevSlide}
+                    className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
+                      isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
                     }`}
-                    title={`Ver ${s.name}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Vista Previa Visual */}
-            <div className="relative w-full flex-1 my-2 bg-slate-950 rounded-2xl overflow-hidden group border border-slate-800/80">
-              <img
-                src={currentSlide.image}
-                alt={currentSlide.heading}
-                className="w-full h-full object-cover opacity-75 group-hover:opacity-90 transition-all duration-500"
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent p-4 flex flex-col justify-end">
-                <h3 className="font-bold text-sm sm:text-base text-white">
-                  {currentSlide.heading}
-                </h3>
-                <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed mt-1">
-                  {currentSlide.description}
-                </p>
+                    title="Módulo Anterior"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleNextSlide}
+                    className={`w-8 h-8 rounded-lg border flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
+                      isDark ? 'bg-slate-900 border-slate-800 text-slate-300 hover:text-white' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+                    }`}
+                    title="Módulo Siguiente"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
 
-              {/* Controles de Navegación */}
-              <button
-                onClick={handlePrevSlide}
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-slate-900/90 border border-slate-700 hover:border-white text-white flex items-center justify-center shadow-lg active:scale-95 transition-all z-20 cursor-pointer"
-                title="Anterior"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={handleNextSlide}
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-slate-900/90 border border-slate-700 hover:border-white text-white flex items-center justify-center shadow-lg active:scale-95 transition-all z-20 cursor-pointer"
-                title="Siguiente"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
             </div>
 
-            {/* Características y Acción */}
-            <div className="space-y-2 pt-1.5 border-t border-slate-800">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {currentSlide.bullets.slice(0, 2).map((bullet, idx) => (
-                  <div key={idx} className="bg-slate-900/60 border border-slate-800 rounded-xl p-2 flex items-start gap-2 text-xs text-slate-300">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <span className="leading-snug font-medium">{bullet}</span>
-                  </div>
-                ))}
-              </div>
-
-              <button
-                onClick={() => onSelectExperience(currentSlide.id)}
-                className={`w-full py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 active:scale-95 cursor-pointer ${currentSlide.btnBg}`}
-              >
-                <currentSlide.icon className="w-3.5 h-3.5" />
-                <span>Explorar {currentSlide.name}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* BLOQUE 3: METODOLOGÍA ADAPTATIVA DE APRENDIZAJE */}
-        {/* ========================================================================= */}
-        <section 
-          id="section-snap-3" 
-          className="h-[calc(100vh-89px)] min-h-[480px] snap-start flex flex-col justify-center py-1 relative overflow-hidden"
-        >
-          <div className="w-full h-full bg-slate-950/80 border border-slate-800/80 rounded-3xl p-5 sm:p-6 flex flex-col justify-between items-center text-center shadow-xl backdrop-blur-md">
-            
-            <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300 text-[10px] font-semibold tracking-wider">
-                <Brain className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Enfoque Pedagógico Integrado</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">¿Cómo Funciona la Metodología GOALS?</h2>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">Reemplaza el estudio memorístico pasivo por una interacción guiada adaptada al ritmo de cada alumno.</p>
-            </div>
-
-            {/* Grid de 3 Pilares */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full my-auto">
+            {/* Split Layout: Vista Previa y Opciones Explicadas */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch mt-6">
               
-              <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-left space-y-2 hover:border-slate-700 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                  <Brain className="w-4 h-4" />
-                </div>
-                <h3 className="font-bold text-sm text-white">Tutoría Adaptativa</h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Identifica patrones de duda en tiempo real. Ajusta el nivel de las pistas y explicaciones según el desempeño registrado.
-                </p>
-              </div>
+              {/* Imagen / Visualizador Limpio */}
+              <div className={`lg:col-span-7 rounded-2xl overflow-hidden border flex flex-col justify-end relative min-h-[340px] sm:min-h-[400px] group ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'
+              }`}>
+                <img
+                  src={currentSlide.image}
+                  alt={currentSlide.heading}
+                  className="absolute inset-0 w-full h-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-102"
+                />
 
-              <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-left space-y-2 hover:border-slate-700 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-                  <Orbit className="w-4 h-4" />
-                </div>
-                <h3 className="font-bold text-sm text-white">Visualización 3D</h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Facilita la comprensión de conceptos abstractos de física y astronomía mediante motores interactivos basados en datos oficiales.
-                </p>
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent pointer-events-none"></div>
 
-              <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-left space-y-2 hover:border-slate-700 transition-colors">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-                  <Zap className="w-4 h-4" />
-                </div>
-                <h3 className="font-bold text-sm text-white">Gamificación Medible</h3>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Fomenta la constancia diaria acumulando puntos de experiencia y manteniendo la racha activa en todo el ecosistema.
-                </p>
-              </div>
-
-            </div>
-
-            <button 
-              onClick={() => scrollToSection(4)}
-              className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-white transition-colors"
-            >
-              <span>Ver especificaciones técnicas</span>
-              <ArrowDown className="w-3.5 h-3.5" />
-            </button>
-
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* BLOQUE 4: RIGOR CIENTÍFICO Y ARQUITECTURA TÉCNICA */}
-        {/* ========================================================================= */}
-        <section 
-          id="section-snap-4" 
-          className="h-[calc(100vh-89px)] min-h-[480px] snap-start flex flex-col justify-center py-1 relative overflow-hidden"
-        >
-          <div className="w-full h-full bg-slate-950/80 border border-slate-800/80 rounded-3xl p-5 sm:p-6 flex flex-col justify-between items-center text-center shadow-xl backdrop-blur-md">
-            
-            <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300 text-[10px] font-semibold tracking-wider">
-                <Cpu className="w-3.5 h-3.5 text-indigo-400" />
-                <span>Rigor Académico & Tecnología</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Arquitectura Tecnológica</h2>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">Construido con estándares modernos de procesamiento visual y bases de datos contrastadas.</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full my-auto">
-              
-              <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-left space-y-2">
-                <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs">
-                  <Terminal className="w-4 h-4" />
-                  <span>Procesamiento OCR Multimodal</span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Reconocimiento de imágenes con extracción de texto manuscrito y expresiones matemáticas para orientación inmediata.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-left space-y-2">
-                <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Fuentes Oficiales NASA & ESA</span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Constantes físicas verificadas, datos orbitales exactos y contraste de veracidad frente a desinformación en redes.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 text-left space-y-2">
-                <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                  <Cpu className="w-4 h-4" />
-                  <span>Motor WebGL de Rendimiento</span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Simulación de cuerpos celestes con shaders procedurales fluidos y navegación en tiempo real sin complementos externos.
-                </p>
-              </div>
-
-            </div>
-
-            <button 
-              onClick={() => scrollToSection(5)}
-              className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 hover:text-white transition-colors"
-            >
-              <span>Ir al acceso final</span>
-              <ArrowDown className="w-3.5 h-3.5" />
-            </button>
-
-          </div>
-        </section>
-
-        {/* ========================================================================= */}
-        {/* BLOQUE 5: LLAMADA A LA ACCIÓN FINAL */}
-        {/* ========================================================================= */}
-        <section 
-          id="section-snap-5" 
-          className="h-[calc(100vh-89px)] min-h-[480px] snap-start flex flex-col justify-center py-1 relative overflow-hidden"
-        >
-          <div className="w-full h-full bg-slate-950/80 border border-slate-800/80 rounded-3xl p-6 sm:p-8 flex flex-col justify-between items-center text-center shadow-xl backdrop-blur-md">
-            
-            <div className="w-11 h-11 rounded-2xl bg-indigo-600/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mx-auto">
-              <Sparkles className="w-5 h-5" />
-            </div>
-
-            <div className="space-y-3 max-w-lg my-auto">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-tight">
-                Empieza a Utilizar GOALS Hoy Mismo
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                Crea tu cuenta de usuario para acceder a todo el ecosistema educativo desde cualquier navegador o dispositivo.
-              </p>
-
-              <div className="pt-3 flex flex-col sm:flex-row justify-center gap-3">
+                {/* Flechas Flotantes Laterales en la Foto */}
                 <button
-                  onClick={() => onOpenAuth('signup')}
-                  className="w-full sm:w-auto px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-md shadow-indigo-600/20 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  type="button"
+                  onClick={handlePrevFeature}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-900/80 hover:bg-slate-900 border border-slate-700/80 text-white backdrop-blur-md flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer z-20 shadow-lg"
+                  title="Anterior (Flecha Izquierda)"
                 >
-                  <span>Crear Cuenta Gratuita</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ChevronLeft className="w-5 h-5" />
                 </button>
 
                 <button
+                  type="button"
+                  onClick={handleNextFeature}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-slate-900/80 hover:bg-slate-900 border border-slate-700/80 text-white backdrop-blur-md flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-105 active:scale-95 cursor-pointer z-20 shadow-lg"
+                  title="Siguiente (Flecha Derecha)"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+
+                {/* Pie con Descripción de la Funcionalidad Activa */}
+                <div className="relative z-10 p-4 sm:p-5 bg-slate-950/85 backdrop-blur-md border-t border-slate-800/80 text-left">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      {activeFeature.tag}
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      {activeFeatureIndex + 1} de {currentSlide.features.length}
+                    </span>
+                  </div>
+                  <h3 className="font-bold text-sm sm:text-base text-white">
+                    {activeFeature.title}
+                  </h3>
+                  <p className="text-xs text-slate-300 font-sans mt-0.5 leading-relaxed">
+                    {activeFeature.desc}
+                  </p>
+                </div>
+              </div>
+
+              {/* Columna Derecha: 4 Opciones Explicadas */}
+              <div className="lg:col-span-5 flex flex-col justify-between space-y-3.5 text-left">
+                
+                <div className="space-y-2">
+                  <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+                    Características Explicadas
+                  </span>
+
+                  <div className="space-y-2">
+                    {currentSlide.features.map((feat, idx) => {
+                      const isSelected = activeFeatureIndex === idx;
+                      const IconComponent = feat.icon;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setActiveFeatureIndex(idx)}
+                          className={`p-3 rounded-xl border transition-all duration-150 cursor-pointer flex items-start gap-3 ${
+                            isSelected 
+                              ? isDark 
+                                ? 'bg-slate-900 border-indigo-500 text-white' 
+                                : 'bg-indigo-50/70 border-indigo-300 text-slate-900'
+                              : isDark 
+                                ? 'bg-slate-950/60 hover:bg-slate-900/60 border-slate-800/80 text-slate-300' 
+                                : 'bg-slate-50 hover:bg-white border-slate-200 text-slate-700'
+                          }`}
+                        >
+                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 border ${
+                            isSelected 
+                              ? 'bg-indigo-600 text-white border-indigo-500' 
+                              : isDark ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-600'
+                          }`}>
+                            <IconComponent className="w-3.5 h-3.5" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-xs truncate">
+                              {feat.title}
+                            </h4>
+                            <p className={`text-[11px] font-sans mt-0.5 leading-relaxed ${
+                              isDark ? 'text-slate-400' : 'text-slate-600'
+                            }`}>
+                              {feat.desc}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Botón de Entrada */}
+                <button
+                  onClick={() => onSelectExperience(currentSlide.id)}
+                  className="w-full py-3 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white active:scale-95 cursor-pointer shadow-sm"
+                >
+                  <span>Explorar {currentSlide.name}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* BLOQUE 3: METODOLOGÍA PEDAGÓGICA */}
+        {/* ========================================================================= */}
+        <section id="methodology-section" className="relative py-2">
+          <div className={`w-full rounded-3xl p-6 sm:p-8 text-center border transition-colors ${
+            isDark ? 'bg-[#0c101c] border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+          }`}>
+            
+            <div className="space-y-2 max-w-2xl mx-auto">
+              <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+                Enfoque Pedagógico
+              </span>
+              <h2 className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Aprendizaje Guiado y Adaptativo
+              </h2>
+              <p className={`text-xs sm:text-sm leading-relaxed font-sans ${
+                isDark ? 'text-slate-400' : 'text-slate-600'
+              }`}>
+                Reemplaza el estudio pasivo por una interacción orientada que se calibra al nivel de cada alumno.
+              </p>
+            </div>
+
+            {/* Grid de 3 Pilares */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 text-left mt-6">
+              
+              <div className={`p-4 rounded-2xl border ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 mb-2.5">
+                  <Brain className="w-4 h-4" />
+                </div>
+                <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Tutoría Socrática
+                </h3>
+                <p className={`text-xs font-sans mt-1 leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Formula preguntas orientadoras para que el estudiante deduzca el razonamiento por sí mismo.
+                </p>
+              </div>
+
+              <div className={`p-4 rounded-2xl border ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500 mb-2.5">
+                  <Orbit className="w-4 h-4" />
+                </div>
+                <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Visualización Espacial
+                </h3>
+                <p className={`text-xs font-sans mt-1 leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Facilita la comprensión de conceptos abstractos de física y geometría con modelos 3D interactivos.
+                </p>
+              </div>
+
+              <div className={`p-4 rounded-2xl border ${
+                isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+              }`}>
+                <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 mb-2.5">
+                  <Star className="w-4 h-4" />
+                </div>
+                <h3 className={`font-bold text-sm ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                  Progreso Medible
+                </h3>
+                <p className={`text-xs font-sans mt-1 leading-relaxed ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                  Fomenta la constancia diaria acumulando estrellas, rachas e insignias por cada lección completada.
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+        </section>
+
+        {/* ========================================================================= */}
+        {/* BLOQUE 4: PREGUNTAS FRECUENTES (FAQ) */}
+        {/* ========================================================================= */}
+        <section id="faq-section" className="relative py-2">
+          <div className={`w-full rounded-3xl p-6 sm:p-8 text-left border transition-colors ${
+            isDark ? 'bg-[#0c101c] border-slate-800' : 'bg-white border-slate-200 shadow-sm'
+          }`}>
+            
+            <div className="text-center space-y-1.5 max-w-xl mx-auto mb-6">
+              <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400">
+                Dudas Comunes
+              </span>
+              <h2 className={`text-2xl sm:text-3xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Preguntas Frecuentes
+              </h2>
+            </div>
+
+            <div className="space-y-2 max-w-3xl mx-auto">
+              {FAQS.map((faq, idx) => {
+                const isOpen = activeFaq === idx;
+                return (
+                  <div 
+                    key={idx}
+                    className={`rounded-xl border transition-all ${
+                      isDark ? 'bg-slate-950/70 border-slate-800/80' : 'bg-slate-50 border-slate-200'
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setActiveFaq(isOpen ? null : idx)}
+                      className={`w-full p-4 flex items-center justify-between gap-4 text-left font-semibold text-xs sm:text-sm cursor-pointer transition-colors ${
+                        isDark ? 'text-slate-200 hover:text-white' : 'text-slate-800 hover:text-indigo-600'
+                      }`}
+                    >
+                      <span>{faq.q}</span>
+                      <span className={`text-slate-400 text-base transition-transform duration-200 ${isOpen ? 'rotate-45 text-indigo-500' : ''}`}>+</span>
+                    </button>
+                    {isOpen && (
+                      <div className={`px-4 pb-4 text-xs font-sans leading-relaxed border-t pt-3 ${
+                        isDark ? 'border-slate-800/60 text-slate-300' : 'border-slate-200 text-slate-600'
+                      }`}>
+                        {faq.a}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Acceso Final */}
+            <div className={`rounded-2xl p-6 text-center space-y-3 max-w-2xl mx-auto mt-8 border ${
+              isDark ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}>
+              <h3 className={`text-lg sm:text-xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                Comienza a aprender con Goalskid
+              </h3>
+              <p className={`text-xs font-sans max-w-md mx-auto ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                Crea una cuenta gratuita para guardar tu progreso o explora directamente en modo visita.
+              </p>
+              <div className="flex flex-wrap justify-center items-center gap-3 pt-1">
+                <button
+                  onClick={() => onOpenAuth('signup')}
+                  className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs uppercase tracking-wider transition-all shadow-sm active:scale-95 cursor-pointer"
+                >
+                  Crear Cuenta Gratuita
+                </button>
+                <button
                   onClick={() => onOpenAuth('login')}
-                  className="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900/90 border border-slate-700 hover:border-slate-500 text-white font-bold text-xs transition-all active:scale-95 cursor-pointer"
+                  className={`px-5 py-2.5 rounded-xl border text-xs font-medium transition-all active:scale-95 cursor-pointer ${
+                    isDark ? 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-slate-300' : 'bg-white hover:bg-slate-50 border-slate-300 text-slate-700 shadow-sm'
+                  }`}
                 >
                   Iniciar Sesión
                 </button>
               </div>
-            </div>
-
-            <div className="flex items-center justify-center gap-5 text-xs text-slate-400 font-medium">
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Sin tarjeta de crédito</span>
-              <span className="flex items-center gap-1.5"><Check className="w-4 h-4 text-emerald-400" /> Acceso inmediato en la nube</span>
             </div>
 
           </div>

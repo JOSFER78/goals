@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">10_goals</string>
-    <string name="title_activity_main">10_goals</string>
+    <string name="app_name">Goalskid</string>
+    <string name="title_activity_main">Goalskid</string>
     <string name="package_name">app.goalskids.app</string>
     <string name="custom_url_scheme">app.goalskids.app</string>
+    <string name="default_web_client_id">828956321348-sprigjvau5kdmlbllcptjuubkjqsg7dm.apps.googleusercontent.com</string>
 </resources>

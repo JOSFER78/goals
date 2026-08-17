@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './core/context/AuthContext';
 import { ProgressProvider, useProgress } from './core/context/ProgressContext';
+import { ThemeProvider, useTheme } from './core/context/ThemeContext';
 import { Header } from './core/components/Header';
 import { Footer } from './core/components/Footer';
 import { ProfileModal } from './core/components/ProfileModal';
@@ -48,8 +49,9 @@ const StarField: React.FC = () => {
 };
 
 const MainContent: React.FC = () => {
-  const { user, isCloud, isAdmin } = useAuth();
-  const { userData } = useProgress();
+  const { user, isAuthenticated, loading, isCloud, isAdmin } = useAuth();
+  const { userData, effectiveAge } = useProgress();
+  const { isDark } = useTheme();
 
   // Modo de Vista Global
   const [authViewMode, setAuthViewMode] = useState<'login' | 'signup'>('login');
@@ -96,7 +98,6 @@ const MainContent: React.FC = () => {
     });
   };
 
-  const isAuthenticated = !!(user && !user.isAnonymous);
   const isApproved = isAdmin || userData?.isApproved === true || user?.isApproved === true;
   const hasCompletedOnboarding = isAdmin || (
     Boolean(userData?.learnerProfile?.onboarding?.globalCompleted) ||
@@ -121,14 +122,14 @@ const MainContent: React.FC = () => {
   };
 
   return (
-    <div className="relative z-10 flex flex-col h-screen w-full mx-auto overflow-hidden bg-slate-950/95 backdrop-blur-xl">
+    <div className={`relative z-10 flex flex-col min-h-screen w-full mx-auto transition-colors duration-300 ${isDark ? 'bg-[#090d16]/98 text-slate-100' : 'bg-slate-50 text-slate-900'}`}>
       
-      {/* Halo de luz ambiental reactivo por Mini App */}
+      {/* Halo de luz ambiental tenue y descansado para la vista */}
       {activeExperience && GOALS_EXPERIENCES[activeExperience] && (
         <div 
-          className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-700 opacity-60"
+          className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-700 opacity-30"
           style={{
-            background: `radial-gradient(ellipse 80% 50% at 50% 0%, ${GOALS_EXPERIENCES[activeExperience].ambientGlow} 0%, transparent 70%)`
+            background: `radial-gradient(ellipse 70% 40% at 50% 0%, ${GOALS_EXPERIENCES[activeExperience].ambientGlow} 0%, transparent 60%)`
           }}
         />
       )}
@@ -140,15 +141,16 @@ const MainContent: React.FC = () => {
         onOpenProfile={() => setActiveExperience('profile')}
         onOpenAdmin={() => setActiveExperience('admin')}
         onOpenMiniApps={() => setIsMiniAppsDrawerOpen(true)}
+        onSelectExperience={(expId) => setActiveExperience(expId)}
         onOpenAuth={(mode) => {
           setAuthViewMode(mode);
           setIsAuthViewOpen(true);
         }}
       />
 
-      {/* Área Principal de Contenido */}
-      <main className={(activeExperience === 'astro' || activeExperience === 'admin' || activeExperience === 'profile') ? 'flex-1 relative p-0 overflow-hidden h-full w-full flex flex-col' : isAuthViewOpen ? 'flex-1 overflow-y-auto relative flex flex-col items-center justify-start p-4 scrollbar-thin' : 'flex-1 overflow-y-auto snap-y snap-mandatory scroll-smooth relative flex flex-col justify-between'}>
-        <div className={(activeExperience === 'astro' || activeExperience === 'admin' || activeExperience === 'profile') ? 'flex-1 w-full h-full relative p-0 flex flex-col' : 'p-0 sm:p-2 flex-1 w-full flex flex-col items-center justify-start h-full'}>
+      {/* Área Principal de Contenido con Proximity Snap Suave */}
+      <main className={(activeExperience === 'astro' || activeExperience === 'admin' || activeExperience === 'profile') ? 'flex-1 relative p-0 overflow-hidden h-[calc(100vh-70px)] w-full flex flex-col' : isAuthViewOpen ? 'flex-1 overflow-y-auto relative flex flex-col items-center justify-start p-4 scrollbar-thin' : 'flex-1 w-full relative flex flex-col justify-between overflow-x-hidden'}>
+        <div className={(activeExperience === 'astro' || activeExperience === 'admin' || activeExperience === 'profile') ? 'flex-1 w-full h-full relative p-0 flex flex-col' : 'p-0 sm:p-2 flex-1 w-full flex flex-col items-center justify-start min-h-max'}>
           {isAuthViewOpen ? (
             /* Pantalla Estándar de Autenticación de Firebase */
             <AuthView
@@ -158,30 +160,62 @@ const MainContent: React.FC = () => {
               onOpenDownloadGuide={() => setIsGuideOpen(true)}
             />
           ) : !isAuthenticated && !activeExperience ? (
-            /* Landing Page Pública Scrollable con Bloqueo de Acceso a No Registrados */
+            /* Landing Page Pública Scrollable con Acceso Directo a Explorar MiniApps en Modo Visita */
             <GoalsLanding
               onOpenAuth={(mode) => {
                 setAuthViewMode(mode);
                 setIsAuthViewOpen(true);
               }}
-              onSelectExperience={() => {
-                setAuthViewMode('signup');
-                setIsAuthViewOpen(true);
+              onSelectExperience={(expId) => {
+                setActiveExperience(expId);
               }}
             />
-          ) : !isAuthenticated ? (
-            /* Si no está registrado y trata de navegar directamente, mostrar Pantalla de Invitación / Registro */
-            <AuthView
-              initialMode="signup"
-              onBackToLanding={() => {
-                setActiveExperience(null);
-                setIsAuthViewOpen(false);
-              }}
-              onSuccess={() => {
-                setIsAuthViewOpen(false);
-              }}
-              onOpenDownloadGuide={() => setIsGuideOpen(true)}
-            />
+          ) : !isAuthenticated && activeExperience ? (
+            /* Modo Invitado / Visita: Puede ver toda la interfaz y 3D pero en modo Solo Lectura */
+            <div className="w-full flex-1 flex flex-col relative">
+              <div className="w-full bg-slate-900/95 border-b border-indigo-500/30 px-3 sm:px-6 py-2 flex items-center justify-between z-40 shadow-lg backdrop-blur-md sticky top-0">
+                <div className="flex items-center gap-2 text-xs text-slate-300">
+                  <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                  <span className="font-extrabold text-amber-300">Modo Visita:</span>
+                  <span className="hidden md:inline text-slate-300">Estás explorando {GOALS_EXPERIENCES[activeExperience]?.name}. Inicia sesión o regístrate para interactuar con la IA y guardar tu progreso.</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleNavigateHome}
+                    className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition-all cursor-pointer"
+                  >
+                    Volver
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAuthViewMode('signup');
+                      setIsAuthViewOpen(true);
+                    }}
+                    className="px-3 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md shadow-indigo-600/30 transition-all active:scale-95 cursor-pointer"
+                  >
+                    Crear Cuenta
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex-1 w-full relative">
+                {activeExperience === 'school' ? (
+                  <SchoolView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                ) : activeExperience === 'languages' ? (
+                  <LanguagesView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                ) : activeExperience === 'verify' ? (
+                  <VerifyView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                ) : activeExperience === 'ai-lab' ? (
+                  <AILabExperience onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                ) : activeExperience === 'astro' ? (
+                  <AstroExperience
+                    onBackToGoals={handleNavigateHome}
+                    onOpenProfile={() => setActiveExperience('profile')}
+                    onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }}
+                  />
+                ) : null}
+              </div>
+            </div>
           ) : !isApproved ? (
             /* Compuerta de Autorización: Cuenta pendiente de aprobación por el Administrador */
             <PendingApprovalGate />
@@ -243,8 +277,8 @@ const MainContent: React.FC = () => {
           )}
         </div>
 
-        {/* Footer únicamente en la Landing Page pública sin logearse */}
-        {!isAuthenticated && !activeExperience && !isAuthViewOpen && (
+        {/* Footer siempre visible en portada y dashboard principal */}
+        {!activeExperience && !isAuthViewOpen && (
           <Footer onSelectExperience={(expId) => setActiveExperience(expId)} />
         )}
       </main>
@@ -287,16 +321,25 @@ const MainContent: React.FC = () => {
   );
 };
 
+const ThemedAppContainer: React.FC = () => {
+  const { isDark } = useTheme();
+  return (
+    <div className={`min-h-screen w-full relative transition-colors duration-300 ${isDark ? 'bg-[#090d16]' : 'bg-slate-50'}`}>
+      {isDark && <StarField />}
+      <MainContent />
+    </div>
+  );
+};
+
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <ProgressProvider>
-        <div className="h-screen w-screen relative bg-[#030509] overflow-hidden">
-          <StarField />
-          <MainContent />
-        </div>
-      </ProgressProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ProgressProvider>
+          <ThemedAppContainer />
+        </ProgressProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 };
 

@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'app.goalskids.app',
-  appName: 'GOALS Platform',
+  appName: 'Goalskid',
   webDir: 'dist',
   server: {
     androidScheme: 'https',

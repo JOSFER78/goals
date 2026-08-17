@@ -47,7 +47,7 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
   };
 
   const handleStartDownload = () => {
-    const apkUrl = updateInfo?.downloadUrl || 'https://appgoals.web.app/downloads/goalskid_2.4.zip';
+    const apkUrl = updateInfo?.downloadUrl || 'https://appgoals.web.app/downloads/goalskid_2.5.zip';
     triggerApkInstall(apkUrl);
     handleDismissAndClose();
   };
@@ -111,7 +111,7 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
                   onClick={() => setShowAndroidGuide(true)}
                   className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <Download className="w-4 h-4" /> Descargar goalskid.apk
+                  <Download className="w-4 h-4" /> Descargar ZIP (APK v{updateInfo.latestVersion})
                 </button>
               ) : (
                 <button
@@ -148,13 +148,13 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
               
               <ol className="space-y-2 text-slate-300 list-decimal pl-4 leading-relaxed">
                 <li>
-                  Se descargará el archivo <strong className="text-emerald-400">goalskid.apk</strong> en tu dispositivo.
+                  Se descargará el archivo <strong className="text-emerald-400">goalskid_2.5.zip</strong> (contiene el APK oficial).
                 </li>
                 <li>
-                  Al abrirlo, Android mostrará un aviso: <span className="text-amber-300 font-semibold font-mono text-[10px]">"Aplicación no registrada en Play Store / Fuentes desconocidas"</span>.
+                  Extrae el ZIP en tu gestor de archivos y toca el archivo APK para instalar.
                 </li>
                 <li>
-                  Debes pulsar en <strong className="text-white">"Ajustes ➔ Permitir de esta fuente"</strong> o <strong className="text-emerald-400">"Instalar de todas formas"</strong> en el icono de Android.
+                  Debes pulsar en <strong className="text-white">"Ajustes ➔ Permitir de esta fuente"</strong> o <strong className="text-emerald-400">"Instalar de todas formas"</strong>.
                 </li>
               </ol>
             </div>
@@ -165,7 +165,7 @@ export const ApkUpdateModal: React.FC<ApkUpdateModalProps> = ({ isOpen, onClose 
               className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-black text-xs uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <Download className="w-4 h-4" />
-              <span>Entendido, Descargar goalskid.apk</span>
+              <span>Entendido, Descargar ZIP con APK</span>
             </button>
           </div>
         )}
