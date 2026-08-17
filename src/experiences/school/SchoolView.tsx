@@ -2,22 +2,29 @@ import React, { useState } from 'react';
 import { 
   BookOpen, Camera, CheckCircle, Sparkles, ArrowRight, Calculator, 
   FlaskConical, Landmark, Leaf, AlertCircle, Loader2, Lock, Check,
-  Cpu, Scan, HelpCircle, Layers, Lightbulb, Compass
+  Cpu, Scan, HelpCircle, Layers, Lightbulb, Compass, Trophy, Brain
 } from 'lucide-react';
 import { useProgress } from '../../core/context/ProgressContext';
 import { useAuth } from '../../core/context/AuthContext';
 import { getAcademicTutorResponse, analyzeNotesOCR } from '../../core/services/aiService';
+import { MiniAppSubHeader } from '../../core/components/navigation/MiniAppSubHeader';
+import { MiniAppBottomNav, MiniAppPillar } from '../../core/components/navigation/MiniAppBottomNav';
+import { MiniAppSubmenuSheet, SubmenuSection } from '../../core/components/navigation/MiniAppSubmenuSheet';
+import { ExperienceId } from '../../core/types';
 
 interface SchoolViewProps {
+  onBackToGoals?: () => void;
   onOpenAuth?: (mode: 'login' | 'signup') => void;
+  onNavigateExperience?: (expId: ExperienceId) => void;
 }
 
-export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
-  const { addXP } = useProgress();
+export const SchoolView: React.FC<SchoolViewProps> = ({ onBackToGoals, onOpenAuth, onNavigateExperience }) => {
+  const { userData, addXP } = useProgress();
   const { user } = useAuth();
   const isAuthenticated = !!(user && !user.isAnonymous);
 
-  const [activeTab, setActiveTab] = useState<'tutor' | 'ocr' | 'step' | 'map'>('tutor');
+  const [activeTab, setActiveTab] = useState<'tutor' | 'ocr' | 'map'>('tutor');
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState<boolean>(false);
   const [userQuery, setUserQuery] = useState('');
   const [selectedSubject, setSelectedSubject] = useState<string>('Matemáticas');
   const [aiResponse, setAiResponse] = useState<string | null>(null);
@@ -25,6 +32,8 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
   const [ocrSampleText, setOcrSampleText] = useState<string>(
     'Ecuación cuadrática: 2x^2 + 5x - 3 = 0. Calcular las raíces x1 y x2 usando la fórmula general.'
   );
+
+  const schoolXP = userData?.experiences?.school?.xp || 0;
 
   const SUBJECTS = [
     { id: 'math', name: 'Matemáticas', icon: Calculator, progress: '85%', color: 'from-emerald-500 to-teal-500', iconColor: 'text-emerald-400', samplePrompt: 'Demostración paso a paso del Teorema de Pitágoras' },
@@ -81,8 +90,68 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
     }
   };
 
+  // Mapeo entre el pilar seleccionado en el Dock inferior y la pestaña
+  const handleSelectPillar = (pillar: MiniAppPillar) => {
+    if (pillar === 'learn') setActiveTab('tutor');
+    else if (pillar === 'lab') setActiveTab('ocr');
+    else if (pillar === 'tests') setActiveTab('map');
+  };
+
+  const currentPillar: MiniAppPillar = activeTab === 'tutor' ? 'learn' : activeTab === 'ocr' ? 'lab' : 'tests';
+
+  // Secciones para el menú inferior desplegable ("Hamburguesa Abajorizada")
+  const submenuSections: SubmenuSection[] = [
+    {
+      title: 'Tutoría Socrática por Materias',
+      icon: BookOpen,
+      items: SUBJECTS.map((sub) => ({
+        id: `subject-${sub.id}`,
+        label: sub.name,
+        description: sub.samplePrompt,
+        icon: sub.icon,
+        badge: sub.progress,
+        isActive: activeTab === 'tutor' && selectedSubject === sub.name,
+        onClick: () => {
+          setSelectedSubject(sub.name);
+          setUserQuery(sub.samplePrompt);
+          setActiveTab('tutor');
+        }
+      }))
+    },
+    {
+      title: 'Laboratorios & OCR',
+      icon: FlaskConical,
+      items: [
+        {
+          id: 'lab-ocr',
+          label: 'Escáner OCR Holográfico',
+          description: 'Digitalización y resolución socrática de apuntes reales',
+          icon: Scan,
+          badge: '+25 XP',
+          isActive: activeTab === 'ocr',
+          onClick: () => setActiveTab('ocr')
+        }
+      ]
+    },
+    {
+      title: 'Itinerario Académico',
+      icon: Trophy,
+      items: [
+        {
+          id: 'map-knowledge',
+          label: 'Mapa Curricular & Retos',
+          description: 'Competencias dominadas y temas de refuerzo',
+          icon: Compass,
+          badge: '82% Nivel',
+          isActive: activeTab === 'map',
+          onClick: () => setActiveTab('map')
+        }
+      ]
+    }
+  ];
+
   return (
-    <div className="w-full space-y-4 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 pb-24 font-display">
+    <div className="w-full space-y-4 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 pb-28 font-display">
       
       {/* Banner de Modo Exploración Libre */}
       {!isAuthenticated && (
@@ -101,83 +170,18 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
         </div>
       )}
 
-      {/* Hero Header Inmersivo Cyber-Matrix de Escuela IA */}
-      <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-slate-950/90 p-5 sm:p-6 shadow-2xl backdrop-blur-xl cyber-grid-pattern">
-        {/* Resplandor Esmeralda Ambiental */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-        
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="p-3 rounded-2xl bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.25)] shrink-0">
-              <BookOpen className="w-6 h-6 text-emerald-400" />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="font-extrabold text-xl sm:text-2xl text-white tracking-tight flex items-center gap-2">
-                  Escuela IA
-                  <span className="text-emerald-400 font-mono text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30">
-                    LAB SOCRÁTICO
-                  </span>
-                </h1>
-              </div>
-              <p className="text-xs text-emerald-200/70 mt-1 max-w-xl">
-                Tutoría Socrática Multimodal & Visor de Reconocimiento OCR de Apuntes Manuscritos.
-              </p>
-            </div>
-          </div>
-
-          {/* Selector de Pestañas Cyber */}
-          <div className="flex items-center gap-1.5 bg-slate-900/90 border border-slate-800 p-1 rounded-2xl shrink-0">
-            <button
-              onClick={() => setActiveTab('tutor')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeTab === 'tutor'
-                  ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/25 font-extrabold scale-102'
-                  : 'text-slate-400 hover:text-emerald-300'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Tutor Socrático</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('ocr')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeTab === 'ocr'
-                  ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/25 font-extrabold scale-102'
-                  : 'text-slate-400 hover:text-emerald-300'
-              }`}
-            >
-              <Scan className="w-3.5 h-3.5" />
-              <span>Escáner OCR</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('map')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
-                activeTab === 'map'
-                  ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/25 font-extrabold scale-102'
-                  : 'text-slate-400 hover:text-emerald-300'
-              }`}
-            >
-              <Compass className="w-3.5 h-3.5" />
-              <span>Mapa Curricular</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       {/* Asignaturas Principales con Micro-Elevación Esmeralda */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         {SUBJECTS.map((sub) => {
           const SubIcon = sub.icon;
-          const isSel = selectedSubject === sub.name;
+          const isSel = selectedSubject === sub.name && activeTab === 'tutor';
           return (
             <div 
               key={sub.id} 
               onClick={() => {
                 setSelectedSubject(sub.name);
                 setUserQuery(sub.samplePrompt);
+                setActiveTab('tutor');
               }}
               className={`border rounded-2xl p-3.5 space-y-2.5 cursor-pointer transition-all duration-300 hover:-translate-y-1 relative overflow-hidden ${
                 isSel 
@@ -205,7 +209,7 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
 
       {/* Pestaña: Tutor Socrático */}
       {activeTab === 'tutor' && (
-        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl">
+        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl animate-fadeIn">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
             <div className="space-y-0.5">
               <h3 className="font-extrabold text-sm text-white flex items-center gap-2">
@@ -297,7 +301,7 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
 
       {/* Pestaña: Escáner OCR con Visor Láser Holográfico */}
       {activeTab === 'ocr' && (
-        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl">
+        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl animate-fadeIn">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
             <div className="space-y-0.5">
               <h3 className="font-extrabold text-sm text-white flex items-center gap-2">
@@ -391,7 +395,7 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
 
       {/* Pestaña: Mapa Curricular */}
       {activeTab === 'map' && (
-        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-3 shadow-xl backdrop-blur-xl">
+        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-3 shadow-xl backdrop-blur-xl animate-fadeIn">
           <div className="flex items-center justify-between border-b border-slate-800 pb-3">
             <div>
               <h3 className="font-extrabold text-sm text-white">Mapa de Conocimiento Académico</h3>
@@ -435,8 +439,56 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onOpenAuth }) => {
         </div>
       )}
 
+      {/* Dock Inferior Ultra-Minimalista de Escuela IA */}
+      <MiniAppBottomNav
+        experienceId="school"
+        onOpenMenu={() => setIsSubmenuOpen(true)}
+        items={[
+          {
+            id: 'tutor',
+            label: 'Tutor IA',
+            icon: Sparkles,
+            isActive: activeTab === 'tutor',
+            onClick: () => setActiveTab('tutor')
+          },
+          {
+            id: 'ocr',
+            label: 'Escáner OCR',
+            icon: Scan,
+            badge: '+25 XP',
+            isActive: activeTab === 'ocr',
+            onClick: () => setActiveTab('ocr')
+          },
+          {
+            id: 'map',
+            label: 'Mapa Curricular',
+            icon: Compass,
+            isActive: activeTab === 'map',
+            onClick: () => setActiveTab('map')
+          }
+        ]}
+      />
+
+      {/* Submenú Desplegable Discreto hacia arriba */}
+      <MiniAppSubmenuSheet
+        isOpen={isSubmenuOpen}
+        onClose={() => setIsSubmenuOpen(false)}
+        experienceId="school"
+        onNavigateExperience={onNavigateExperience}
+        onSelectAction={(actionId) => {
+          if (actionId === 'learn') setActiveTab('tutor');
+          if (actionId === 'lab') setActiveTab('ocr');
+          if (actionId === 'tests') setActiveTab('map');
+          if (actionId === 'subj-math') setSelectedSubject('Matemáticas');
+          if (actionId === 'subj-physics') setSelectedSubject('Física & Química');
+          if (actionId === 'subj-lang') setSelectedSubject('Lengua y Literatura');
+          if (actionId === 'subj-bio') setSelectedSubject('Biología & Ciencias');
+          if (actionId === 'subj-hist') setSelectedSubject('Historia & Geo');
+        }}
+      />
+
     </div>
   );
 };
 
-
+export default SchoolView;

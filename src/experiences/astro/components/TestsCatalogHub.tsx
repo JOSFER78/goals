@@ -28,7 +28,7 @@ export const TestsCatalogHub: React.FC<TestsCatalogHubProps> = ({
 }) => {
   const { userData, isTestUnlocked, adminBypass, toggleAdminBypass, showToast, effectiveAge } = useProgress();
   const { user } = useAuth();
-  const isUserAdmin = Boolean(user?.email === 'josferestudio@gmail.com' || userData?.role === 'admin');
+  const isUserAdmin = Boolean(user?.email === 'josferestudio@gmail.com' || userData?.role === 'admin' || user?.role === 'admin');
 
   const declaredAge = effectiveAge || userData?.learnerProfile?.education?.age || userData?.childProfile?.age || 9;
   const levelBadge = PresentationEngine.getLevelBadge(declaredAge);
@@ -42,7 +42,7 @@ export const TestsCatalogHub: React.FC<TestsCatalogHubProps> = ({
         const prog = astroLessons[canonicalNum];
         const isCompleted = Boolean(prog?.testDone);
         const stars = prog?.stars || 0;
-        const isUnlocked = isTestUnlocked(canonicalNum) || adminBypass;
+        const isUnlocked = isUserAdmin || isTestUnlocked(canonicalNum) || adminBypass;
         const qCount = u.test?.questions?.length || 4;
 
         return {
@@ -63,7 +63,7 @@ export const TestsCatalogHub: React.FC<TestsCatalogHubProps> = ({
         const prog = astroLessons[l.id];
         const isCompleted = Boolean(prog?.testDone);
         const stars = prog?.stars || 0;
-        const isUnlocked = isTestUnlocked(l.id) || adminBypass;
+        const isUnlocked = isUserAdmin || isTestUnlocked(l.id) || adminBypass;
         const qCount = l.test?.length || 4;
 
         return {

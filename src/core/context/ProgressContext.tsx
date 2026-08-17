@@ -12,6 +12,7 @@ interface ProgressContextType {
   toggleAdminBypass: () => void;
   adminSimulatedAge: number | null;
   setAdminSimulatedAge: (age: number | null) => void;
+  isUserAdmin: boolean;
   effectiveAge: number;
   lessonProg: (id: number) => LessonProgress;
   lessonUnlocked: (id: number) => boolean;
@@ -246,7 +247,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const lessonUnlocked = (id: number): boolean => {
     if (id === 1) return true;
-    if (isUserAdmin && adminBypass) return true;
+    if (isUserAdmin) return true; // SuperAdmin siempre tiene acceso a todos los niveles
     const prevProg = lessonProg(id - 1);
     const prevDef = LESSONS.find(l => l.id === id - 1);
     const maxSteps = prevDef ? prevDef.steps.length : 4;
@@ -256,7 +257,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const isLessonUnlocked = lessonUnlocked;
 
   const isTestUnlocked = (id: number): boolean => {
-    if (isUserAdmin && adminBypass) return true;
+    if (isUserAdmin) return true; // SuperAdmin siempre tiene acceso a todos los tests
     if (!isLessonUnlocked(id)) return false;
     if (id === 1) return true;
     const current = lessonProg(id);
@@ -543,6 +544,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       toggleAdminBypass,
       adminSimulatedAge,
       setAdminSimulatedAge,
+      isUserAdmin,
       effectiveAge,
       lessonProg,
       lessonUnlocked,

@@ -1,6 +1,17 @@
 // Servicio Transparente de Verificación y Auto-Actualización de APK In-App
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import { 
+  CURRENT_APP_VERSION, 
+  CURRENT_VERSION_CODE, 
+  VERSION_CHECK_URL, 
+  APK_DOWNLOAD_URL,
+  VersionInfo,
+  compareSemver
+} from '../config/version';
+import { appUpdateService } from './AppUpdateService';
+
+export { CURRENT_APP_VERSION, CURRENT_VERSION_CODE, compareSemver };
 
 export interface UpdateInfo {
   hasUpdate: boolean;
@@ -11,10 +22,6 @@ export interface UpdateInfo {
   publishedAt: string;
   isNative: boolean;
 }
-
-export const CURRENT_APP_VERSION = '2.5.0';
-const VERSION_ENDPOINT = 'https://appgoals.web.app/version.json';
-const DEFAULT_APK_URL = 'https://appgoals.web.app/downloads/goalskid_2.5.zip';
 
 export const isNativeApp = (): boolean => Capacitor.isNativePlatform();
 
@@ -42,99 +49,40 @@ export async function getAppVersion(): Promise<string> {
 }
 
 /**
- * Compara dos versiones semver (ej: "2.4.0" > "2.3.0")
+ * Compara dos versiones semver (ej: "2.5.1" > "2.5.0")
  */
 export function isVersionNewer(latest: string, current: string): boolean {
-  const cleanLatest = latest.replace(/^v/, '').trim();
-  const cleanCurrent = current.replace(/^v/, '').trim();
-
-  const latestParts = cleanLatest.split('.').map((n) => parseInt(n, 10) || 0);
-  const currentParts = cleanCurrent.split('.').map((n) => parseInt(n, 10) || 0);
-
-  for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
-    const l = latestParts[i] || 0;
-    const c = currentParts[i] || 0;
-    if (l > c) return true;
-    if (l < c) return false;
-  }
-  return false;
+  return compareSemver(latest, current) > 0;
 }
 
 /**
- * Consulta el endpoint remoto version.json en tiempo real desde cualquier plataforma (Web, Windows, APK Nativa)
+ * Consulta el endpoint oficial version.json
  */
 export async function checkForApkUpdate(): Promise<UpdateInfo> {
-  const isNative = isNativeApp();
-  const currentVersion = await getAppVersion();
+  const check = await appUpdateService.checkForUpdates(true);
+  const info = check.updateInfo;
 
-  try {
-    const response = await fetch(`${VERSION_ENDPOINT}?t=${Date.now()}`, {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`Servidor de actualizaciones respondió (${response.status})`);
-    }
-
-    const data = await response.json();
-    const latestVersion = data.version || CURRENT_APP_VERSION;
-    const downloadUrl = data.apkUrl || DEFAULT_APK_URL;
-    const hasUpdate = isVersionNewer(latestVersion, currentVersion);
-
-    return {
-      hasUpdate,
-      currentVersion,
-      latestVersion,
-      downloadUrl,
-      releaseNotes: data.changelog || 'Novedades y optimizaciones de rendimiento.',
-      publishedAt: new Date().toISOString(),
-      isNative
-    };
-  } catch (error: any) {
-    console.warn('Verificación de actualización:', error.message);
-    return {
-      hasUpdate: false,
-      currentVersion,
-      latestVersion: CURRENT_APP_VERSION,
-      downloadUrl: DEFAULT_APK_URL,
-      releaseNotes: 'Servidor de actualizaciones en mantenimiento.',
-      publishedAt: new Date().toISOString(),
-      isNative
-    };
-  }
+  return {
+    hasUpdate: check.hasUpdate,
+    currentVersion: check.currentVersion,
+    latestVersion: check.latestVersion,
+    downloadUrl: info?.apkDirectDownload || info?.apkUrl || APK_DOWNLOAD_URL,
+    releaseNotes: Array.isArray(info?.releaseNotes) ? info.releaseNotes.join(' • ') : (info?.releaseNotes || 'Mejoras y correcciones'),
+    publishedAt: info?.releaseDate || new Date().toISOString().split('T')[0],
+    isNative: Capacitor.isNativePlatform()
+  };
 }
 
 /**
- * Descarga directa del archivo goalskid_2.4.apk usando elemento <a download>
+ * Lanza la instalación/descarga del APK
  */
-export function triggerApkInstall(downloadUrl?: string): void {
-  const url = downloadUrl || DEFAULT_APK_URL;
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'goalskid_2.5.zip';
-  a.target = '_blank';
-  a.rel = 'noopener noreferrer';
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => {
-    document.body.removeChild(a);
-  }, 100);
+export function triggerApkInstall(apkUrl?: string): void {
+  appUpdateService.launchUpdate(apkUrl);
 }
 
+/**
+ * Marca una versión como descartada
+ */
 export function markUpdateDismissed(version: string): void {
-  try {
-    localStorage.setItem('goals_dismissed_update_version', version);
-  } catch (e) {}
-}
-
-export function isUpdateDismissed(version: string): boolean {
-  try {
-    return localStorage.getItem('goals_dismissed_update_version') === version;
-  } catch (e) {
-    return false;
-  }
+  appUpdateService.dismissVersion(version);
 }

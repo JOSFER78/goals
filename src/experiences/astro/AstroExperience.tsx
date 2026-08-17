@@ -19,21 +19,29 @@ import { LegacyCurriculumAdapter } from '../../core/services/LegacyCurriculumAda
 import { PresentationEngine } from '../../core/services/PresentationEngine';
 import { AdaptiveCosmosCatalogService } from './data/adaptiveCosmosCatalog';
 import { CurriculumUnit, AgeTranche } from '../../core/types/adaptiveCurriculum';
-import { BookOpen, CheckCircle2, Sparkles, ChevronRight } from 'lucide-react';
+import { BookOpen, CheckCircle2, Sparkles, ChevronRight, Orbit, Trophy, FlaskConical } from 'lucide-react';
 
 import { TestsCatalogHub } from './components/TestsCatalogHub';
 import { CosmicLearningPath } from './components/CosmicLearningPath';
+
+// Componentes del Sistema de Navegación Universal
+import { MiniAppSubHeader } from '../../core/components/navigation/MiniAppSubHeader';
+import { MiniAppBottomNav, MiniAppPillar } from '../../core/components/navigation/MiniAppBottomNav';
+import { MiniAppSubmenuSheet, SubmenuSection } from '../../core/components/navigation/MiniAppSubmenuSheet';
+import { ExperienceId } from '../../core/types';
 
 interface AstroExperienceProps {
   onBackToGoals: () => void;
   onOpenProfile: () => void;
   onOpenAuth?: (mode: 'login' | 'signup') => void;
+  onNavigateExperience?: (expId: ExperienceId) => void;
 }
 
 export const AstroExperience: React.FC<AstroExperienceProps> = ({
   onBackToGoals,
   onOpenProfile,
-  onOpenAuth
+  onOpenAuth,
+  onNavigateExperience
 }) => {
   const { user } = useAuth();
   const { userData, finishTest, completeStep, isLessonUnlocked, isTestUnlocked, showToast, effectiveAge } = useProgress();
@@ -45,28 +53,32 @@ export const AstroExperience: React.FC<AstroExperienceProps> = ({
   const [isReadingLesson, setIsReadingLesson] = useState<boolean>(false);
   const [isTakingTest, setIsTakingTest] = useState<boolean>(false);
   const [isBottomNavCollapsed, setIsBottomNavCollapsed] = useState<boolean>(false);
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState<boolean>(false);
 
   const declaredAge = effectiveAge || userData?.learnerProfile?.education?.age || userData?.childProfile?.age || 9;
   const tranche: AgeTranche = PresentationEngine.getTrancheForAge(declaredAge);
+  const allUnits: CurriculumUnit[] = LegacyCurriculumAdapter.getAllAdaptedUnits();
   const trancheUnits: CurriculumUnit[] = AdaptiveCosmosCatalogService.getUnitsForTranche(tranche);
 
-  // Resolver unidad activa
+  const astroXP = userData?.experiences?.astro?.xp || userData?.xp || 0;
+
+  // Resolver unidad activa (prioriza allUnits para soportar las 12 lecciones)
   const activeCurriculumUnit: CurriculumUnit | undefined = currentUnitId 
-    ? AdaptiveCosmosCatalogService.getUnitById(currentUnitId)
-    : (trancheUnits[currentLessonId - 1] || trancheUnits[0]);
+    ? (AdaptiveCosmosCatalogService.getUnitById(currentUnitId) || allUnits.find(u => u.id === currentUnitId))
+    : (allUnits[currentLessonId - 1] || allUnits[0]);
 
   const currentLesson: Lesson = LESSONS.find(l => l.id === currentLessonId) || LESSONS[0];
 
   const handleSelectLesson = (id: number) => {
     setCurrentLessonId(id);
-    const unit = trancheUnits[id - 1] || trancheUnits[0];
+    const unit = allUnits[id - 1] || allUnits[0];
     if (unit) setCurrentUnitId(unit.id);
     setIsReadingLesson(true);
   };
 
   const handleSelectUnit = (unitId: string) => {
     setCurrentUnitId(unitId);
-    const unit = AdaptiveCosmosCatalogService.getUnitById(unitId);
+    const unit = AdaptiveCosmosCatalogService.getUnitById(unitId) || allUnits.find(u => u.id === unitId);
     if (unit) {
       setCurrentLessonId(unit.canonicalNumber);
     }
@@ -76,14 +88,14 @@ export const AstroExperience: React.FC<AstroExperienceProps> = ({
   const handleSelectTest = (id: number, unitId?: string) => {
     if (unitId) {
       setCurrentUnitId(unitId);
-      const unit = AdaptiveCosmosCatalogService.getUnitById(unitId);
+      const unit = AdaptiveCosmosCatalogService.getUnitById(unitId) || allUnits.find(u => u.id === unitId);
       if (unit) {
         setCurrentLessonId(unit.canonicalNumber);
       } else {
         setCurrentLessonId(id);
       }
     } else {
-      const unit = trancheUnits[id - 1] || trancheUnits[0];
+      const unit = allUnits[id - 1] || allUnits[0];
       if (unit) {
         setCurrentUnitId(unit.id);
         setCurrentLessonId(unit.canonicalNumber);
@@ -94,17 +106,80 @@ export const AstroExperience: React.FC<AstroExperienceProps> = ({
     setIsTakingTest(true);
   };
 
+  // Mapeo entre Dock y Tabs
+  const handleSelectPillar = (pillar: MiniAppPillar) => {
+    if (pillar === 'learn') setActiveTab('learn');
+    else if (pillar === 'lab') setActiveTab('explore');
+    else if (pillar === 'tests') setActiveTab('tests');
+  };
+
+  const currentPillar: MiniAppPillar = activeTab === 'learn' ? 'learn' : activeTab === 'explore' ? 'lab' : 'tests';
+
+  // Submenú Desplegable de Cosmos 3D
+  const submenuSections: SubmenuSection[] = [
+    {
+      title: 'Ruta Cósmica (12 Lecciones Teóricas)',
+      icon: BookOpen,
+      items: LESSONS.map((les) => ({
+        id: `astro-les-${les.id}`,
+        label: `${les.id}. ${les.title}`,
+        description: les.tag,
+        icon: BookOpen,
+        badge: les.tag,
+        isActive: activeTab === 'learn' && isReadingLesson && currentLessonId === les.id,
+        isCompleted: ((userData?.experiences?.astro as any)?.completedLessons || []).includes(les.id),
+        onClick: () => {
+          handleSelectLesson(les.id);
+          setActiveTab('learn');
+        }
+      }))
+    },
+    {
+      title: 'Simulador Espacial 3D NASA',
+      icon: Orbit,
+      items: [
+        {
+          id: 'astro-3d-sim',
+          label: 'Simulador Espacial WebGL2',
+          description: 'Viajes orbitales, telemetría y modelos planetarios 3D',
+          icon: Sparkles,
+          badge: 'WebGL2',
+          isActive: activeTab === 'explore',
+          onClick: () => setActiveTab('explore')
+        }
+      ]
+    },
+    {
+      title: 'Centro de Evaluaciones (12 Tests)',
+      icon: Trophy,
+      items: [
+        {
+          id: 'astro-tests-hub',
+          label: 'Catálogo de 12 Tests Formativos',
+          description: 'Exámenes adaptados por tramo con estrellas y XP',
+          icon: Trophy,
+          badge: '12 Tests',
+          isActive: activeTab === 'tests' && !isTakingTest,
+          onClick: () => {
+            setIsTakingTest(false);
+            setActiveTab('tests');
+          }
+        }
+      ]
+    }
+  ];
+
   return (
-    <div className="relative w-full h-full min-h-[calc(100vh-60px)] flex flex-col bg-slate-950 overflow-hidden select-none">
+    <div className="relative w-full h-full min-h-[calc(100vh-60px)] flex flex-col bg-slate-950 overflow-hidden select-none font-display">
       
       {/* ÁREA PRINCIPAL SEGÚN PESTAÑA ACTIVA */}
       <div className="flex-1 relative w-full h-full overflow-hidden flex flex-col">
         
-        {/* PESTAÑA 1: LECCIONES TEÓRICAS */}
+        {/* PESTAÑA 1: LECCIONES TEÓRICAS (12 Lecciones) */}
         {activeTab === 'learn' && (
-          <div className="flex-1 w-full h-full overflow-y-auto p-3 sm:p-6 scrollbar-thin">
+          <div className="flex-1 w-full h-full overflow-y-auto p-3 sm:p-6 pb-28 scrollbar-thin">
             {!isReadingLesson ? (
-              /* RUTA DE APRENDIZAJE CÓSMICA ADAPTADA */
+              /* RUTA DE APRENDIZAJE CÓSMICA CON TODAS LAS 12 LECCIONES */
               <CosmicLearningPath
                 lessons={LESSONS}
                 onSelectLesson={handleSelectLesson}
@@ -133,21 +208,20 @@ export const AstroExperience: React.FC<AstroExperienceProps> = ({
           </div>
         )}
 
-        {/* PESTAÑA 2: TESTS Y EVALUACIÓN */}
+        {/* PESTAÑA 2: TESTS Y EVALUACIÓN (12 Tests) */}
         {activeTab === 'tests' && (
-          <div className="flex-1 w-full h-full overflow-y-auto p-3 sm:p-6 scrollbar-thin">
+          <div className="flex-1 w-full h-full overflow-y-auto p-3 sm:p-6 pb-28 scrollbar-thin">
             {!isTakingTest ? (
-              /* CENTRO DE EVALUACIONES Y TESTS INDEPENDIENTES ADAPTADOS POR TRAMO */
+              /* CENTRO DE EVALUACIONES CON LOS 12 TESTS COMPLETOS */
               <TestsCatalogHub
-                units={trancheUnits}
+                units={allUnits}
                 lessons={LESSONS}
                 onSelectTest={handleSelectTest}
                 onGoToLesson={(id, unitId) => {
                   if (unitId) {
                     handleSelectUnit(unitId);
-                  } else {
-                    handleSelectLesson(id);
                   }
+                  handleSelectLesson(id);
                   setActiveTab('learn');
                 }}
               />
@@ -249,57 +323,54 @@ export const AstroExperience: React.FC<AstroExperienceProps> = ({
 
       </div>
 
-      {/* TIRADOR DE AUTOPLEGADO PARA MODO EXPLORAR 3D */}
-      <div className="relative shrink-0 flex flex-col items-center">
-        {activeTab === 'explore' && (
-          <div className="absolute -top-7 z-50 flex justify-center w-full pointer-events-none">
-            <button
-              onClick={() => setIsBottomNavCollapsed(!isBottomNavCollapsed)}
-              className="pointer-events-auto px-4 py-1 rounded-t-xl bg-slate-950/95 hover:bg-slate-900 border-t border-x border-cyan-500/40 text-[11px] font-mono font-extrabold text-cyan-300 backdrop-blur-2xl shadow-2xl flex items-center justify-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-cyan-950"
-              title={isBottomNavCollapsed ? 'Desplegar Barra de Navegación (Lecciones / Tests)' : 'Plegar Barra de Navegación para más espacio 3D'}
-              aria-expanded={!isBottomNavCollapsed}
-            >
-              <span className="text-cyan-400 font-bold">{isBottomNavCollapsed ? '▲' : '▼'}</span>
-              <span>{isBottomNavCollapsed ? 'Barra de Navegación' : 'Plegar Barra'}</span>
-            </button>
-          </div>
-        )}
+      {/* Dock Inferior Ultra-Minimalista de Cosmos 3D con Tirador Plegable */}
+      <MiniAppBottomNav
+        experienceId="astro"
+        isCollapsible={activeTab === 'explore'}
+        isCollapsed={isBottomNavCollapsed}
+        onToggleCollapse={() => setIsBottomNavCollapsed(!isBottomNavCollapsed)}
+        onOpenMenu={() => setIsSubmenuOpen(true)}
+        items={[
+          {
+            id: 'learn',
+            label: 'Lecciones',
+            icon: BookOpen,
+            isActive: activeTab === 'learn',
+            onClick: () => setActiveTab('learn')
+          },
+          {
+            id: 'explore',
+            label: 'Explorar 3D',
+            icon: Sparkles,
+            badge: 'WebGL2',
+            isActive: activeTab === 'explore',
+            onClick: () => setActiveTab('explore')
+          },
+          {
+            id: 'tests',
+            label: 'Tests (12)',
+            icon: CheckCircle2,
+            isActive: activeTab === 'tests',
+            onClick: () => setActiveTab('tests')
+          }
+        ]}
+      />
 
-        {/* NAVEGACIÓN INFERIOR DE 3 PESTAÑAS */}
-        {!isBottomNavCollapsed && (
-          <nav className="w-full flex border-t border-slate-800 bg-slate-950/95 backdrop-blur-xl z-40 shrink-0">
-            <button 
-              onClick={() => setActiveTab('learn')}
-              className={`flex-1 py-2 flex flex-col items-center gap-0.5 text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'learn' ? 'text-cyan-400 font-extrabold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Lecciones</span>
-            </button>
-
-            <button 
-              onClick={() => setActiveTab('tests')}
-              className={`flex-1 py-2 flex flex-col items-center gap-0.5 text-xs font-bold transition-all cursor-pointer ${
-                activeTab === 'tests' ? 'text-cyan-400 font-extrabold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Tests</span>
-            </button>
-
-            <button 
-              onClick={() => setActiveTab('explore')}
-              className={`flex-1 py-2 flex flex-col items-center gap-0.5 text-xs font-bold transition-all cursor-pointer relative ${
-                activeTab === 'explore' ? 'text-cyan-400 font-extrabold' : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Explorar 3D</span>
-            </button>
-          </nav>
-        )}
-      </div>
+      {/* Submenú Desplegable Discreto hacia arriba */}
+      <MiniAppSubmenuSheet
+        isOpen={isSubmenuOpen}
+        onClose={() => setIsSubmenuOpen(false)}
+        experienceId="astro"
+        onNavigateExperience={onNavigateExperience}
+        onSelectAction={(actionId) => {
+          if (actionId === 'learn') setActiveTab('learn');
+          if (actionId === 'lab') setActiveTab('explore');
+          if (actionId === 'tests') setActiveTab('tests');
+          if (actionId.startsWith('mission-') || actionId.startsWith('rover-')) {
+            setActiveTab('explore');
+          }
+        }}
+      />
 
     </div>
   );

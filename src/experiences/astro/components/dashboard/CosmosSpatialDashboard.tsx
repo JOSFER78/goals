@@ -488,7 +488,7 @@ export const CosmosSpatialDashboard: React.FC<CosmosSpatialDashboardProps> = ({
 
         {/* TELEMETRÍA INFERIOR FLOTANTE */}
         {!isZenMode && (
-          <div className="absolute bottom-2 left-2 md:bottom-3 md:left-3 pointer-events-none z-20">
+          <div className="absolute bottom-16 left-2 md:bottom-16 md:left-4 pointer-events-none z-20">
             <div className="pointer-events-auto bg-slate-950/80 backdrop-blur-xl border border-white/10 px-2.5 py-1.5 md:px-3 md:py-2 rounded-xl md:rounded-2xl shadow-2xl flex items-center gap-2 md:gap-3 text-[10px] md:text-[11px] font-mono">
               <div className="flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -509,7 +509,7 @@ export const CosmosSpatialDashboard: React.FC<CosmosSpatialDashboardProps> = ({
           En Móvil: Mitad Inferior (50% Pantalla) sin tapar el 3D
           ======================================================== */}
       {isSidebarOpen && !isZenMode && (
-        <aside className="w-full md:w-96 lg:w-[400px] h-[52vh] md:h-full bg-slate-950/95 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-white/10 flex flex-col z-40 shadow-2xl shrink-0 animate-in slide-in-from-bottom md:slide-in-from-right duration-300">
+        <aside className="w-full md:w-96 lg:w-[400px] h-[52vh] md:h-full pb-16 md:pb-0 bg-slate-950/95 backdrop-blur-2xl border-t md:border-t-0 md:border-l border-white/10 flex flex-col z-30 shadow-2xl shrink-0 animate-in slide-in-from-bottom md:slide-in-from-right duration-300">
           
           {/* CABECERA DEL SIDEBAR */}
           <div className="p-3 md:p-4 border-b border-white/10 flex items-start justify-between shrink-0">

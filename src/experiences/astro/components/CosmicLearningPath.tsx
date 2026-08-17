@@ -35,10 +35,10 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
 }) => {
   const { userData, isLessonUnlocked, isTestUnlocked, adminBypass, toggleAdminBypass, showToast, effectiveAge } = useProgress();
   const { user } = useAuth();
-  const isUserAdmin = Boolean(user?.email === 'josferestudio@gmail.com' || userData?.role === 'admin');
+  const isUserAdmin = Boolean(user?.email === 'josferestudio@gmail.com' || userData?.role === 'admin' || user?.role === 'admin');
 
-  // Modo de vista: 'my_path' (Ruta Personal Focalizada) vs 'full_catalog' (Catálogo Completo)
-  const [viewMode, setViewMode] = useState<'my_path' | 'full_catalog'>('my_path');
+  // Modo de vista: 'full_catalog' (Catálogo de 12 Lecciones) vs 'my_path' (Ruta Personal Focalizada)
+  const [viewMode, setViewMode] = useState<'my_path' | 'full_catalog'>('full_catalog');
   const [isDiagnosticOpen, setIsDiagnosticOpen] = useState<boolean>(false);
   const [studentState, setStudentState] = useState<StudentLearningState | null>(null);
   const [learningPath, setLearningPath] = useState<LearningPath | null>(null);
@@ -47,6 +47,7 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
   const declaredAge = effectiveAge || userData?.learnerProfile?.education?.age || userData?.childProfile?.age || 9;
   const declaredGrade = userData?.learnerProfile?.education?.grade || userData?.childProfile?.grade || '4º de Primaria';
   const tranche: AgeTranche = PresentationEngine.getTrancheForAge(declaredAge);
+  const allUnits: CurriculumUnit[] = LegacyCurriculumAdapter.getAllAdaptedUnits();
   const trancheUnits: CurriculumUnit[] = AdaptiveCosmosCatalogService.getUnitsForTranche(tranche);
   const levelBadge = PresentationEngine.getLevelBadge(declaredAge);
 
@@ -66,8 +67,8 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
           age: declaredAge,
           grade: declaredGrade,
           diagnosticStatus: 'pending',
-          recommendedStartUnitId: trancheUnits[0]?.id || 'astro_8_9_u01_atmosphere_satellites',
-          currentUnitId: trancheUnits[0]?.id || 'astro_8_9_u01_atmosphere_satellites',
+          recommendedStartUnitId: allUnits[0]?.id || 'astro_u01_earth_atmosphere',
+          currentUnitId: allUnits[0]?.id || 'astro_u01_earth_atmosphere',
           completedUnitIds: [],
           conceptMastery: {},
           weakConcepts: [],
@@ -80,7 +81,7 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
 
       if (isMounted) {
         setStudentState(state);
-        const path = LearningPathEngine.computeLearningPath(state, trancheUnits);
+        const path = LearningPathEngine.computeLearningPath(state, allUnits);
         setLearningPath(path);
       }
     };
@@ -90,7 +91,7 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
   }, [userId, declaredAge, declaredGrade, tranche]);
 
   const completedUnitsCount = learningPath?.completedUnitsCount || 0;
-  const totalUnits = trancheUnits.length;
+  const totalUnits = allUnits.length;
   const progressPct = Math.round((completedUnitsCount / Math.max(1, totalUnits)) * 100);
 
   const handleStartDiagnostic = () => {
@@ -101,7 +102,7 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
     const state = await studentStateService.getStudentState(userId, 'astro');
     if (state) {
       setStudentState(state);
-      setLearningPath(LearningPathEngine.computeLearningPath(state, trancheUnits));
+      setLearningPath(LearningPathEngine.computeLearningPath(state, allUnits));
     }
   };
 
@@ -125,7 +126,7 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
                 <Compass className="w-5 h-5" />
               </span>
               <h2 className="text-lg sm:text-xl font-display font-extrabold text-white tracking-tight">
-                Ruta de Aprendizaje Cósmica
+                Ruta de Aprendizaje Cósmica (12 Lecciones)
               </h2>
             </div>
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
@@ -134,27 +135,14 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
                 {levelBadge.label}
               </span>
               <span className="text-xs text-slate-400 font-mono">
-                {levelBadge.stageTitle} • {totalUnits} Unidades Adaptadas
+                {levelBadge.stageTitle} • 12 Lecciones Completas
               </span>
             </div>
           </div>
 
-          {/* SELECTOR DE VISTA: MI CAMINO vs CATÁLOGO */}
+          {/* SELECTOR DE VISTA: CATÁLOGO vs MI CAMINO */}
           <div className="flex items-center gap-2 shrink-0">
             <div className="flex bg-slate-950 border border-slate-800 p-1 rounded-2xl">
-              <button
-                type="button"
-                onClick={() => setViewMode('my_path')}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  viewMode === 'my_path'
-                    ? 'bg-indigo-600 text-white shadow-md'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Compass className="w-3.5 h-3.5" />
-                <span>Mi Camino</span>
-              </button>
-
               <button
                 type="button"
                 onClick={() => setViewMode('full_catalog')}
@@ -165,7 +153,20 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
-                <span>Catálogo ({totalUnits})</span>
+                <span>12 Lecciones</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setViewMode('my_path')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  viewMode === 'my_path'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Compass className="w-3.5 h-3.5" />
+                <span>Mi Progreso</span>
               </button>
             </div>
 
@@ -190,8 +191,8 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
           </div>
         </div>
 
-        {/* BANNER DE DIAGNÓSTICO PENDIENTE SI CORRESPONDE */}
-        {studentState?.diagnosticStatus === 'pending' && (
+        {/* BANNER DE DIAGNÓSTICO PENDIENTE SI CORRESPONDE (Oculto para super admin) */}
+        {!isUserAdmin && studentState?.diagnosticStatus === 'pending' && (
           <div className="p-4 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-indigo-500/20 text-indigo-300 shrink-0">
@@ -301,7 +302,7 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
               <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400">Próximos Pasos en tu Camino</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {learningPath.upcomingUnits.map((u) => {
-                  const isUnlocked = u.status === 'upcoming' || u.status === 'completed' || adminBypass;
+                  const isUnlocked = isUserAdmin || u.status === 'upcoming' || u.status === 'completed' || adminBypass;
                   return (
                     <div
                       key={u.unitId}
@@ -335,13 +336,22 @@ export const CosmicLearningPath: React.FC<CosmicLearningPathProps> = ({
         </div>
       )}
 
-      {/* VISTA 2: CATÁLOGO COMPLETO DE UNIDADES */}
+      {/* VISTA 2: CATÁLOGO COMPLETO DE LAS 12 LECCIONES */}
       {viewMode === 'full_catalog' && (
         <div className="space-y-4 animate-in fade-in duration-300">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-cyan-400">
+              Catálogo Maestro · 12 Lecciones de Astrofísica
+            </span>
+            <span className="text-xs font-mono text-slate-400">
+              12 Unidades Disponibles
+            </span>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {trancheUnits.map((unit) => {
+            {allUnits.map((unit) => {
               const isCompleted = studentState?.completedUnitIds?.includes(unit.id) || false;
-              const isUnlocked = isCompleted || unit.id === studentState?.currentUnitId || adminBypass;
+              const isUnlocked = isUserAdmin || isLessonUnlocked(unit.canonicalNumber) || isCompleted || unit.id === studentState?.currentUnitId || adminBypass;
 
               return (
                 <div

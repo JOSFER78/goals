@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { useTheme } from '../context/ThemeContext';
 import { db, collection, onSnapshot } from '../config/firebase';
-import { Zap, Flame, Star, ArrowLeft, Shield, LogIn, User, Sparkles, LogOut, Sun, Moon } from 'lucide-react';
+import { Zap, Flame, Star, ArrowLeft, Shield, LogIn, User, Sparkles, LogOut, Sun, Moon, Menu } from 'lucide-react';
 import { ExperienceId, AppViewMode } from '../types';
 import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
 
@@ -175,36 +175,47 @@ export const Header: React.FC<HeaderProps> = ({
         : 'border-slate-200 bg-white/95 text-slate-900 shadow-sm'
     }`}>
       
-      {/* Sección Izquierda: Logotipo GOALS con Menú Hover Desplegable Directo de MiniApps */}
-      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-        
-        {/* Contenedor del Logo con Hover y Cierre Instantáneo */}
+      {/* Sección Izquierda: Logotipo Adaptativo (Sustitución directa de GOALS por la MiniApp activa) */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
         <div 
           ref={dropdownRef}
-          className="relative group/goalslogo py-1"
+          className="relative group/cornerlogo py-1"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
           <button 
             type="button"
             onClick={handleLogoClick}
-            className="flex items-center gap-2.5 cursor-pointer group shrink-0 text-left bg-transparent border-0 p-0 focus:outline-none transition-transform active:scale-95"
-            title="Goalskid Platform (Pasa el ratón para ver las MiniApps)"
+            className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group shrink-0 text-left bg-transparent border-0 p-0 focus:outline-none transition-transform active:scale-95"
+            title={activeExpConfig ? `${activeExpConfig.name} • Pincha para ir al inicio de Goals o pasa el ratón para cambiar de app` : "Goalskid Platform • Pasa el ratón para ver las MiniApps"}
           >
             <div className="relative">
               <img 
-                src="/goalskid_logo.png" 
-                alt="Goalskid Logo" 
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl border border-slate-700/80 shadow-md object-cover group-hover:scale-105 group-hover:border-slate-500 transition-all duration-200 shrink-0" 
+                src={activeExpConfig ? activeExpConfig.logoUrl : "/goalskid_logo.png"} 
+                alt={activeExpConfig ? activeExpConfig.name : "Goalskid Logo"} 
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border border-slate-700/80 shadow-md object-cover group-hover:scale-105 group-hover:border-slate-500 transition-all duration-200 shrink-0" 
               />
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-400 border-2 border-slate-950 shadow-sm"></span>
             </div>
             
             <div className="flex flex-col">
-              <span className="font-display font-black text-base sm:text-lg tracking-tight text-white group-hover:text-slate-200 transition-colors leading-tight">
-                Goalskid
+              <div className="flex items-center gap-1.5">
+                <span className={`font-display font-black text-sm sm:text-base tracking-tight transition-colors leading-tight ${
+                  isDark ? 'text-white group-hover:text-slate-200' : 'text-slate-900 group-hover:text-indigo-600'
+                }`}>
+                  {activeExpConfig ? activeExpConfig.name : "Goalskid"}
+                </span>
+                {activeExpConfig ? (
+                  <span className={`px-1.5 py-0.2 rounded-md text-[9px] font-mono font-bold uppercase border hidden sm:inline-block ${activeExpConfig.badgeClass}`}>
+                    {activeExpConfig.badge}
+                  </span>
+                ) : null}
+              </div>
+              <span className={`hidden md:inline text-[9px] font-medium tracking-tight -mt-0.5 ${
+                isDark ? 'text-slate-400' : 'text-slate-500'
+              }`}>
+                {activeExpConfig ? activeExpConfig.tagline : "Ecosistema Educativo IA"}
               </span>
-              <span className="hidden md:inline text-[10px] text-slate-400 font-medium tracking-tight -mt-0.5">Ecosistema Educativo IA</span>
             </div>
           </button>
 
@@ -220,16 +231,57 @@ export const Header: React.FC<HeaderProps> = ({
 
           {isDropdownHovered && (
             <div className="absolute top-full left-0 pt-2 w-72 sm:w-84 z-50 animate-fadeIn">
-              <div className="bg-[#0c101c]/95 backdrop-blur-2xl border border-slate-800 rounded-2xl p-2.5 shadow-2xl shadow-black/80 space-y-1.5">
-                <div className="px-2 py-1 border-b border-slate-800/80 flex items-center justify-between">
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-200">MiniApps de Goalskid</span>
-                  </div>
-                  <span className="text-[10px] font-mono font-medium text-slate-400 bg-slate-900 px-2 py-0.5 rounded-full border border-slate-800">5 Módulos</span>
+              <div className={`backdrop-blur-2xl border rounded-2xl p-2.5 shadow-2xl space-y-1.5 ${
+                isDark ? 'bg-[#0c101c]/95 border-slate-800 shadow-black/80' : 'bg-white/95 border-slate-200 shadow-slate-300/60'
+              }`}>
+                {/* Encabezado del Dropdown con botón directo a GOALS */}
+                <div className={`px-2 py-1.5 border-b flex items-center justify-between ${
+                  isDark ? 'border-slate-800/80' : 'border-slate-100'
+                }`}>
+                  <button
+                    type="button"
+                    onClick={handleLogoClick}
+                    className="flex items-center gap-2 hover:opacity-80 transition-opacity text-left cursor-pointer"
+                  >
+                    <img src="/goalskid_logo.png" alt="GOALS" className="w-5 h-5 rounded-md object-cover" />
+                    <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                      isDark ? 'text-slate-200' : 'text-slate-800'
+                    }`}>GOALS • Módulos</span>
+                  </button>
+                  <span className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded-full border ${
+                    isDark ? 'text-slate-400 bg-slate-900 border-slate-800' : 'text-slate-600 bg-slate-100 border-slate-200'
+                  }`}>5 MiniApps</span>
                 </div>
 
-                <div className="space-y-1 pt-1">
+                {/* Botón Volver al Inicio Matriz (Hub) */}
+                <button
+                  type="button"
+                  onClick={handleLogoClick}
+                  className={`w-full p-2 rounded-xl flex items-center gap-3 transition-all text-left group cursor-pointer ${
+                    !activeExperience
+                      ? isDark ? 'bg-slate-800/90 border border-slate-700 text-white' : 'bg-indigo-50 border border-indigo-200 text-indigo-900'
+                      : isDark ? 'bg-slate-900/60 hover:bg-slate-800/90 border border-slate-800 text-slate-200 hover:text-white' : 'hover:bg-slate-50 border border-slate-200'
+                  }`}
+                >
+                  <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-slate-700/80 shadow-sm flex items-center justify-center bg-slate-950">
+                    <img src="/goalskid_logo.png" alt="GOALS" className="w-6 h-6 object-contain" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="font-bold text-xs text-white group-hover:text-amber-300 transition-colors">
+                        ⭐ GOALS • Portal Principal
+                      </span>
+                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-md border bg-amber-500/20 text-amber-300 border-amber-500/30">
+                        HUB
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-slate-400 truncate mt-0.5">Volver al panel central de experiencias</p>
+                  </div>
+                </button>
+
+                <div className="h-px bg-slate-800/80 my-1"></div>
+
+                <div className="space-y-1">
                   {ALL_MINIAPPS.map((app) => {
                     const isActive = activeExperience === app.id;
                     return (
@@ -239,11 +291,11 @@ export const Header: React.FC<HeaderProps> = ({
                         onClick={() => handleSelectMiniApp(app.id)}
                         className={`w-full p-2 rounded-xl flex items-center gap-3 transition-all text-left group cursor-pointer ${
                           isActive 
-                            ? 'bg-slate-800/90 border border-slate-700 text-white' 
-                            : 'hover:bg-slate-900/80 hover:border-slate-800 border border-transparent text-slate-300 hover:text-white'
+                            ? isDark ? 'bg-slate-800/90 border border-slate-700 text-white' : 'bg-indigo-50 border border-indigo-200 text-indigo-900'
+                            : isDark ? 'hover:bg-slate-900/80 hover:border-slate-800 border border-transparent text-slate-300 hover:text-white' : 'hover:bg-slate-50 hover:border-slate-200 border border-transparent text-slate-700 hover:text-slate-900'
                         }`}
                       >
-                        <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 border border-slate-700/80 shadow-sm group-hover:scale-105 group-hover:border-slate-600 transition-all">
+                        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-slate-700/80 shadow-sm group-hover:scale-105 group-hover:border-slate-600 transition-all">
                           <img 
                             src={app.logoUrl} 
                             alt={app.name} 
@@ -252,7 +304,9 @@ export const Header: React.FC<HeaderProps> = ({
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-1">
-                            <span className="font-bold text-xs text-white group-hover:text-slate-100 transition-colors truncate">
+                            <span className={`font-bold text-xs transition-colors truncate ${
+                              isDark ? 'text-white group-hover:text-slate-100' : 'text-slate-900 group-hover:text-indigo-600'
+                            }`}>
                               {app.name}
                             </span>
                             <span className={`text-[9px] font-medium px-1.5 py-0.2 rounded-md font-mono border ${app.badgeBg}`}>
@@ -269,20 +323,6 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           )}
         </div>
-
-        {activeExpConfig && (
-          <div className="flex items-center gap-1.5 min-w-0 animate-fadeIn">
-            <button
-              type="button"
-              onClick={() => setIsDropdownHovered(prev => !prev)}
-              className={`px-2.5 py-1 rounded-xl border text-xs font-extrabold flex items-center gap-1.5 shadow-sm truncate hover:opacity-90 transition-opacity cursor-pointer ${activeExpConfig.badgeClass}`}
-              title="Cambiar de MiniApp"
-            >
-              <img src={activeExpConfig.logoUrl} alt={activeExpConfig.name} className="w-4 h-4 rounded-md object-cover" />
-              <span className="truncate">{activeExpConfig.name}</span>
-            </button>
-          </div>
-        )}
       </div>
 
       {/* Sección Derecha: Admin, Gamificación, Perfil y Salida */}

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS School — Showcase Curricular Interactivo & Laboratorios Reales (6 a 15 Años)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#22c55e',
+              600: '#16a34a',
+              900: '#14532d',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #030712;
+      color: #f3f4f6;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card {
+      background: rgba(31, 41, 55, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease-in-out;
+    }
+    .glass-card:hover {
+      border-color: rgba(34, 197, 94, 0.4);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-white">
+
+  <!-- TOP NAVBAR -->
+  <header class="sticky top-0 z-50 glass-panel border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-calculator text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-gray-200 to-emerald-400 bg-clip-text text-transparent">
+            GOALS School
+          </h1>
+          <p class="text-xs text-emerald-400 font-mono">Curriculum Master Plan & Labs (6–15a)</p>
+        </div>
+      </div>
+
+      <!-- TABS SELECTOR -->
+      <div class="flex items-center space-x-2 bg-gray-900/80 p-1 rounded-xl border border-gray-800">
+        <button id="btnTabInteractive" onclick="switchMainTab('interactive')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-md">
+          <i class="fa-solid fa-cube mr-2"></i>Vista Interactiva
+        </button>
+        <button id="btnTabRaw" onclick="switchMainTab('raw')" class="px-4 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-all">
+          <i class="fa-solid fa-code mr-2"></i>Markdown SSOT
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- TAB 1: INTERACTIVE VIEW -->
+    <section id="tabInteractive" class="space-y-8">
+      
+      <!-- HERO BANNER -->
+      <div class="glass-panel p-6 sm:p-8 rounded-2xl relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-3xl">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold mb-4">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>MÉTODO SINGAPUR CPA + HEURÍSTICA DE PÓLYA + 5E INDAGACIÓN</span>
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-white mb-3">
+            Matemáticas, Ciencias Integradas y Métodos de Aprendizaje Activo
+          </h2>
+          <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+            Estructurado en 5 tramos de edad desde la etapa enactiva/sensorial hasta el rigor simbólico preuniversitario, con 10 fichas experimentales de laboratorio cuantitativo, GeoGebra/SymPy y motor psicométrico IRT 2PL adaptativo.
+          </p>
+        </div>
+
+        <!-- AGE TRANCHE SELECTOR -->
+        <div class="mt-8 pt-6 border-t border-gray-800">
+          <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Selecciona el Tramo de Edad:</div>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="trancheButtons">
+            <button onclick="selectTranche(1)" class="tranche-btn p-3 rounded-xl glass-card text-left border-emerald-500/50 bg-emerald-950/30" data-tranche="1">
+              <div class="text-xs text-emerald-400 font-mono">Tramo 1</div>
+              <div class="text-sm font-bold text-white">6–7 años</div>
+              <div class="text-[11px] text-gray-400">1º-2º Primaria</div>
+            </button>
+            <button onclick="selectTranche(2)" class="tranche-btn p-3 rounded-xl glass-card text-left" data-tranche="2">
+              <div class="text-xs text-gray-400 font-mono">Tramo 2</div>
+              <div class="text-sm font-bold text-white">8–9 años</div>
+              <div class="text-[11px] text-gray-400">3º-4º Primaria</div>
+            </button>
+            <button onclick="selectTranche(3)" class="tranche-btn p-3 rounded-xl glass-card text-left" data-tranche="3">
+              <div class="text-xs text-gray-400 font-mono">Tramo 3</div>
+              <div class="text-sm font-bold text-white">10–11 años</div>
+              <div class="text-[11px] text-gray-400">5º-6º Primaria</div>
+            </button>
+            <button onclick="selectTranche(4)" class="tranche-btn p-3 rounded-xl glass-card text-left" data-tranche="4">
+              <div class="text-xs text-gray-400 font-mono">Tramo 4</div>
+              <div class="text-sm font-bold text-white">12–13 años</div>
+              <div class="text-[11px] text-gray-400">1º-2º ESO</div>
+            </button>
+            <button onclick="selectTranche(5)" class="tranche-btn p-3 rounded-xl glass-card text-left" data-tranche="5">
+              <div class="text-xs text-gray-400 font-mono">Tramo 5</div>
+              <div class="text-sm font-bold text-white">14–15 años</div>
+              <div class="text-[11px] text-gray-400">3º-4º ESO</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DYNAMIC TRANCHE CONTENT -->
+      <div id="trancheContent" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Will be filled by JS -->
+      </div>
+
+      <!-- 10 LABS EXPLORER -->
+      <div class="glass-panel p-6 sm:p-8 rounded-2xl space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center">
+              <i class="fa-solid fa-flask-vial text-emerald-400 mr-3"></i>Catálogo de 10 Laboratorios Científicos y Matemáticos Reales
+            </h3>
+            <p class="text-xs text-gray-400 mt-1">Protocolos cuantitativos seguros con materiales domésticos, control de variables y análisis de error.</p>
+          </div>
+          <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-mono">100% Cero Mocks</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="labsContainer">
+          <!-- Labs loaded via JS -->
+        </div>
+      </div>
+
+      <!-- IRT 2PL PSICOMETRICS SIMULATOR -->
+      <div class="glass-panel p-6 sm:p-8 rounded-2xl space-y-6">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center">
+              <i class="fa-solid fa-chart-line text-emerald-400 mr-3"></i>Simulador Psicométrico Adaptativo IRT (2PL) & ELO
+            </h3>
+            <p class="text-xs text-gray-400 mt-1">Cálculo en vivo de la probabilidad de acierto \(P(\theta)\), Información de Fisher \(I(\theta)\) y actualización Bayesiana.</p>
+          </div>
+          <span class="px-3 py-1 bg-teal-500/10 text-teal-400 border border-teal-500/20 rounded-full text-xs font-mono">IRT 2PL Core</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">Habilidad Latente del Estudiante (\(\theta\)): <span id="valTheta" class="text-emerald-400 font-mono font-bold">0.0</span></label>
+              <input type="range" id="sliderTheta" min="-3" max="3" step="0.1" value="0" class="w-full accent-emerald-500" oninput="updateIRTSimulator()">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">Dificultad del Problema (\(b_i\)): <span id="valB" class="text-emerald-400 font-mono font-bold">0.0</span></label>
+              <input type="range" id="sliderB" min="-3" max="3" step="0.1" value="0" class="w-full accent-emerald-500" oninput="updateIRTSimulator()">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">Discriminación del Ítem (\(a_i\)): <span id="valA" class="text-emerald-400 font-mono font-bold">1.2</span></label>
+              <input type="range" id="sliderA" min="0.5" max="2.5" step="0.1" value="1.2" class="w-full accent-emerald-500" oninput="updateIRTSimulator()">
+            </div>
+          </div>
+
+          <div class="md:col-span-2 grid grid-cols-2 gap-4">
+            <div class="glass-card p-4 rounded-xl flex flex-col justify-center items-center text-center">
+              <div class="text-xs text-gray-400 uppercase font-semibold">Probabilidad de Acierto \(P(\theta)\)</div>
+              <div id="resProb" class="text-3xl font-extrabold text-emerald-400 mt-2 font-mono">50.0%</div>
+              <div class="text-[11px] text-gray-500 mt-1">\(P_i(\theta) = \frac{1}{1 + e^{-1.702 a_i (\theta - b_i)}}\)</div>
+            </div>
+            <div class="glass-card p-4 rounded-xl flex flex-col justify-center items-center text-center">
+              <div class="text-xs text-gray-400 uppercase font-semibold">Información de Fisher \(I_i(\theta)\)</div>
+              <div id="resInfo" class="text-3xl font-extrabold text-teal-400 mt-2 font-mono">0.360</div>
+              <div class="text-[11px] text-gray-500 mt-1">\(I_i(\theta) = a_i^2 P_i (1 - P_i)\)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: RAW MARKDOWN VIEW -->
+    <section id="tabRaw" class="hidden space-y-4">
+      <div class="glass-panel p-4 rounded-xl flex items-center justify-between">
+        <div class="flex items-center space-x-2 text-sm text-gray-300">
+          <i class="fa-solid fa-file-lines text-emerald-400"></i>
+          <span>Documento Maestro: <code>docs/school/00_MASTER_PLAN_CURRICULAR.md</code></span>
+        </div>
+        <button onclick="copyRawText()" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs rounded-lg transition-all">
+          <i class="fa-solid fa-copy mr-1"></i>Copiar Markdown
+        </button>
+      </div>
+      <pre id="rawMarkdownContent" class="glass-panel p-6 rounded-2xl text-xs font-mono text-gray-300 overflow-x-auto whitespace-pre leading-relaxed border border-gray-800 max-h-[700px]">
+# 📐 PLAN CURRICULAR INTEGRAL: GOALS SCHOOL (6 A 15 AÑOS)
+[Cargando contenido SSOT...]
+      </pre>
+    </section>
+
+  </main>
+
+  <script>
+    const tranchesData = {
+      1: {
+        title: "Tramo 1: 6–7 años (1º y 2º Primaria)",
+        math: "Sentido numérico, subitización (hasta 4 elementos), descomposición aditiva del 10, valor posicional con regletas Cuisenaire, geometría intuitiva y simetría especular.",
+        science: "Los 5 sentidos como instrumentos de observación cuantitativa, estados de la materia (H2O), germinación de plantas y ciclo vital.",
+        methods: "Rutinas visuales de 3 fases (Preparar -> Ejecutar -> Revisar), Temporizador Pomodoro Junior (10 min + 3 min descanso activo).",
+        lomloe: "RD 157/2022 (Matemáticas y C. Naturaleza Ciclo Inicial)"
+      },
+      2: {
+        title: "Tramo 2: 8–9 años (3º y 4º Primaria)",
+        math: "Multiplicación como matriz de puntos, propiedad distributiva, fracciones visuales continuas y discretas, distinción entre perímetro [L] y área [L²].",
+        science: "Método científico elemental ('¿Qué ocurre si...?'), tablas bidireccionales de datos, magnetismo y líneas de campo con limaduras.",
+        methods: "Cuaderno de laboratorio con registro gráfico-textual dual, verificación inversa.",
+        lomloe: "RD 157/2022 (Matemáticas y C. Naturaleza Ciclo Medio)"
+      },
+      3: {
+        title: "Tramo 3: 10–11 años (5º y 6º Primaria)",
+        math: "Proporcionalidad directa/inversa, porcentajes, potencias de base 10, ecuaciones de 1er grado con modelo de balanza de dos platos.",
+        science: "Circuitos eléctricos en serie y paralelo (4.5V), técnicas de separación de mezclas (cromatografía, decantación).",
+        methods: "Técnica Feynman, Active Recall (recuperación activa), Sistema Leitner (cajas de repaso espaciado: 1d, 3d, 7d, 14d).",
+        lomloe: "RD 157/2022 (Matemáticas y C. Naturaleza Ciclo Superior)"
+      },
+      4: {
+        title: "Tramo 4: 12–13 años (1º y 2º ESO)",
+        math: "Álgebra simbólica, productos notables, funciones lineales (y=mx+n) y cuadráticas, Teorema de Pitágoras demostrativo y 3D.",
+        science: "Cinemática (MRU, MRUA), Leyes de Newton (1ª, 2ª F=ma, 3ª), Diagramas de Cuerpo Libre (DCL).",
+        methods: "Mapas de argumentos y diagramas de flujo causales para derivaciones físico-matemáticas.",
+        lomloe: "RD 217/2022 (Matemáticas y Física & Química 1º-2º ESO)"
+      },
+      5: {
+        title: "Tramo 5: 14–15 años (3º y 4º ESO)",
+        math: "Trigonometría analítica (seno, coseno, tangente, circunferencia goniométrica), estadística inferencial (σ², σ, IQR), Teorema de Bayes.",
+        science: "Termodinámica (Q=mcΔT, ΔU=Q-W), estequiometría química (concepto de mol, reactivo limitante), genética mendeliana y test χ².",
+        methods: "Optimización de memoria de trabajo, reducción de carga extrínseca y preparación preuniversitaria.",
+        lomloe: "RD 217/2022 (Matemáticas B, Física & Química, Biología 3º-4º ESO)"
+      }
+    };
+
+    const labsList = [
+      { id: "LAB-MAT-01", age: "10-11a", title: "Balanza de Ecuaciones Algebraicas", desc: "Isomorfismo físico entre el equilibrio estático de una balanza de brazos iguales y las transformaciones algebraicas ax+b=cx+d." },
+      { id: "LAB-MAT-02", age: "12-13a", title: "Estimación de π (Aguja de Buffon y Montecarlo)", desc: "Lanzamiento aleatorio de 500 agujas para converger a π = 2LN/(DH) mediante probabilidad geométrica." },
+      { id: "LAB-MAT-03", age: "14-15a", title: "Regresión Lineal por Mínimos Cuadrados", desc: "Ajuste de rectas en plano inclinado con cálculo analítico del coeficiente de correlación de Pearson (r)." },
+      { id: "LAB-FIS-01", age: "12-13a", title: "Ley de Hooke y Constante Elástica (k)", desc: "Medición de elongación con masas calibradas y determinación de la constante elástica k = F/Δx." },
+      { id: "LAB-FIS-02", age: "12-13a", title: "Caída Libre y Medición de la Gravedad (g)", desc: "Determinación de g = 9.81 m/s² mediante filmación a cámara lenta (240 fps) y regresión de h vs t²." },
+      { id: "LAB-FIS-03", age: "12-13a", title: "Termodinámica de Gases (Ley de Boyle)", desc: "Verificación experimental de P·V = constante mediante compresión controlada en jeringa hermética." },
+      { id: "LAB-FIS-04", age: "14-15a", title: "Calorimetría y Calor Específico del Agua", desc: "Balance térmico en calorímetro aislado para comprobar c = 4186 J/(kg·K)." },
+      { id: "LAB-FIS-05", age: "14-15a", title: "Óptica y Verificación de Ley de Snell", desc: "Trazado de rayos láser en cubeta con agua para obtener el índice de refracción n = 1.333." },
+      { id: "LAB-QUI-01", age: "12-13a", title: "Cinética Gravimétrica: Vinagre + Bicarbonato", desc: "Monitoreo de pérdida de masa en balanza para calcular la velocidad de desprendimiento de CO2." },
+      { id: "LAB-BIO-01", age: "14-15a", title: "Segregación Mendeliana 3:1 y Test χ²", desc: "Contraste de hipótesis nula sobre frecuencias fenotípicas con estadístico Chi-Cuadrado." }
+    ];
+
+    function selectTranche(num) {
+      document.querySelectorAll('.tranche-btn').forEach(btn => {
+        if (btn.dataset.tranche == num) {
+          btn.classList.add('border-emerald-500/50', 'bg-emerald-950/30');
+          btn.querySelector('.font-mono').classList.replace('text-gray-400', 'text-emerald-400');
+        } else {
+          btn.classList.remove('border-emerald-500/50', 'bg-emerald-950/30');
+          btn.querySelector('.font-mono').classList.replace('text-emerald-400', 'text-gray-400');
+        }
+      });
+
+      const d = tranchesData[num];
+      const container = document.getElementById('trancheContent');
+      container.innerHTML = `
+        <div class="glass-card p-6 rounded-2xl border-emerald-500/20">
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <i class="fa-solid fa-square-root-variable"></i>
+            </div>
+            <h4 class="font-bold text-white text-base">Saberes Matemáticos</h4>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">${d.math}</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-teal-500/20">
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-teal-500/20 text-teal-400 flex items-center justify-center">
+              <i class="fa-solid fa-atom"></i>
+            </div>
+            <h4 class="font-bold text-white text-base">Ciencias Experimentales</h4>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">${d.science}</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-cyan-500/20">
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center">
+              <i class="fa-solid fa-brain"></i>
+            </div>
+            <h4 class="font-bold text-white text-base">Técnicas de Aprendizaje</h4>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">${d.methods}</p>
+          <div class="mt-4 pt-3 border-t border-gray-800 text-[11px] text-gray-400 font-mono">
+            <i class="fa-solid fa-certificate text-emerald-400 mr-1"></i> ${d.lomloe}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLabs() {
+      const c = document.getElementById('labsContainer');
+      c.innerHTML = labsList.map(lab => `
+        <div class="glass-card p-4 rounded-xl flex items-start space-x-4">
+          <div class="px-2.5 py-1 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-mono text-xs font-bold shrink-0">
+            ${lab.id}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <h5 class="text-sm font-bold text-white truncate">${lab.title}</h5>
+              <span class="text-[10px] text-gray-400 font-mono px-2 py-0.5 bg-gray-800 rounded">${lab.age}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1 leading-relaxed">${lab.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateIRTSimulator() {
+      const theta = parseFloat(document.getElementById('sliderTheta').value);
+      const b = parseFloat(document.getElementById('sliderB').value);
+      const a = parseFloat(document.getElementById('sliderA').value);
+
+      document.getElementById('valTheta').innerText = theta.toFixed(1);
+      document.getElementById('valB').innerText = b.toFixed(1);
+      document.getElementById('valA').innerText = a.toFixed(1);
+
+      const p = 1 / (1 + Math.exp(-1.702 * a * (theta - b)));
+      const info = Math.pow(a, 2) * p * (1 - p);
+
+      document.getElementById('resProb').innerText = (p * 100).toFixed(1) + '%';
+      document.getElementById('resInfo').innerText = info.toFixed(3);
+    }
+
+    function switchMainTab(tab) {
+      if (tab === 'interactive') {
+        document.getElementById('tabInteractive').classList.remove('hidden');
+        document.getElementById('tabRaw').classList.add('hidden');
+        document.getElementById('btnTabInteractive').className = "px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-md";
+        document.getElementById('btnTabRaw').className = "px-4 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-all";
+      } else {
+        document.getElementById('tabInteractive').classList.add('hidden');
+        document.getElementById('tabRaw').classList.remove('hidden');
+        document.getElementById('btnTabRaw').className = "px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-emerald-600 text-white shadow-md";
+        document.getElementById('btnTabInteractive').className = "px-4 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-all";
+      }
+    }
+
+    function copyRawText() {
+      const text = document.getElementById('rawMarkdownContent').innerText;
+      navigator.clipboard.writeText(text);
+      alert('¡Markdown copiado al portapapeles!');
+    }
+
+    // Init
+    selectTranche(1);
+    renderLabs();
+    updateIRTSimulator();
+  </script>
+</body>
+</html>

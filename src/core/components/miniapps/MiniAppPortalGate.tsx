@@ -30,7 +30,19 @@ export const MiniAppPortalGate: React.FC<MiniAppPortalGateProps> = ({
   onBackToGoals
 }) => {
   const { user } = useAuth();
-  const { effectiveAge, addXP } = useProgress();
+  const { effectiveAge, addXP, isUserAdmin, userData } = useProgress();
+
+  const isAdminAccess = Boolean(
+    isUserAdmin || 
+    user?.email === 'josferestudio@gmail.com' || 
+    userData?.role === 'admin' || 
+    user?.role === 'admin'
+  );
+
+  // El super admin josferestudio@gmail.com no tiene prueba de nivel ni portada de bloqueo en ninguna miniapp: accede directamente a todo
+  if (isAdminAccess) {
+    return <>{children}</>;
+  }
 
   const [loading, setLoading] = useState<boolean>(true);
   const [learningState, setLearningState] = useState<StudentLearningState | null>(null);

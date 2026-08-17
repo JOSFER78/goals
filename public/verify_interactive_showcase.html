@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS Verify — Showcase Interactivo de Fact-Checking & OSINT (6 a 15 Años)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            verify: {
+              50: '#fff1f2',
+              500: '#f43f5e',
+              600: '#e11d48',
+              900: '#881337',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #030712;
+      color: #f3f4f6;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .glass-panel {
+      background: rgba(17, 24, 39, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card {
+      background: rgba(31, 41, 55, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease-in-out;
+    }
+    .glass-card:hover {
+      border-color: rgba(244, 63, 94, 0.4);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-rose-500 selection:text-white">
+
+  <!-- TOP NAVBAR -->
+  <header class="sticky top-0 z-50 glass-panel border-b border-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-amber-500 flex items-center justify-center shadow-lg shadow-rose-500/20">
+          <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-gray-200 to-rose-400 bg-clip-text text-transparent">
+            GOALS Verify
+          </h1>
+          <p class="text-xs text-rose-400 font-mono">Fact-Checking & OSINT Curriculum (6–15a)</p>
+        </div>
+      </div>
+
+      <!-- TABS SELECTOR -->
+      <div class="flex items-center space-x-2 bg-gray-900/80 p-1 rounded-xl border border-gray-800">
+        <button id="btnTabInteractive" onclick="switchMainTab('interactive')" class="px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-rose-600 text-white shadow-md">
+          <i class="fa-solid fa-magnifying-glass-chart mr-2"></i>Vista Interactiva
+        </button>
+        <button id="btnTabRaw" onclick="switchMainTab('raw')" class="px-4 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-all">
+          <i class="fa-solid fa-code mr-2"></i>Markdown SSOT
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- TAB 1: INTERACTIVE VIEW -->
+    <section id="tabInteractive" class="space-y-8">
+      
+      <!-- HERO BANNER -->
+      <div class="glass-panel p-6 sm:p-8 rounded-2xl relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="max-w-3xl">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-semibold mb-4">
+            <span class="w-2 h-2 rounded-full bg-rose-400 animate-pulse"></span>
+            <span>STANFORD SHEG + UNESCO MIL + ESTÁNDAR C2PA CRIPTOGRÁFICO</span>
+          </div>
+          <h2 class="text-3xl font-extrabold tracking-tight text-white mb-3">
+            Inmunidad a la Desinformación, Forense de Deepfakes y Periodismo de Datos
+          </h2>
+          <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+            Metodología de lectura lateral (Wineburg), contención de clics, cronolocalización solar con SunCalc y 10 laboratorios de casos históricos reales para formar detectives de información de 6 a 15 años.
+          </p>
+        </div>
+
+        <!-- AGE TRANCHE SELECTOR -->
+        <div class="mt-8 pt-6 border-t border-gray-800">
+          <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Selecciona el Tramo de Edad:</div>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3" id="trancheButtons">
+            <button onclick="selectTranche(1)" class="tranche-btn p-3 rounded-xl glass-card text-left border-rose-500/50 bg-rose-950/30" data-tranche="1">
+              <div class="text-xs text-rose-400 font-mono">Tramo 1</div>
+              <div class="text-sm font-bold text-white">6–7 años</div>
+              <div class="text-[11px] text-gray-400">1º-2º Primaria</div>
+            </button>
+            <button onclick="selectTranche(2)" class="tranche-btn p-3 rounded-xl glass-card text-left" data-tranche="2">
+              <div class="text-xs text-gray-400 font-mono">Tramo 2</div>
+              <div class="text-sm font-bold text-white">8–9 años</div>
+              <div class="text-[11px] text-gray-400">3º-4º Primaria</div>
+            </button>
+            <button onclick="selectTranche(3)" class="tranche-btn p-3 rounded-xl glass-card text-left" data-tranche="3">
+              <div class="text-xs text-gray-400 font-mono">Tramo 3</div>
+              <div class="text-sm font-bold text-white">10–11 años</div>
+              <div class="text-[11px] text-gray-400">5º-6º Primaria</div>
+            </button>
+            <button onclick="selectTranche(4)" class="tranche-btn p-3 rounded-xl glass-card text-left" data-tranche="4">
+              <div class="text-xs text-gray-400 font-mono">Tramo 4</div>
+              <div class="text-sm font-bold text-white">12–13 años</div>
+              <div class="text-[11px] text-gray-400">1º-2º ESO</div>
+            </button>
+            <button onclick="selectTranche(5)" class="tranche-btn p-3 rounded-xl glass-card text-left" data-tranche="5">
+              <div class="text-xs text-gray-400 font-mono">Tramo 5</div>
+              <div class="text-sm font-bold text-white">14–15 años</div>
+              <div class="text-[11px] text-gray-400">3º-4º ESO</div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DYNAMIC TRANCHE CONTENT -->
+      <div id="trancheContent" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Will be filled by JS -->
+      </div>
+
+      <!-- 10 FORENSIC LABS -->
+      <div class="glass-panel p-6 sm:p-8 rounded-2xl space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center">
+              <i class="fa-solid fa-fingerprint text-rose-400 mr-3"></i>Catálogo de 10 Laboratorios de Casos Históricos Reales
+            </h3>
+            <p class="text-xs text-gray-400 mt-1">Investigaciones forenses paso a paso sobre bulos mundiales desmentidos con herramientas de código abierto.</p>
+          </div>
+          <span class="px-3 py-1 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full text-xs font-mono">100% Casos Reales</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="labsContainer">
+          <!-- Labs loaded via JS -->
+        </div>
+      </div>
+
+      <!-- SUNCALC & EXIF SIMULATOR -->
+      <div class="glass-panel p-6 sm:p-8 rounded-2xl space-y-6">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+          <div>
+            <h3 class="text-xl font-bold text-white flex items-center">
+              <i class="fa-solid fa-sun text-amber-400 mr-3"></i>Simulador de Cronolocalización Solar (SunCalc Shadow Core)
+            </h3>
+            <p class="text-xs text-gray-400 mt-1">Verificación de la hora real de un vídeo mediante la relación trigonométrica \(\tan(\gamma) = h/s\).</p>
+          </div>
+          <span class="px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-mono">Trigonometría Solar</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-4">
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">Altura del Objeto Vertical (\(h\)): <span id="valH" class="text-amber-400 font-mono font-bold">2.0 m</span></label>
+              <input type="range" id="sliderH" min="0.5" max="10" step="0.5" value="2" class="w-full accent-rose-500" oninput="updateSunSimulator()">
+            </div>
+            <div>
+              <label class="text-xs text-gray-400 block mb-1">Longitud de la Sombra Medida (\(s\)): <span id="valS" class="text-amber-400 font-mono font-bold">3.5 m</span></label>
+              <input type="range" id="sliderS" min="0.5" max="20" step="0.5" value="3.5" class="w-full accent-rose-500" oninput="updateSunSimulator()">
+            </div>
+          </div>
+
+          <div class="md:col-span-2 grid grid-cols-2 gap-4">
+            <div class="glass-card p-4 rounded-xl flex flex-col justify-center items-center text-center">
+              <div class="text-xs text-gray-400 uppercase font-semibold">Altitud Solar (\(\gamma\))</div>
+              <div id="resGamma" class="text-3xl font-extrabold text-amber-400 mt-2 font-mono">29.7°</div>
+              <div class="text-[11px] text-gray-500 mt-1">\(\gamma = \arctan(h/s)\)</div>
+            </div>
+            <div class="glass-card p-4 rounded-xl flex flex-col justify-center items-center text-center">
+              <div class="text-xs text-gray-400 uppercase font-semibold">Momento del Día Estimado</div>
+              <div id="resMoment" class="text-sm font-bold text-rose-400 mt-2 font-mono">Media Tarde / Mañana Media</div>
+              <div class="text-[11px] text-gray-500 mt-1">Incompatible con mediodía estival (>65°)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 2: RAW MARKDOWN VIEW -->
+    <section id="tabRaw" class="hidden space-y-4">
+      <div class="glass-panel p-4 rounded-xl flex items-center justify-between">
+        <div class="flex items-center space-x-2 text-sm text-gray-300">
+          <i class="fa-solid fa-file-lines text-rose-400"></i>
+          <span>Documento Maestro: <code>docs/verify/00_MASTER_PLAN_CURRICULAR.md</code></span>
+        </div>
+        <button onclick="copyRawText()" class="px-3 py-1 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs rounded-lg transition-all">
+          <i class="fa-solid fa-copy mr-1"></i>Copiar Markdown
+        </button>
+      </div>
+      <pre id="rawMarkdownContent" class="glass-panel p-6 rounded-2xl text-xs font-mono text-gray-300 overflow-x-auto whitespace-pre leading-relaxed border border-gray-800 max-h-[700px]">
+# 🔍 PLAN CURRICULAR INTEGRAL: GOALS VERIFY (6 A 15 AÑOS)
+[Cargando contenido SSOT...]
+      </pre>
+    </section>
+
+  </main>
+
+  <script>
+    const tranchesData = {
+      1: {
+        title: "Tramo 1: 6–7 años (1º y 2º Primaria)",
+        col1: "Distinción entre seres reales y animaciones CGI 3D. Identificación de decorados y disfraces frente a la realidad cotidiana.",
+        col2: "Detección de publicidad encubierta ('Ad', 'Comprar gemas') en juegos infantiles y vídeos de unboxing.",
+        col3: "Protección de datos personales sensibles y regla del semáforo emocional ('Ante la duda, paro la pantalla y hablo con un adulto').",
+        lomloe: "LOMLOE RD 157/2022 (Competencia Digital CD1 / C. del Medio)"
+      },
+      2: {
+        title: "Tramo 2: 8–9 años (3º y 4º Primaria)",
+        col1: "Búsqueda inversa de fotos (Google Lens / TinEye) para encontrar la primera fecha de publicación (first crawled date).",
+        col2: "Localización de firma de autor y marcas de tiempo para neutralizar noticias zombi antiguas.",
+        col3: "Deconstrucción de titulares sensacionalistas y flechas rojas de clickbait. Transformación a titulares factuales.",
+        lomloe: "LOMLOE RD 157/2022 (Competencia Digital CD2, CD3 / Lengua)"
+      },
+      3: {
+        title: "Tramo 3: 10–11 años (5º y 6º Primaria)",
+        col1: "Metodología de Lectura Lateral: abrir 3 pestañas paralelas para verificar quién respalda la fuente antes de confiar.",
+        col2: "Diferenciación entre fuentes primarias (estudios con revisión por pares, comunicados oficiales) y prensa secundaria.",
+        col3: "Análisis de sesgos de encuadre (Framing y Cropping) y prevención de phishing con dominios clonados (typosquatting).",
+        lomloe: "LOMLOE RD 157/2022 (Competencia Digital CD4 / Valores Cívicos)"
+      },
+      4: {
+        title: "Tramo 4: 12–13 años (1º y 2º ESO)",
+        col1: "Inspección de metadatos binarios EXIF (cámara, hora UTC, coordenadas GPS, huella de software de retoque Photoshop).",
+        col2: "Cronolocalización y OSINT solar con SunCalc API mediante la relación trigonométrica entre sombras y altura del objeto.",
+        col3: "Detección de falacias estadísticas (ejes Y truncados, correlaciones espurias) y análisis de algoritmos de retención.",
+        lomloe: "LOMLOE RD 217/2022 (Digitalización 1º-2º ESO / Matemáticas)"
+      },
+      5: {
+        title: "Tramo 5: 14–15 años (3º y 4º ESO)",
+        col1: "Forense de deepfakes visuales (reflejos corneales, parpadeo, blending) y clonación vocal (espectrogramas en Audacity).",
+        col2: "Estándar C2PA / Content Credentials: verificación de manifiestos JUMBF y firmas digitales criptográficas X.509.",
+        col3: "Auditoría de alucinaciones de LLM (citas DOI falsas) e investigación OSINT de redes de bots y astroturfing.",
+        lomloe: "LOMLOE RD 217/2022 (Digitalización 3º-4º ESO / C. Audiovisual)"
+      }
+    };
+
+    const labsList = [
+      { id: "LAB-VER-01", age: "8-9a", title: "El Tiburón en la Autopista", desc: "Búsqueda inversa para desmentir el fotomontaje viral de un tiburón en una autopista inundada durante huracanes." },
+      { id: "LAB-VER-02", age: "10-11a", title: "El Papa Balenciaga", desc: "Detección de artefactos anatómicos de difusión en manos y gafas generadas por Midjourney v5." },
+      { id: "LAB-VER-03", age: "12-13a", title: "Cronolocalización Solar (SunCalc)", desc: "Cálculo trigonométrico del vector de sombra para demostrar que un vídeo ocurrió al atardecer y no de mañana." },
+      { id: "LAB-VER-04", age: "10-11a", title: "Incendios del Amazonas y Fotos de 1989", desc: "Extracción de keyframes con InVID para revelar fotos tomadas 30 años antes de la crisis actual." },
+      { id: "LAB-VER-05", age: "14-15a", title: "Robo-Call Clonada de Joe Biden", desc: "Análisis espectrográfico en Audacity y detección de cortes artificiales a 7.5 kHz en voz neuronal." },
+      { id: "LAB-VER-06", age: "12-13a", title: "Falsa Explosión en el Pentágono", desc: "Modelado 3D de fachadas en Google Earth y contraste con el parte oficial de bomberos." },
+      { id: "LAB-VER-07", age: "12-13a", title: "Extracción EXIF en Foto de Ovni", desc: "Uso de ExifTool para revelar coordenadas de Los Ángeles y edición en Photoshop en 2017." },
+      { id: "LAB-VER-08", age: "14-15a", title: "Auditoría Criptográfica C2PA", desc: "Inspección del bloque JUMBF para certificar procedencia sintética por DALL-E 3." },
+      { id: "LAB-VER-09", age: "12-13a", title: "El Tweet Borrado sin Rectificar", desc: "Arqueología web con Wayback Machine CDX API para recuperar declaraciones eliminadas." },
+      { id: "LAB-VER-10", age: "14-15a", title: "Red de Bots y Astroturfing", desc: "Análisis de grafos y entropía de mensajes idénticos emitidos cada 4.2 segundos por cuentas falsas." }
+    ];
+
+    function selectTranche(num) {
+      document.querySelectorAll('.tranche-btn').forEach(btn => {
+        if (btn.dataset.tranche == num) {
+          btn.classList.add('border-rose-500/50', 'bg-rose-950/30');
+          btn.querySelector('.font-mono').classList.replace('text-gray-400', 'text-rose-400');
+        } else {
+          btn.classList.remove('border-rose-500/50', 'bg-rose-950/30');
+          btn.querySelector('.font-mono').classList.replace('text-rose-400', 'text-gray-400');
+        }
+      });
+
+      const d = tranchesData[num];
+      const container = document.getElementById('trancheContent');
+      container.innerHTML = `
+        <div class="glass-card p-6 rounded-2xl border-rose-500/20">
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <i class="fa-solid fa-eye"></i>
+            </div>
+            <h4 class="font-bold text-white text-base">Verificación Visual & Fuentes</h4>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">${d.col1}</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-amber-500/20">
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+              <i class="fa-solid fa-arrows-split-up-and-left"></i>
+            </div>
+            <h4 class="font-bold text-white text-base">Lectura Lateral & Contexto</h4>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">${d.col2}</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border-orange-500/20">
+          <div class="flex items-center space-x-3 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center">
+              <i class="fa-solid fa-user-shield"></i>
+            </div>
+            <h4 class="font-bold text-white text-base">Forense & Seguridad Digital</h4>
+          </div>
+          <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">${d.col3}</p>
+          <div class="mt-4 pt-3 border-t border-gray-800 text-[11px] text-gray-400 font-mono">
+            <i class="fa-solid fa-certificate text-rose-400 mr-1"></i> ${d.lomloe}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderLabs() {
+      const c = document.getElementById('labsContainer');
+      c.innerHTML = labsList.map(lab => `
+        <div class="glass-card p-4 rounded-xl flex items-start space-x-4">
+          <div class="px-2.5 py-1 rounded bg-rose-500/10 border border-rose-500/20 text-rose-400 font-mono text-xs font-bold shrink-0">
+            ${lab.id}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center justify-between">
+              <h5 class="text-sm font-bold text-white truncate">${lab.title}</h5>
+              <span class="text-[10px] text-gray-400 font-mono px-2 py-0.5 bg-gray-800 rounded">${lab.age}</span>
+            </div>
+            <p class="text-xs text-gray-400 mt-1 leading-relaxed">${lab.desc}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateSunSimulator() {
+      const h = parseFloat(document.getElementById('sliderH').value);
+      const s = parseFloat(document.getElementById('sliderS').value);
+
+      document.getElementById('valH').innerText = h.toFixed(1) + ' m';
+      document.getElementById('valS').innerText = s.toFixed(1) + ' m';
+
+      const gammaRad = Math.atan(h / s);
+      const gammaDeg = (gammaRad * 180 / Math.PI);
+
+      document.getElementById('resGamma').innerText = gammaDeg.toFixed(1) + '°';
+
+      let moment = "Media Tarde / Mañana Media";
+      if (gammaDeg > 55) moment = "Mediodía Solar (Cerca del Cénit)";
+      else if (gammaDeg < 15) moment = "Amanecer / Atardecer Rasante";
+
+      document.getElementById('resMoment').innerText = moment;
+    }
+
+    function switchMainTab(tab) {
+      if (tab === 'interactive') {
+        document.getElementById('tabInteractive').classList.remove('hidden');
+        document.getElementById('tabRaw').classList.add('hidden');
+        document.getElementById('btnTabInteractive').className = "px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-rose-600 text-white shadow-md";
+        document.getElementById('btnTabRaw').className = "px-4 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-all";
+      } else {
+        document.getElementById('tabInteractive').classList.add('hidden');
+        document.getElementById('tabRaw').classList.remove('hidden');
+        document.getElementById('btnTabRaw').className = "px-4 py-1.5 rounded-lg text-sm font-medium transition-all bg-rose-600 text-white shadow-md";
+        document.getElementById('btnTabInteractive').className = "px-4 py-1.5 rounded-lg text-sm font-medium text-gray-400 hover:text-white transition-all";
+      }
+    }
+
+    function copyRawText() {
+      const text = document.getElementById('rawMarkdownContent').innerText;
+      navigator.clipboard.writeText(text);
+      alert('¡Markdown copiado al portapapeles!');
+    }
+
+    // Init
+    selectTranche(1);
+    renderLabs();
+    updateSunSimulator();
+  </script>
+</body>
+</html>

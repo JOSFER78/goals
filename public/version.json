@@ -1,5 +1,18 @@
 {
-  "version": "2.5.0",
-  "apkUrl": "https://appgoals.web.app/downloads/goalskid_2.5.zip",
-  "changelog": "🚀 Versión v2.5.0 Oficial (goalskid_2.5.zip): APK Android nativo (7.3MB) empaquetado. Firebase Auth real, Firestore DB en tiempo real e IA FreeLLMApi integrada."
+  "version": "2.5.1",
+  "versionCode": 251,
+  "minRequiredVersion": "2.4.0",
+  "releaseDate": "2026-08-17",
+  "title": "Actualización Goalskid v2.5.1",
+  "releaseNotes": [
+    "Inicio de sesión con Google 100% nativo para Android (resolución bloqueo 403).",
+    "Nueva navegación por pilares minimalista (Aprender, Laboratorio, Retos).",
+    "Ajuste magnético suave y limpio en portadas y módulos.",
+    "Showcase fotorrealista 16:9 sin textos superpuestos en fotos.",
+    "Sistema de comprobación y notificación de auto-actualizaciones in-app."
+  ],
+  "apkUrl": "https://appgoals.web.app/download/goalskid-v2.5.1.apk",
+  "apkDirectDownload": "https://appgoals.web.app/download/goalskid.apk",
+  "fileSizeBytes": 16777216,
+  "isMandatory": false
 }

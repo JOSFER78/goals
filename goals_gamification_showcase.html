@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS™ • Ecosistema de Gamificación Ética, Meta-Nivel y Pactos Familiares</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-outfit: 'Outfit', sans-serif;
+      --font-space: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body {
+      font-family: var(--font-outfit);
+      background-color: #050811;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.20) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 30%, rgba(245, 158, 11, 0.12) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    .font-space { font-family: var(--font-space); }
+    .font-mono { font-family: var(--font-mono); }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-panel-glow {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      box-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
+    }
+    @keyframes pulse-slow {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .animate-pulse-slow {
+      animation: pulse-slow 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 selection:bg-indigo-500 selection:text-white">
+
+  <div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- HEADER SUPREMO -->
+    <header class="glass-panel rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+      <div class="space-y-2">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Motor de Gamificación Ética</span>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">3 Franjas de Edad (6-15a)</span>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">docs/gamificacion/</span>
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black font-space tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-cyan-300">
+          GOALS Hybrid Gamification & Cosmic Meta-Rank
+        </h1>
+        <p class="text-slate-400 text-sm md:text-base max-w-3xl">
+          <strong>School como Llave Maestra (15 min)</strong>, Meta-Nivel Global con <strong>Factor de Armonía de Shannon</strong>, Avatar Modular Reactivo y <strong>Pactos Familiares</strong> con recompensas en el mundo real.
+        </p>
+      </div>
+
+      <!-- BOTONES DE MODO DE VISTA -->
+      <div class="flex bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shrink-0">
+        <button id="btn-view-interactive" onclick="switchView('interactive')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer">
+          ⚡ Demostrador Interactivo
+        </button>
+        <button id="btn-view-markdown" onclick="switchView('markdown')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer">
+          📄 Tratado Markdown (.md)
+        </button>
+      </div>
+    </header>
+
+    <!-- VISTA 1: INTERACTIVA -->
+    <main id="container-interactive" class="space-y-8">
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 1: SELECTOR DE LAS 3 FRANJAS DE EDAD -->
+      <!-- ========================================================================= -->
+      <section class="glass-panel rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider font-mono">Calibración Neuropsicológica</span>
+            <h3 class="text-2xl font-black font-space text-white mt-1">1. Selección de Franja de Edad (Psicología del Desarrollo)</h3>
+          </div>
+          <span class="text-xs font-mono text-emerald-400 bg-emerald-950 px-3 py-1.5 rounded-xl border border-emerald-500/30">
+            Cero Babyish UI en Secundaria • Cero Castigo en Primaria
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <!-- Franja 1 -->
+          <div onclick="selectAgeBracket('explorer')" id="card-bracket-explorer" class="p-5 rounded-2xl border-2 border-emerald-500 bg-slate-900/90 cursor-pointer transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-2xl">🪐 🐾</span>
+              <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">6 a 8 AÑOS</span>
+            </div>
+            <h4 class="text-base font-black font-space text-white">El Explorador Curioso</h4>
+            <p class="text-xs text-slate-400">1º a 3º Primaria • Preoperacional/Concreto</p>
+            <ul class="text-[11px] text-slate-300 space-y-1 font-mono">
+              <li>• Feedback inmediato &lt;300ms</li>
+              <li>• Zero-Penalty (cero vidas perdidas)</li>
+              <li>• Mascotas cósmicas coleccionables</li>
+              <li>• Web Audio: Escala Do Mayor</li>
+            </ul>
+          </div>
+
+          <!-- Franja 2 -->
+          <div onclick="selectAgeBracket('builder')" id="card-bracket-builder" class="p-5 rounded-2xl border-2 border-transparent bg-slate-900/50 hover:bg-slate-900 cursor-pointer transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-2xl">🔮 🛠️</span>
+              <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300">9 a 11 AÑOS</span>
+            </div>
+            <h4 class="text-base font-black font-space text-white">El Constructor de Maestría</h4>
+            <p class="text-xs text-slate-400">4º a 6º Primaria • Operaciones Concretas</p>
+            <ul class="text-[11px] text-slate-300 space-y-1 font-mono">
+              <li>• Árbol de talentos ramificado (RPG)</li>
+              <li>• 3 Cristales: Silicio, Plasma, Luz</li>
+              <li>• Crafteo de instrumental científico</li>
+              <li>• Misiones semanales dinámicas</li>
+            </ul>
+          </div>
+
+          <!-- Franja 3 -->
+          <div onclick="selectAgeBracket('strategist')" id="card-bracket-strategist" class="p-5 rounded-2xl border-2 border-transparent bg-slate-900/50 hover:bg-slate-900 cursor-pointer transition-all space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-2xl">⚡ 💻</span>
+              <span class="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">12 a 15 AÑOS</span>
+            </div>
+            <h4 class="text-base font-black font-space text-white">El Estratega Autónomo</h4>
+            <p class="text-xs text-slate-400">1º a 4º ESO • Operaciones Formales</p>
+            <ul class="text-[11px] text-slate-300 space-y-1 font-mono">
+              <li>• Terminal JPL & Dark Glassmorphism</li>
+              <li>• Rangos profesionales aeroespaciales</li>
+              <li>• Logros élite: Deep Focus 45m</li>
+              <li>• Heatmap de telemetría y Bloom BKT</li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- Feedback dinámico de la franja seleccionada -->
+        <div id="bracket-details-panel" class="p-4 rounded-2xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <span id="bracket-icon" class="text-3xl">🪐</span>
+            <div>
+              <h5 id="bracket-title" class="font-bold text-sm text-white">Modo Activo: El Explorador Curioso (6-8 años)</h5>
+              <p id="bracket-desc" class="text-xs text-slate-400">Sesión sugerida: 10 min • Soft-Cap Diario: 200 XP • Interfaz táctil de baja carga cognitiva.</p>
+            </div>
+          </div>
+          <button onclick="testBracketAudio()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shrink-0">
+            <span>🔊</span> Probar Audio Sintetizado
+          </button>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 2: THE MASTER KEY & CALCULADOR DE ARMONÍA DE SHANNON -->
+      <!-- ========================================================================= -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Columna Izquierda: The Master Key -->
+        <div class="lg:col-span-4 glass-panel rounded-3xl p-6 space-y-5 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <span class="text-xs font-bold text-amber-400 uppercase tracking-wider font-mono">Reactor Académico</span>
+              <span id="master-key-badge" class="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">STANDBY (1.0x)</span>
+            </div>
+            
+            <h3 class="text-lg font-black font-space text-white">🔑 The Master Key (School)</h3>
+            <p class="text-slate-400 text-xs leading-relaxed">
+              <strong>School NO es un juego</strong>: es el núcleo curricular de 15 min. Al completarlo con honestidad ($H \ge 0.80$), enciende el reactor que duplica la XP en las 4 mini-apps:
+            </p>
+
+            <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-slate-400">Estado de School:</span>
+                <span id="school-status-text" class="text-amber-400 font-bold">Pendiente (0/15 min)</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div id="school-progress-bar" class="h-full bg-amber-500 transition-all duration-500" style="width: 0%"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-500 font-mono">
+                <span>Honestidad BKT: <strong id="honesty-val" class="text-slate-300">--</strong></span>
+                <span>Multiplicador: <strong id="multiplier-val" class="text-slate-300">1.0x</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <button onclick="toggleMasterKey()" id="btn-master-key" class="w-full py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg">
+            <span>⚡</span> Completar Sesión Diaria de School (15 min)
+          </button>
+        </div>
+
+        <!-- Columna Derecha: Calculador de Entropía de Shannon & Meta-Progreso -->
+        <div class="lg:col-span-8 glass-panel-glow rounded-3xl p-6 md:p-8 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div>
+              <span class="text-xs font-mono text-cyan-400 uppercase font-bold">Ecuación de Fusión Universal</span>
+              <h3 class="text-2xl font-black font-space text-white mt-1">Meta-Nivel & Factor de Armonía de Shannon</h3>
+            </div>
+            <div class="text-right">
+              <div id="cosmic-rank-name" class="text-sm font-black font-space text-indigo-300">Cadete Planetario</div>
+              <div id="cosmic-rank-tier" class="text-[11px] font-mono text-slate-400">Tier I • Nivel <span id="current-level-num">1</span></div>
+            </div>
+          </div>
+
+          <!-- Sliders de las 5 Mini-Apps -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <!-- School -->
+            <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-1.5">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-slate-300">📐 School (Core LOMLOE):</span>
+                <span id="val-school" class="text-amber-400 font-bold">120 XP</span>
+              </div>
+              <input type="range" id="slider-school" min="0" max="1000" value="120" oninput="updateProgression()" class="w-full accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Cosmos -->
+            <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-1.5">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-slate-300">🌌 Cosmos (Astro 3D):</span>
+                <span id="val-cosmos" class="text-cyan-400 font-bold">150 XP</span>
+              </div>
+              <input type="range" id="slider-cosmos" min="0" max="1000" value="150" oninput="updateProgression()" class="w-full accent-cyan-500 cursor-pointer">
+            </div>
+
+            <!-- Cortex -->
+            <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-1.5">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-slate-300">🤖 Cortex (IA & Código):</span>
+                <span id="val-cortex" class="text-emerald-400 font-bold">140 XP</span>
+              </div>
+              <input type="range" id="slider-cortex" min="0" max="1000" value="140" oninput="updateProgression()" class="w-full accent-emerald-500 cursor-pointer">
+            </div>
+
+            <!-- Vox -->
+            <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-1.5">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-slate-300">🗣️ Vox (Idiomas / Flow):</span>
+                <span id="val-vox" class="text-purple-400 font-bold">130 XP</span>
+              </div>
+              <input type="range" id="slider-vox" min="0" max="1000" value="130" oninput="updateProgression()" class="w-full accent-purple-500 cursor-pointer">
+            </div>
+
+            <!-- Criterio -->
+            <div class="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-1.5 sm:col-span-2">
+              <div class="flex justify-between text-xs font-mono">
+                <span class="text-slate-300">⚖️ Criterio (Pensamiento Crítico):</span>
+                <span id="val-criterio" class="text-rose-400 font-bold">110 XP</span>
+              </div>
+              <input type="range" id="slider-criterio" min="0" max="1000" value="110" oninput="updateProgression()" class="w-full accent-rose-500 cursor-pointer">
+            </div>
+
+          </div>
+
+          <!-- Barra de XP Universal & Fórmulas Calculadas -->
+          <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+              <span>XP Universal Total: <strong id="total-universal-xp" class="text-white text-sm">650 XP</strong></span>
+              <span>Factor de Armonía de Shannon: <strong id="harmony-factor-val" class="text-emerald-400">+48.2%</strong></span>
+              <span>Progreso de Nivel: <strong id="level-progress-pct" class="text-indigo-400">45%</strong></span>
+            </div>
+            <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+              <div id="universal-xp-bar" class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-cyan-400 transition-all duration-300" style="width: 45%"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 3: PACTOS FAMILIARES & RECOMPENSAS EN EL MUNDO REAL -->
+      <!-- ========================================================================= -->
+      <section class="glass-panel rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-black">MUNDO REAL</span>
+              <h3 class="text-2xl font-black font-space text-white">3. Pactos Familiares & Recompensas Tangibles</h3>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">
+              Los niños ganan <strong>Effort Points (EP)</strong> por constancia que canjean por pactos acordados con sus padres.
+            </p>
+          </div>
+          <div class="text-right font-mono text-xs">
+            <span class="text-slate-400">Saldo del Alumno:</span>
+            <span class="text-emerald-400 font-bold text-sm ml-1">195 EP</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Pacto 1 -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">🎮</span>
+                <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded">80 EP</span>
+              </div>
+              <h4 class="font-bold text-sm text-white">+30 min Consola Finde</h4>
+              <p class="text-slate-400 text-[11px]">Tiempo de ocio libre el sábado tras cumplir los deberes.</p>
+            </div>
+            <button onclick="requestFamilyPact('+30 min Consola Finde', 80)" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-emerald-600/40 border border-slate-700 text-xs font-bold text-slate-200 transition-all cursor-pointer">
+              Solicitar Canje
+            </button>
+          </div>
+
+          <!-- Pacto 2 -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">🪐</span>
+                <span class="text-xs font-mono font-bold text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded">300 EP</span>
+              </div>
+              <h4 class="font-bold text-sm text-white">Visita al Planetario</h4>
+              <p class="text-slate-400 text-[11px]">Tarde familiar en el museo de ciencias o planetario.</p>
+            </div>
+            <button onclick="requestFamilyPact('Visita al Planetario', 300)" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-cyan-600/40 border border-slate-700 text-xs font-bold text-slate-200 transition-all cursor-pointer">
+              Solicitar Canje
+            </button>
+          </div>
+
+          <!-- Pacto 3 -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">🍕</span>
+                <span class="text-xs font-mono font-bold text-amber-400 bg-amber-950 px-2 py-0.5 rounded">60 EP</span>
+              </div>
+              <h4 class="font-bold text-sm text-white">Elegir Cena Viernes</h4>
+              <p class="text-slate-400 text-[11px]">El alumno decide el menú familiar para la cena.</p>
+            </div>
+            <button onclick="requestFamilyPact('Elegir Cena Viernes', 60)" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-amber-600/40 border border-slate-700 text-xs font-bold text-slate-200 transition-all cursor-pointer">
+              Solicitar Canje
+            </button>
+          </div>
+
+          <!-- Pacto 4 -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-2xl">📚</span>
+                <span class="text-xs font-mono font-bold text-purple-400 bg-purple-950 px-2 py-0.5 rounded">180 EP</span>
+              </div>
+              <h4 class="font-bold text-sm text-white">Libro / Cómic Ciencia</h4>
+              <p class="text-slate-400 text-[11px]">Nuevo libro o cómic STEM a elección del alumno.</p>
+            </div>
+            <button onclick="requestFamilyPact('Libro / Cómic Ciencia', 180)" class="w-full py-2 rounded-xl bg-slate-900 hover:bg-purple-600/40 border border-slate-700 text-xs font-bold text-slate-200 transition-all cursor-pointer">
+              Solicitar Canje
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Cupón Holográfico Generado -->
+        <div id="holographic-coupon" class="hidden p-5 rounded-2xl bg-gradient-to-r from-indigo-950 via-slate-900 to-purple-950 border-2 border-indigo-500 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 animate-pulse-slow">
+          <div class="space-y-1">
+            <span class="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-indigo-500/30 text-indigo-200 border border-indigo-400/40">CUPÓN FAMILIAR HOLOGRÁFICO ACTIVO</span>
+            <h4 id="coupon-title" class="text-lg font-black font-space text-white">Tarde de Cine Familiar</h4>
+            <p class="text-xs text-indigo-300">Aprobado por los padres mediante Parental Gate • Válido para este fin de semana.</p>
+          </div>
+          <div class="flex items-center gap-3 shrink-0">
+            <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center text-slate-950 text-xl font-bold font-mono">
+              QR
+            </div>
+            <button onclick="fulfillCoupon()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs cursor-pointer">
+              ¡Disfrutado en Familia! ✨
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 4: REACTOR COOPERATIVO DE HERMANOS (SIBLING CO-OP) -->
+      <!-- ========================================================================= -->
+      <section class="glass-panel rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs font-black">CO-OP FAMILIAR</span>
+              <h3 class="text-2xl font-black font-space text-white">4. Misión Familiar Cósmica (Reactor de Hermanos)</h3>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">
+              Los hermanos no compiten entre sí; alimentan un <strong>Reactor de Combustible Estelar común</strong> para ganar un premio compartido.
+            </p>
+          </div>
+          <span class="text-xs font-mono text-cyan-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-cyan-500/30">
+            🍕 Premio Común: Noche de Pizza + Cine Sábado
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Hermano 1: Leo -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🤖</span>
+                <h4 class="font-bold text-sm text-white">Leo Cósmico (8 años - 3º Primaria)</h4>
+              </div>
+              <span class="text-xs font-mono text-emerald-400 font-bold">15 min Foco (Completado)</span>
+            </div>
+            <p class="text-slate-400 text-xs">Aporte al Reactor: 50% de energía diaria.</p>
+          </div>
+
+          <!-- Hermana 2: Clara -->
+          <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">🐱</span>
+                <h4 class="font-bold text-sm text-white">Clara Galáctica (12 años - 1º ESO)</h4>
+              </div>
+              <span class="text-xs font-mono text-purple-400 font-bold">25 min Foco (Completado)</span>
+            </div>
+            <p class="text-slate-400 text-xs">Aporte al Reactor: 50% de energía diaria.</p>
+          </div>
+
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+          <div class="flex justify-between text-xs font-mono">
+            <span class="text-slate-400">Carga del Reactor Estelar Familiar (Día 4 de 5):</span>
+            <span class="text-cyan-400 font-bold">80% [████████████████░░░░]</span>
+          </div>
+          <div class="w-full h-3 rounded-full bg-slate-800 overflow-hidden">
+            <div class="h-full bg-gradient-to-r from-cyan-500 to-indigo-500" style="width: 80%"></div>
+          </div>
+          <p class="text-[11px] text-slate-400 font-mono text-center pt-1">
+            🛡️ Escudo Fraternal Activo: Mañana completan el Día 5 y se desbloquea la pizza casera.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- VISTA 2: RAW MARKDOWN DOCUMENT -->
+    <section id="container-markdown" class="hidden glass-panel rounded-3xl p-6 md:p-8 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <span class="text-xs font-mono text-cyan-400 font-bold">docs/gamificacion/README.md</span>
+        <span class="text-xs text-slate-400">Tratado de Gamificación Ética y Meta-Progresión</span>
+      </div>
+      <pre class="bg-slate-950 p-6 rounded-2xl text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed border border-slate-800/80 whitespace-pre-wrap">
+# 🚀 ECOSISTEMA DE GAMIFICACIÓN ÉTICA Y META-PROGRESIÓN (GOALS)
+## Master Key, Entropía de Shannon, 3 Franjas de Edad y Pactos Familiares
+
+1. **School NO es un juego:** Núcleo académico formal LOMLOE/UK de 15 min sin ruido.
+2. **The Master Key:** Al completar School, se activa el multiplicador 2.0x en las 4 mini-apps.
+3. **Factor de Armonía de Shannon:** Bonificación de hasta +50% XP a quienes equilibran las 5 áreas.
+4. **Pactos Familiares:** Canje seguro de Effort Points (EP) por recompensas del mundo real.
+      </pre>
+    </section>
+
+  </div>
+
+  <!-- SCRIPT INTERACTIVO CON WEB AUDIO API REAL -->
+  <script>
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.15) {
+      try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        console.log('Audio not supported', e);
+      }
+    }
+
+    // 1. Selector de Franja de Edad
+    let currentAgeBracket = 'explorer';
+
+    function selectAgeBracket(bracket) {
+      currentAgeBracket = bracket;
+      const cardExp = document.getElementById('card-bracket-explorer');
+      const cardBld = document.getElementById('card-bracket-builder');
+      const cardStr = document.getElementById('card-bracket-strategist');
+      
+      const bTitle = document.getElementById('bracket-title');
+      const bDesc = document.getElementById('bracket-desc');
+      const bIcon = document.getElementById('bracket-icon');
+
+      cardExp.className = "p-5 rounded-2xl border-2 border-transparent bg-slate-900/50 hover:bg-slate-900 cursor-pointer transition-all space-y-3";
+      cardBld.className = "p-5 rounded-2xl border-2 border-transparent bg-slate-900/50 hover:bg-slate-900 cursor-pointer transition-all space-y-3";
+      cardStr.className = "p-5 rounded-2xl border-2 border-transparent bg-slate-900/50 hover:bg-slate-900 cursor-pointer transition-all space-y-3";
+
+      if (bracket === 'explorer') {
+        cardExp.className = "p-5 rounded-2xl border-2 border-emerald-500 bg-slate-900/90 cursor-pointer transition-all space-y-3";
+        bIcon.innerText = "🪐";
+        bTitle.innerText = "Modo Activo: El Explorador Curioso (6-8 años)";
+        bDesc.innerText = "Sesión sugerida: 10 min • Soft-Cap Diario: 200 XP • Interfaz táctil de baja carga cognitiva y zero-penalty.";
+      } else if (bracket === 'builder') {
+        cardBld.className = "p-5 rounded-2xl border-2 border-indigo-500 bg-slate-900/90 cursor-pointer transition-all space-y-3";
+        bIcon.innerText = "🔮";
+        bTitle.innerText = "Modo Activo: El Constructor de Maestría (9-11 años)";
+        bDesc.innerText = "Sesión sugerida: 20 min • Soft-Cap Diario: 380 XP • Árbol de talentos RPG, 3 cristales y crafteo.";
+      } else {
+        cardStr.className = "p-5 rounded-2xl border-2 border-amber-500 bg-slate-900/90 cursor-pointer transition-all space-y-3";
+        bIcon.innerText = "⚡";
+        bTitle.innerText = "Modo Activo: El Estratega Autónomo (12-15 años)";
+        bDesc.innerText = "Sesión sugerida: 40 min • Soft-Cap Diario: 500 XP • Terminal de telemetría, rangos aeroespaciales y cero babyish UI.";
+      }
+    }
+
+    function testBracketAudio() {
+      if (currentAgeBracket === 'explorer') {
+        // Escala pentatónica Do Mayor (Do, Mi, Sol, Do)
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((f, i) => setTimeout(() => playTone(f, 'sine', 0.2), i * 80));
+      } else if (currentAgeBracket === 'builder') {
+        // Arpegio sintetizado
+        const notes = [440.00, 554.37, 659.25, 880.00];
+        notes.forEach((f, i) => setTimeout(() => playTone(f, 'triangle', 0.2), i * 70));
+      } else {
+        // Sonido de confirmación cockpit sobrio
+        playTone(880, 'sine', 0.08);
+        setTimeout(() => playTone(1760, 'sine', 0.12), 90);
+      }
+    }
+
+    // 2. The Master Key
+    let isMasterKeyActive = false;
+
+    function toggleMasterKey() {
+      isMasterKeyActive = !isMasterKeyActive;
+      const badge = document.getElementById('master-key-badge');
+      const text = document.getElementById('school-status-text');
+      const bar = document.getElementById('school-progress-bar');
+      const btn = document.getElementById('btn-master-key');
+      const mult = document.getElementById('multiplier-val');
+      const honesty = document.getElementById('honesty-val');
+
+      if (isMasterKeyActive) {
+        badge.innerText = "SUPERCHARGE (2.0x)";
+        badge.className = "text-[10px] font-mono text-emerald-300 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/40 font-bold";
+        text.innerText = "¡Completado! (15/15 min)";
+        text.className = "text-emerald-400 font-bold";
+        bar.style.width = "100%";
+        bar.className = "h-full bg-emerald-500 transition-all duration-500";
+        mult.innerText = "2.0x";
+        mult.className = "text-emerald-400 font-bold";
+        honesty.innerText = "0.94 (Óptima)";
+        honesty.className = "text-emerald-400 font-bold";
+        btn.innerText = "🔄 Reiniciar Sesión de School";
+        btn.className = "w-full py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer border border-slate-700";
+        testBracketAudio();
+      } else {
+        badge.innerText = "STANDBY (1.0x)";
+        badge.className = "text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded";
+        text.innerText = "Pendiente (0/15 min)";
+        text.className = "text-amber-400 font-bold";
+        bar.style.width = "0%";
+        bar.className = "h-full bg-amber-500 transition-all duration-500";
+        mult.innerText = "1.0x";
+        mult.className = "text-slate-300";
+        honesty.innerText = "--";
+        honesty.className = "text-slate-300";
+        btn.innerText = "⚡ Completar Sesión Diaria de School (15 min)";
+        btn.className = "w-full py-3 rounded-2xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg";
+      }
+      updateProgression();
+    }
+
+    // 3. Calculador de Armonía de Shannon & Meta-Nivel
+    function updateProgression() {
+      const s = parseInt(document.getElementById('slider-school').value, 10);
+      const c = parseInt(document.getElementById('slider-cosmos').value, 10);
+      const cx = parseInt(document.getElementById('slider-cortex').value, 10);
+      const v = parseInt(document.getElementById('slider-vox').value, 10);
+      const cr = parseInt(document.getElementById('slider-criterio').value, 10);
+
+      document.getElementById('val-school').innerText = `${s} XP`;
+      document.getElementById('val-cosmos').innerText = `${c} XP`;
+      document.getElementById('val-cortex').innerText = `${cx} XP`;
+      document.getElementById('val-vox').innerText = `${v} XP`;
+      document.getElementById('val-criterio').innerText = `${cr} XP`;
+
+      const values = [s, c, cx, v, cr];
+      const sum = values.reduce((a, b) => a + b, 0);
+
+      // Entropía de Shannon normalizada
+      let entropy = 1.0;
+      if (sum > 0) {
+        const smoothTotal = sum + 5; // epsilon
+        let h = 0;
+        for (let val of values) {
+          let p = (val + 1) / smoothTotal;
+          h -= p * (Math.log(p) / Math.log(5));
+        }
+        entropy = Math.max(0, Math.min(1, h));
+      }
+      const harmonyFactor = 1.0 + 0.5 * entropy; // 1.0 a 1.5
+      document.getElementById('harmony-factor-val').innerText = `+${((harmonyFactor - 1) * 100).toFixed(1)}%`;
+
+      const multiplier = isMasterKeyActive ? 2.0 : 1.0;
+      const totalXp = Math.floor(sum * harmonyFactor * multiplier);
+      document.getElementById('total-universal-xp').innerText = `${totalXp} XP`;
+
+      // Nivel y Tier
+      let lvl = Math.max(1, Math.min(100, Math.floor(Math.pow(totalXp / 120, 1 / 1.85))));
+      document.getElementById('current-level-num').innerText = lvl;
+      
+      const pct = Math.min(100, Math.round((totalXp % 250) / 2.5));
+      document.getElementById('level-progress-pct').innerText = `${pct}%`;
+      document.getElementById('universal-xp-bar').style.width = `${pct}%`;
+
+      const rankName = document.getElementById('cosmic-rank-name');
+      const rankTier = document.getElementById('cosmic-rank-tier');
+
+      if (lvl <= 10) {
+        rankName.innerText = "Cadete Planetario";
+        rankName.className = "text-sm font-black font-space text-emerald-400";
+        rankTier.innerText = `Tier I • Nivel ${lvl}`;
+      } else if (lvl <= 20) {
+        rankName.innerText = "Piloto Orbital";
+        rankName.className = "text-sm font-black font-space text-cyan-400";
+        rankTier.innerText = `Tier II • Nivel ${lvl}`;
+      } else if (lvl <= 30) {
+        rankName.innerText = "Navegante Estelar";
+        rankName.className = "text-sm font-black font-space text-indigo-400";
+        rankTier.innerText = `Tier III • Nivel ${lvl}`;
+      } else {
+        rankName.innerText = "Comandante Cuántico";
+        rankName.className = "text-sm font-black font-space text-amber-400";
+        rankTier.innerText = `Tier V • Nivel ${lvl}`;
+      }
+    }
+
+    // 4. Pactos Familiares
+    function requestFamilyPact(title, cost) {
+      const pass = prompt(`[PARENTAL GATE]\nPara solicitar el canje de '${title}' (${cost} EP):\nResuelve la operación de control parental: ¿Cuánto es 8 × 9?`);
+      if (pass === '72') {
+        document.getElementById('coupon-title').innerText = title;
+        document.getElementById('holographic-coupon').classList.remove('hidden');
+        alert(`🎉 ¡Pacto aprobado por el padre!\nSe ha emitido el Cupón Holográfico para '${title}'.`);
+        testBracketAudio();
+      } else if (pass !== null) {
+        alert("❌ Respuesta incorrecta. Canje cancelado.");
+      }
+    }
+
+    function fulfillCoupon() {
+      document.getElementById('holographic-coupon').classList.add('hidden');
+      alert("✨ ¡Pacto cumplido en familia! Los puntos han sido sellados en el álbum familiar.");
+    }
+
+    function switchView(mode) {
+      if (mode === 'interactive') {
+        document.getElementById('container-interactive').classList.remove('hidden');
+        document.getElementById('container-markdown').classList.add('hidden');
+        document.getElementById('btn-view-interactive').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer";
+        document.getElementById('btn-view-markdown').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+      } else {
+        document.getElementById('container-interactive').classList.add('hidden');
+        document.getElementById('container-markdown').classList.remove('hidden');
+        document.getElementById('btn-view-interactive').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+        document.getElementById('btn-view-markdown').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer";
+      }
+    }
+
+    // Inicializar cálculo al cargar
+    updateProgression();
+  </script>
+</body>
+</html>

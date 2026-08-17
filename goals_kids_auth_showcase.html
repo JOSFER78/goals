@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS™ • Sistema de Login Infantil, Picture PIN y Parental Gate</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-outfit: 'Outfit', sans-serif;
+      --font-space: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body {
+      font-family: var(--font-outfit);
+      background-color: #050811;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.20) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 30%, rgba(245, 158, 11, 0.10) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    .font-space { font-family: var(--font-space); }
+    .font-mono { font-family: var(--font-mono); }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-panel-glow {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      box-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-8px); }
+      40%, 80% { transform: translateX(8px); }
+    }
+    .animate-shake {
+      animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 selection:bg-indigo-500 selection:text-white">
+
+  <div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- HEADER SUPREMO -->
+    <header class="glass-panel rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+      <div class="space-y-2">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Arquitectura de Login Infantil</span>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Estándar Smartick & COPPA/RGPD</span>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">docs/login/</span>
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black font-space tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-cyan-300">
+          GOALS Family Auth & Parental Gates
+        </h1>
+        <p class="text-slate-400 text-sm md:text-base max-w-3xl">
+          El padre gestiona la cuenta legal y la suscripción; los niños acceden con <strong>Picture PIN (4 iconos)</strong> en tablets familiares y la zona de adultos queda blindada con <strong>Parental Gate dinámico</strong>.
+        </p>
+      </div>
+
+      <!-- BOTONES DE MODO DE VISTA -->
+      <div class="flex bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shrink-0">
+        <button id="btn-view-interactive" onclick="switchView('interactive')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer">
+          ⚡ Demostrador Interactivo
+        </button>
+        <button id="btn-view-markdown" onclick="switchView('markdown')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer">
+          📄 Tratado Markdown (.md)
+        </button>
+      </div>
+    </header>
+
+    <!-- VISTA 1: INTERACTIVA -->
+    <main id="container-interactive" class="space-y-8">
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 1: SELECTOR DE PERFILES & SIMULADOR DE PICTURE PIN INFANTIL -->
+      <!-- ========================================================================= -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Columna Izquierda: Selector de Hermanos en Tablet Compartida -->
+        <div class="lg:col-span-4 glass-panel rounded-3xl p-6 space-y-4 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider font-mono">Tablet Familiar</span>
+              <span class="text-xs font-mono text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/30">1-Tap Switcher</span>
+            </div>
+            
+            <h3 class="text-lg font-black font-space text-white">¿Quién va a aprender hoy?</h3>
+            <p class="text-slate-400 text-xs leading-relaxed">
+              En dispositivos compartidos, los hermanos cambian de perfil en 1 toque sin exponer contraseñas del padre:
+            </p>
+
+            <!-- Lista de Hermanos -->
+            <div class="space-y-2.5">
+              <!-- Hermano 1: Leo -->
+              <div onclick="selectSibling('leo')" id="sibling-card-leo" class="p-3.5 rounded-2xl border-2 border-emerald-500 bg-slate-900/90 flex items-center justify-between cursor-pointer transition-all">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-xl">
+                    🤖
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm text-white">Leo Cósmico</h4>
+                    <p class="text-[11px] text-emerald-400 font-mono">8 años • 3º Primaria</p>
+                  </div>
+                </div>
+                <span class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">Picture PIN</span>
+              </div>
+
+              <!-- Hermana 2: Clara -->
+              <div onclick="selectSibling('clara')" id="sibling-card-clara" class="p-3.5 rounded-2xl border-2 border-transparent bg-slate-900/50 hover:bg-slate-900 flex items-center justify-between cursor-pointer transition-all">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-xl">
+                    🐱
+                  </div>
+                  <div>
+                    <h4 class="font-bold text-sm text-white">Clara Galáctica</h4>
+                    <p class="text-[11px] text-purple-400 font-mono">12 años • 1º ESO</p>
+                  </div>
+                </div>
+                <span class="text-xs font-mono text-slate-400 bg-slate-800 px-2 py-1 rounded-lg">PIN 4d</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Botón de Acceso a Zona Parental -->
+          <div class="pt-4 border-t border-slate-800 space-y-2">
+            <button onclick="openParentalGateModal('manage_settings')" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>🛡️</span> Zona Padres / Facturación (Gate 🔒)
+            </button>
+            <p class="text-[10px] text-slate-500 text-center font-mono">Protegido por Parental Gate Matemático</p>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Teclado Visual de Picture PIN con Web Audio -->
+        <div class="lg:col-span-8 glass-panel-glow rounded-3xl p-6 md:p-8 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+            <div>
+              <span id="active-student-tag" class="text-[10px] font-extrabold font-mono uppercase px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300">
+                Perfil Activo: Leo Cósmico (Picture PIN)
+              </span>
+              <h3 class="text-2xl font-black font-space text-white mt-1">Introduce tu Llave Secreta de 4 Iconos</h3>
+            </div>
+            <span class="text-xs font-mono text-indigo-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-indigo-500/30">
+              🔊 Web Audio API Activa
+            </span>
+          </div>
+
+          <!-- Ranuras del Picture PIN (4 Slots) -->
+          <div id="pin-slots-container" class="flex justify-center items-center gap-3 md:gap-4 py-2">
+            <div id="slot-0" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-950 border-2 border-dashed border-slate-700 flex items-center justify-center text-3xl transition-all shadow-inner">
+              <span class="text-slate-600 text-sm font-mono">1</span>
+            </div>
+            <div id="slot-1" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-950 border-2 border-dashed border-slate-700 flex items-center justify-center text-3xl transition-all shadow-inner">
+              <span class="text-slate-600 text-sm font-mono">2</span>
+            </div>
+            <div id="slot-2" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-950 border-2 border-dashed border-slate-700 flex items-center justify-center text-3xl transition-all shadow-inner">
+              <span class="text-slate-600 text-sm font-mono">3</span>
+            </div>
+            <div id="slot-3" class="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-950 border-2 border-dashed border-slate-700 flex items-center justify-center text-3xl transition-all shadow-inner">
+              <span class="text-slate-600 text-sm font-mono">4</span>
+            </div>
+          </div>
+
+          <!-- Mensaje de Feedback -->
+          <div id="pin-feedback-msg" class="text-center text-xs font-mono text-slate-400 min-h-[20px]">
+            Toca 4 iconos en orden para entrar a tu sesión. (PIN de prueba de Leo: 🚀 ⭐ 🍕 🐱)
+          </div>
+
+          <!-- Teclado de 12 Iconos Táctiles -->
+          <div class="grid grid-cols-4 sm:grid-cols-6 gap-2.5 max-w-lg mx-auto">
+            <button onclick="pressIcon('🚀', 0)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🚀</button>
+            <button onclick="pressIcon('⭐', 1)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">⭐</button>
+            <button onclick="pressIcon('🪐', 2)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🪐</button>
+            <button onclick="pressIcon('🍕', 3)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🍕</button>
+            <button onclick="pressIcon('🐱', 4)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🐱</button>
+            <button onclick="pressIcon('🤖', 5)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🤖</button>
+            <button onclick="pressIcon('🦖', 6)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🦖</button>
+            <button onclick="pressIcon('🍦', 7)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🍦</button>
+            <button onclick="pressIcon('⚡', 8)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">⚡</button>
+            <button onclick="pressIcon('💎', 9)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">💎</button>
+            <button onclick="pressIcon('🚗', 10)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🚗</button>
+            <button onclick="pressIcon('🎮', 11)" class="p-3.5 rounded-2xl bg-slate-900/90 hover:bg-indigo-600/40 border border-slate-800 hover:border-indigo-500 text-2xl transition-all transform hover:scale-105 active:scale-95 cursor-pointer">🎮</button>
+          </div>
+
+          <!-- Controles de Borrado -->
+          <div class="flex justify-center gap-4 pt-2">
+            <button onclick="deleteLastIcon()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold transition-all cursor-pointer">
+              ⌫ Borrar Último
+            </button>
+            <button onclick="resetPinSlots()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold transition-all cursor-pointer">
+              🔄 Reiniciar
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 2: SIMULADOR DE RETOS DE PUERTA PARENTAL (PARENTAL GATE) -->
+      <!-- ========================================================================= -->
+      <section class="glass-panel rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-xs font-black">SEGURIDAD ADULTA</span>
+              <h3 class="text-2xl font-black font-space text-white">Simulador de Retos Dinámicos (Parental Gate)</h3>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">
+              Conforme a Apple Kids 1.3 y Google Play Families: retos generados aleatoriamente para impedir compras o accesos indebidos de menores.
+            </p>
+          </div>
+
+          <!-- Botón de Generar Nuevo Reto -->
+          <button onclick="generateNewParentalChallenge()" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-lg">
+            <span>🎲</span> Generar Nuevo Reto Aleatorio
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Reto 1: Aritmética de 2 Dígitos -->
+          <div class="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-amber-400 font-mono">Nivel 1: Reto Matemático</span>
+              <span class="text-[10px] text-slate-500 font-mono">Para salir a web general</span>
+            </div>
+            <p class="text-slate-300 text-xs">Un niño de 7 años no puede resolver multiplicaciones de 2 dígitos sin calculadora:</p>
+            
+            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+              <span id="math-challenge-text" class="text-base font-black font-space text-white">¿Cuánto es 7 × 8?</span>
+              <div class="flex gap-2">
+                <input id="math-input" type="number" placeholder="Respuesta" class="w-24 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white text-center font-mono focus:border-amber-500 outline-none">
+                <button onclick="testMathChallenge()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs cursor-pointer">Verificar</button>
+              </div>
+            </div>
+            <p id="math-result-msg" class="text-[11px] font-mono text-slate-500 min-h-[16px]"></p>
+          </div>
+
+          <!-- Reto 2: Comprensión Lectora de Números en Español -->
+          <div class="p-5 rounded-2xl bg-slate-950/80 border border-slate-800 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-indigo-400 font-mono">Nivel 2: Lectura en Español</span>
+              <span class="text-[10px] text-slate-500 font-mono">Para compras y pagos</span>
+            </div>
+            <p class="text-slate-300 text-xs">Exige lectura fluida y transcripción de números en cifras:</p>
+            
+            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <span id="text-challenge-text" class="text-xs font-black font-mono text-indigo-200">"MIL NOVECIENTOS OCHENTA Y CUATRO"</span>
+              <div class="flex gap-2 shrink-0">
+                <input id="text-input" type="number" placeholder="Ej: 1984" class="w-24 px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white text-center font-mono focus:border-indigo-500 outline-none">
+                <button onclick="testTextChallenge()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs cursor-pointer">Verificar</button>
+              </div>
+            </div>
+            <p id="text-result-msg" class="text-[11px] font-mono text-slate-500 min-h-[16px]"></p>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- VISTA 2: RAW MARKDOWN DOCUMENT -->
+    <section id="container-markdown" class="hidden glass-panel rounded-3xl p-6 md:p-8 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <span class="text-xs font-mono text-cyan-400 font-bold">docs/login/README.md</span>
+        <span class="text-xs text-slate-400">Tratado de Login Infantil y Control Parental</span>
+      </div>
+      <pre class="bg-slate-950 p-6 rounded-2xl text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed border border-slate-800/80 whitespace-pre-wrap">
+# 🔐 ARQUITECTURA DE AUTENTICACIÓN FAMILIAR Y LOGIN INFANTIL (GOALS)
+## Estándar Smartick, COPPA, RGPD-K (menores 14a) y Parental Gates
+
+1. **El Padre es el Titular Legal:** Cuenta con Email/Google/Apple Auth y gestiona suscripciones.
+2. **Los Niños Acceden sin Email:** Picture PIN de 4 iconos (6 a 9 años) o PIN numérico (10 a 15 años).
+3. **Parental Gate Dinámico:** Retos matemáticos y lógicos antes de pagos o salir del modo niño.
+4. **Conmutador Rápido de Hermanos:** Cambio de perfil en 1 tap en tablets compartidas.
+      </pre>
+    </section>
+
+  </div>
+
+  <!-- SCRIPT INTERACTIVO CON WEB AUDIO API REAL -->
+  <script>
+    // Audio Context Real
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      return audioCtx;
+    }
+
+    function playTone(freq, type = 'sine', duration = 0.15) {
+      try {
+        const ctx = getAudioContext();
+        if (ctx.state === 'suspended') ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch (e) {
+        console.log('Audio not supported', e);
+      }
+    }
+
+    function playVictoryArpeggio() {
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      notes.forEach((freq, idx) => {
+        setTimeout(() => playTone(freq, 'triangle', 0.25), idx * 70);
+      });
+    }
+
+    function playErrorBuzz() {
+      playTone(180, 'sawtooth', 0.3);
+    }
+
+    // Estado del Picture PIN
+    const correctLeoPin = ['🚀', '⭐', '🍕', '🐱'];
+    let currentEnteredPin = [];
+    const toneFreqs = [523.25, 659.25, 783.99, 1046.50];
+
+    function pressIcon(icon, index) {
+      if (currentEnteredPin.length >= 4) return;
+      
+      const slotIdx = currentEnteredPin.length;
+      currentEnteredPin.push(icon);
+      playTone(toneFreqs[slotIdx], 'sine', 0.18);
+
+      const slot = document.getElementById(`slot-${slotIdx}`);
+      slot.innerText = icon;
+      slot.className = "w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-indigo-950/80 border-2 border-indigo-500 flex items-center justify-center text-3xl transition-all shadow-lg transform scale-105";
+
+      if (currentEnteredPin.length === 4) {
+        validatePin();
+      }
+    }
+
+    function deleteLastIcon() {
+      if (currentEnteredPin.length === 0) return;
+      const slotIdx = currentEnteredPin.length - 1;
+      currentEnteredPin.pop();
+      const slot = document.getElementById(`slot-${slotIdx}`);
+      slot.innerText = `${slotIdx + 1}`;
+      slot.className = "w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-950 border-2 border-dashed border-slate-700 flex items-center justify-center text-sm font-mono text-slate-600 transition-all shadow-inner";
+      document.getElementById('pin-feedback-msg').innerText = "Icono eliminado. Continúa tu secuencia.";
+      document.getElementById('pin-feedback-msg').className = "text-center text-xs font-mono text-slate-400 min-h-[20px]";
+    }
+
+    function resetPinSlots() {
+      currentEnteredPin = [];
+      for (let i = 0; i < 4; i++) {
+        const slot = document.getElementById(`slot-${i}`);
+        slot.innerText = `${i + 1}`;
+        slot.className = "w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-slate-950 border-2 border-dashed border-slate-700 flex items-center justify-center text-sm font-mono text-slate-600 transition-all shadow-inner";
+      }
+      document.getElementById('pin-feedback-msg').innerText = "Introduce tu Picture PIN de 4 iconos.";
+      document.getElementById('pin-feedback-msg').className = "text-center text-xs font-mono text-slate-400 min-h-[20px]";
+    }
+
+    function validatePin() {
+      const isMatch = currentEnteredPin.every((icon, idx) => icon === correctLeoPin[idx]);
+      const feedback = document.getElementById('pin-feedback-msg');
+      const container = document.getElementById('pin-slots-container');
+
+      if (isMatch) {
+        playVictoryArpeggio();
+        feedback.innerText = "🎉 ¡PIN CORRECTO! Entrando a la cabina espacial de Leo...";
+        feedback.className = "text-center text-xs font-mono text-emerald-400 font-bold min-h-[20px]";
+        for (let i = 0; i < 4; i++) {
+          document.getElementById(`slot-${i}`).className = "w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-emerald-950 border-2 border-emerald-500 flex items-center justify-center text-3xl transition-all shadow-lg";
+        }
+      } else {
+        playErrorBuzz();
+        feedback.innerText = "❌ PIN Incorrecto. Pista para demo: 🚀 ⭐ 🍕 🐱";
+        feedback.className = "text-center text-xs font-mono text-rose-400 font-bold min-h-[20px]";
+        container.classList.add('animate-shake');
+        if (navigator.vibrate) navigator.vibrate([60, 100, 60, 100]);
+        setTimeout(() => {
+          container.classList.remove('animate-shake');
+          resetPinSlots();
+        }, 1200);
+      }
+    }
+
+    function selectSibling(sibling) {
+      if (sibling === 'leo') {
+        document.getElementById('sibling-card-leo').className = "p-3.5 rounded-2xl border-2 border-emerald-500 bg-slate-900/90 flex items-center justify-between cursor-pointer transition-all";
+        document.getElementById('sibling-card-clara').className = "p-3.5 rounded-2xl border-2 border-transparent bg-slate-900/50 hover:bg-slate-900 flex items-center justify-between cursor-pointer transition-all";
+        document.getElementById('active-student-tag').innerText = "Perfil Activo: Leo Cósmico (Picture PIN)";
+        document.getElementById('active-student-tag').className = "text-[10px] font-extrabold font-mono uppercase px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300";
+        resetPinSlots();
+      } else {
+        document.getElementById('sibling-card-clara').className = "p-3.5 rounded-2xl border-2 border-purple-500 bg-slate-900/90 flex items-center justify-between cursor-pointer transition-all";
+        document.getElementById('sibling-card-leo').className = "p-3.5 rounded-2xl border-2 border-transparent bg-slate-900/50 hover:bg-slate-900 flex items-center justify-between cursor-pointer transition-all";
+        document.getElementById('active-student-tag').innerText = "Perfil Activo: Clara Galáctica (PIN 4 Dígitos)";
+        document.getElementById('active-student-tag').className = "text-[10px] font-extrabold font-mono uppercase px-2.5 py-1 rounded bg-purple-500/20 text-purple-300";
+        resetPinSlots();
+        document.getElementById('pin-feedback-msg').innerText = "Clara usa PIN numérico (Demo de Picture PIN activa para pruebas visuales).";
+      }
+    }
+
+    // Retos Dinámicos de Parental Gate
+    let currentMathAnswer = 56;
+    let currentTextAnswer = 1984;
+
+    const textChallenges = [
+      { text: '"MIL NOVECIENTOS OCHENTA Y CUATRO"', ans: 1984 },
+      { text: '"DOS MIL QUINIENTOS TREINTA Y SIETE"', ans: 2537 },
+      { text: '"TRES MIL DIECIOCHO"', ans: 3018 },
+      { text: '"CUATRO MIL SETECIENTOS NOVENTA Y DOS"', ans: 4792 },
+      { text: '"MIL CUATROCIENTOS NOVENTA Y DOS"', ans: 1492 }
+    ];
+
+    function generateNewParentalChallenge() {
+      // Reto 1 Matemático
+      const a = Math.floor(Math.random() * 6) + 7; // 7 a 12
+      const b = Math.floor(Math.random() * 6) + 7; // 7 a 12
+      currentMathAnswer = a * b;
+      document.getElementById('math-challenge-text').innerText = `¿Cuánto es ${a} × ${b}?`;
+      document.getElementById('math-input').value = '';
+      document.getElementById('math-result-msg').innerText = '';
+
+      // Reto 2 Texto
+      const randomText = textChallenges[Math.floor(Math.random() * textChallenges.length)];
+      currentTextAnswer = randomText.ans;
+      document.getElementById('text-challenge-text').innerText = randomText.text;
+      document.getElementById('text-input').value = '';
+      document.getElementById('text-result-msg').innerText = '';
+    }
+
+    function testMathChallenge() {
+      const val = parseInt(document.getElementById('math-input').value, 10);
+      const msg = document.getElementById('math-result-msg');
+      if (val === currentMathAnswer) {
+        msg.innerText = "✅ ¡Reto superado! Acceso parental autorizado.";
+        msg.className = "text-[11px] font-mono text-emerald-400 font-bold min-h-[16px]";
+      } else {
+        msg.innerText = "❌ Incorrecto. Inténtalo de nuevo.";
+        msg.className = "text-[11px] font-mono text-rose-400 font-bold min-h-[16px]";
+      }
+    }
+
+    function testTextChallenge() {
+      const val = parseInt(document.getElementById('text-input').value, 10);
+      const msg = document.getElementById('text-result-msg');
+      if (val === currentTextAnswer) {
+        msg.innerText = "✅ ¡Verificación de comprensión lectora exitosa!";
+        msg.className = "text-[11px] font-mono text-emerald-400 font-bold min-h-[16px]";
+      } else {
+        msg.innerText = "❌ Incorrecto. Escribe el número en cifras.";
+        msg.className = "text-[11px] font-mono text-rose-400 font-bold min-h-[16px]";
+      }
+    }
+
+    function openParentalGateModal(action) {
+      generateNewParentalChallenge();
+      alert(`[PARENTAL GATE ACTIVADO]\nAcción solicitada: ${action}\nResuelve uno de los retos matemáticos o de comprensión lectora abajo para continuar.`);
+    }
+
+    function switchView(mode) {
+      if (mode === 'interactive') {
+        document.getElementById('container-interactive').classList.remove('hidden');
+        document.getElementById('container-markdown').classList.add('hidden');
+        document.getElementById('btn-view-interactive').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer";
+        document.getElementById('btn-view-markdown').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+      } else {
+        document.getElementById('container-interactive').classList.add('hidden');
+        document.getElementById('container-markdown').classList.remove('hidden');
+        document.getElementById('btn-view-interactive').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+        document.getElementById('btn-view-markdown').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer";
+      }
+    }
+  </script>
+</body>
+</html>

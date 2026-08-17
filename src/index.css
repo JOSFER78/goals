@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --bg-page: #f8fafc;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f1f5f9;
+    --bg-card-subtle: #f8fafc;
+    --border-card: #e2e8f0;
+    --border-card-subtle: #cbd5e1;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+  }
+
+  .dark {
+    --bg-page: #090d16;
+    --bg-card: #0c101c;
+    --bg-card-hover: #131929;
+    --bg-card-subtle: #080c14;
+    --border-card: #1e293b;
+    --border-card-subtle: #334155;
+    --text-primary: #f8fafc;
+    --text-secondary: #cbd5e1;
+    --text-muted: #64748b;
+  }
+}
+
 @keyframes float {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-4px); }
@@ -27,6 +53,32 @@
   animation: fadeIn 0.2s ease-out forwards;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+.snap-section {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  scroll-margin-top: 3.75rem;
+}
+
+.snap-footer {
+  scroll-snap-align: end;
+  scroll-snap-stop: normal;
+  scroll-margin-bottom: 0px;
+}
+
+@media (max-width: 768px) {
+  .snap-section-mobile {
+    min-height: calc(100svh - 3.75rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
 /* Ocultar barras de desplazamiento nativas manteniendo scroll táctil */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
@@ -36,19 +88,30 @@
   scrollbar-width: none;
 }
 
-/* Custom Scrollbar (Global GOALS - Sober Slate) */
+/* Custom Scrollbar (Global GOALS - Adaptive Light / Dark) */
 ::-webkit-scrollbar {
   width: 6px;
 }
-::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track {
   background: #090d16;
 }
-::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: #1e293b;
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
+.dark ::-webkit-scrollbar-thumb:hover {
   background: #334155;
+}
+
+.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+.light ::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 .star {
@@ -58,11 +121,15 @@
   animation: twinkle 4s ease-in-out infinite;
 }
 
-/* Paneles de Cristal Mate Soberbio (Sin Neones Cegadores) */
+/* Paneles de Cristal Mate Adaptativos */
 .glass-panel {
   background: rgba(13, 18, 30, 0.75);
   border: 1px solid rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(16px);
+}
+.light .glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 .glass-card {
@@ -71,10 +138,18 @@
   backdrop-filter: blur(12px);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
 
 .glass-card:hover {
   border-color: rgba(255, 255, 255, 0.12);
   background: rgba(22, 30, 46, 0.75);
+}
+.light .glass-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  background: rgba(248, 250, 252, 0.95);
 }
 
 /* =========================================================
@@ -106,6 +181,11 @@
     linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
+.light .cyber-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+}
 
 /* 2. IDIOMAS VOZ: Ondas de Audio Calmadas */
 @keyframes soundwavePulse1 {
@@ -135,6 +215,10 @@
   background-image: 
     radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
 }
+.light .soundwave-grid-pattern {
+  background-image: 
+    radial-gradient(circle, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+}
 
 /* 3. CRITERIO: Radar Sobrio */
 @keyframes radarSweep {
@@ -152,6 +236,11 @@
   background-image: 
     linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+}
+.light .forensic-grid-pattern {
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
 }
 
 /* 4. IA LAB: Malla Sináptica Neutra */
@@ -171,10 +260,9 @@
     linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
 }
-
-.space-stars-pattern {
-  background-size: 48px 48px;
+.light .neural-mesh-pattern {
   background-image: 
-    radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    radial-gradient(circle at 18px 18px, rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
 }
-

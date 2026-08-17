@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRITERIO · Aprender a Informarse | Master Dossier & Interactive Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.395.0/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --bg: #030712;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(245, 158, 11, 0.2);
+      --amber: #f59e0b;
+      --amber-glow: rgba(245, 158, 11, 0.15);
+      --emerald: #10b981;
+      --cyan: #06b6d4;
+      --rose: #f43f5e;
+      --indigo: #6366f1;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+    .font-display { font-family: 'Outfit', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    
+    /* Background Glows */
+    .ambient-glow {
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 600px;
+      background: radial-gradient(circle, var(--amber-glow) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px 80px; position: relative; z-index: 1; }
+    
+    /* Navigation Bar */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      margin-bottom: 24px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--amber);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--amber);
+    }
+
+    /* Tabs */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 24px;
+    }
+    .tab-btn {
+      padding: 10px 18px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: #fff; background: rgba(30, 41, 59, 0.8); }
+    .tab-btn.active {
+      background: var(--amber);
+      color: #030712;
+      border-color: var(--amber);
+      font-weight: 800;
+      box-shadow: 0 4px 20px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(12px);
+      margin-bottom: 20px;
+    }
+    .card-hero {
+      border-color: var(--card-border);
+      background: linear-gradient(135deg, rgba(30, 27, 75, 0.5) 0%, rgba(15, 23, 42, 0.9) 100%);
+    }
+
+    /* Grid */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+
+    /* Module item */
+    .module-item {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+    .module-item:hover { border-color: rgba(245, 158, 11, 0.4); transform: translateY(-2px); }
+
+    /* Telemetry Meter */
+    .meter-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    .meter-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--amber), var(--emerald));
+      transition: width 0.6s ease;
+    }
+
+    /* Markdown Raw Viewer */
+    .raw-md {
+      background: #020617;
+      border: 1px solid #1e293b;
+      padding: 20px;
+      border-radius: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      max-height: 500px;
+    }
+
+    /* Buttons */
+    .btn-action {
+      background: var(--amber);
+      color: #020617;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-weight: 800;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-action:hover { background: #fbbf24; transform: scale(1.02); }
+  </style>
+</head>
+<body>
+  <div class="ambient-glow"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">
+          <i data-lucide="compass"></i>
+        </div>
+        <div>
+          <h1 class="font-display" style="font-size: 20px; font-weight: 900; letter-spacing: -0.02em;">CRITERIO</h1>
+          <p style="font-size: 12px; color: var(--text-muted);">GOALS · Alfabetización Informativa & IA</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <span class="badge"><i data-lucide="shield-check" style="width: 12px;"></i> Ecosistema GOALS v2.5</span>
+        <span class="badge" style="color: var(--emerald); border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1);"><i data-lucide="sparkles" style="width: 12px;"></i> 100% Fuentes Reales</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="showTab('dossier')"><i data-lucide="file-text"></i> 01 · Dossier Ejecutivo</button>
+      <button class="tab-btn" onclick="showTab('modules')"><i data-lucide="book-open"></i> 02 · 12 Módulos Didácticos</button>
+      <button class="tab-btn" onclick="showTab('simulator')"><i data-lucide="cpu"></i> 03 · Simulador de Algoritmos</button>
+      <button class="tab-btn" onclick="showTab('matiza')"><i data-lucide="scale"></i> 04 · Laboratorio MATIZA</button>
+      <button class="tab-btn" onclick="showTab('missions')"><i data-lucide="target"></i> 05 · 60 Misiones</button>
+      <button class="tab-btn" onclick="showTab('markdown')"><i data-lucide="code"></i> 06 · Documentación Raw (.md)</button>
+    </div>
+
+    <!-- TAB 1: DOSSIER EJECUTIVO -->
+    <div id="tab-dossier" class="tab-pane">
+      <div class="card card-hero">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
+          <div>
+            <span class="badge" style="margin-bottom: 8px;">Principio Insignia</span>
+            <h2 class="font-display" style="font-size: 26px; font-weight: 900;">«¿Y tú cómo lo sabes?»</h2>
+            <p style="font-size: 14px; color: var(--text-muted); max-width: 700px; margin-top: 6px;">
+              No creer todo + No desconfiar de todo = Aprender a Informarse. Un viaje formativo por etapas (8 a 18 años) para comprender los incentivos de la atención, la mecánica de los algoritmos y la naturaleza de la IA generativa.
+            </p>
+          </div>
+          <div style="text-align: right;">
+            <span class="font-mono" style="font-size: 28px; font-weight: 900; color: var(--amber);">8</span>
+            <span style="display: block; font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Competencias Clave</span>
+          </div>
+        </div>
+
+        <div class="grid-3" style="margin-top: 24px;">
+          <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; color: var(--amber);">
+              <i data-lucide="database"></i>
+              <strong style="font-size: 13px;">Cero Mocks / Fuentes Reales</strong>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">Documentación anclada en el BOE, NASA PDS, ESA Science, CSIC, FTC y la Universidad de Granada (CIMCYC).</p>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; color: var(--cyan);">
+              <i data-lucide="shield-alert"></i>
+              <strong style="font-size: 13px;">Método PAUSA (30s)</strong>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">Protocolo conductual de desaceleración para activar el córtex prefrontal ante contenidos de alto impacto emocional.</p>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 6px; color: var(--emerald);">
+              <i data-lucide="scale"></i>
+              <strong style="font-size: 13px;">Laboratorio MATIZA</strong>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">Estación analítica estructurada en 4 capas (Afirmación, Evidencia, Contexto Faltante y Síntesis Matizada).</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: 12 MÓDULOS -->
+    <div id="tab-modules" class="tab-pane" style="display: none;">
+      <div class="card">
+        <h2 class="font-display" style="font-size: 20px; font-weight: 800; margin-bottom: 16px;">Mapa de los 12 Módulos Pedagógicos</h2>
+        <div class="grid-3">
+          <div class="module-item">
+            <span class="badge">01 · 8-10 AÑOS</span>
+            <strong style="font-size: 14px;">¿Por qué informarme?</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">La información afecta decisiones reales en el colegio, amistades y dinero.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">02 · 8-10 AÑOS</span>
+            <strong style="font-size: 14px;">El mundo que ves</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Qué es una fuente y cómo el encuadre visual recorta la realidad.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">03 · 10-12 AÑOS</span>
+            <strong style="font-size: 14px;">Tu cerebro también participa</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Neurobiología de la rabia, el miedo y el impulso de compartir.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">04 · 10-12 AÑOS</span>
+            <strong style="font-size: 14px;">El viaje de una información</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">El teléfono escacharrado digital de un estudio a un meme viral.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">05 · 12-14 AÑOS</span>
+            <strong style="font-size: 14px;">Los algoritmos y la atención</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Cómo el recomendador optimiza el tiempo de pantalla y amplifica extremos.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">06 · 12-14 AÑOS</span>
+            <strong style="font-size: 14px;">Hecho, Opinión y Evidencia</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Separar datos comprobables de valoraciones subjetivas y anuncios.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">07 · 14-16 AÑOS</span>
+            <strong style="font-size: 14px;">Aprender a buscar</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Lectura lateral en pestañas paralelas y búsqueda neutral.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">08 · 14-16 AÑOS</span>
+            <strong style="font-size: 14px;">IA: Cuando la máquina inventa</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Alucinaciones, citas inventadas y límites de los LLMs.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">09 · 14-16 AÑOS</span>
+            <strong style="font-size: 14px;">IA: Medios Sintéticos</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Deepfakes, clonación de voz y pérdida de prueba visual automática.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">10 · 8-18 AÑOS</span>
+            <strong style="font-size: 14px;">El Método PAUSA</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Protocolo en 5 pasos de desaceleración y comprobación de fuentes.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">11 · 8-18 AÑOS</span>
+            <strong style="font-size: 14px;">Misiones de Campo</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">60 situaciones cotidianas gamificadas con dificultad adaptativa.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge">12 · 14-18 AÑOS</span>
+            <strong style="font-size: 14px;">Investigación & MATIZA</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Análisis de afirmaciones complejas con rigor y fuentes primarias.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: SIMULADOR DE ALGORITMOS -->
+    <div id="tab-simulator" class="tab-pane" style="display: none;">
+      <div class="card">
+        <h2 class="font-display" style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">Simulador Interactivo del Algoritmo</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Experimenta cómo tus interacciones modifican el peso que el recomendador asigna a cada tipo de contenido:</p>
+        
+        <div class="grid-2">
+          <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08);">
+            <strong style="font-size: 14px; display: block; margin-bottom: 12px;">Simulación de Post Viral</strong>
+            <div style="padding: 14px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 12px; font-size: 13px; color: #fecdd3; margin-bottom: 14px;">
+              🚨 «¡ESCÁNDALO TOTAL! Lo que los medios ocultan y nadie se atreve a decir. ¡Compártelo ya!»
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn-action" style="background: var(--rose); color: #fff;" onclick="boostSensational()"><i data-lucide="heart"></i> Dar Like a la Rabia</button>
+              <button class="btn-action" style="background: var(--indigo); color: #fff;" onclick="boostScientific()"><i data-lucide="book-open"></i> Ver Datos Científicos</button>
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08);">
+            <strong style="font-size: 14px; display: block; margin-bottom: 16px;">Telemetría de la Cámara de Eco</strong>
+            <div style="margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                <span style="color: var(--rose);">Exposición a Contenido Sensacional</span>
+                <span id="sensational-score" class="font-mono">50%</span>
+              </div>
+              <div class="meter-bar">
+                <div id="sensational-bar" class="meter-fill" style="width: 50%; background: var(--rose);"></div>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
+                <span style="color: var(--indigo);">Exposición a Ciencia & Fuentes</span>
+                <span id="science-score" class="font-mono">50%</span>
+              </div>
+              <div class="meter-bar">
+                <div id="science-bar" class="meter-fill" style="width: 50%; background: var(--indigo);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 4: MATIZA -->
+    <div id="tab-matiza" class="tab-pane" style="display: none;">
+      <div class="card">
+        <h2 class="font-display" style="font-size: 20px; font-weight: 800; margin-bottom: 8px;">Laboratorio MATIZA · Contraste Fáctico</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Desglose estructurado de un caso real analizado en 4 capas:</p>
+        
+        <div style="background: rgba(0,0,0,0.4); padding: 20px; border-radius: 18px; border: 1px solid rgba(245, 158, 11, 0.3); margin-bottom: 20px;">
+          <span class="badge" style="margin-bottom: 8px;">Caso Analizado</span>
+          <h3 style="font-size: 16px; color: #fff;">«¿El telescopio James Webb ha confirmado vida extraterrestre inteligente en K2-18b?»</h3>
+        </div>
+
+        <div class="grid-2">
+          <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 18px; border-radius: 16px;">
+            <strong style="color: var(--emerald); font-size: 13px; display: flex; align-items: center; gap: 6px;"><i data-lucide="check-circle-2"></i> 1. Hechos Probados con Evidencia</strong>
+            <p style="font-size: 12px; color: #d1fae5; margin-top: 8px;">El James Webb detectó moléculas con carbono en la atmósfera de K2-18b y un indicio preliminar de sulfuro de dimetilo.</p>
+          </div>
+
+          <div style="background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); padding: 18px; border-radius: 16px;">
+            <strong style="color: var(--cyan); font-size: 13px; display: flex; align-items: center; gap: 6px;"><i data-lucide="alert-triangle"></i> 2. Contexto Faltante & Matices</strong>
+            <p style="font-size: 12px; color: #cffafe; margin-top: 8px;">La señal de sulfuro de dimetilo es débil y requiere años de confirmación. No hay ninguna prueba de vida inteligente.</p>
+          </div>
+        </div>
+
+        <div style="margin-top: 16px; padding: 16px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px;">
+          <strong style="color: var(--amber); font-size: 13px;">3. Conclusión Matizada</strong>
+          <p style="font-size: 12px; color: #fef3c7; margin-top: 4px;">Es un hallazgo astrofísico prometedor, pero titular que "se ha descubierto vida inteligente" es una falsedad sensacionalista.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 5: 60 MISIONES -->
+    <div id="tab-missions" class="tab-pane" style="display: none;">
+      <div class="card">
+        <h2 class="font-display" style="font-size: 20px; font-weight: 800; margin-bottom: 12px;">Banco de 60 Misiones Gamificadas</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Escenarios interactivos clasificados por categorías cotidianas:</p>
+        
+        <div class="grid-3">
+          <div class="module-item">
+            <span class="badge" style="color: var(--cyan);">COLEGIO & GRUPOS</span>
+            <strong>El comunicado de huelga sorpresa</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Captura borrosa sin membrete escolar.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge" style="color: var(--rose);">SORTEOS & PHISHING</span>
+            <strong>El sorteo de consolas del streamer</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Cuenta clonada que solicita contraseñas.</p>
+          </div>
+          <div class="module-item">
+            <span class="badge" style="color: var(--indigo);">IA & DEEPFAKES</span>
+            <strong>El audio urgente de mamá</strong>
+            <p style="font-size: 12px; color: var(--text-muted);">Voz clonada pidiendo dinero por Bizum.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 6: MARKDOWN DOCUMENTATION -->
+    <div id="tab-markdown" class="tab-pane" style="display: none;">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h2 class="font-display" style="font-size: 20px; font-weight: 800;">Entregables Documentales (.md)</h2>
+          <span class="badge">14 Documentos Versionados</span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Todos los entregables están disponibles en el directorio <code>docs/criterio/</code>:
+        </p>
+        <div class="raw-md">
+# Listado de Entregables Maestros en docs/criterio/:
+
+00_AUDIT_REPORT.md             - Auditoría Integral GOALS, VPS, contradesinformacion2 y MATIZA
+01_RESEARCH_REPORT.md          - Síntesis de Investigación Multiagente
+02_PEDAGOGICAL_FRAMEWORK.md    - Marco Pedagógico por edades (8 a 18 años)
+03_PRODUCT_SPEC.md             - Especificación de Producto y Propuesta de Valor
+04_INFORMATION_ARCHITECTURE.md - Arquitectura de Información y Navegación
+05_TECHNICAL_ARCHITECTURE.md   - Arquitectura Técnica, TypeScript y Firestore
+06_DESIGN_SYSTEM.md            - Sistema de Diseño y Tokens Tactile Brutalism
+07_AI_ARCHITECTURE.md          - Tutor Socrático y Prompts Estructurados MATIZA
+08_CONTENT_MODEL.md            - Repositorio de 12 Módulos y Fuentes Primarias
+09_MATIZA_INTEGRATION.md       - Integración y Contrato de Análisis en 4 Capas
+10_SECURITY_CHILD_SAFETY.md    - Protocolos COPPA, GDPR-K y Seguridad Infantil
+11_QA_PLAN.md                  - Matriz de Pruebas y Cobertura de Calidad
+12_ROADMAP.md                  - Plan de Rollout Progresivo
+CHANGELOG.md                   - Registro de Versiones y Cambios
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    function showTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).style.display = 'block';
+      event.currentTarget.classList.add('active');
+    }
+
+    let sens = 50;
+    let sci = 50;
+
+    function boostSensational() {
+      sens = Math.min(100, sens + 15);
+      sci = Math.max(10, sci - 10);
+      updateMeters();
+    }
+
+    function boostScientific() {
+      sci = Math.min(100, sci + 20);
+      sens = Math.max(10, sens - 10);
+      updateMeters();
+    }
+
+    function updateMeters() {
+      document.getElementById('sensational-bar').style.width = sens + '%';
+      document.getElementById('sensational-score').innerText = sens + '%';
+      document.getElementById('science-bar').style.width = sci + '%';
+      document.getElementById('science-score').innerText = sci + '%';
+    }
+  </script>
+</body>
+</html>

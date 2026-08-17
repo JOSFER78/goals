@@ -1,13 +1,14 @@
 {
   "name": "goals-platform",
   "private": true,
-  "version": "2.5.0",
+  "version": "2.5.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "test": "npx tsx scripts/runAdaptiveTests.ts",
+    "package:apk": "node scripts/packageApk.cjs",
     "curriculum:compile": "npx tsx scripts/compileCurriculum.ts",
     "curriculum:sync": "npx tsx scripts/compileCurriculum.ts --sync-firebase",
     "knowledge:process": "npx tsx scripts/pipelineKnowledge.ts",

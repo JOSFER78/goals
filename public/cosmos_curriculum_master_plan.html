@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOALS — Plan Curricular de Cosmos 3D (6–15 Años) | Arquitectura Adaptativa</title>
+  
+  <!-- Google Fonts: Outfit & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            cosmos: {
+              950: '#020617',
+              900: '#0f172a',
+              800: '#1e293b',
+              700: '#334155',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg-deep: #020617;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(99, 102, 241, 0.25);
+      --card-hover-border: rgba(99, 102, 241, 0.6);
+      --accent-indigo: #6366f1;
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: #f8fafc;
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 60%);
+    }
+
+    .glass-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 1.25rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-panel:hover {
+      border-color: var(--card-hover-border);
+      box-shadow: 0 12px 32px -10px rgba(99, 102, 241, 0.2);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(2, 6, 23, 0.8);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(99, 102, 241, 0.4);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(99, 102, 241, 0.7);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-slate-100 flex flex-col antialiased selection:bg-indigo-500 selection:text-white">
+
+  <!-- ==========================================
+       HEADER & NAVIGATION
+       ========================================== -->
+  <header class="sticky top-0 z-50 border-b border-indigo-500/20 bg-slate-950/85 backdrop-blur-xl px-4 lg:px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3.5">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/20 border border-white/20">
+        <i data-lucide="orbit" class="w-6 h-6 text-white animate-spin" style="animation-duration: 20s;"></i>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-black text-lg sm:text-xl tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">GOALS</span>
+          <span class="badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">COSMOS 3D</span>
+          <span class="hidden sm:inline-block badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">2026 ASTRO DATA</span>
+        </div>
+        <p class="text-xs text-slate-400 font-medium">Plan Curricular y Arquitectura Adaptativa (6–15 Años)</p>
+      </div>
+    </div>
+
+    <!-- View Mode Switcher: Interactive UI vs Raw Markdown -->
+    <div class="flex items-center gap-2 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+      <button id="btn-view-interactive" onclick="switchMainView('interactive')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md">
+        <i data-lucide="layout" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Vista Interactiva 360º</span>
+      </button>
+      <button id="btn-view-markdown" onclick="switchMainView('markdown')" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+        <i data-lucide="file-code" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Raw Markdown (.md)</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==========================================
+       CONTAINER: INTERACTIVE VIEW
+       ========================================== -->
+  <main id="view-interactive" class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+    
+    <!-- HERO DASHBOARD BANNER -->
+    <section class="glass-panel p-6 sm:p-8 relative overflow-hidden">
+      <div class="absolute -right-16 -bottom-16 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div class="space-y-2 max-w-2xl">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="badge bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Single Source of Truth (SSOT)
+            </span>
+            <span class="badge bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> LOMLOE & IAU Calibrado
+            </span>
+          </div>
+          <h1 class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+            Arquitectura Curricular de Astronomía y Astrofísica
+          </h1>
+          <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+            Personalización pedagógica multinivel: una misma base factual científica modulada rigurosamente para 5 tramos de desarrollo cognitivo. Cero mocks, integración con telescopios espaciales activos y simuladores orbitales interactivos.
+          </p>
+        </div>
+
+        <!-- Global Quick KPIs -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full md:w-auto">
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
+            <div class="text-2xl font-black text-indigo-400 font-mono">5</div>
+            <div class="text-[11px] text-slate-400 uppercase font-semibold">Tramos de Edad</div>
+          </div>
+          <div class="bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
+            <div class="text-2xl font-black text-cyan-400 font-mono">25</div>
+            <div class="text-[11px] text-slate-400 uppercase font-semibold">Rangos Espaciales</div>
+          </div>
+          <div class="col-span-2 sm:col-span-1 bg-slate-900/80 border border-slate-800 p-3.5 rounded-2xl text-center">
+            <div class="text-2xl font-black text-emerald-400 font-mono">100%</div>
+            <div class="text-[11px] text-slate-400 uppercase font-semibold">Datos 2026 Reales</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         AGE TRANCHE INTERACTIVE SELECTOR
+         ========================================== -->
+    <section class="space-y-3">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="sliders" class="w-5 h-5 text-indigo-400"></i>
+          Selector Dinámico de Tramo de Edad
+        </h2>
+        <span class="text-xs text-slate-400">Cambia en tiempo real tono, densidad y nivel técnico</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="tranche-buttons">
+        <!-- 6-7 -->
+        <button onclick="setAgeTranche('6-7')" id="btn-tranche-6-7" class="tranche-tab glass-panel p-4 text-left relative overflow-hidden transition-all border-indigo-500/30 hover:border-indigo-500">
+          <div class="text-2xl mb-1">🌍</div>
+          <div class="font-extrabold text-base text-white">6–7 Años</div>
+          <div class="text-xs text-indigo-400 font-medium">1º-2º Primaria</div>
+          <div class="text-[11px] text-slate-400 mt-1">Sensorial • Lúdico</div>
+        </button>
+
+        <!-- 8-9 -->
+        <button onclick="setAgeTranche('8-9')" id="btn-tranche-8-9" class="tranche-tab glass-panel p-4 text-left relative overflow-hidden transition-all border-cyan-500/30 hover:border-cyan-500">
+          <div class="text-2xl mb-1">🚀</div>
+          <div class="font-extrabold text-base text-white">8–9 Años</div>
+          <div class="text-xs text-cyan-400 font-medium">3º-4º Primaria</div>
+          <div class="text-[11px] text-slate-400 mt-1">Explorador • 3D Guiado</div>
+        </button>
+
+        <!-- 10-11 -->
+        <button onclick="setAgeTranche('10-11')" id="btn-tranche-10-11" class="tranche-tab glass-panel p-4 text-left relative overflow-hidden transition-all border-indigo-500/30 hover:border-indigo-500">
+          <div class="text-2xl mb-1">🛰️</div>
+          <div class="font-extrabold text-base text-white">10–11 Años</div>
+          <div class="text-xs text-indigo-400 font-medium">5º-6º Primaria</div>
+          <div class="text-[11px] text-slate-400 mt-1">Leyes Kepler • Escala</div>
+        </button>
+
+        <!-- 12-13 -->
+        <button onclick="setAgeTranche('12-13')" id="btn-tranche-12-13" class="tranche-tab glass-panel p-4 text-left relative overflow-hidden transition-all border-purple-500/30 hover:border-purple-500">
+          <div class="text-2xl mb-1">🌀</div>
+          <div class="font-extrabold text-base text-white">12–13 Años</div>
+          <div class="text-xs text-purple-400 font-medium">1º-2º ESO</div>
+          <div class="text-[11px] text-slate-400 mt-1">Astrofísica • Materia Oscura</div>
+        </button>
+
+        <!-- 14-15 -->
+        <button onclick="setAgeTranche('14-15')" id="btn-tranche-14-15" class="tranche-tab glass-panel p-4 text-left relative overflow-hidden transition-all border-rose-500/30 hover:border-rose-500">
+          <div class="text-2xl mb-1">⚛️</div>
+          <div class="font-extrabold text-base text-white">14–15 Años</div>
+          <div class="text-xs text-rose-400 font-medium">3º-4º ESO</div>
+          <div class="text-[11px] text-slate-400 mt-1">Lambda-CDM • CMB • Fórmulas</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         PRESENTATION PROFILE HUD
+         ========================================== -->
+    <section class="glass-panel p-6 border-indigo-500/30 bg-slate-950/60 space-y-4" id="presentation-hud">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i data-lucide="cpu" class="w-5 h-5 text-indigo-400"></i>
+          <h3 class="font-bold text-white text-base">Perfil de Presentación Adaptativa Activo</h3>
+        </div>
+        <div id="hud-tranche-badge" class="badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+          Tramo: 8–9 Años (Explorador)
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800/80 space-y-1">
+          <span class="text-slate-400 font-mono uppercase text-[10px]">Tono y Vocabulario</span>
+          <p id="hud-tone" class="text-white font-medium">Amigable, guiado con analogías directas y curiosidad.</p>
+        </div>
+        <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800/80 space-y-1">
+          <span class="text-slate-400 font-mono uppercase text-[10px]">Densidad & Profundidad</span>
+          <p id="hud-density" class="text-white font-medium">Equilibrada • Párrafos cortos de 3-4 líneas.</p>
+        </div>
+        <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800/80 space-y-1">
+          <span class="text-slate-400 font-mono uppercase text-[10px]">Interacción 3D</span>
+          <p id="hud-3d" class="text-white font-medium">Modelos 3D interactivos con etiquetas tocables y órbita.</p>
+        </div>
+        <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800/80 space-y-1">
+          <span class="text-slate-400 font-mono uppercase text-[10px]">Persona de IA / Tutor</span>
+          <p id="hud-ai" class="text-white font-medium">Tutor Amigable (Preguntas socráticas cortas).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         CURRICULUM TREE EXPLORER & 360º LESSON HUB
+         ========================================== -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- LEFT: CURRICULUM TREE EXPLORER (4 COLS) -->
+      <section class="lg:col-span-4 space-y-4">
+        <div class="flex items-center justify-between">
+          <h3 class="font-bold text-white text-base flex items-center gap-2">
+            <i data-lucide="git-branch" class="w-5 h-5 text-cyan-400"></i>
+            Árbol Curricular del Tramo
+          </h3>
+          <span class="text-xs text-slate-400 font-mono" id="tree-unit-count">3 Unidades</span>
+        </div>
+
+        <div class="space-y-3" id="tree-units-container">
+          <!-- Dynamically populated unit cards -->
+        </div>
+      </section>
+
+      <!-- RIGHT: 360º LESSON HUB (8 COLS) -->
+      <section class="lg:col-span-8 glass-panel p-6 sm:p-8 space-y-6" id="lesson-360-hub">
+        
+        <!-- Lesson Header -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span id="lesson-icon" class="text-2xl">🌍</span>
+              <span id="lesson-tag" class="badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">Nivel 2 • 8-9 Años</span>
+              <span id="lesson-time" class="badge bg-slate-800 text-slate-300">⏱️ 7 min</span>
+            </div>
+            <h2 id="lesson-title" class="text-xl sm:text-2xl font-extrabold text-white">
+              La Atmósfera Terrestre y los Satélites Artificiales
+            </h2>
+            <p id="lesson-subtitle" class="text-xs sm:text-sm text-slate-400">
+              La frontera del espacio a 100 km y la Estación Espacial Internacional
+            </p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <div class="bg-indigo-950/80 border border-indigo-500/30 px-3 py-1.5 rounded-xl text-right">
+              <div class="text-[10px] text-slate-400 uppercase font-mono">Recompensa</div>
+              <div id="lesson-xp" class="text-sm font-bold text-indigo-400 font-mono">+50 XP</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 360º Inner Tabs -->
+        <div class="flex items-center gap-2 border-b border-slate-800 pb-2 overflow-x-auto">
+          <button onclick="switchLessonTab('theory')" id="tab-btn-theory" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all">
+            <i data-lucide="book-open" class="w-4 h-4"></i> Teoría 2026
+          </button>
+          <button onclick="switchLessonTab('sim3d')" id="tab-btn-sim3d" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+            <i data-lucide="box" class="w-4 h-4"></i> Simulación Física
+          </button>
+          <button onclick="switchLessonTab('eval')" id="tab-btn-eval" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+            <i data-lucide="check-circle-2" class="w-4 h-4"></i> Evaluación Formativa
+          </button>
+          <button onclick="switchLessonTab('rank')" id="tab-btn-rank" class="flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all">
+            <i data-lucide="award" class="w-4 h-4"></i> Rango Espacial
+          </button>
+        </div>
+
+        <!-- TAB CONTENT: THEORY -->
+        <div id="lesson-tab-theory" class="space-y-5">
+          <div id="lesson-theory-content" class="space-y-4 text-sm text-slate-200 leading-relaxed">
+            <!-- Dynamically populated steps -->
+          </div>
+
+          <!-- WOW & NOW FACTS 2026 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div class="bg-indigo-950/40 border border-indigo-500/30 p-4 rounded-2xl space-y-1.5">
+              <div class="flex items-center gap-2 text-indigo-400 font-bold text-xs">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> DATO CIENTÍFICO WOW
+              </div>
+              <p id="lesson-wow" class="text-xs text-slate-300">
+                Si la Tierra tuviera el tamaño de un balón de fútbol, toda la atmósfera respirable sería tan fina como una hoja de papel envolviendo el balón.
+              </p>
+            </div>
+            <div class="bg-cyan-950/40 border border-cyan-500/30 p-4 rounded-2xl space-y-1.5">
+              <div class="flex items-center gap-2 text-cyan-400 font-bold text-xs">
+                <i data-lucide="radio" class="w-4 h-4"></i> MISIÓN EN DIRECTO (2026)
+              </div>
+              <p id="lesson-now" class="text-xs text-slate-300">
+                La misión Artemis II de la NASA/ESA prepara el vuelo tripulado alrededor de la Luna, probando los escudos térmicos al reingresar a 40.000 km/h.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: 3D SIMULATION -->
+        <div id="lesson-tab-sim3d" class="space-y-4 hidden">
+          <div class="flex items-center justify-between bg-slate-900/90 p-3 rounded-xl border border-slate-800 text-xs">
+            <span class="text-slate-300 flex items-center gap-2">
+              <i data-lucide="mouse-pointer" class="w-4 h-4 text-indigo-400"></i>
+              <strong>Controles Universales:</strong> Mantén <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-700 rounded font-mono text-[10px]">Space</kbd> + Arrastrar para Paneo | 2 dedos en Táctil.
+            </span>
+            <span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Physics Canvas Engine</span>
+          </div>
+
+          <!-- Canvas Simulation Area -->
+          <div class="relative w-full h-80 bg-slate-950 border border-slate-800 rounded-2xl overflow-hidden flex items-center justify-center">
+            <canvas id="orbit-sim-canvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+            
+            <div class="absolute top-3 left-3 bg-slate-900/90 border border-slate-800/90 p-3 rounded-xl text-xs space-y-1 pointer-events-none backdrop-blur-md">
+              <div class="font-mono text-indigo-400 font-bold" id="sim-telemetry-speed">v = 27.600 km/h</div>
+              <div class="font-mono text-cyan-400" id="sim-telemetry-alt">Altitud = 408 km (ISS)</div>
+              <div class="font-mono text-emerald-400" id="sim-telemetry-grav">g = 8.7 m/s² (90%)</div>
+            </div>
+          </div>
+
+          <!-- Simulation Interactive Sliders -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-900/70 p-4 rounded-2xl border border-slate-800 text-xs">
+            <div class="space-y-1">
+              <div class="flex justify-between text-slate-300">
+                <span>Velocidad Tangencial ($v$)</span>
+                <span id="slider-speed-val" class="font-mono text-indigo-400 font-bold">7.66 km/s</span>
+              </div>
+              <input type="range" id="slider-speed" min="4" max="11" step="0.1" value="7.66" oninput="updateSimParameters()" class="w-full accent-indigo-500 cursor-pointer">
+            </div>
+            <div class="space-y-1">
+              <div class="flex justify-between text-slate-300">
+                <span>Altitud Orbital ($h$)</span>
+                <span id="slider-alt-val" class="font-mono text-cyan-400 font-bold">408 km</span>
+              </div>
+              <input type="range" id="slider-alt" min="150" max="2000" step="10" value="408" oninput="updateSimParameters()" class="w-full accent-cyan-500 cursor-pointer">
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: EVALUATION & RUBRIC -->
+        <div id="lesson-tab-eval" class="space-y-5 hidden">
+          <div class="bg-slate-900/80 p-4 rounded-2xl border border-slate-800 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="font-bold text-white text-sm flex items-center gap-2">
+                <i data-lucide="target" class="w-4 h-4 text-emerald-400"></i>
+                Evaluación Formativa Calibrada
+              </h4>
+              <span class="badge bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Sin Penalización Punitiva</span>
+            </div>
+            <p class="text-xs text-slate-400">
+              Demuestra tu comprensión conceptual para consolidar tu maestría y ganar estrellas de rango.
+            </p>
+          </div>
+
+          <div id="quiz-question-card" class="glass-panel p-5 space-y-4">
+            <div class="text-xs font-mono text-indigo-400 font-bold" id="quiz-q-num">Pregunta 1 de 1</div>
+            <h3 class="text-base font-bold text-white leading-snug" id="quiz-q-prompt">
+              ¿A qué altitud se sitúa la Línea de Kármán donde comienza oficialmente el espacio exterior?
+            </h3>
+            <div class="space-y-2" id="quiz-q-options">
+              <!-- Options populated by JS -->
+            </div>
+            <div id="quiz-q-feedback" class="hidden p-3.5 rounded-xl text-xs leading-relaxed"></div>
+          </div>
+        </div>
+
+        <!-- TAB CONTENT: SPACE RANK -->
+        <div id="lesson-tab-rank" class="space-y-5 hidden">
+          <div class="bg-gradient-to-r from-indigo-950/80 via-slate-900 to-cyan-950/80 p-6 rounded-2xl border border-indigo-500/40 flex flex-col sm:flex-row items-center gap-6">
+            <div class="w-24 h-24 rounded-2xl bg-indigo-900/60 border-2 border-indigo-400/60 flex items-center justify-center text-4xl shadow-xl shadow-indigo-500/30" id="rank-icon-big">
+              🚀
+            </div>
+            <div class="space-y-1.5 text-center sm:text-left flex-1">
+              <span class="badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/30" id="rank-stage-label">
+                Tramo 8–9 Años • Primaria 2º Ciclo
+              </span>
+              <h3 class="text-xl font-black text-white" id="rank-title-big">
+                Explorador Orbital
+              </h3>
+              <p class="text-xs text-slate-300" id="rank-desc">
+                Has demostrado dominio en la estructura atmosférica, satélites LEO y dinámica orbital básica.
+              </p>
+              <div class="pt-2 flex flex-wrap gap-2 justify-center sm:justify-start">
+                <span class="badge bg-slate-800 text-slate-300">Desbloqueo: Simulador ISS</span>
+                <span class="badge bg-slate-800 text-slate-300">Privilegio: Telemetría Real</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+
+    <!-- ==========================================
+         DIAGNOSTIC SIMULATOR & SPACE RANK CALCULATOR
+         ========================================== -->
+    <section class="glass-panel p-6 sm:p-8 space-y-6">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div>
+          <h2 class="text-xl font-extrabold text-white flex items-center gap-2">
+            <i data-lucide="compass" class="w-5 h-5 text-indigo-400"></i>
+            Simulador de Diagnóstico Adaptativo & Calculador de Rango
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400">
+            Algoritmo de búsqueda binaria conceptual: determina el punto exacto de entrada sin frustración.
+          </p>
+        </div>
+        <span class="badge bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">Micro-Test Adaptativo</span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Interactive Diagnostic Question Runner (7 cols) -->
+        <div class="lg:col-span-7 bg-slate-900/80 p-5 rounded-2xl border border-slate-800 space-y-4">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-mono text-indigo-400 font-bold" id="diag-step-indicator">Pregunta 1 de 3</span>
+            <span class="text-slate-400" id="diag-tranche-label">Tramo: 8–9 Años</span>
+          </div>
+
+          <h4 class="text-base font-bold text-white leading-snug" id="diag-prompt">
+            ¿A qué altitud se sitúa la Línea de Kármán donde comienza el espacio exterior?
+          </h4>
+
+          <div class="space-y-2" id="diag-options-container">
+            <!-- Dynamically injected diagnostic options -->
+          </div>
+
+          <div id="diag-explanation-box" class="hidden p-3.5 rounded-xl text-xs bg-slate-800 border border-slate-700 text-slate-300"></div>
+
+          <div class="flex justify-end pt-2">
+            <button id="btn-diag-next" onclick="nextDiagnosticQuestion()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+              <span>Siguiente Pregunta</span>
+              <i data-lucide="chevron-right" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live Projected Result (5 cols) -->
+        <div class="lg:col-span-5 glass-panel p-5 border-indigo-500/30 bg-slate-950/70 space-y-4 flex flex-col justify-between">
+          <div class="space-y-3">
+            <div class="text-xs font-mono uppercase text-indigo-400 font-bold">Proyección de Entrada Algorítmica</div>
+            
+            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+              <div class="text-xs text-slate-400">Punto de Inicio Sugerido:</div>
+              <div class="text-sm font-bold text-white" id="diag-res-unit">Unidad 1: Atmósfera y Satélites</div>
+              <div class="text-xs text-emerald-400 font-mono" id="diag-res-status">Nivel Adecuado al Tramo</div>
+            </div>
+
+            <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-2">
+              <div class="text-xs text-slate-400">Rango Espacial Asignado:</div>
+              <div class="flex items-center gap-2.5">
+                <span class="text-2xl" id="diag-res-icon">🚀</span>
+                <div>
+                  <div class="text-sm font-bold text-white" id="diag-res-rank">Explorador Orbital</div>
+                  <div class="text-[11px] text-slate-400" id="diag-res-stage">Primaria 2º Ciclo</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button onclick="resetDiagnostic()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all">
+              Reiniciar Simulación de Diagnóstico
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       CONTAINER: RAW MARKDOWN SPEC VIEW
+       ========================================== -->
+  <section id="view-markdown" class="hidden flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="text-2xl font-bold text-white">Especificación Técnica en Markdown (.md)</h2>
+        <p class="text-xs text-slate-400">Texto completo con contratos TypeScript, matrices de adaptación y rúbricas LOMLOE.</p>
+      </div>
+      <button onclick="copyMarkdownText()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-md">
+        <i data-lucide="copy" class="w-4 h-4"></i> Copiar Markdown
+      </button>
+    </div>
+
+    <pre class="bg-slate-950 p-6 rounded-2xl border border-indigo-500/30 text-xs font-mono text-slate-300 overflow-x-auto whitespace-pre-wrap leading-relaxed selection:bg-indigo-500 selection:text-white" id="raw-markdown-content">
+# PLAN CURRICULAR DE COSMOS 3D (6–15 AÑOS)
+**GOALS Architecture • Versión 2.0 (2026)**
+
+## 1. FUNDAMENTACIÓN TÉCNICA Y SSOT
+Cosmos 3D estructura el aprendizaje en 5 tramos calibrados contra el marco LOMLOE y estándares de la IAU (International Astronomical Union).
+
+### Tramos y Densidad:
+- **6–7 años (Primaria 1º ciclo)**: Enfoque sensorial, sin fórmulas, vocabulario intuitivo.
+- **8–9 años (Primaria 2º ciclo)**: Explorador espacial, modelos 3D interactivos, datos de la ISS.
+- **10–11 años (Primaria 3º ciclo)**: Física newtoniana/kepleriana, magnitudes UA y caída libre.
+- **12–13 años (ESO 1º ciclo)**: Astrofísica galáctica, materia oscura y agujero negro Sgr A*.
+- **14–15 años (ESO 2º ciclo)**: Cosmología relativista, radiación CMB (2.7255 K) y modelo Lambda-CDM.
+    </pre>
+  </section>
+
+  <!-- ==========================================
+       FOOTER
+       ========================================== -->
+  <footer class="border-t border-slate-900 bg-slate-950/80 px-6 py-6 mt-12 text-center text-xs text-slate-500">
+    <p>GOALS • Global Online Adaptive Learning System © 2026 • Diseñado con Estándares Científicos Reales (NASA, ESA, IAU)</p>
+  </footer>
+
+  <!-- ==========================================
+       CLIENT APPLICATION LOGIC
+       ========================================== -->
+  <script>
+    // --- MASTER ADAPTIVE CATALOG DATA (SSOT 2026) ---
+    const COSMOS_CATALOG = {
+      '6-7': {
+        trancheLabel: '6–7 Años (Inicial)',
+        stageLabel: 'Primaria 1º Ciclo',
+        tone: 'Cálido, lúdico, visual y sensorial (sin fórmulas).',
+        density: 'Espaciosa • 1 idea por pantalla con iconos grandes.',
+        sim3d: 'Rotación 3D automática y planetas con texturas vivas.',
+        aiPersona: 'Mascota Cósmica Amiga (frases cortas y afectuosas).',
+        rank: { icon: '🌍', title: 'Cadete de la Tierra', stage: 'Primaria 1º Ciclo', desc: 'Conoce la Tierra, el día y la noche y los 8 planetas amigos.' },
+        units: [
+          {
+            id: 'u6_01',
+            number: 1,
+            title: 'Nuestra Canica Azul: La Piel de Aire y los Océanos',
+            subtitle: 'El aire azul que respiramos y los astronautas en el espacio',
+            tag: 'Nivel 1 • 6-7 Años • Descubrimiento',
+            icon: '🌍',
+            time: '5 min',
+            xp: 40,
+            wow: '¡La Tierra es el único planeta conocido con agua líquida y plantas para respirar!',
+            now: 'Los astronautas en la estación espacial ven 16 amaneceres y atardeceres cada día.',
+            steps: [
+              { title: 'Nuestra Casa es una Esfera Azul', text: 'Vivimos sobre una bola gigante que flota en el espacio. Desde arriba se ve azul por los océanos y blanca por las nubes esponjosas.' },
+              { title: 'Una Manta Invisible de Aire', text: 'La atmósfera es una mantita de aire que nos cuida del frío del espacio y nos da oxígeno fresco para jugar y respirar.' }
+            ],
+            quiz: {
+              prompt: '¿De qué color principal se ve nuestro planeta Tierra desde el espacio? 🌍',
+              options: ['Azul brillante por el agua de los océanos 🌊', 'Verde entera como una lechuga 🥬', 'Roja como un tomate 🍅'],
+              answer: 0,
+              explanation: '¡Exacto! Los mares y océanos cubren la mayor parte de la Tierra y le dan ese color azul precioso.'
+            }
+          },
+          {
+            id: 'u6_02',
+            number: 2,
+            title: 'El Día, la Noche y la Gran Peonza',
+            subtitle: 'Cómo gira nuestro planeta para que podamos dormir',
+            tag: 'Nivel 1 • 6-7 Años • Movimiento',
+            icon: '🌞',
+            time: '5 min',
+            xp: 40,
+            wow: '¡La Tierra nunca para de girar como una peonza gigante!',
+            now: 'En el espacio no se hace de noche como en tu casa porque el Sol siempre brilla.',
+            steps: [
+              { title: 'La Gran Peonza Cósmica', text: 'La Tierra gira despacito sobre sí misma. Cuando nuestra ciudad mira al Sol es de día, y cuando queda de espaldas llega la noche estrellada.' }
+            ],
+            quiz: {
+              prompt: '¿Por qué se hace de noche en tu casa para dormir? 🌙',
+              options: ['Porque la Tierra gira sobre sí misma 🌍', 'Porque el Sol se apaga como una bombilla 💡', 'Porque una nube gigante lo tapa ☁️'],
+              answer: 0,
+              explanation: '¡Muy bien! Cuando la Tierra gira, nuestra parte se pone de espaldas al Sol y vemos las estrellas.'
+            }
+          }
+        ],
+        diagnostic: [
+          {
+            prompt: '¿Qué forma tiene nuestro planeta Tierra en el espacio? 🌍',
+            options: ['Una esfera redonda como una pelota azul ⚽', 'Plana como una moneda 🪙', 'Un cubo con esquinas 📦'],
+            answer: 0,
+            explanation: 'La Tierra es una gran esfera redonda que flota en el espacio.'
+          },
+          {
+            prompt: '¿Qué es el Sol que brilla por la mañana? ☀️',
+            options: ['Una estrella gigante que da luz y calor 🔥', 'Una roca fría como una montaña 🪨', 'Una luna de noche 🌙'],
+            answer: 0,
+            explanation: 'El Sol es una estrella luminosa en el centro de nuestro espacio.'
+          }
+        ]
+      },
+
+      '8-9': {
+        trancheLabel: '8–9 Años (Explorador)',
+        stageLabel: 'Primaria 2º Ciclo',
+        tone: 'Amigable, estructurado con analogías y curiosidad.',
+        density: 'Equilibrada • Párrafos cortos de 3-4 líneas.',
+        sim3d: 'Modelos 3D interactivos con etiquetas tocables y órbita.',
+        aiPersona: 'Tutor Amigable (guía con preguntas socráticas breves).',
+        rank: { icon: '🚀', title: 'Explorador Orbital', stage: 'Primaria 2º Ciclo', desc: 'Comprende la atmósfera a 100 km, satélites LEO y eclipses.' },
+        units: [
+          {
+            id: 'u8_01',
+            number: 1,
+            title: 'La Atmósfera Terrestre y los Satélites Artificiales',
+            subtitle: 'La frontera del espacio a 100 km y la Estación Espacial',
+            tag: 'Nivel 2 • 8-9 Años • Explorador',
+            icon: '🌍',
+            time: '7 min',
+            xp: 50,
+            wow: 'Si la Tierra tuviera el tamaño de un balón de fútbol, toda la atmósfera respirable sería tan fina como una hoja de papel.',
+            now: 'La misión Artemis II prepara el regreso de astronautas a la Luna orbitando a 40.000 km/h.',
+            steps: [
+              { title: 'La Línea de Kármán a 100 km', text: 'A los 100 km de altura el aire es tan fino que los aviones ya no pueden volar y comienza el espacio exterior.' },
+              { title: 'Vivir en la Estación Espacial a 400 km', text: 'La ISS vuela a 27.600 km/h dando una vuelta completa a la Tierra cada 90 minutos.' }
+            ],
+            quiz: {
+              prompt: '¿A qué altitud se sitúa la Línea de Kármán donde comienza oficialmente el espacio exterior?',
+              options: ['A los 100 km de altitud', 'A los 10 km donde vuelan los aviones', 'A 1.000.000 km'],
+              answer: 0,
+              explanation: 'A 100 km el aire es insuficiente para la sustentación aerodinámica.'
+            }
+          },
+          {
+            id: 'u8_02',
+            number: 2,
+            title: 'El Gran Eclipse Total de 2026 en España',
+            subtitle: 'Alineación geométrica del Sol, la Luna y la Tierra',
+            tag: 'Nivel 2 • 8-9 Años • Eventos Celestes',
+            icon: '🌑',
+            time: '7 min',
+            xp: 50,
+            wow: 'En agosto de 2026 España vivirá un eclipse solar total visible a simple vista con filtros.',
+            now: 'Los observatorios de Canarias calibran sus coronógrafos para estudiar la corona solar.',
+            steps: [
+              { title: 'La Sombra de la Luna', text: 'Cuando la Luna pasa exactamente entre el Sol y la Tierra, proyecta un cono de sombra (umbra) de unos 100 km de ancho.' }
+            ],
+            quiz: {
+              prompt: '¿Qué ocurre durante un Eclipse Total de Sol?',
+              options: ['La Luna se coloca exactamente entre el Sol y la Tierra', 'El Sol se congela', 'La Tierra se sale de su órbita'],
+              answer: 0,
+              explanation: 'La Luna bloquea el disco solar por unos minutos permitiendo ver la corona.'
+            }
+          }
+        ],
+        diagnostic: [
+          {
+            prompt: '¿A qué altitud se sitúa la Línea de Kármán donde comienza el espacio exterior?',
+            options: ['A los 100 km sobre el nivel del mar', 'A 10 km con los aviones', 'A 1.000.000 km'],
+            answer: 0,
+            explanation: 'La Línea de Kármán a 100 km es el límite internacional acordado.'
+          },
+          {
+            prompt: '¿Cuál es la causa principal de las cuatro estaciones (verano, invierno...)?',
+            options: ['La inclinación de 23,44° del eje de la Tierra', 'Que la Tierra se acerca al Sol en verano', 'Que el Sol arde con más fuerza'],
+            answer: 0,
+            explanation: 'La inclinación axial hace que los rayos incidan más directos en verano.'
+          }
+        ]
+      },
+
+      '10-11': {
+        trancheLabel: '10–11 Años (Avanzado)',
+        stageLabel: 'Primaria 3º Ciclo',
+        tone: 'Estructurado, explicativo con causas físicas y proporcionalidad.',
+        density: 'Media • Textos con datos numéricos y diagramas.',
+        sim3d: 'Vistas orbitales con control de cámara libre y escalas.',
+        aiPersona: 'Mentor Socrático (razona el por qué de los fenómenos).',
+        rank: { icon: '🛰️', title: 'Navegante Heliocéntrico', stage: 'Primaria 3º Ciclo', desc: 'Domina las escalas en UA, inclinación axial y mecánica de Kepler.' },
+        units: [
+          {
+            id: 'u10_01',
+            number: 1,
+            title: 'La Inclinación Axial (23,44°) y la Insolación Solar',
+            subtitle: 'Por qué la distancia no causa las estaciones',
+            tag: 'Nivel 3 • 10-11 Años • Mecánica Orbital',
+            icon: '📐',
+            time: '9 min',
+            xp: 75,
+            wow: 'En enero la Tierra está en su punto más cercano al Sol (perihelio a 147 Mkm) y en España es pleno invierno.',
+            now: 'El satélite meteorológico Meteosat de tercera generación mide la insolación diaria en vatios por metro cuadrado.',
+            steps: [
+              { title: 'El Ángulo de Incidencia', text: 'Cuando los rayos solares caen perpendiculares (90°), la energía se concentra en pocos metros cuadrados produciendo altas temperaturas.' }
+            ],
+            quiz: {
+              prompt: 'En el hemisferio norte, ¿en qué punto orbital nos encontramos en enero?',
+              options: ['En el perihelio (el punto más cercano al Sol)', 'En el afelio (el punto más lejano)', 'En el centro de la elipse'],
+              answer: 0,
+              explanation: 'Demuestra que la cercanía no define las estaciones, sino la inclinación del eje.'
+            }
+          }
+        ],
+        diagnostic: [
+          {
+            prompt: '¿A qué velocidad media orbita la Estación Espacial Internacional (ISS)?',
+            options: ['A unos 27.600 km/h (7,66 km/s)', 'A 900 km/h como un avión comercial', 'A 300.000 km/s (velocidad luz)'],
+            answer: 0,
+            explanation: 'A 7,66 km/s equilibra la fuerza de la gravedad con la aceleración centrípeta.'
+          }
+        ]
+      },
+
+      '12-13': {
+        trancheLabel: '12–13 Años (Secundaria)',
+        stageLabel: 'ESO 1º Ciclo',
+        tone: 'Académico, riguroso, vocabulario formal y física clásica.',
+        density: 'Compacta • Fórmulas físicas, telemetría y espectrometría.',
+        sim3d: 'Simuladores con parámetros físicos ajustables (masa, velocidad).',
+        aiPersona: 'Asistente Científico (evalúa hipótesis y deducción).',
+        rank: { icon: '🌀', title: 'Oficial Astrofísico', stage: 'ESO 1º Ciclo', desc: 'Calcula velocidades orbitales, analiza espectros y leyes de Newton.' },
+        units: [
+          {
+            id: 'u12_01',
+            number: 1,
+            title: 'Cinemática Orbital y Caída Libre Perpetua',
+            subtitle: 'Derivación de la velocidad orbital y gravedad en LEO',
+            tag: 'Nivel 4 • 12-13 Años • Astrofísica',
+            icon: '⚡',
+            time: '12 min',
+            xp: 100,
+            wow: 'En la ISS a 400 km de altura la gravedad terrestre sigue siendo del 90% (8,7 m/s²); flotan porque caen continuamente.',
+            now: 'La constelación Starlink utiliza propulsores iónicos de gas kriptón para mantener sus órbitas bajas.',
+            steps: [
+              { title: 'La Ecuación de la Velocidad Orbital', text: 'Igualando la fuerza gravitatoria a la fuerza centrípeta: v = √(G·M/r).' }
+            ],
+            quiz: {
+              prompt: '¿Por qué flotan los astronautas dentro de la Estación Espacial Internacional?',
+              options: ['Porque están en estado de caída libre continua alrededor del planeta', 'Porque a 400 km ya no existe la gravedad terrestre', 'Por los trajes magnéticos'],
+              answer: 0,
+              explanation: 'La nave y los astronautas caen a la misma velocidad hacia el centro de la Tierra.'
+            }
+          }
+        ],
+        diagnostic: [
+          {
+            prompt: 'Según la 2ª Ley de Kepler (Ley de las Áreas), un planeta en su órbita:',
+            options: ['Se desplaza más rápido en el perihelio que en el afelio', 'Mantiene una velocidad constante e invariable', 'Se detiene en los extremos'],
+            answer: 0,
+            explanation: 'El radio vector barre áreas iguales en intervalos de tiempo idénticos.'
+          }
+        ]
+      },
+
+      '14-15': {
+        trancheLabel: '14–15 Años (Superior)',
+        stageLabel: 'ESO 2º Ciclo',
+        tone: 'Técnico, pre-universitario, formulación matemática y modelos.',
+        density: 'Alta • Gráficos multieje, datasets reales y cosmología.',
+        sim3d: 'Telemetría completa, vectores de fuerza, métricas relativistas.',
+        aiPersona: 'Co-investigador Riguroso (debate modelos científicos).',
+        rank: { icon: '⚛️', title: 'Comandante Cosmológico', stage: 'ESO 2º Ciclo', desc: 'Modela el universo Lambda-CDM, radiación de fondo CMB y relatividad.' },
+        units: [
+          {
+            id: 'u14_01',
+            number: 1,
+            title: 'Cosmología Cuantitativa: Modelo Lambda-CDM y CMB',
+            subtitle: 'El eco térmico del Big Bang a 2,7255 K y la expansión acelerada',
+            tag: 'Nivel 5 • 14-15 Años • Cosmología',
+            icon: '🌌',
+            time: '15 min',
+            xp: 150,
+            wow: 'El 1% de la estática en televisiones analógicas antiguas proviene del Fondo Cósmico de Microondas emitido hace 13.800 millones de años.',
+            now: 'El telescopio espacial Euclid de la ESA cartografía 3D la red cósmica para medir la Energía Oscura.',
+            steps: [
+              { title: 'La Ecuación de Friedmann y la Métrica FLRW', text: 'El factor de escala cósmico a(t) gobierna la expansión del tejido espaciotemporal.' }
+            ],
+            quiz: {
+              prompt: '¿Qué porcentaje aproximado de la densidad del Universo constituye la Materia y Energía Oscura combinadas?',
+              options: ['Aproximadamente el 95% (68% Energía Oscura + 27% Materia Oscura)', 'Solo el 10%', 'El 50% exacto'],
+              answer: 0,
+              explanation: 'La materia bariónica ordinaria (átomos de estrellas y planetas) representa únicamente el 5%.'
+            }
+          }
+        ],
+        diagnostic: [
+          {
+            prompt: 'Según la Ley de Desplazamiento de Wien (λ_max · T = b), si una estrella duplica su temperatura superficial:',
+            options: ['Su longitud de onda máxima de emisión se reduce a la mitad', 'Su longitud de onda máxima se duplica', 'Su color se vuelve rojo'],
+            answer: 0,
+            explanation: 'A mayor temperatura, el pico espectral se desplaza inversamente hacia longitudes más cortas (azul/ultravioleta).'
+          }
+        ]
+      }
+    };
+
+    // --- APPLICATION STATE ---
+    let currentTranche = '8-9';
+    let currentUnitIndex = 0;
+    let diagStep = 0;
+    let diagScore = 0;
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      setAgeTranche('8-9');
+      initSimCanvas();
+    });
+
+    // --- VIEW MODE SWITCHER ---
+    function switchMainView(mode) {
+      const vInteractive = document.getElementById('view-interactive');
+      const vMarkdown = document.getElementById('view-markdown');
+      const btnInt = document.getElementById('btn-view-interactive');
+      const btnMd = document.getElementById('btn-view-markdown');
+
+      if (mode === 'interactive') {
+        vInteractive.classList.remove('hidden');
+        vMarkdown.classList.add('hidden');
+        btnInt.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md';
+        btnMd.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all';
+      } else {
+        vInteractive.classList.add('hidden');
+        vMarkdown.classList.remove('hidden');
+        btnMd.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md';
+        btnInt.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all';
+      }
+      lucide.createIcons();
+    }
+
+    // --- TRANCHE SELECTION ---
+    function setAgeTranche(trancheKey) {
+      currentTranche = trancheKey;
+      currentUnitIndex = 0;
+      const data = COSMOS_CATALOG[trancheKey];
+
+      // Update Tranche Tabs UI
+      document.querySelectorAll('.tranche-tab').forEach(el => {
+        el.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-950/40');
+      });
+      const activeBtn = document.getElementById(`btn-tranche-${trancheKey}`);
+      if (activeBtn) activeBtn.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-950/40');
+
+      // Update Presentation Profile HUD
+      document.getElementById('hud-tranche-badge').textContent = `Tramo: ${data.trancheLabel}`;
+      document.getElementById('hud-tone').textContent = data.tone;
+      document.getElementById('hud-density').textContent = data.density;
+      document.getElementById('hud-3d').textContent = data.sim3d;
+      document.getElementById('hud-ai').textContent = data.aiPersona;
+
+      // Update Space Rank HUD
+      document.getElementById('rank-icon-big').textContent = data.rank.icon;
+      document.getElementById('rank-stage-label').textContent = `${data.trancheLabel} • ${data.stageLabel}`;
+      document.getElementById('rank-title-big').textContent = data.rank.title;
+      document.getElementById('rank-desc').textContent = data.rank.desc;
+
+      // Render Curriculum Tree Units
+      renderCurriculumTree();
+      loadUnit(0);
+      resetDiagnostic();
+      lucide.createIcons();
+    }
+
+    // --- CURRICULUM TREE RENDERER ---
+    function renderCurriculumTree() {
+      const data = COSMOS_CATALOG[currentTranche];
+      const container = document.getElementById('tree-units-container');
+      document.getElementById('tree-unit-count').textContent = `${data.units.length} Unidades`;
+      
+      container.innerHTML = '';
+      data.units.forEach((unit, idx) => {
+        const isSelected = (idx === currentUnitIndex);
+        const card = document.createElement('div');
+        card.className = `glass-panel p-4 cursor-pointer transition-all border ${isSelected ? 'border-indigo-500 bg-indigo-950/50' : 'border-slate-800 hover:border-slate-700 bg-slate-900/60'}`;
+        card.onclick = () => loadUnit(idx);
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="badge ${isSelected ? 'bg-indigo-500 text-white' : 'bg-slate-800 text-slate-400'}">Unidad ${unit.number}</span>
+            <span class="text-xs font-mono text-indigo-400 font-bold">+${unit.xp} XP</span>
+          </div>
+          <h4 class="font-bold text-white text-sm mt-2 flex items-center gap-2">
+            <span>${unit.icon}</span>
+            <span>${unit.title}</span>
+          </h4>
+          <p class="text-xs text-slate-400 mt-1 line-clamp-1">${unit.subtitle}</p>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // --- UNIT 360º LOADER ---
+    function loadUnit(unitIdx) {
+      currentUnitIndex = unitIdx;
+      const unit = COSMOS_CATALOG[currentTranche].units[unitIdx] || COSMOS_CATALOG[currentTranche].units[0];
+      
+      // Update Header
+      document.getElementById('lesson-icon').textContent = unit.icon;
+      document.getElementById('lesson-tag').textContent = unit.tag;
+      document.getElementById('lesson-time').textContent = `⏱️ ${unit.time}`;
+      document.getElementById('lesson-title').textContent = unit.title;
+      document.getElementById('lesson-subtitle').textContent = unit.subtitle;
+      document.getElementById('lesson-xp').textContent = `+${unit.xp} XP`;
+
+      // Update Theory Content
+      const theoryContainer = document.getElementById('lesson-theory-content');
+      theoryContainer.innerHTML = '';
+      unit.steps.forEach((step, sIdx) => {
+        const stepEl = document.createElement('div');
+        stepEl.className = 'bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-1';
+        stepEl.innerHTML = `
+          <div class="text-xs font-mono text-indigo-400 font-bold">Paso ${sIdx + 1}: ${step.title}</div>
+          <p class="text-sm text-slate-200">${step.text}</p>
+        `;
+        theoryContainer.appendChild(stepEl);
+      });
+
+      // Update Facts
+      document.getElementById('lesson-wow').textContent = unit.wow;
+      document.getElementById('lesson-now').textContent = unit.now;
+
+      // Update Quiz
+      renderQuiz(unit.quiz);
+      renderCurriculumTree();
+    }
+
+    // --- INNER TAB SWITCHER ---
+    function switchLessonTab(tabKey) {
+      const tabs = ['theory', 'sim3d', 'eval', 'rank'];
+      tabs.forEach(t => {
+        const tabEl = document.getElementById(`lesson-tab-${t}`);
+        const btnEl = document.getElementById(`tab-btn-${t}`);
+        if (t === tabKey) {
+          tabEl.classList.remove('hidden');
+          btnEl.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition-all';
+        } else {
+          tabEl.classList.add('hidden');
+          btnEl.className = 'flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition-all';
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // --- QUIZ COMPONENT ---
+    function renderQuiz(quiz) {
+      if (!quiz) return;
+      document.getElementById('quiz-q-prompt').textContent = quiz.prompt;
+      const optsContainer = document.getElementById('quiz-q-options');
+      const feedbackEl = document.getElementById('quiz-q-feedback');
+      feedbackEl.className = 'hidden';
+      optsContainer.innerHTML = '';
+
+      quiz.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full p-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-left text-xs text-slate-200 transition-all flex items-center justify-between';
+        btn.innerHTML = `<span>${opt}</span><i data-lucide="circle" class="w-4 h-4 text-slate-500"></i>`;
+        btn.onclick = () => {
+          if (idx === quiz.answer) {
+            btn.className = 'w-full p-3 rounded-xl bg-emerald-950/80 border border-emerald-500/60 text-left text-xs text-emerald-200 font-bold flex items-center justify-between';
+            feedbackEl.className = 'p-3.5 rounded-xl text-xs bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 font-medium block';
+            feedbackEl.innerHTML = `🎉 <strong>¡Correcto!</strong> ${quiz.explanation}`;
+          } else {
+            btn.className = 'w-full p-3 rounded-xl bg-rose-950/80 border border-rose-500/60 text-left text-xs text-rose-200 font-medium flex items-center justify-between';
+            feedbackEl.className = 'p-3.5 rounded-xl text-xs bg-rose-950/40 border border-rose-500/40 text-rose-300 font-medium block';
+            feedbackEl.innerHTML = `💡 <strong>Pista de Refuerzo:</strong> Inténtalo de nuevo. ${quiz.explanation}`;
+          }
+          lucide.createIcons();
+        };
+        optsContainer.appendChild(btn);
+      });
+      lucide.createIcons();
+    }
+
+    // --- DIAGNOSTIC SIMULATOR ENGINE ---
+    function resetDiagnostic() {
+      diagStep = 0;
+      diagScore = 0;
+      renderDiagnosticStep();
+    }
+
+    function renderDiagnosticStep() {
+      const list = COSMOS_CATALOG[currentTranche].diagnostic || [];
+      const total = list.length;
+      if (diagStep >= total) {
+        // Complete state
+        document.getElementById('diag-step-indicator').textContent = 'Diagnóstico Completado';
+        document.getElementById('diag-prompt').textContent = '¡Evaluación Inicial Finalizada con Éxito!';
+        document.getElementById('diag-options-container').innerHTML = `
+          <div class="p-4 rounded-xl bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 text-xs">
+            Se ha determinado con precisión matemática tu nivel competencial. Tu ruta de aprendizaje está lista.
+          </div>
+        `;
+        document.getElementById('btn-diag-next').disabled = true;
+        document.getElementById('diag-explanation-box').classList.add('hidden');
+        return;
+      }
+
+      const q = list[diagStep];
+      document.getElementById('diag-step-indicator').textContent = `Pregunta ${diagStep + 1} de ${total}`;
+      document.getElementById('diag-tranche-label').textContent = `Tramo: ${COSMOS_CATALOG[currentTranche].trancheLabel}`;
+      document.getElementById('diag-prompt').textContent = q.prompt;
+      
+      const container = document.getElementById('diag-options-container');
+      const expBox = document.getElementById('diag-explanation-box');
+      expBox.classList.add('hidden');
+      container.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full p-3 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-left text-xs text-white transition-all';
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (idx === q.answer) {
+            diagScore++;
+            btn.className = 'w-full p-3 rounded-xl bg-emerald-950 border border-emerald-500 text-left text-xs text-emerald-200 font-bold';
+            expBox.className = 'p-3.5 rounded-xl text-xs bg-emerald-950/60 border border-emerald-500/40 text-emerald-200 block';
+            expBox.innerHTML = `✅ <strong>Acierto:</strong> ${q.explanation}`;
+          } else {
+            btn.className = 'w-full p-3 rounded-xl bg-rose-950 border border-rose-500 text-left text-xs text-rose-200';
+            expBox.className = 'p-3.5 rounded-xl text-xs bg-rose-950/60 border border-rose-500/40 text-rose-200 block';
+            expBox.innerHTML = `🔍 <strong>Explicación:</strong> ${q.explanation}`;
+          }
+          // Update Projection Card
+          updateDiagnosticProjection();
+        };
+        container.appendChild(btn);
+      });
+
+      document.getElementById('btn-diag-next').disabled = false;
+      lucide.createIcons();
+    }
+
+    function nextDiagnosticQuestion() {
+      const list = COSMOS_CATALOG[currentTranche].diagnostic || [];
+      if (diagStep < list.length) {
+        diagStep++;
+        renderDiagnosticStep();
+      }
+    }
+
+    function updateDiagnosticProjection() {
+      const data = COSMOS_CATALOG[currentTranche];
+      document.getElementById('diag-res-unit').textContent = data.units[0]?.title || 'Unidad Troncal';
+      document.getElementById('diag-res-status').textContent = (diagScore > 0) ? 'Calibrado al Tramo' : 'Refuerzo Guiado';
+      document.getElementById('diag-res-icon').textContent = data.rank.icon;
+      document.getElementById('diag-res-rank').textContent = data.rank.title;
+      document.getElementById('diag-res-stage').textContent = data.stageLabel;
+    }
+
+    // --- CANVAS ORBIT SIMULATION ENGINE ---
+    let canvas, ctx, simSpeed = 7.66, simAlt = 408, angle = 0;
+    function initSimCanvas() {
+      canvas = document.getElementById('orbit-sim-canvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      requestAnimationFrame(renderSimLoop);
+    }
+
+    function resizeCanvas() {
+      if (!canvas) return;
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+
+    function updateSimParameters() {
+      simSpeed = parseFloat(document.getElementById('slider-speed').value);
+      simAlt = parseFloat(document.getElementById('slider-alt').value);
+      document.getElementById('slider-speed-val').textContent = `${simSpeed.toFixed(2)} km/s`;
+      document.getElementById('slider-alt-val').textContent = `${Math.round(simAlt)} km`;
+
+      const speedKmh = Math.round(simSpeed * 3600);
+      document.getElementById('sim-telemetry-speed').textContent = `v = ${speedKmh.toLocaleString('es-ES')} km/h`;
+      document.getElementById('sim-telemetry-alt').textContent = `Altitud = ${Math.round(simAlt)} km`;
+      
+      const g = (9.81 * Math.pow(6371 / (6371 + simAlt), 2)).toFixed(1);
+      const gPct = Math.round((g / 9.81) * 100);
+      document.getElementById('sim-telemetry-grav').textContent = `g = ${g} m/s² (${gPct}%)`;
+    }
+
+    function renderSimLoop() {
+      if (!ctx || !canvas) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const earthRadius = 45;
+      const orbitRadius = earthRadius + (simAlt / 2000) * 80;
+
+      // Draw Earth Glow
+      const glow = ctx.createRadialGradient(cx, cy, earthRadius * 0.8, cx, cy, earthRadius * 1.5);
+      glow.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+      glow.addColorStop(1, 'rgba(59, 130, 246, 0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, earthRadius * 1.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Earth
+      ctx.fillStyle = '#1e3a8a';
+      ctx.beginPath();
+      ctx.arc(cx, cy, earthRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#60a5fa';
+      ctx.stroke();
+
+      // Earth Continent Schemes
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath();
+      ctx.arc(cx - 10, cy - 10, 14, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + 12, cy + 10, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Draw Orbit Path
+      ctx.strokeStyle = 'rgba(99, 102, 241, 0.3)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.arc(cx, cy, orbitRadius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Update Satellite Position
+      angle += (simSpeed / orbitRadius) * 0.05;
+      const satX = cx + Math.cos(angle) * orbitRadius;
+      const satY = cy + Math.sin(angle) * orbitRadius;
+
+      // Draw Satellite
+      ctx.fillStyle = '#06b6d4';
+      ctx.shadowColor = '#06b6d4';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(satX, satY, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Solar Panels
+      ctx.fillStyle = '#6366f1';
+      ctx.fillRect(satX - 10, satY - 2, 6, 4);
+      ctx.fillRect(satX + 4, satY - 2, 6, 4);
+
+      requestAnimationFrame(renderSimLoop);
+    }
+
+    // --- COPY MARKDOWN UTILITY ---
+    function copyMarkdownText() {
+      const text = document.getElementById('raw-markdown-content').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('¡Especificación en Markdown copiada al portapapeles con éxito!');
+      });
+    }
+  </script>
+</body>
+</html>

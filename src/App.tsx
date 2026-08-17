@@ -27,6 +27,8 @@ import { InitialOnboardingGate } from './core/components/onboarding/InitialOnboa
 import { PendingApprovalGate } from './core/components/auth/PendingApprovalGate';
 import { MiniAppPortalGate } from './core/components/miniapps/MiniAppPortalGate';
 import { MiniAppsDrawer } from './core/components/navigation/MiniAppsDrawer';
+import { useAppUpdate } from './core/hooks/useAppUpdate';
+import { UpdateAvailableModal } from './core/components/UpdateAvailableModal';
 
 const StarField: React.FC = () => {
   useEffect(() => {
@@ -57,6 +59,15 @@ const MainContent: React.FC = () => {
   const [authViewMode, setAuthViewMode] = useState<'login' | 'signup'>('login');
   const [isAuthViewOpen, setIsAuthViewOpen] = useState<boolean>(false);
   const [activeExperience, setActiveExperience] = useState<AppViewMode>(null);
+
+  // Sistema de Auto-Actualizaciones OTA In-App
+  const { 
+    isModalOpen: isUpdateModalOpen, 
+    updateInfo, 
+    isMandatory: isUpdateMandatory, 
+    closeModal: closeUpdateModal, 
+    handleUpdateNow 
+  } = useAppUpdate();
 
   // Modales y Drawers
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
@@ -200,18 +211,19 @@ const MainContent: React.FC = () => {
 
               <div className="flex-1 w-full relative">
                 {activeExperience === 'school' ? (
-                  <SchoolView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                  <SchoolView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
                 ) : activeExperience === 'languages' ? (
-                  <LanguagesView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                  <LanguagesView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
                 ) : activeExperience === 'verify' ? (
-                  <VerifyView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                  <VerifyView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
                 ) : activeExperience === 'ai-lab' ? (
-                  <AILabExperience onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                  <AILabExperience onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
                 ) : activeExperience === 'astro' ? (
                   <AstroExperience
                     onBackToGoals={handleNavigateHome}
                     onOpenProfile={() => setActiveExperience('profile')}
                     onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }}
+                    onNavigateExperience={(expId) => setActiveExperience(expId)}
                   />
                 ) : null}
               </div>
@@ -259,18 +271,19 @@ const MainContent: React.FC = () => {
               onBackToGoals={handleNavigateHome}
             >
               {activeExperience === 'school' ? (
-                <SchoolView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                <SchoolView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
               ) : activeExperience === 'languages' ? (
-                <LanguagesView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                <LanguagesView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
               ) : activeExperience === 'verify' ? (
-                <VerifyView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                <VerifyView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
               ) : activeExperience === 'ai-lab' ? (
-                <AILabExperience onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+                <AILabExperience onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
               ) : activeExperience === 'astro' ? (
                 <AstroExperience
                   onBackToGoals={handleNavigateHome}
                   onOpenProfile={() => setActiveExperience('profile')}
                   onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }}
+                  onNavigateExperience={(expId) => setActiveExperience(expId)}
                 />
               ) : null}
             </MiniAppPortalGate>
@@ -315,6 +328,15 @@ const MainContent: React.FC = () => {
         }}
         isMinimized={isMascotMinimized}
         onToggleMinimize={handleToggleMascotMinimize}
+      />
+
+      {/* Modal de Auto-Actualización In-App OTA */}
+      <UpdateAvailableModal
+        isOpen={isUpdateModalOpen}
+        onClose={closeUpdateModal}
+        updateInfo={updateInfo}
+        isMandatory={isUpdateMandatory}
+        onUpdateNow={handleUpdateNow}
       />
 
     </div>

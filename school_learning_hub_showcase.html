@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS School • Ingesta Contextual de Aula & Hub de Aprendizaje Personalizado</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-atkinson: 'Atkinson Hyperlegible', sans-serif;
+      --font-outfit: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body {
+      font-family: var(--font-outfit);
+      background-color: #080c14;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.18) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+        radial-gradient(at 50% 30%, rgba(245, 158, 11, 0.08) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-panel-glow {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      box-shadow: 0 0 35px rgba(99, 102, 241, 0.15);
+    }
+    .card-flip {
+      perspective: 1000px;
+    }
+    .card-inner {
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+    .card-flip.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+    .badge-glow-cyan {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.35);
+    }
+    .badge-glow-emerald {
+      box-shadow: 0 0 15px rgba(16, 185, 129, 0.35);
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 selection:bg-indigo-500 selection:text-white">
+
+  <div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- HEADER SUPREMO -->
+    <header class="glass-panel rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+      <div class="space-y-2">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Paradigma GOALS School</span>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Cero Trampas / Cero Homework Solvers</span>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">LOMLOE & UK NC</span>
+        </div>
+        <h1 class="text-3xl md:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-cyan-300">
+          Sensor de Contexto de Aula & Hub de Aprendizaje
+        </h1>
+        <p class="text-slate-400 text-sm md:text-base max-w-3xl">
+          La foto de los materiales del alumno <strong>no es para darle soluciones</strong>, sino para saber qué está dando en su colegio y desplegar al instante <strong>tests interactivos, explicaciones visuales, retos Feynman y misiones de dominio</strong>.
+        </p>
+      </div>
+
+      <!-- BOTONES DE VISTA (INTERACTIVA VS RAW MARKDOWN) -->
+      <div class="flex bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shrink-0">
+        <button id="btn-view-interactive" onclick="switchView('interactive')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer">
+          ⚡ Hub Interactivo
+        </button>
+        <button id="btn-view-markdown" onclick="switchView('markdown')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer">
+          📄 Tratado Markdown (.md)
+        </button>
+      </div>
+    </header>
+
+    <!-- VISTA 1: INTERACTIVA (HUB EN VIVO) -->
+    <main id="container-interactive" class="space-y-8">
+
+      <!-- SELECCIONADOR DE MATERIAL REAL DE AULA (PRESETS & UPLOAD) -->
+      <section class="glass-panel rounded-3xl p-6 md:p-8 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-white flex items-center gap-2">
+              <span>📷</span> 1. Ingesta de Material de Aula del Alumno
+            </h2>
+            <p class="text-slate-400 text-xs mt-0.5">Selecciona una foto real de cuaderno/libro de texto para simular la detección contextual en vivo:</p>
+          </div>
+          <span class="text-xs font-mono text-cyan-400 px-3 py-1 rounded-xl bg-cyan-950/40 border border-cyan-500/30">
+            Detector de Unidad: DocLayNet + OCR 2026
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+          <!-- Preset 1 -->
+          <button onclick="loadScenario('fracciones')" id="btn-preset-fracciones" class="p-4 rounded-2xl bg-indigo-950/40 hover:bg-indigo-900/50 border-2 border-indigo-500 text-left transition-all group cursor-pointer">
+            <div class="flex items-center justify-between text-xs font-mono text-indigo-300 mb-1">
+              <span>5.º Primaria / Y6</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-white">Libro Anaya</span>
+            </div>
+            <h4 class="font-extrabold text-sm text-white group-hover:text-indigo-200">Fracciones & Reparto</h4>
+            <p class="text-slate-400 text-xs mt-1">Fracciones equivalentes y suma con distinto denominador.</p>
+          </button>
+
+          <!-- Preset 2 -->
+          <button onclick="loadScenario('algebra')" id="btn-preset-algebra" class="p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-left transition-all group cursor-pointer">
+            <div class="flex items-center justify-between text-xs font-mono text-purple-300 mb-1">
+              <span>2.º E.S.O. / Y8</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/30 text-white">Cuaderno Manuscrito</span>
+            </div>
+            <h4 class="font-extrabold text-sm text-white group-hover:text-purple-200">Ecuaciones con Paréntesis</h4>
+            <p class="text-slate-400 text-xs mt-1">Transposición de términos y regla de signos.</p>
+          </button>
+
+          <!-- Preset 3 -->
+          <button onclick="loadScenario('ecosistemas')" id="btn-preset-ecosistemas" class="p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-left transition-all group cursor-pointer">
+            <div class="flex items-center justify-between text-xs font-mono text-emerald-300 mb-1">
+              <span>4.º Primaria / Y5</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/30 text-white">Ficha Santillana</span>
+            </div>
+            <h4 class="font-extrabold text-sm text-white group-hover:text-emerald-200">Ecosistemas & Cadenas</h4>
+            <p class="text-slate-400 text-xs mt-1">Productores, consumidores y descomponedores.</p>
+          </button>
+
+          <!-- Preset 4 -->
+          <button onclick="loadScenario('cinematica')" id="btn-preset-cinematica" class="p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-left transition-all group cursor-pointer">
+            <div class="flex items-center justify-between text-xs font-mono text-amber-300 mb-1">
+              <span>4.º E.S.O. / Y11</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/30 text-white">Oxford GCSE Physics</span>
+            </div>
+            <h4 class="font-extrabold text-sm text-white group-hover:text-amber-200">Cinemática MRUA</h4>
+            <p class="text-slate-400 text-xs mt-1">Gráficas v-t y ecuaciones de aceleración.</p>
+          </button>
+        </div>
+      </section>
+
+      <!-- BANNER DE CONTEXTO EXTRAÍDO DEL COLEGIO -->
+      <section class="glass-panel-glow rounded-3xl p-6 md:p-8 space-y-4 border-l-8 border-indigo-500">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span id="detected-grade" class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 font-mono text-xs font-bold">5.º EDUCACIÓN PRIMARIA</span>
+              <span id="detected-subject" class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono text-xs font-bold">MATEMÁTICAS • TEMA 4</span>
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold">Confianza de Mapeo: 99.4%</span>
+            </div>
+            <h3 id="detected-title" class="text-2xl font-black text-white">Unidad 4: Las Fracciones, Equivalencia y Operaciones</h3>
+            <p id="detected-methodology" class="text-slate-300 text-xs">
+              <strong>Metodología detectada del docente:</strong> Exige justificación gráfica mediante modelo de barras antes de simplificar a fracción irreducible.
+            </p>
+          </div>
+          <div class="flex items-center gap-3 bg-slate-950/80 p-3 rounded-2xl border border-slate-800 shrink-0">
+            <div class="text-right">
+              <div class="text-[10px] font-bold text-slate-400 uppercase">Hub Generado a Medida</div>
+              <div class="text-xs font-black text-emerald-400">4 Módulos Activos</div>
+            </div>
+            <span class="text-2xl">✨</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- NAVEGACIÓN ENTRE LOS 4 MODOS GENERATIVOS DEL LEARNING HUB -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <button onclick="activateHubMode('quiz')" id="tab-mode-quiz" class="glass-panel p-4 rounded-2xl border-b-4 border-cyan-500 text-left transition-all group bg-slate-800/80 cursor-pointer">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xl">🎯</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Diagnóstico 3m</span>
+          </div>
+          <h4 class="font-black text-sm text-white group-hover:text-cyan-300">1. Test Activo</h4>
+          <p class="text-slate-400 text-xs mt-0.5">Evaluación formativa rápida.</p>
+        </button>
+
+        <button onclick="activateHubMode('explainer')" id="tab-mode-explainer" class="glass-panel p-4 rounded-2xl border-b-4 border-transparent text-left transition-all group hover:bg-slate-800/60 cursor-pointer">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xl">💡</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">Método CPA</span>
+          </div>
+          <h4 class="font-black text-sm text-white group-hover:text-amber-300">2. Explicador Visual</h4>
+          <p class="text-slate-400 text-xs mt-0.5">Simulador & analogías reales.</p>
+        </button>
+
+        <button onclick="activateHubMode('feynman')" id="tab-mode-feynman" class="glass-panel p-4 rounded-2xl border-b-4 border-transparent text-left transition-all group hover:bg-slate-800/60 cursor-pointer">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xl">🧠</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-500/20 text-purple-300">Reto Voz & FSRS</span>
+          </div>
+          <h4 class="font-black text-sm text-white group-hover:text-purple-300">3. Workout Feynman</h4>
+          <p class="text-slate-400 text-xs mt-0.5">Explícalo como a un amigo.</p>
+        </button>
+
+        <button onclick="activateHubMode('quests')" id="tab-mode-quests" class="glass-panel p-4 rounded-2xl border-b-4 border-transparent text-left transition-all group hover:bg-slate-800/60 cursor-pointer">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-xl">🚀</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">Niveles 1-4</span>
+          </div>
+          <h4 class="font-black text-sm text-white group-hover:text-emerald-300">4. Arena de Retos</h4>
+          <p class="text-slate-400 text-xs mt-0.5">Misiones del mundo real.</p>
+        </button>
+      </div>
+
+      <!-- ========================================================================= -->
+      <!-- MODO 1: TEST INTERACTIVO ADAPTATIVO -->
+      <!-- ========================================================================= -->
+      <section id="panel-hub-quiz" class="glass-panel-glow rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 text-xs font-black">MODO 1</span>
+              <h3 class="text-2xl font-black text-white">Test Activo de Comprensión (Active Retrieval)</h3>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Preguntas interactivas generadas sobre el tema de clase para verificar si hay lagunas ocultas.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono text-slate-400">Pregunta <span id="quiz-step-num" class="text-cyan-400 font-bold">1</span> de 3</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-8 bg-slate-950/70 rounded-2xl p-6 border border-slate-800 space-y-5">
+            <!-- Enunciado de la Pregunta -->
+            <div class="space-y-2">
+              <span class="text-[11px] font-extrabold uppercase text-cyan-400 tracking-wider">Desafío Rápido de Pensamiento:</span>
+              <p id="quiz-question-text" class="text-lg font-bold text-white leading-snug">
+                ¿Cuál de las siguientes fracciones representa exactamente la MISMA cantidad que 2/3?
+              </p>
+            </div>
+
+            <!-- Opciones de Respuesta -->
+            <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+              <!-- Renderizado dinámicamente -->
+            </div>
+
+            <!-- Feedback Socrático Inmediato -->
+            <div id="quiz-feedback-box" class="hidden p-4 rounded-2xl text-xs font-bold space-y-1"></div>
+          </div>
+
+          <!-- Radar Psicométrico Lateral -->
+          <div class="lg:col-span-4 bg-slate-900/50 rounded-2xl p-5 border border-slate-800/80 space-y-4">
+            <h4 class="text-xs font-black uppercase text-slate-300 tracking-wider">Calibración BKT en Vivo</h4>
+            <div class="space-y-3">
+              <div>
+                <div class="flex justify-between text-xs font-mono mb-1">
+                  <span class="text-slate-400">Dominio del Concepto ($P(L)$):</span>
+                  <span id="bkt-score-label" class="text-cyan-400 font-bold">78%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                  <div id="bkt-score-bar" class="bg-gradient-to-r from-cyan-500 to-indigo-500 h-full w-[78%] transition-all duration-700"></div>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                El motor ajusta la probabilidad bayesiana de maestría tras cada respuesta. Si detecta confusión, deriva automáticamente al <strong>Explicador Visual</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- MODO 2: EXPLICADOR CONCEPTUAL VISUAL & MANIPULATIVO -->
+      <!-- ========================================================================= -->
+      <section id="panel-hub-explainer" class="hidden glass-panel-glow rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 text-xs font-black">MODO 2</span>
+              <h3 class="text-2xl font-black text-white">Explicador Visual y Manipulativo (Método CPA)</h3>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Conecta el concepto abstracto con una simulación interactiva y analogías de tus aficiones favoritas.</p>
+          </div>
+          <!-- Selector de Analogía Personalizada -->
+          <div class="flex items-center gap-2 bg-slate-900/90 p-1.5 rounded-xl border border-slate-800">
+            <span class="text-[10px] font-bold text-slate-400 px-2">Analogía:</span>
+            <button onclick="setAnalogy('futbol')" id="btn-ana-futbol" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/30 text-amber-200 cursor-pointer">⚽ Fútbol</button>
+            <button onclick="setAnalogy('minecraft')" id="btn-ana-minecraft" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white cursor-pointer">⛏️ Minecraft</button>
+            <button onclick="setAnalogy('espacio')" id="btn-ana-espacio" class="px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white cursor-pointer">🚀 Espacio</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Simulador Visual Interactivo -->
+          <div class="lg:col-span-7 bg-slate-950/70 rounded-2xl p-6 border border-slate-800 space-y-5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold uppercase text-amber-400 tracking-wider">Laboratorio Interactivo de Fracciones Equivalentes</span>
+              <span class="text-xs font-mono text-slate-400">Arrastra el deslizador</span>
+            </div>
+
+            <!-- Control Deslizante de Partición -->
+            <div class="space-y-2">
+              <div class="flex justify-between text-xs font-mono">
+                <span>Multiplicador de Trozos: <strong id="multiplier-label" class="text-amber-300">x 2</strong></span>
+                <span>Fracción Resultante: <strong id="fraction-result-label" class="text-emerald-400">4 / 6</strong></span>
+              </div>
+              <input id="slider-fraction" type="range" min="1" max="4" value="2" oninput="updateFractionVisualizer()" class="w-full accent-amber-500 cursor-pointer">
+            </div>
+
+            <!-- Visualizador Gráfico de Barras Proporcionales -->
+            <div class="space-y-3 pt-2">
+              <div class="text-xs font-bold text-slate-300">Barra Base (2 de 3 trozos pintados = 2/3):</div>
+              <div class="h-10 w-full bg-slate-800 rounded-xl overflow-hidden flex border border-slate-700 p-0.5 gap-1">
+                <div class="w-1/3 bg-amber-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xs">1/3</div>
+                <div class="w-1/3 bg-amber-500 rounded-lg flex items-center justify-center font-bold text-slate-950 text-xs">1/3</div>
+                <div class="w-1/3 bg-slate-900/60 rounded-lg flex items-center justify-center font-bold text-slate-500 text-xs">Vacío</div>
+              </div>
+
+              <div class="text-xs font-bold text-slate-300">Barra Equivalente Subdividida:</div>
+              <div id="fraction-subdivided-bar" class="h-10 w-full bg-slate-800 rounded-xl overflow-hidden flex border border-slate-700 p-0.5 gap-0.5">
+                <!-- Renderizado por JS -->
+              </div>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 flex items-start gap-3">
+              <span class="text-2xl">💡</span>
+              <p id="analogy-text-content" class="leading-relaxed">
+                <strong>La Analogía del Campo de Fútbol:</strong> Si tienes 2 pases completados de 3 intentos, es exactamente la misma efectividad que si haces 4 pases completados de 6 intentos. ¡La proporción de acierto no cambia!
+              </p>
+            </div>
+          </div>
+
+          <!-- Desglose de 3 Fases Bruner CPA -->
+          <div class="lg:col-span-5 bg-slate-900/50 rounded-2xl p-5 border border-slate-800/80 space-y-4">
+            <h4 class="text-xs font-black uppercase text-amber-400 tracking-wider">Andamiaje en 3 Fases (CPA)</h4>
+            <div class="space-y-3 text-xs">
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span class="text-[10px] font-bold uppercase text-blue-400">1. Fase Concreta (Manipulable)</span>
+                <p class="text-slate-300">Partir barras físicas de plastilina o chocolate en trozos iguales.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span class="text-[10px] font-bold uppercase text-emerald-400">2. Fase Pictórica (Visual)</span>
+                <p class="text-slate-300">Dibujo del modelo de barras divididas para ver que ocupan la misma área.</p>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span class="text-[10px] font-bold uppercase text-purple-400">3. Fase Abstracta (Simbólica)</span>
+                <p class="text-slate-300 font-mono text-cyan-300">$$\frac{2 \times 2}{3 \times 2} = \frac{4}{6}$$</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- MODO 3: WORKOUT FEYNMAN & MEMORIA ESPACIADA (FSRS) -->
+      <!-- ========================================================================= -->
+      <section id="panel-hub-feynman" class="hidden glass-panel-glow rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 text-xs font-black">MODO 3</span>
+              <h3 class="text-2xl font-black text-white">Workout Mnemotécnico & Reto Feynman</h3>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Explica el concepto con palabras sencillas y consolida el recuerdo con Flashcards de repetición espaciada.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <!-- Simulador Reto Feynman -->
+          <div class="lg:col-span-7 bg-slate-950/70 rounded-2xl p-6 border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold uppercase text-purple-400 tracking-wider">Reto Feynman de 45 Segundos</span>
+              <span class="text-xs font-mono text-slate-400">Regla de Oro: Sin jerga</span>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 space-y-2">
+              <div class="text-xs font-bold text-purple-200 flex items-center gap-2">
+                <span>🤖</span>
+                <span>Tu misión socrática:</span>
+              </div>
+              <p class="text-sm font-semibold text-white">
+                "Explícale a tu primo de 7 años qué significa que dos fracciones sean equivalentes. ¡No puedes usar la palabra 'amplificar' ni 'denominador'!"
+              </p>
+            </div>
+
+            <!-- Área de Grabación / Texto -->
+            <div class="space-y-2">
+              <textarea id="feynman-input-text" rows="3" placeholder="Escribe o dicta tu explicación con palabras súper sencillas..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-white focus:outline-none focus:border-purple-500 transition-all"></textarea>
+              
+              <div class="flex gap-2">
+                <button onclick="simulateVoiceRecording()" id="btn-voice-rec" class="flex-1 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer">
+                  <span>🎙️</span> Dictar por Voz
+                </button>
+                <button onclick="evaluateFeynmanExplanation()" class="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold text-xs border border-cyan-500/30 transition-all cursor-pointer">
+                  ✨ Comprobar Claridad
+                </button>
+              </div>
+            </div>
+
+            <div id="feynman-feedback-result" class="hidden p-3.5 rounded-xl text-xs font-bold"></div>
+          </div>
+
+          <!-- Flashcards Activas FSRS -->
+          <div class="lg:col-span-5 bg-slate-900/50 rounded-2xl p-5 border border-slate-800/80 space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-black uppercase text-purple-400 tracking-wider">Flashcards Espaciadas (FSRS)</h4>
+              <span class="text-[10px] text-slate-400">Toca la tarjeta para voltear</span>
+            </div>
+
+            <!-- Flashcard 3D Interactiva -->
+            <div onclick="toggleCardFlip(this)" class="card-flip h-44 w-full cursor-pointer">
+              <div class="card-inner relative w-full h-full">
+                <!-- Frente -->
+                <div class="card-front absolute w-full h-full bg-slate-950 border border-indigo-500/40 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+                  <div class="flex justify-between items-center text-[10px] font-mono text-indigo-400">
+                    <span>Pregunta de Evocación</span>
+                    <span>🔄 Toca</span>
+                  </div>
+                  <div class="text-center font-bold text-sm text-white">
+                    ¿Qué le pasa a una fracción si multiplicamos el número de arriba y el de abajo por 3?
+                  </div>
+                  <div class="text-[10px] text-center text-slate-500">
+                    Intenta recordarlo antes de voltear
+                  </div>
+                </div>
+
+                <!-- Reverso -->
+                <div class="card-back absolute w-full h-full bg-gradient-to-br from-indigo-950 to-slate-950 border border-emerald-500/40 rounded-2xl p-5 flex flex-col justify-between shadow-xl">
+                  <div class="flex justify-between items-center text-[10px] font-mono text-emerald-400">
+                    <span>Respuesta Explicada</span>
+                    <span>✓ FSRS +4 días</span>
+                  </div>
+                  <div class="text-center font-bold text-xs text-emerald-200 leading-relaxed">
+                    Sigue valiendo exactamente lo mismo (es equivalente), solo que la hemos cortado en trozos 3 veces más pequeños.
+                  </div>
+                  <div class="flex justify-center gap-2">
+                    <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">¡La recordaba!</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- MODO 4: ARENA DE DESAFÍOS Y MISIONES GAMIFICADAS (QUESTS) -->
+      <!-- ========================================================================= -->
+      <section id="panel-hub-quests" class="hidden glass-panel-glow rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-xs font-black">MODO 4</span>
+              <h3 class="text-2xl font-black text-white">Arena de Retos y Desafíos Progresivos</h3>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Aplica lo que has aprendido en el colegio a retos del mundo real, detectives de errores y casos cósmicos.</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Quest Nivel 1 -->
+          <div class="bg-slate-950/70 rounded-2xl p-5 border border-slate-800 hover:border-emerald-500/40 transition-all space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-blue-500/20 text-blue-300">Nivel 1 • Aprendiz</span>
+                <span class="text-xs font-mono text-amber-400 font-bold">+50 XP</span>
+              </div>
+              <h4 class="font-extrabold text-sm text-white">El Cortador de Pizzas</h4>
+              <p class="text-xs text-slate-400">Si comes 3 trozos de una pizza de 8 trozos y tu amigo come 6 de una de 16, ¿quién comió más?</p>
+            </div>
+            <button onclick="alert('¡Reto Nivel 1 Completado! Comieron exactamente lo mismo porque 3/8 = 6/16. +50 XP')" class="w-full py-2 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-bold text-xs transition-all cursor-pointer">
+              Resolver Desafío
+            </button>
+          </div>
+
+          <!-- Quest Nivel 2 -->
+          <div class="bg-slate-950/70 rounded-2xl p-5 border border-slate-800 hover:border-emerald-500/40 transition-all space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">Nivel 2 • Detective</span>
+                <span class="text-xs font-mono text-amber-400 font-bold">+100 XP</span>
+              </div>
+              <h4 class="font-extrabold text-sm text-white">El Error del Examen</h4>
+              <p class="text-xs text-slate-400">Un alumno escribió: '2/5 = 4/7 porque sumó 2 arriba y 2 abajo'. ¿Dónde está la trampa?</p>
+            </div>
+            <button onclick="alert('¡Correcto Detective! Para mantener la equivalencia se debe MULTIPLICAR o DIVIDIR por el mismo número, nunca sumar. +100 XP')" class="w-full py-2 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-bold text-xs transition-all cursor-pointer">
+              Cazar el Error
+            </button>
+          </div>
+
+          <!-- Quest Nivel 3 -->
+          <div class="bg-slate-950/70 rounded-2xl p-5 border border-slate-800 hover:border-emerald-500/40 transition-all space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300">Nivel 3 • Ingeniero</span>
+                <span class="text-xs font-mono text-amber-400 font-bold">+150 XP</span>
+              </div>
+              <h4 class="font-extrabold text-sm text-white">Mezcla de Combustible</h4>
+              <p class="text-xs text-slate-400">Un cohete necesita 3/4 de oxígeno líquido. Si el depósito tiene 120 litros, ¿cuántos litros de oxígeno hacen falta?</p>
+            </div>
+            <button onclick="alert('¡Excelente cálculo espacial! 120 * 3/4 = 90 litros. +150 XP')" class="w-full py-2 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-bold text-xs transition-all cursor-pointer">
+              Calcular Cohete
+            </button>
+          </div>
+
+          <!-- Quest Nivel 4 -->
+          <div class="bg-slate-950/70 rounded-2xl p-5 border border-slate-800 hover:border-emerald-500/40 transition-all space-y-3 flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">Nivel 4 • Maestro</span>
+                <span class="text-xs font-mono text-amber-400 font-bold">+250 XP</span>
+              </div>
+              <h4 class="font-extrabold text-sm text-white">Reto de la Luna</h4>
+              <p class="text-xs text-slate-400">En la Luna pesas 1/6 de tu peso en la Tierra. ¿Cuánto pesaría un rover espacial de 600 kg en la Luna?</p>
+            </div>
+            <button onclick="alert('¡Misión Lunar Cumplida! 600 / 6 = 100 kg equivalentes de peso aparente. +250 XP')" class="w-full py-2 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-bold text-xs transition-all cursor-pointer">
+              Despegar a la Luna
+            </button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- VISTA 2: RAW MARKDOWN DOCUMENT -->
+    <section id="container-markdown" class="hidden glass-panel rounded-3xl p-6 md:p-8 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <span class="text-xs font-mono text-cyan-400 font-bold">docs/school/12_INGESTA_CONTEXTUAL_HUB_APRENDIZAJE.md</span>
+        <span class="text-xs text-slate-400">Compendio Oficial</span>
+      </div>
+      <pre class="bg-slate-950 p-6 rounded-2xl text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed border border-slate-800/80 whitespace-pre-wrap">
+# 📸 INGESTA CONTEXTUAL DE AULA Y HUB DE APRENDIZAJE PERSONALIZADO
+## De la "Resolución de Deberes" al Ecosistema Dinámico de Aprendizaje: Detección Automática de Tema, Generación de Tests Interactivos, Explicaciones Visuales y Técnicas de Estudio
+
+**Principio Rector:** *"Las fotos del cuaderno, libro de texto o fichas no existen para que una IA 'resuelva ejercicios' de forma pasiva, sino como sensor de contexto de aula: permiten que el tutor inteligente sepa con exactitud milimétrica qué está aprendiendo el alumno hoy en su colegio y despliegue un Hub Interactivo de Aprendizaje a medida."*
+
+---
+
+### 1. EL CAMBIO DE PARADIGMA: DEL 'HOMEWORK SOLVER' AL 'LEARNING HUB'
+- Las apps tradicionales actúan como fotocopiadoras automáticas de soluciones.
+- GOALS School no da soluciones vacías: extrae la unidad curricular y genera 4 modos interactivos:
+  1. Test Activo de Comprensión (Active Recall).
+  2. Explicador Visual & Manipulativo (CPA + Analogías personalizadas).
+  3. Workout Feynman de Voz & Flashcards FSRS.
+  4. Arena de Retos Progresivos del Mundo Real.
+      </pre>
+    </section>
+
+  </div>
+
+  <script>
+    // ESTADO DE LA APLICACIÓN
+    let currentScenario = 'fracciones';
+    let currentHubMode = 'quiz';
+
+    const scenariosData = {
+      fracciones: {
+        grade: "5.º EDUCACIÓN PRIMARIA",
+        subject: "MATEMÁTICAS • TEMA 4",
+        title: "Unidad 4: Las Fracciones, Equivalencia y Operaciones",
+        methodology: "Metodología detectada del docente: Exige justificación gráfica mediante modelo de barras antes de simplificar a fracción irreducible.",
+        quiz: {
+          question: "¿Cuál de las siguientes fracciones representa exactamente la MISMA cantidad que 2/3?",
+          options: [
+            { text: "4 / 6", correct: true, feedback: "¡Exacto! 4/6 se obtiene multiplicando 2 y 3 por 2. Ambas ocupan la misma cantidad." },
+            { text: "3 / 4", correct: false, feedback: "Ojo: 3/4 es 0.75, mientras que 2/3 es 0.66. No son equivalentes." },
+            { text: "2 / 6", correct: false, feedback: "Fíjate: si solo duplicas el número de abajo (denominador), la fracción se hace la mitad de pequeña." },
+            { text: "5 / 6", correct: false, feedback: "Cuidado: sumar 3 arriba y 3 abajo no conserva la proporción." }
+          ]
+        },
+        analogies: {
+          futbol: "La Analogía del Campo de Fútbol: Si tienes 2 pases completados de 3 intentos, es exactamente la misma efectividad que si haces 4 pases completados de 6 intentos. ¡La proporción de acierto no cambia!",
+          minecraft: "La Analogía de Minecraft: Si crafteas una losa de 2 bloques de altura sobre 3 de base, ocupa la misma proporción de bloque que si usas 4 losas sobre 6 bloques.",
+          espacio: "La Analogía Espacial: Si la nave gasta 2 toneladas de combustible cada 3 minutos, en 6 minutos gastará 4 toneladas. ¡El ratio de consumo es idéntico!"
+        }
+      },
+      algebra: {
+        grade: "2.º EDUCACIÓN SECUNDARIA (E.S.O.)",
+        subject: "MATEMÁTICAS • TEMA 5",
+        title: "Unidad 5: Ecuaciones de 1.er Grado con Paréntesis y Balanzas",
+        methodology: "Metodología detectada del docente: Exige indicar la propiedad de la balanza en cada paso y recuadrar el resultado final.",
+        quiz: {
+          question: "En la ecuación 2(x + 3) = 14, ¿cuál es el primer paso correcto?",
+          options: [
+            { text: "Aplicar distributiva: 2x + 6 = 14", correct: true, feedback: "¡Perfecto! El 2 multiplica tanto a x como a 3." },
+            { text: "Sumar 3 al otro lado: 2x = 17", correct: false, feedback: "Ojo: el 3 está atrapado dentro del paréntesis multiplicado por 2." },
+            { text: "Restar 2: x + 3 = 12", correct: false, feedback: "El 2 está multiplicando al paréntesis, no sumando." },
+            { text: "Dividir entre 14", correct: false, feedback: "Eso complicaría innecesariamente la ecuación." }
+          ]
+        },
+        analogies: {
+          futbol: "Analogía Fútbol: El entrenador da una charla doble (2x) a la defensa y a los delanteros (+3 cada grupo).",
+          minecraft: "Analogía Minecraft: Tienes 2 cofres dobles, y en cada uno hay x diamantes y 3 esmeraldas.",
+          espacio: "Analogía Espacial: 2 módulos de la estación espacial, cada uno con x tripulantes y 3 tanques de oxígeno."
+        }
+      },
+      ecosistemas: {
+        grade: "4.º EDUCACIÓN PRIMARIA",
+        subject: "CIENCIAS DE LA NATURALEZA • TEMA 3",
+        title: "Unidad 3: Los Ecosistemas, Productores y Cadenas Tróficas",
+        methodology: "Metodología detectada del docente: Enfatiza la fotosíntesis como origen de la energía en el ecosistema.",
+        quiz: {
+          question: "¿Por qué las plantas se llaman 'Productores' en un ecosistema?",
+          options: [
+            { text: "Porque fabrican su propio alimento con luz solar", correct: true, feedback: "¡Brillante! Son seres autótrofos que transforman energía solar en materia orgánica." },
+            { text: "Porque producen frutos para los humanos", correct: false, feedback: "Ese es un beneficio secundario, pero su función biológica es sintetizar su biomasa." },
+            { text: "Porque comen insectos de la tierra", correct: false, feedback: "Las plantas absorben agua y sales minerales, no comen otros seres vivos (salvo carnívoras)." },
+            { text: "Porque limpian el agua del río", correct: false, feedback: "Tienen un papel en el ciclo del agua, pero no es la razón de llamarse productores." }
+          ]
+        },
+        analogies: {
+          futbol: "Analogía Fútbol: Los productores son como la cantera del equipo: sin ellos no hay nuevos jugadores en el campo.",
+          minecraft: "Analogía Minecraft: Son como los bloques de trigo y zanahorias que plantas: generan comida desde la nada con luz.",
+          espacio: "Analogía Espacial: Son los paneles solares de la estación espacial que generan toda la energía de la nave."
+        }
+      },
+      cinematica: {
+        grade: "4.º EDUCACIÓN SECUNDARIA (E.S.O.)",
+        subject: "FÍSICA Y QUÍMICA • TEMA 2",
+        title: "Unidad 2: Cinemática, Movimiento Rectilíneo y Gráficas v-t",
+        methodology: "Metodología detectada del docente: Exige usar unidades del Sistema Internacional (m/s) y justificar con la pendiente de la recta.",
+        quiz: {
+          question: "En una gráfica Velocidad-Tiempo (v-t), ¿qué representa la pendiente de la recta?",
+          options: [
+            { text: "La aceleración del móvil (a = Δv / Δt)", correct: true, feedback: "¡Exacto! La derivada de la velocidad respecto al tiempo es la aceleración instantánea." },
+            { text: "La distancia recorrida", correct: false, feedback: "La distancia recorrida es el ÁREA bajo la curva, no la pendiente." },
+            { text: "La masa del objeto", correct: false, feedback: "La masa es un concepto de dinámica (fuerzas), no de cinemática pura." },
+            { text: "El tiempo total de viaje", correct: false, feedback: "El tiempo se mide directamente en el eje horizontal X." }
+          ]
+        },
+        analogies: {
+          futbol: "Analogía Fútbol: La aceleración es el 'sprint' explosivo de un delantero de 0 a 30 km/h.",
+          minecraft: "Analogía Minecraft: Es la propulsión que te da una vagoneta aceleradora con redstone.",
+          espacio: "Analogía Espacial: El empuje gravitacional de los cohetes Falcon 9 saliendo de la atmósfera."
+        }
+      }
+    };
+
+    function switchView(mode) {
+      if (mode === 'interactive') {
+        document.getElementById('container-interactive').classList.remove('hidden');
+        document.getElementById('container-markdown').classList.add('hidden');
+        document.getElementById('btn-view-interactive').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer";
+        document.getElementById('btn-view-markdown').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+      } else {
+        document.getElementById('container-interactive').classList.add('hidden');
+        document.getElementById('container-markdown').classList.remove('hidden');
+        document.getElementById('btn-view-interactive').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+        document.getElementById('btn-view-markdown').className = "px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer";
+      }
+    }
+
+    function activateHubMode(mode) {
+      currentHubMode = mode;
+      const modes = ['quiz', 'explainer', 'feynman', 'quests'];
+      modes.forEach(m => {
+        const panel = document.getElementById(`panel-hub-${m}`);
+        const tab = document.getElementById(`tab-mode-${m}`);
+        if (m === mode) {
+          panel.classList.remove('hidden');
+          tab.classList.remove('border-transparent');
+          tab.classList.add('border-cyan-500', 'bg-slate-800/80');
+        } else {
+          panel.classList.add('hidden');
+          tab.classList.remove('border-cyan-500', 'bg-slate-800/80');
+          tab.classList.add('border-transparent');
+        }
+      });
+    }
+
+    function loadScenario(key) {
+      currentScenario = key;
+      const data = scenariosData[key];
+
+      // Actualizar botones de preset
+      ['fracciones', 'algebra', 'ecosistemas', 'cinematica'].forEach(k => {
+        const btn = document.getElementById(`btn-preset-${k}`);
+        if (k === key) {
+          btn.className = "p-4 rounded-2xl bg-indigo-950/40 hover:bg-indigo-900/50 border-2 border-indigo-500 text-left transition-all group cursor-pointer";
+        } else {
+          btn.className = "p-4 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border-2 border-transparent hover:border-slate-700 text-left transition-all group cursor-pointer";
+        }
+      });
+
+      // Actualizar Banner
+      document.getElementById('detected-grade').innerText = data.grade;
+      document.getElementById('detected-subject').innerText = data.subject;
+      document.getElementById('detected-title').innerText = data.title;
+      document.getElementById('detected-methodology').innerHTML = `<strong>Metodología detectada del docente:</strong> ${data.methodology}`;
+
+      // Actualizar Quiz
+      renderQuiz(data.quiz);
+
+      // Actualizar Analogía
+      setAnalogy('futbol');
+    }
+
+    function renderQuiz(quizData) {
+      document.getElementById('quiz-question-text').innerText = quizData.question;
+      const container = document.getElementById('quiz-options-container');
+      container.innerHTML = '';
+      document.getElementById('quiz-feedback-box').className = 'hidden';
+
+      quizData.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "p-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-cyan-500/50 text-white font-bold text-xs transition-all text-left flex items-center gap-3 cursor-pointer";
+        btn.innerHTML = `<span class="w-6 h-6 rounded-lg bg-slate-800 flex items-center justify-center font-mono text-cyan-400 text-xs shrink-0">${String.fromCharCode(65 + idx)}</span> <span>${opt.text}</span>`;
+        btn.onclick = () => handleQuizAnswer(opt);
+        container.appendChild(btn);
+      });
+    }
+
+    function handleQuizAnswer(option) {
+      const feedback = document.getElementById('quiz-feedback-box');
+      feedback.classList.remove('hidden');
+      if (option.correct) {
+        feedback.className = "p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs font-bold space-y-1";
+        feedback.innerHTML = `<div class="text-sm font-black text-emerald-200">🎉 ¡Respuesta Brillante!</div><p>${option.feedback}</p>`;
+        document.getElementById('bkt-score-label').innerText = '94%';
+        document.getElementById('bkt-score-bar').style.width = '94%';
+      } else {
+        feedback.className = "p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-300 text-xs font-bold space-y-1";
+        feedback.innerHTML = `<div class="text-sm font-black text-rose-200">🔍 Pista Socrática:</div><p>${option.feedback}</p>`;
+        document.getElementById('bkt-score-label').innerText = '62%';
+        document.getElementById('bkt-score-bar').style.width = '62%';
+      }
+    }
+
+    function updateFractionVisualizer() {
+      const mult = parseInt(document.getElementById('slider-fraction').value);
+      document.getElementById('multiplier-label').innerText = `x ${mult}`;
+      const num = 2 * mult;
+      const den = 3 * mult;
+      document.getElementById('fraction-result-label').innerText = `${num} / ${den}`;
+
+      const bar = document.getElementById('fraction-subdivided-bar');
+      bar.innerHTML = '';
+
+      for (let i = 0; i < den; i++) {
+        const seg = document.createElement('div');
+        seg.style.width = `${100 / den}%`;
+        if (i < num) {
+          seg.className = "bg-emerald-500 rounded flex items-center justify-center font-bold text-slate-950 text-[10px]";
+          seg.innerText = `1/${den}`;
+        } else {
+          seg.className = "bg-slate-900/60 rounded flex items-center justify-center font-bold text-slate-500 text-[10px]";
+        }
+        bar.appendChild(seg);
+      }
+    }
+
+    function setAnalogy(type) {
+      ['futbol', 'minecraft', 'espacio'].forEach(t => {
+        const btn = document.getElementById(`btn-ana-${t}`);
+        if (t === type) {
+          btn.className = "px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/30 text-amber-200 cursor-pointer";
+        } else {
+          btn.className = "px-2.5 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white cursor-pointer";
+        }
+      });
+
+      const text = scenariosData[currentScenario].analogies[type];
+      document.getElementById('analogy-text-content').innerHTML = `<strong>Analogía:</strong> ${text}`;
+    }
+
+    function simulateVoiceRecording() {
+      const input = document.getElementById('feynman-input-text');
+      input.value = "Dos fracciones son equivalentes cuando te comes la misma cantidad de tarta aunque una tarta esté cortada en 3 trozos grandes y la otra en 6 trozos más pequeños.";
+      evaluateFeynmanExplanation();
+    }
+
+    function evaluateFeynmanExplanation() {
+      const text = document.getElementById('feynman-input-text').value;
+      const res = document.getElementById('feynman-feedback-result');
+      res.classList.remove('hidden');
+
+      if (text.length < 15) {
+        res.className = "p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 text-amber-300 text-xs font-bold";
+        res.innerText = "¡Escribe o dicta una explicación un poco más completa para poder evaluarla!";
+        return;
+      }
+
+      res.className = "p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-300 text-xs font-bold space-y-1";
+      res.innerHTML = `
+        <div class="text-emerald-200 font-extrabold flex items-center gap-1.5">
+          <span>🌟</span> ¡Explicación Feynman Excelente! (Puntuación: 98/100)
+        </div>
+        <p class="text-slate-300 font-normal">
+          Has utilizado una analogía cotidiana perfecta (la tarta cortada en trozos) y has evitado tecnicismos vacíos. ¡El concepto ha quedado anclado en tu memoria a largo plazo!
+        </p>
+      `;
+    }
+
+    function toggleCardFlip(card) {
+      card.classList.toggle('flipped');
+    }
+
+    // Inicialización al cargar la página
+    window.addEventListener('DOMContentLoaded', () => {
+      loadScenario('fracciones');
+      updateFractionVisualizer();
+    });
+  </script>
+</body>
+</html>

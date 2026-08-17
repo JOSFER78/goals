@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS™ • Estrategia Maestra de Branding & Naming Basado en Intención</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-outfit: 'Outfit', sans-serif;
+      --font-space: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    body {
+      font-family: var(--font-outfit);
+      background-color: #050811;
+      color: #f1f5f9;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.20) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 30%, rgba(245, 158, 11, 0.10) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+    .font-space { font-family: var(--font-space); }
+    .font-mono { font-family: var(--font-mono); }
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-panel-glow {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      box-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
+    }
+    .badge-forge { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-cosmos { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); }
+    .badge-cortex { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-vox { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.3); }
+    .badge-criterio { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+  </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 selection:bg-indigo-500 selection:text-white">
+
+  <div class="max-w-7xl mx-auto space-y-8">
+    
+    <!-- HEADER SUPREMO -->
+    <header class="glass-panel rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+      <div class="space-y-2">
+        <div class="flex items-center gap-3 flex-wrap">
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Marketing & Branding Canónico</span>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Comparador de Naming: Corto vs Compuesto</span>
+          <span class="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-500/30">docs/marketing/</span>
+        </div>
+        <h1 id="header-title" class="text-3xl md:text-5xl font-black font-space tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-cyan-300">
+          GOALS FutureSkills™: The Future Intelligence App
+        </h1>
+        <p class="text-slate-400 text-sm md:text-base max-w-3xl">
+          Ecosistema de marca y arquitectura de nombres basados en la <strong>intención real y explícita</strong> para las 5 inteligencias humanas (6 a 15 años).
+        </p>
+      </div>
+
+      <!-- BOTONES DE MODO DE VISTA -->
+      <div class="flex flex-col gap-2 shrink-0">
+        <!-- Switcher Corto vs Compuesto -->
+        <div class="flex bg-slate-950 p-1.5 rounded-2xl border border-indigo-500/30">
+          <button id="btn-naming-compound" onclick="switchNamingMode('compound')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer">
+            ✨ Nombres Compuestos
+          </button>
+          <button id="btn-naming-short" onclick="switchNamingMode('short')" class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer">
+            🏛️ Nombres Cortos
+          </button>
+        </div>
+
+        <!-- Switcher Vista Web vs Markdown -->
+        <div class="flex bg-slate-900/90 p-1 rounded-xl border border-slate-800 self-end">
+          <button id="btn-view-interactive" onclick="switchView('interactive')" class="px-3 py-1 rounded-lg text-[11px] font-bold transition-all bg-slate-800 text-white cursor-pointer">
+            ⚡ Web
+          </button>
+          <button id="btn-view-markdown" onclick="switchView('markdown')" class="px-3 py-1 rounded-lg text-[11px] font-bold transition-all text-slate-400 hover:text-white cursor-pointer">
+            📄 .md
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- VISTA 1: INTERACTIVA -->
+    <main id="container-interactive" class="space-y-8">
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 1: EL QUINTETO DE SUBMARCAS (DINÁMICO CORTO / COMPUESTO) -->
+      <!-- ========================================================================= -->
+      <section class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h2 id="section-naming-title" class="text-2xl font-black font-space text-white flex items-center gap-2">
+              <span>💎</span> Ecosistema Compuesto Basado en Intención
+            </h2>
+            <p id="section-naming-desc" class="text-slate-400 text-xs mt-0.5">
+              Nombres compuestos que explican de inmediato qué hace la aplicación en menos de 500ms sin jerga aburrida:
+            </p>
+          </div>
+          <span id="badge-naming-mode" class="text-xs font-mono text-emerald-400 px-3 py-1 rounded-xl bg-emerald-950/40 border border-emerald-500/30 self-start sm:self-auto">
+            Modo: Máxima Claridad de Intención
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          
+          <!-- Card 1: Escuela -->
+          <div class="glass-panel p-5 rounded-2xl border-2 border-emerald-500 hover:bg-slate-800/80 transition-all space-y-3 flex flex-col justify-between cursor-pointer group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="badge-forge text-[10px] font-black uppercase px-2 py-0.5 rounded">Tutor Curricular</span>
+                <span class="text-xs">📐</span>
+              </div>
+              <h3 id="name-card-1" class="font-black font-space text-lg text-white group-hover:text-emerald-300">GOALS StudyCraft</h3>
+              <p id="desc-card-1" class="text-slate-400 text-xs leading-relaxed">
+                Tutor socrático particular que acompaña los deberes diarios, escanea cuadernos y prepara exámenes sin hacer trampas.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-emerald-400 font-bold">
+              <span id="sub-card-1">Study + Craft</span>
+              <span class="text-white font-mono text-[10px] bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-500/40">9.60 ★</span>
+            </div>
+          </div>
+
+          <!-- Card 2: Espacio -->
+          <div class="glass-panel p-5 rounded-2xl border-2 border-indigo-500/60 hover:border-indigo-500 hover:bg-slate-800/80 transition-all space-y-3 flex flex-col justify-between cursor-pointer group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="badge-cosmos text-[10px] font-black uppercase px-2 py-0.5 rounded">Astrofísica 3D</span>
+                <span class="text-xs">🪐</span>
+              </div>
+              <h3 id="name-card-2" class="font-black font-space text-lg text-white group-hover:text-indigo-300">GOALS SpaceExplorer 3D</h3>
+              <p id="desc-card-2" class="text-slate-400 text-xs leading-relaxed">
+                Simulador del universo a 8 escalas, física gravitacional Kepleriana y telemetría de misiones reales de la NASA/ESA.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-indigo-400 font-bold">
+              <span id="sub-card-2">Space + Explorer</span>
+              <span class="text-white font-mono text-[10px] bg-indigo-950 px-1.5 py-0.5 rounded border border-indigo-500/40">9.68 ★</span>
+            </div>
+          </div>
+
+          <!-- Card 3: IA & Código -->
+          <div class="glass-panel p-5 rounded-2xl border-2 border-purple-500/60 hover:border-purple-500 hover:bg-slate-800/80 transition-all space-y-3 flex flex-col justify-between cursor-pointer group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="badge-cortex text-[10px] font-black uppercase px-2 py-0.5 rounded">IA & Python Wasm</span>
+                <span class="text-xs">🤖</span>
+              </div>
+              <h3 id="name-card-3" class="font-black font-space text-lg text-white group-hover:text-purple-300">GOALS CodeCraft AI</h3>
+              <p id="desc-card-3" class="text-slate-400 text-xs leading-relaxed">
+                Laboratorio de programación Python, redes neuronales y Transformers reales para crear código e IA sin cajas negras.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-purple-400 font-bold">
+              <span id="sub-card-3">Code + Craft + AI</span>
+              <span class="text-white font-mono text-[10px] bg-purple-950 px-1.5 py-0.5 rounded border border-purple-500/40">9.70 ★</span>
+            </div>
+          </div>
+
+          <!-- Card 4: Idiomas -->
+          <div class="glass-panel p-5 rounded-2xl border-2 border-cyan-500/60 hover:border-cyan-500 hover:bg-slate-800/80 transition-all space-y-3 flex flex-col justify-between cursor-pointer group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="badge-vox text-[10px] font-black uppercase px-2 py-0.5 rounded">Idiomas por Voz</span>
+                <span class="text-xs">🗣️</span>
+              </div>
+              <h3 id="name-card-4" class="font-black font-space text-lg text-white group-hover:text-cyan-300">GOALS SpeakFlow</h3>
+              <p id="desc-card-4" class="text-slate-400 text-xs leading-relaxed">
+                Adquisición natural por voz en streaming, corrección acústica de formantes y fluidez oral sin memorizar tablas de gramática.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-cyan-400 font-bold">
+              <span id="sub-card-4">Speak + Flow</span>
+              <span class="text-white font-mono text-[10px] bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-500/40">9.75 ★</span>
+            </div>
+          </div>
+
+          <!-- Card 5: Crítico -->
+          <div class="glass-panel p-5 rounded-2xl border-2 border-amber-500/60 hover:border-amber-500 hover:bg-slate-800/80 transition-all space-y-3 flex flex-col justify-between cursor-pointer group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="badge-criterio text-[10px] font-black uppercase px-2 py-0.5 rounded">Pensamiento Crítico</span>
+                <span class="text-xs">🧭</span>
+              </div>
+              <h3 id="name-card-5" class="font-black font-space text-lg text-white group-hover:text-amber-300">GOALS MindShield</h3>
+              <p id="desc-card-5" class="text-slate-400 text-xs leading-relaxed">
+                Escudo cognitivo, detección de falacias, sesgos psicológicos, noticias falsas y verificación de fuentes con OSINT.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between text-[11px] font-mono text-amber-400 font-bold">
+              <span id="sub-card-5">Mind + Shield</span>
+              <span class="text-white font-mono text-[10px] bg-amber-950 px-1.5 py-0.5 rounded border border-amber-500/40">9.69 ★</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 2: SIMULADOR DE SLOGANS Y MATRIZ PSICOGRÁFICA -->
+      <!-- ========================================================================= -->
+      <section class="glass-panel-glow rounded-3xl p-6 md:p-8 space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-black">SIMULADOR DE AUDIENCIA</span>
+              <h3 class="text-2xl font-black font-space text-white">Mensajería Segmentada y Slogans Duales</h3>
+            </div>
+            <p class="text-slate-400 text-xs mt-1">Cómo habla GOALS según la edad del alumno y la perspectiva de tranquilidad de los padres.</p>
+          </div>
+
+          <!-- Selector de Audiencia -->
+          <div class="flex items-center gap-1.5 bg-slate-950 p-1.5 rounded-2xl border border-slate-800">
+            <button onclick="setAudience('kid7')" id="btn-aud-kid7" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white cursor-pointer">👶 7 Años</button>
+            <button onclick="setAudience('kid11')" id="btn-aud-kid11" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white cursor-pointer">👦 11 Años</button>
+            <button onclick="setAudience('teen15')" id="btn-aud-teen15" class="px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white cursor-pointer">🧑 15 Años</button>
+            <button onclick="setAudience('parents')" id="btn-aud-parents" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white cursor-pointer">👨‍👩‍👦 Familias</button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-8 bg-slate-950/80 rounded-2xl p-6 border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between">
+              <span id="aud-archetype-tag" class="text-[10px] font-extrabold font-mono uppercase px-2.5 py-1 rounded bg-indigo-500/20 text-indigo-300">
+                Arquetipo: Aliado Pedagógico de Confianza y Paz Mental
+              </span>
+              <span id="aud-target-label" class="text-xs font-mono text-slate-400">Padres de Alumnos 6-15a</span>
+            </div>
+
+            <!-- Slogan Principal Dinámico -->
+            <div class="space-y-1">
+              <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Slogan Maestro Adaptado:</span>
+              <h4 id="aud-main-headline" class="text-xl md:text-2xl font-black font-space text-white leading-snug">
+                "La super-app que transforma el tiempo de pantalla en pensamiento crítico, ciencia y futuro."
+              </h4>
+            </div>
+
+            <!-- Copy de Transformación / Dolor Resuelto -->
+            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-300 space-y-1.5">
+              <div class="font-bold text-indigo-300 flex items-center gap-1.5">
+                <span>💡</span> <span id="aud-benefit-title">Beneficio Nuclear para Familias:</span>
+              </div>
+              <p id="aud-benefit-desc" class="leading-relaxed text-slate-300">
+                Despídete de las batallas vespertinas por los deberes. GOALS actúa como un profesor particular socrático que no hace las trampas por ellos, sino que les enseña a razonar y a amar la ciencia.
+              </p>
+            </div>
+
+            <!-- Botones de Acción de Ejemplo -->
+            <div class="flex flex-wrap gap-2 pt-2">
+              <button id="aud-cta-primary" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition-all cursor-pointer">
+                Probar 14 Días Gratis en Familia
+              </button>
+              <button id="aud-cta-secondary" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs border border-slate-800 transition-all cursor-pointer">
+                Ver Informe de Progreso Demostrativo
+              </button>
+            </div>
+          </div>
+
+          <!-- Caja de Pitch de 15 Segundos -->
+          <div class="lg:col-span-4 bg-gradient-to-br from-indigo-950/40 to-slate-900/60 rounded-2xl p-6 border border-indigo-500/30 space-y-3">
+            <div class="flex items-center justify-between text-xs font-mono text-indigo-300">
+              <span class="font-bold">⚡ ELEVATOR PITCH (15s)</span>
+              <span>🎙️ Cuña</span>
+            </div>
+            <p class="text-xs text-slate-200 leading-relaxed italic">
+              "Los niños pasan más de 4 horas al día frente a las pantallas. <strong>GOALS FutureSkills</strong> convierte ese tiempo en notas excelentes, idiomas fluidos y pensamiento crítico real con simuladores de la NASA. Cero adicción pasiva, 100% inteligencia humana."
+            </p>
+            <button onclick="alert('¡Pitch de audio simulado con éxito en el reproductor!')" class="w-full py-2 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer">
+              <span>▶️</span> Escuchar Locución de Marca
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN 3: MATRIZ DE COMPARACIÓN DE NOMBRES COMPUESTOS -->
+      <!-- ========================================================================= -->
+      <section class="glass-panel rounded-3xl p-6 md:p-8 space-y-4">
+        <h3 class="text-xl font-black font-space text-white flex items-center gap-2">
+          <span>⚖️</span> Catálogo de Opciones Compuestas Basadas en Intención
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+          <!-- Dominio 1: Escuela -->
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="font-bold text-emerald-400 flex items-center justify-between">
+              <span>📐 Escuela & Tutor</span>
+              <span class="text-[10px] text-slate-400 font-mono">LOMLOE / UK NC</span>
+            </div>
+            <ul class="space-y-1 text-slate-300">
+              <li>• <strong class="text-white">GOALS StudyCraft:</strong> El arte del estudio activo.</li>
+              <li>• <strong class="text-white">GOALS StudyPilot:</strong> Tu copiloto hacia el sobresaliente.</li>
+              <li>• <strong class="text-white">GOALS TutorLab:</strong> Laboratorio socrático 1-a-1.</li>
+              <li>• <strong class="text-white">GOALS AulaPro:</strong> Máxima cercanía y rigor escolar.</li>
+            </ul>
+          </div>
+
+          <!-- Dominio 2: Espacio -->
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="font-bold text-indigo-400 flex items-center justify-between">
+              <span>🪐 Espacio & Cosmos</span>
+              <span class="text-[10px] text-slate-400 font-mono">NASA / WebGPU</span>
+            </div>
+            <ul class="space-y-1 text-slate-300">
+              <li>• <strong class="text-white">GOALS SpaceExplorer 3D:</strong> Exploración cósmica total.</li>
+              <li>• <strong class="text-white">GOALS CosmicPilot 3D:</strong> Pilotaje con física orbital real.</li>
+              <li>• <strong class="text-white">GOALS AstroPhysics 3D:</strong> Astrofísica táctil y accesible.</li>
+              <li>• <strong class="text-white">GOALS UniverseLab 3D:</strong> Laboratorio de leyes cósmicas.</li>
+            </ul>
+          </div>
+
+          <!-- Dominio 3: IA & Código -->
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="font-bold text-purple-400 flex items-center justify-between">
+              <span>🤖 IA & Programación</span>
+              <span class="text-[10px] text-slate-400 font-mono">Pyodide / Tensores</span>
+            </div>
+            <ul class="space-y-1 text-slate-300">
+              <li>• <strong class="text-white">GOALS CodeCraft AI:</strong> Crear código e IA reales.</li>
+              <li>• <strong class="text-white">GOALS NeuralLab:</strong> Redes neuronales sin cajas negras.</li>
+              <li>• <strong class="text-white">GOALS RobotBuilder AI:</strong> Agentes autónomos y lógica.</li>
+              <li>• <strong class="text-white">GOALS DevStudio AI:</strong> Suite de desarrollo para jóvenes.</li>
+            </ul>
+          </div>
+
+          <!-- Dominio 4: Idiomas -->
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="font-bold text-cyan-400 flex items-center justify-between">
+              <span>🗣️ Idiomas por Voz</span>
+              <span class="text-[10px] text-slate-400 font-mono">Streaming / Formantes</span>
+            </div>
+            <ul class="space-y-1 text-slate-300">
+              <li>• <strong class="text-white">GOALS SpeakFlow:</strong> Hablar con fluidez natural sin trabas.</li>
+              <li>• <strong class="text-white">GOALS TalkNative AI:</strong> Oído y pronunciación nativa.</li>
+              <li>• <strong class="text-white">GOALS Polyglot AI:</strong> Conquistar múltiples lenguas.</li>
+              <li>• <strong class="text-white">GOALS FluentVoice AI:</strong> Tutor conversacional 24/7.</li>
+            </ul>
+          </div>
+
+          <!-- Dominio 5: Crítico -->
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="font-bold text-amber-400 flex items-center justify-between">
+              <span>🧭 Pensamiento Crítico</span>
+              <span class="text-[10px] text-slate-400 font-mono">OSINT / MATIZA</span>
+            </div>
+            <ul class="space-y-1 text-slate-300">
+              <li>• <strong class="text-white">GOALS MindShield:</strong> Armadura y escudo ante bulos.</li>
+              <li>• <strong class="text-white">GOALS TruthHunter:</strong> Caza de fake news y pistas.</li>
+              <li>• <strong class="text-white">GOALS CriterioLab:</strong> Taller de lógica y debate.</li>
+              <li>• <strong class="text-white">GOALS FakeRadar:</strong> Detector de sesgos y trampas.</li>
+            </ul>
+          </div>
+
+          <!-- Marca Paraguas -->
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+            <div class="font-bold text-indigo-300 flex items-center justify-between">
+              <span>🏛️ Marca Paraguas</span>
+              <span class="text-[10px] text-slate-400 font-mono">Apellidos Oficiales</span>
+            </div>
+            <ul class="space-y-1 text-slate-300">
+              <li>• <strong class="text-white">GOALS FutureSkills™:</strong> Habilidades del 2040.</li>
+              <li>• <strong class="text-white">GOALS FutureMind™:</strong> Desarrollo cognitivo integral.</li>
+              <li>• <strong class="text-white">GOALS SuperApp™:</strong> Plataforma 5-en-1 sin silos.</li>
+              <li>• <strong class="text-white">GOALS LearningLab™:</strong> Laboratorio interactivo global.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- VISTA 2: RAW MARKDOWN DOCUMENT -->
+    <section id="container-markdown" class="hidden glass-panel rounded-3xl p-6 md:p-8 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <span class="text-xs font-mono text-cyan-400 font-bold">docs/marketing/04_INTENT_DRIVEN_COMPOUND_NAMING.md</span>
+        <span class="text-xs text-slate-400">Tratado de Nombres Compuestos Basados en Intención</span>
+      </div>
+      <pre class="bg-slate-950 p-6 rounded-2xl text-xs font-mono text-slate-300 overflow-x-auto leading-relaxed border border-slate-800/80 whitespace-pre-wrap">
+# 💎 TRATADO MAESTRO DE NAMING BASADO EN INTENCIÓN Y NOMBRES COMPUESTOS
+## Ecosistema GOALS de Máxima Claridad Inmediata (<500ms)
+
+### EL QUINTETO COMPUESTO RECOMENDADO:
+1. **GOALS StudyCraft** / **StudyPilot** (Tutor Socrático Escolar & Exámenes)
+2. **GOALS SpaceExplorer 3D** (Simulador 3D del Universo & NASA)
+3. **GOALS CodeCraft AI** / **NeuralLab** (Laboratorio Python, Redes & IA Real)
+4. **GOALS SpeakFlow** / **TalkNative AI** (Inmersión en Idiomas por Voz en Vivo)
+5. **GOALS MindShield** / **TruthHunter** (Pensamiento Crítico & Fact-Checking)
+
+### MARCA PARAGUAS COMPUESTA:
+- **GOALS FutureSkills™** (o **GOALS FutureMind™**)
+      </pre>
+    </section>
+
+  </div>
+
+  <script>
+    let currentNamingMode = 'compound';
+
+    const namingDatasets = {
+      compound: {
+        title: "GOALS FutureSkills™: The Future Intelligence App",
+        sectionTitle: "Ecosistema Compuesto Basado en Intención",
+        sectionDesc: "Nombres compuestos que explican de inmediato qué hace la aplicación en menos de 500ms sin jerga aburrida:",
+        badge: "Modo: Máxima Claridad de Intención",
+        cards: [
+          { name: "GOALS StudyCraft", desc: "Tutor socrático particular que acompaña los deberes diarios, escanea cuadernos y prepara exámenes sin hacer trampas.", sub: "Study + Craft", score: "9.60 ★" },
+          { name: "GOALS SpaceExplorer 3D", desc: "Simulador del universo a 8 escalas, física gravitacional Kepleriana y telemetría de misiones reales de la NASA/ESA.", sub: "Space + Explorer", score: "9.68 ★" },
+          { name: "GOALS CodeCraft AI", desc: "Laboratorio de programación Python, redes neuronales y Transformers reales para crear código e IA sin cajas negras.", sub: "Code + Craft + AI", score: "9.70 ★" },
+          { name: "GOALS SpeakFlow", desc: "Adquisición natural por voz en streaming, corrección acústica de formantes y fluidez oral sin memorizar tablas de gramática.", sub: "Speak + Flow", score: "9.75 ★" },
+          { name: "GOALS MindShield", desc: "Escudo cognitivo, detección de falacias, sesgos psicológicos, noticias falsas y verificación de fuentes con OSINT.", sub: "Mind + Shield", score: "9.69 ★" }
+        ]
+      },
+      short: {
+        title: "GOALS™: The Super-App of Future Human Intelligence",
+        sectionTitle: "El Quinteto Canónico de Nombres Cortos",
+        sectionDesc: "Nombres cortos de alto impacto estético, fonosemántica de poder y herencia conceptual:",
+        badge: "Modo: Nombres Cortos Canónicos",
+        cards: [
+          { name: "GOALS FORGE", desc: "El taller donde se forja el entendimiento diario sin trampas (LOMLOE + UK NC, método Pólya/Singapur).", sub: "Forja del Saber", score: "9.60 ★" },
+          { name: "GOALS COSMOS", desc: "Simulación orbital 3D WebGPU, telemetría real NASA/ESA y perspectiva del universo a 8 escalas.", sub: "Perspectiva Cósmica", score: "9.65 ★" },
+          { name: "GOALS CÓRTEX", desc: "Laboratorio de Transformers, redes neuronales y Python WebAssembly real sin cajas negras.", sub: "Centro de Cómputo", score: "9.50 ★" },
+          { name: "GOALS VOX", desc: "Adquisición natural (Krashen i+1), espectrogramas de formantes y fluidez oral conversacional.", sub: "Voz Humana", score: "9.55 ★" },
+          { name: "GOALS CRITERIO", desc: "Detección de falacias, sesgos cognitivos, desinformación algorítmica y verificación OSINT.", sub: "Juicio Propio", score: "9.50 ★" }
+        ]
+      }
+    };
+
+    function switchNamingMode(mode) {
+      currentNamingMode = mode;
+      const data = namingDatasets[mode];
+
+      document.getElementById('header-title').innerText = data.title;
+      document.getElementById('section-naming-title').innerHTML = `<span>💎</span> ${data.sectionTitle}`;
+      document.getElementById('section-naming-desc').innerText = data.sectionDesc;
+      document.getElementById('badge-naming-mode').innerText = data.badge;
+
+      data.cards.forEach((c, idx) => {
+        const i = idx + 1;
+        document.getElementById(`name-card-${i}`).innerText = c.name;
+        document.getElementById(`desc-card-${i}`).innerText = c.desc;
+        document.getElementById(`sub-card-${i}`).innerText = c.sub;
+      });
+
+      if (mode === 'compound') {
+        document.getElementById('btn-naming-compound').className = "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer";
+        document.getElementById('btn-naming-short').className = "px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+      } else {
+        document.getElementById('btn-naming-compound').className = "px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+        document.getElementById('btn-naming-short').className = "px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-lg cursor-pointer";
+      }
+    }
+
+    const audienceData = {
+      kid7: {
+        tag: "Arquetipo: Cosmic Pet (AstroBot Cósmico)",
+        label: "Niños de 6 a 8 años (1.º - 2.º Primaria)",
+        headline: "¡Despega hacia las estrellas! Tu laboratorio de aventuras espaciales y magia matemática.",
+        benefitTitle: "Palanca Psicológica: Asombro y Refuerzo Positivo",
+        benefitDesc: "Aprende jugando con misiones de 3 minutitos, gana medallas brillantes y explora planetas en 3D con tu mascota espacial.",
+        cta1: "¡Vamos a Jugar! 🚀",
+        cta2: "Ver mi Cohete 🪐"
+      },
+      kid11: {
+        tag: "Arquetipo: Copiloto Gamer / Mentor Táctico",
+        label: "Preadolescentes de 9 a 12 años (5.º - 6.º Primaria)",
+        headline: "Misiones reales, simuladores de la NASA y código en vivo: desbloquea tus superpoderes.",
+        benefitTitle: "Palanca Psicológica: Autonomía y Subir de Nivel",
+        benefitDesc: "Aquí nadie te trata como a un niño pequeño. Escanea deberes difíciles, aprende trucos para reventar los exámenes y mantén tu racha diaria.",
+        cta1: "Aceptar Desafío 🔥",
+        cta2: "Subir al Nivel 4 ⚡"
+      },
+      teen15: {
+        tag: "Arquetipo: Asistente Pro / Colega de Alto Rendimiento",
+        label: "Jóvenes de 13 a 15 años (Secundaria / ESO)",
+        headline: "No seas solo un usuario del algoritmo. Sé quien diseña el futuro.",
+        benefitTitle: "Palanca Psicológica: Rendimiento Top y Dominio de la IA",
+        benefitDesc: "Domina física Keplariana, programa redes neuronales reales y saca notas sobresalientes estudiando en la mitad de tiempo sin rollos.",
+        cta1: "Iniciar Simulación Pro ⚡",
+        cta2: "Auditar Algoritmo con Datos 📊"
+      },
+      parents: {
+        tag: "Arquetipo: Aliado Pedagógico de Confianza y Paz Mental",
+        label: "Familias y Educadores",
+        headline: "La super-app que transforma el tiempo de pantalla en pensamiento crítico, ciencia y futuro.",
+        benefitTitle: "Beneficio Nuclear para Familias:",
+        benefitDesc: "Despídete de las batallas vespertinas por los deberes. GOALS actúa como un profesor particular socrático que no hace las trampas por ellos, sino que les enseña a razonar y a amar la ciencia.",
+        cta1: "Probar 14 Días Gratis en Familia",
+        cta2: "Ver Informe de Progreso Demostrativo"
+      }
+    };
+
+    function setAudience(type) {
+      ['kid7', 'kid11', 'teen15', 'parents'].forEach(k => {
+        const btn = document.getElementById(`btn-aud-${k}`);
+        if (k === type) {
+          btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white cursor-pointer";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white cursor-pointer";
+        }
+      });
+
+      const d = audienceData[type];
+      document.getElementById('aud-archetype-tag').innerText = d.tag;
+      document.getElementById('aud-target-label').innerText = d.label;
+      document.getElementById('aud-main-headline').innerText = d.headline;
+      document.getElementById('aud-benefit-title').innerText = d.benefitTitle;
+      document.getElementById('aud-benefit-desc').innerText = d.benefitDesc;
+      document.getElementById('aud-cta-primary').innerText = d.cta1;
+      document.getElementById('aud-cta-secondary').innerText = d.cta2;
+    }
+
+    function switchView(mode) {
+      if (mode === 'interactive') {
+        document.getElementById('container-interactive').classList.remove('hidden');
+        document.getElementById('container-markdown').classList.add('hidden');
+        document.getElementById('btn-view-interactive').className = "px-3 py-1 rounded-lg text-[11px] font-bold transition-all bg-slate-800 text-white cursor-pointer";
+        document.getElementById('btn-view-markdown').className = "px-3 py-1 rounded-lg text-[11px] font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+      } else {
+        document.getElementById('container-interactive').classList.add('hidden');
+        document.getElementById('container-markdown').classList.remove('hidden');
+        document.getElementById('btn-view-interactive').className = "px-3 py-1 rounded-lg text-[11px] font-bold transition-all text-slate-400 hover:text-white cursor-pointer";
+        document.getElementById('btn-view-markdown').className = "px-3 py-1 rounded-lg text-[11px] font-bold transition-all bg-slate-800 text-white cursor-pointer";
+      }
+    }
+  </script>
+</body>
+</html>
