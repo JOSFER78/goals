@@ -11,8 +11,9 @@
     "Showcase fotorrealista 16:9 sin textos superpuestos en fotos.",
     "Sistema de comprobación y notificación de auto-actualizaciones in-app."
   ],
-  "apkUrl": "https://appgoals.web.app/download/goalskid-v2.5.1.apk",
-  "apkDirectDownload": "https://appgoals.web.app/download/goalskid.apk",
-  "fileSizeBytes": 16777216,
+  "apkUrl": "https://appgoals.web.app/download/goalskid_v2.5.1.zip",
+  "apkDirectDownload": "https://appgoals.web.app/download/goalskid_v2.5.1.apk",
+  "zipUrl": "https://appgoals.web.app/download/goalskid_v2.5.1.zip",
+  "fileSizeBytes": 89892044,
   "isMandatory": false
 }

@@ -5,6 +5,7 @@
  */
 
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { GOALS_EXPERIENCES } from '../../config/experiencesConfig';
 import { ExperienceId } from '../../types';
 import { useProgress } from '../../context/ProgressContext';
@@ -42,13 +43,13 @@ const MINIAPP_VARIANTS_SUMMARY: Record<ExperienceId, { id: string; name: string;
   verify: [
     { id: 'sources', name: 'Fuentes & Hechos', tag: 'BOE & Oficial' },
     { id: 'biases', name: 'Sesgos & Falacias', tag: 'Lógica' },
-    { id: 'pausa', name: 'Protocolo Pausa', tag: 'Juicio Crítico' },
+    { id: 'pausa', name: 'Protocolo PAUSA', tag: 'Juicio Crítico' },
     { id: 'matiza', name: 'Multiperspectiva', tag: 'Prensa Neutral' }
   ],
   criterio: [
     { id: 'sources', name: 'Fuentes & Hechos', tag: 'BOE & Oficial' },
     { id: 'biases', name: 'Sesgos & Falacias', tag: 'Lógica' },
-    { id: 'pausa', name: 'Protocolo Pausa', tag: 'Juicio Crítico' },
+    { id: 'pausa', name: 'Protocolo PAUSA', tag: 'Juicio Crítico' },
     { id: 'matiza', name: 'Multiperspectiva', tag: 'Prensa Neutral' }
   ],
   'ai-lab': [
@@ -81,8 +82,8 @@ export const MiniAppsDrawer: React.FC<MiniAppsDrawerProps> = ({
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end font-display select-none animate-fadeIn">
+  const drawerContent = (
+    <div className="fixed inset-0 z-[9999] flex justify-end font-display select-none animate-fadeIn">
       
       {/* Backdrop oscuro con desenfoque de cristal */}
       <div 
@@ -231,5 +232,8 @@ export const MiniAppsDrawer: React.FC<MiniAppsDrawerProps> = ({
       </div>
     </div>
   );
+
+  if (typeof document === 'undefined') return null;
+  return createPortal(drawerContent, document.body);
 };
 

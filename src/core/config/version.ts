@@ -11,6 +11,7 @@ export interface VersionInfo {
   releaseNotes: string[];
   apkUrl: string;
   apkDirectDownload: string;
+  zipUrl?: string;
   fileSizeBytes?: number;
   isMandatory?: boolean;
 }
@@ -18,8 +19,13 @@ export interface VersionInfo {
 export const CURRENT_APP_VERSION = '2.5.1';
 export const CURRENT_VERSION_CODE = 251;
 
+export const APK_FILE_NAME = `goalskid_v${CURRENT_APP_VERSION}.apk`;
+export const ZIP_FILE_NAME = `goalskid_v${CURRENT_APP_VERSION}.zip`;
+
 export const VERSION_CHECK_URL = 'https://appgoals.web.app/version.json';
-export const APK_DOWNLOAD_URL = 'https://appgoals.web.app/download/goalskid.apk';
+export const APK_DOWNLOAD_URL = `https://appgoals.web.app/download/${ZIP_FILE_NAME}`;
+export const ZIP_DOWNLOAD_URL = `https://appgoals.web.app/download/${ZIP_FILE_NAME}`;
+export const DIRECT_APK_URL = `https://appgoals.web.app/download/${APK_FILE_NAME}`;
 
 /**
  * Compara dos cadenas de versión semántica (ej. "2.5.1" > "2.5.0")

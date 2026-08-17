@@ -142,18 +142,18 @@ export const Footer: React.FC<FooterProps> = ({ onSelectExperience }) => {
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   </div>
 
-                  {/* Botón de Descargar Directa */}
-                  <a
-                    href="https://appgoals.web.app/download/goalskid.apk"
-                    download="goalskid.apk"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setIsDropdownOpen(false)}
+                  {/* Botón de Descargar Directa / Centro de Descargas */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsGuideOpen(true);
+                      setIsDropdownOpen(false);
+                    }}
                     className="w-full py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Descargar APK (Android)</span>
-                  </a>
+                    <span>Descargar APK (Android ZIP)</span>
+                  </button>
 
                   {/* Acciones Secundarias */}
                   <div className={isNativeApp() ? "grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80" : "pt-1 border-t border-slate-800/80"}>

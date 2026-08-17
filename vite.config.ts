@@ -10,8 +10,9 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
-    open: true,
+    host: true,
+    port: 5173,
+    open: false,
     proxy: {
       '/v1': {
         target: 'https://143-47-35-167.sslip.io',

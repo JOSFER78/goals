@@ -352,22 +352,60 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
           <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-3.5 mt-6 sm:mt-7">
             <button
               onClick={() => onOpenAuth('signup')}
-              className="px-6 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-sm active:scale-95 flex items-center gap-2 cursor-pointer"
+              className="px-6 sm:px-7 py-2.5 sm:py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md shadow-indigo-600/30 active:scale-95 flex items-center gap-2 cursor-pointer"
             >
               <span>Comenzar Gratis</span>
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              onClick={() => scrollToSection('carousel-section')}
+              onClick={() => scrollToSection('miniapps-bento')}
               className={`px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl border font-medium text-xs sm:text-sm transition-all active:scale-95 flex items-center gap-2 cursor-pointer ${
                 isDark 
                   ? 'bg-slate-900 hover:bg-slate-800 border-slate-800 text-slate-300' 
                   : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 shadow-sm'
               }`}
             >
-              <span>Ver Demostración</span>
+              <span>Explorar 5 MiniApps</span>
               <ArrowDown className="w-4 h-4 text-slate-400" />
             </button>
+          </div>
+
+          {/* Selector Rápido de las 5 MiniApps en Hero (Directo a Modo Visita) */}
+          <div className="mt-8 pt-6 border-t border-slate-800/60 w-full max-w-4xl mx-auto">
+            <p className="text-[11px] font-mono uppercase tracking-wider text-slate-400 mb-3 font-semibold">
+              Explora cualquier experiencia en vivo (Modo Visita):
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5">
+              {SLIDES.map((slide) => {
+                const IconComp = slide.icon;
+                return (
+                  <button
+                    key={slide.id}
+                    onClick={() => onSelectExperience(slide.id)}
+                    className={`p-2.5 rounded-2xl border text-left flex flex-col justify-between gap-2 transition-all hover:-translate-y-0.5 active:scale-95 cursor-pointer group ${
+                      isDark 
+                        ? 'bg-slate-900/70 hover:bg-slate-800/90 border-slate-800 hover:border-indigo-500/50' 
+                        : 'bg-white hover:bg-indigo-50/50 border-slate-200 hover:border-indigo-300 shadow-sm'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <IconComp className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                        Visitar →
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className={`font-bold text-xs ${isDark ? 'text-white' : 'text-slate-900'}`}>
+                        {slide.name}
+                      </h4>
+                      <p className="text-[10px] text-slate-400 truncate mt-0.5">{slide.badgeTag}</p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </section>
 
@@ -392,7 +430,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
 
               {/* CARD 1: Escuela IA */}
               <div 
-                onClick={() => { setCurrentSlideIndex(0); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                onClick={() => onSelectExperience('school')}
                 className={`w-[85vw] sm:w-auto shrink-0 snap-center lg:col-span-2 group cursor-pointer p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
                   isDark 
                     ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
@@ -413,7 +451,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                       <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5">Tutor OCR de Cuadernos</p>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                  <span className="text-xs font-semibold text-emerald-400 group-hover:translate-x-0.5 transition-transform font-mono">Visitar →</span>
                 </div>
                 <div className={`mt-2.5 sm:mt-3 p-2 sm:p-2.5 rounded-xl border text-[11px] sm:text-xs font-sans ${
                   isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
@@ -424,7 +462,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
 
               {/* CARD 2: Idiomas Voz */}
               <div 
-                onClick={() => { setCurrentSlideIndex(1); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                onClick={() => onSelectExperience('languages')}
                 className={`w-[85vw] sm:w-auto shrink-0 snap-center lg:col-span-2 group cursor-pointer p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
                   isDark 
                     ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
@@ -445,7 +483,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                       <p className="text-xs text-slate-400 mt-0.5">Profesor Particular de Voz</p>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-cyan-500 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                  <span className="text-xs font-semibold text-cyan-400 group-hover:translate-x-0.5 transition-transform font-mono">Visitar →</span>
                 </div>
                 <div className={`mt-2.5 sm:mt-3 p-2 sm:p-2.5 rounded-xl border text-xs font-sans ${
                   isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
@@ -456,7 +494,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
 
               {/* CARD 3: Cosmos 3D */}
               <div 
-                onClick={() => { setCurrentSlideIndex(2); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                onClick={() => onSelectExperience('astro')}
                 className={`w-[85vw] sm:w-auto shrink-0 snap-center lg:col-span-2 group cursor-pointer p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
                   isDark 
                     ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
@@ -477,7 +515,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                       <p className="text-xs text-slate-400 mt-0.5">Simulador Espacial NASA</p>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                  <span className="text-xs font-semibold text-indigo-400 group-hover:translate-x-0.5 transition-transform font-mono">Visitar →</span>
                 </div>
                 <div className={`mt-2.5 sm:mt-3 p-2 sm:p-2.5 rounded-xl border text-xs font-sans ${
                   isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
@@ -488,7 +526,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
 
               {/* CARD 4: Criterio */}
               <div 
-                onClick={() => { setCurrentSlideIndex(3); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                onClick={() => onSelectExperience('verify')}
                 className={`w-[85vw] sm:w-auto shrink-0 snap-center lg:col-span-3 group cursor-pointer p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
                   isDark 
                     ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
@@ -509,7 +547,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                       <p className="text-xs text-slate-400 mt-0.5">Pensamiento Crítico & IA</p>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-amber-500 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                  <span className="text-xs font-semibold text-amber-400 group-hover:translate-x-0.5 transition-transform font-mono">Visitar →</span>
                 </div>
                 <div className={`mt-2.5 sm:mt-3 p-2 sm:p-2.5 rounded-xl border text-xs font-sans ${
                   isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
@@ -520,7 +558,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
 
               {/* CARD 5: IA Lab */}
               <div 
-                onClick={() => { setCurrentSlideIndex(4); setActiveFeatureIndex(0); scrollToSection('carousel-section'); }}
+                onClick={() => onSelectExperience('ai-lab')}
                 className={`w-[85vw] sm:w-auto shrink-0 snap-center lg:col-span-3 group cursor-pointer p-3.5 sm:p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 flex flex-col justify-between ${
                   isDark 
                     ? 'bg-slate-900/60 hover:bg-slate-900/90 border-slate-800 hover:border-slate-700' 
@@ -541,7 +579,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                       <p className="text-xs text-slate-400 mt-0.5">Laboratorio de Inteligencia Artificial</p>
                     </div>
                   </div>
-                  <span className="text-xs font-semibold text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">Ver →</span>
+                  <span className="text-xs font-semibold text-purple-400 group-hover:translate-x-0.5 transition-transform font-mono">Visitar →</span>
                 </div>
                 <div className={`mt-2.5 sm:mt-3 p-2 sm:p-2.5 rounded-xl border text-xs font-sans ${
                   isDark ? 'bg-slate-950/80 border-slate-800/80 text-slate-300' : 'bg-slate-50 border-slate-100 text-slate-600'
