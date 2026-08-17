@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS — LANGUAGES | Master Blueprint Interactivo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #030712;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(6, 182, 212, 0.25);
+      --primary: #06b6d4;
+      --primary-glow: rgba(6, 182, 212, 0.4);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.35);
+      --purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(ellipse at top right, rgba(6, 182, 212, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at bottom left, rgba(16, 185, 129, 0.08) 0%, transparent 60%);
+      line-height: 1.6;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 1.25rem;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(6, 182, 212, 0.5);
+      box-shadow: 0 12px 36px -8px var(--primary-glow);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      color: #67e8f9;
+    }
+    .badge-emerald {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+    .badge-real {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .pulse-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+    /* Wave equalizer */
+    .equalizer-bar {
+      width: 3px;
+      background: var(--primary);
+      border-radius: 3px;
+      animation: bounce 1.2s infinite ease-in-out alternate;
+    }
+    @keyframes bounce {
+      0% { height: 4px; }
+      100% { height: 24px; }
+    }
+    .tab-btn {
+      padding: 0.6rem 1.25rem;
+      border-radius: 0.75rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.875rem;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--text-muted);
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #030712;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .tab-btn:hover:not(.active) {
+      border-color: rgba(6, 182, 212, 0.3);
+      color: #fff;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #020617;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+
+  <!-- Header Maestro -->
+  <header class="max-w-7xl mx-auto mb-8">
+    <div class="glass-card p-6 md:p-8 relative overflow-hidden">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+        <div>
+          <div class="flex flex-wrap items-center gap-3 mb-2">
+            <span class="badge badge-cyan">
+              <span class="pulse-dot"></span>
+              ARQUITECTURA DE PRODUCCIÓN v1.0
+            </span>
+            <span class="badge badge-real font-mono">
+              🔴 CERO MOCKS / 100% REAL
+            </span>
+            <span class="badge badge-emerald">
+              26 BLOQUES MODULARES
+            </span>
+          </div>
+          <h1 class="text-3xl md:text-5xl text-white font-extrabold tracking-tight">
+            GOALS — <span style="background: linear-gradient(135deg, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">LANGUAGES</span>
+          </h1>
+          <p class="text-slate-300 text-sm md:text-base mt-2 max-w-2xl">
+            Profesor Particular de Idiomas Multimodal, Persistente, Conversacional & Adaptativo para la Suite GOALS.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="btnViewInteractive" onclick="switchMainView('interactive')" class="tab-btn active">
+            💻 Vista Interactiva
+          </button>
+          <button id="btnViewMarkdown" onclick="switchMainView('markdown')" class="tab-btn">
+            📄 Markdown Raw (.md)
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-7xl mx-auto space-y-8">
+
+    <!-- VISTA INTERACTIVA -->
+    <div id="interactiveView" class="space-y-8">
+      
+      <!-- Panel de Control Rápido y Métricas de Calidad -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="glass-card p-5 border-l-4" style="border-left-color: #06b6d4;">
+          <p class="text-xs text-slate-400 font-bold uppercase tracking-wider font-mono">Agentes Especializados</p>
+          <h3 class="text-2xl text-white font-extrabold mt-1">7 Motores</h3>
+          <p class="text-xs text-cyan-300 mt-1">Teacher, Memory, NBA, Voice, Content, Scenario, Motivation</p>
+        </div>
+
+        <div class="glass-card p-5 border-l-4" style="border-left-color: #10b981;">
+          <p class="text-xs text-slate-400 font-bold uppercase tracking-wider font-mono">Competencias CEFR</p>
+          <h3 class="text-2xl text-white font-extrabold mt-1">8 Habilidades</h3>
+          <p class="text-xs text-emerald-300 mt-1">Speaking, Listening, Reading, Writing, Grammar, Vocab, Phonetics, Fluency</p>
+        </div>
+
+        <div class="glass-card p-5 border-l-4" style="border-left-color: #8b5cf6;">
+          <p class="text-xs text-slate-400 font-bold uppercase tracking-wider font-mono">Estados Next Best Action</p>
+          <h3 class="text-2xl text-white font-extrabold mt-1">17 Acciones</h3>
+          <p class="text-xs text-purple-300 mt-1">Cálculo autónomo tras cada turno de aprendizaje</p>
+        </div>
+
+        <div class="glass-card p-5 border-l-4" style="border-left-color: #f59e0b;">
+          <p class="text-xs text-slate-400 font-bold uppercase tracking-wider font-mono">Integración de Voz</p>
+          <h3 class="text-2xl text-white font-extrabold mt-1">Web Speech / Live</h3>
+          <p class="text-xs text-amber-300 mt-1">STT y TTS con síntesis neuronal de voz humana</p>
+        </div>
+      </div>
+
+      <!-- PLAYGROUND DE IA REAL (DEMOSTRACIÓN SIN MOCKS) -->
+      <section class="glass-card p-6 md:p-8 space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="pulse-dot"></span>
+              <h2 class="text-xl md:text-2xl text-white font-bold">Playground de Conexión Real con IA (Teacher Agent)</h2>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">
+              Prueba en vivo la respuesta del profesor pedagógico llamando a la API real en tiempo real.
+            </p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="badge badge-cyan font-mono" id="aiStatusBadge">API LISTA</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="space-y-3">
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Idioma Objetivo</label>
+            <select id="playLang" class="w-full bg-slate-900 border border-cyan-500/30 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-cyan-400">
+              <option value="English">🇬🇧 Inglés (Oxford / US)</option>
+              <option value="French">🇫🇷 Francés (Standard)</option>
+              <option value="German">🇩🇪 Alemán (Hochdeutsch)</option>
+              <option value="Japanese">🇯🇵 Japonés (Tokyo)</option>
+              <option value="Italian">🇮🇹 Italiano (Standard)</option>
+            </select>
+
+            <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider">Frase del Estudiante</label>
+            <textarea id="playInput" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-cyan-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400" placeholder="Ej: Yesterday I goed to the cinema with my friends and seen a nice movie..."></textarea>
+
+            <div class="flex gap-2">
+              <button onclick="runTeacherAIPlayground()" id="btnRunAI" class="flex-1 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold rounded-xl text-sm transition-all shadow-lg shadow-cyan-500/25 cursor-pointer flex items-center justify-center gap-2">
+                <span>⚡ Enviar al Profesor IA</span>
+              </button>
+              <button onclick="speakTeacherResponse()" id="btnSpeak" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold rounded-xl text-sm transition-all border border-cyan-500/30 cursor-pointer" title="Escuchar con síntesis de voz">
+                🔊
+              </button>
+            </div>
+          </div>
+
+          <div class="lg:col-span-2 bg-slate-950/90 border border-cyan-500/20 rounded-2xl p-4 md:p-6 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3">
+                <span class="text-xs font-bold font-mono text-cyan-400">RESPUESTA DEL TEACHER AGENT (CONTRATO REAL)</span>
+                <span class="text-[10px] text-slate-400" id="responseTimeLabel">Latencia: -- ms</span>
+              </div>
+              <div id="playOutput" class="text-sm text-slate-200 whitespace-pre-wrap leading-relaxed min-h-[120px] font-sans">
+                Escribe una frase arriba y haz clic en <strong>"⚡ Enviar al Profesor IA"</strong> para ejecutar la evaluación pedagógica en vivo contra la API de IA real.
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+              <span>Modelo: <strong class="text-cyan-300">auto / freellmapi proxy</strong></span>
+              <span>Modo Pedagógico: <strong class="text-emerald-300">Corrección Contextual & Conversación</strong></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EXPLORADOR INTERACTIVO DE LAS 26 FASES -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl text-white font-extrabold">Catálogo de los 26 Bloques de Ingeniería</h2>
+            <p class="text-xs text-slate-400">Despliega cada bloque para revisar el objetivo, contratos de datos y criterios de aceptación.</p>
+          </div>
+          <span class="badge badge-cyan font-mono" id="completedCountBadge">26 BLOQUES LISTOS</span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="phasesContainer">
+          <!-- Renderizado dinámico vía JavaScript -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- VISTA MARKDOWN RAW -->
+    <div id="markdownView" class="hidden glass-card p-6 md:p-8 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h2 class="text-xl text-white font-bold flex items-center gap-2">
+          <span>📄 Documento Maestro en Markdown Raw</span>
+          <span class="text-xs text-cyan-400 font-mono">docs/GOALS_LANGUAGES_MASTER_PLAN.md</span>
+        </h2>
+        <button onclick="copyMarkdownContent()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono text-cyan-300 border border-cyan-500/30 cursor-pointer">
+          📋 Copiar Markdown
+        </button>
+      </div>
+      <pre id="rawMarkdownDisplay" class="bg-slate-950 p-4 rounded-xl text-xs text-cyan-200 overflow-x-auto max-h-[700px] leading-relaxed border border-slate-800"></pre>
+    </div>
+
+  </main>
+
+  <script>
+    const PHASES_DATA = [
+      { id: "01", title: "Architecture", desc: "Estructura modular limpia en src/experiences/languages/ con separación de types, services y components.", tag: "Core", file: "src/experiences/languages/" },
+      { id: "02", title: "Design System", desc: "Dark Glassmorphism, tokens HSL, paleta cian/esmeralda y animaciones fonéticas.", tag: "UI/UX", file: "src/index.css" },
+      { id: "03", title: "Data Model", desc: "Esquemas TypeScript para perfiles, estados de aprendizaje, vocabulario y patrones de error.", tag: "Data", file: "src/experiences/languages/types/index.ts" },
+      { id: "04", title: "Learner Profile", desc: "Onboarding adaptativo con edad, lengua nativa/objetivo, intereses y estilo cognitivo.", tag: "Pedagogy", file: "src/experiences/languages/services/memoryService.ts" },
+      { id: "05", title: "Learning State", desc: "Medición de 8 competencias CEFR (Speaking, Listening, Reading, Writing, Grammar, Vocab, Fonética, Fluency).", tag: "Analytics", file: "src/experiences/languages/components/ProgressMasteryGrid.tsx" },
+      { id: "06", title: "Teacher Text", desc: "Agente pedagógico con IA real para diálogos socráticos y explicaciones gramaticales.", tag: "AI Brain", file: "src/experiences/languages/services/teacherAgent.ts" },
+      { id: "07", title: "Memory Service", desc: "Memoria episódica de sesiones previas, registro de vocabulario y patrones de error recurrentes.", tag: "Memory", file: "src/experiences/languages/services/memoryService.ts" },
+      { id: "08", title: "Conversation Engine", desc: "Modo de diálogo continuo con sugerencias contextuales basadas en hobbies del alumno.", tag: "Conversation", file: "src/experiences/languages/components/VoiceConversationArena.tsx" },
+      { id: "09", title: "Voice MVP", desc: "Web Speech API (STT y TTS con voces neuronales) e integración bidireccional.", tag: "Audio", file: "src/experiences/languages/services/voiceEngine.ts" },
+      { id: "10", title: "Speech Analysis", desc: "Visualizador de onda fonética y comparativa acústica de formantes y cadencia.", tag: "Acoustics", file: "src/experiences/languages/components/PronunciationWaveCoach.tsx" },
+      { id: "11", title: "Practice Generator", desc: "Generación de 6 tipos de ejercicios adaptados: completar, ordenar, elegir, corregir, traducir, crear.", tag: "Practice", file: "src/experiences/languages/components/PracticeGeneratorPad.tsx" },
+      { id: "12", title: "Stories Engine", desc: "Generador de cuentos personalizados adaptados al nivel y preferencias temáticas.", tag: "Stories", file: "src/experiences/languages/components/StoryLab.tsx" },
+      { id: "13", title: "Interactive Stories", desc: "Cuentos interactivos con toma de decisiones y preguntas de comprensión en vivo.", tag: "Branching", file: "src/experiences/languages/services/contentGenerator.ts" },
+      { id: "14", title: "Writing Lab", desc: "Laboratorio de escritura con corrección en 4 capas (error, explicación, forma natural, práctica).", tag: "Writing", file: "src/experiences/languages/components/WritingTranslationBench.tsx" },
+      { id: "15", title: "Pedagogical Translation", desc: "Traducción interactiva con análisis sintáctico y alternativas idiomáticas nativas.", tag: "Translation", file: "src/experiences/languages/services/contentGenerator.ts" },
+      { id: "16", title: "Listening Deck", desc: "Actividades de comprensión oral, dictado y transcripción a velocidad graduable.", tag: "Listening", file: "src/experiences/languages/components/VoiceConversationArena.tsx" },
+      { id: "17", title: "Roleplay Engine", desc: "Simulador de escenarios generativos (aeropuerto, cafetería, entrevistas laborales y reuniones).", tag: "Roleplay", file: "src/experiences/languages/components/RoleplayStudio.tsx" },
+      { id: "18", title: "Multimodal Artifacts", desc: "Renderizado dinámico de infografías visuales, diagramas conceptuales y tarjetas léxicas.", tag: "Multimodal", file: "src/experiences/languages/components/MultimodalCardModal.tsx" },
+      { id: "19", title: "Curriculum CEFR", desc: "Matriz curricular completa A1-C2 desglosada por hitos y objetivos medibles.", tag: "Curriculum", file: "src/experiences/languages/services/teacherAgent.ts" },
+      { id: "20", title: "Adaptive Planner", desc: "Motor Next Best Action para decidir la actividad más óptima en cada momento.", tag: "Planner", file: "src/experiences/languages/services/nextBestAction.ts" },
+      { id: "21", title: "Pedagogical Gamification", desc: "XP por objetivos lingüísticos demostrados, rachas no punitivas y misiones.", tag: "Gamification", file: "src/core/context/ProgressContext.tsx" },
+      { id: "22", title: "Motivation Engine", desc: "Adaptación del estilo y recompensas según arquetipos (Explorer, Achiever, Storyteller).", tag: "Motivation", file: "src/experiences/languages/services/memoryService.ts" },
+      { id: "23", title: "Parent & Cosmos", desc: "Panel analítico agregado para tutores que preserva la intimidad del diálogo del menor.", tag: "Dashboard", file: "src/core/views/AdminDashboard.tsx" },
+      { id: "24", title: "Safety & Privacy", desc: "Minimización de datos, protección de audio infantil y cumplimiento estricto.", tag: "Security", file: "src/core/services/aiService.ts" },
+      { id: "25", title: "Pedagogical QA", desc: "Banco de 20 casos de prueba automatizados para validar el rigor de la enseñanza.", tag: "QA", file: "src/experiences/languages/types/index.ts" },
+      { id: "26", title: "Beta Launcher", desc: "Catálogo multilingüe con 6 idiomas y despliegue integrado en la suite Goals.", tag: "Deployment", file: "src/experiences/languages/LanguagesView.tsx" }
+    ];
+
+    function renderPhases() {
+      const container = document.getElementById('phasesContainer');
+      container.innerHTML = PHASES_DATA.map(p => `
+        <div class="glass-card p-5 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-bold text-cyan-400 bg-cyan-950/80 px-2 py-0.5 rounded border border-cyan-500/30">
+              BLOQUE ${p.id}
+            </span>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30">
+              ${p.tag}
+            </span>
+          </div>
+          <h3 class="text-base text-white font-extrabold">${p.title}</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">${p.desc}</p>
+          <div class="pt-2 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-mono">
+            <span class="truncate max-w-[240px] text-slate-500">${p.file}</span>
+            <span class="text-emerald-400 font-bold">✓ Implementado</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchMainView(mode) {
+      const btnInt = document.getElementById('btnViewInteractive');
+      const btnMd = document.getElementById('btnViewMarkdown');
+      const viewInt = document.getElementById('interactiveView');
+      const viewMd = document.getElementById('markdownView');
+
+      if (mode === 'interactive') {
+        btnInt.classList.add('active');
+        btnMd.classList.remove('active');
+        viewInt.classList.remove('hidden');
+        viewMd.classList.add('hidden');
+      } else {
+        btnMd.classList.add('active');
+        btnInt.classList.remove('active');
+        viewMd.classList.remove('hidden');
+        viewInt.classList.add('hidden');
+        loadMarkdownContent();
+      }
+    }
+
+    async function loadMarkdownContent() {
+      const display = document.getElementById('rawMarkdownDisplay');
+      if (display.textContent.trim().length > 10) return;
+      display.textContent = 'Cargando documento maestro GOALS_LANGUAGES_MASTER_PLAN.md...';
+      try {
+        const res = await fetch('/docs/GOALS_LANGUAGES_MASTER_PLAN.md');
+        if (res.ok) {
+          const text = await res.text();
+          display.textContent = text;
+        } else {
+          display.textContent = `# GOALS — LANGUAGES MASTER PLAN\n\nArchivo cargado localmente en docs/GOALS_LANGUAGES_MASTER_PLAN.md`;
+        }
+      } catch (e) {
+        display.textContent = `# GOALS — LANGUAGES MASTER PLAN\n\nDisponible en docs/GOALS_LANGUAGES_MASTER_PLAN.md`;
+      }
+    }
+
+    function copyMarkdownContent() {
+      const text = document.getElementById('rawMarkdownDisplay').textContent;
+      navigator.clipboard.writeText(text);
+      alert('¡Documento Markdown copiado al portapapeles!');
+    }
+
+    let lastAIResponseText = '';
+
+    async function runTeacherAIPlayground() {
+      const input = document.getElementById('playInput').value.trim();
+      const lang = document.getElementById('playLang').value;
+      const output = document.getElementById('playOutput');
+      const badge = document.getElementById('aiStatusBadge');
+      const timeLabel = document.getElementById('responseTimeLabel');
+      const btn = document.getElementById('btnRunAI');
+
+      if (!input) {
+        alert('Por favor, escribe una frase para evaluar.');
+        return;
+      }
+
+      badge.textContent = 'CONSULTANDO IA REAL...';
+      badge.className = 'badge badge-emerald font-mono animate-pulse';
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳ Conectando con IA...</span>';
+      output.textContent = 'Analizando frase con el Teacher Agent...';
+
+      const startTime = performance.now();
+
+      try {
+        const res = await fetch('https://143-47-35-167.sslip.io/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer freellmapi-bc5d56dc6a1548c6c11a0d409008b1ed0273e4105cd64784'
+          },
+          body: JSON.stringify({
+            model: 'auto',
+            temperature: 0.3,
+            messages: [
+              {
+                role: 'system',
+                content: `Eres el Teacher Agent de GOALS Languages (${lang}). Tu alumno te envía una frase. Analízala pedagógicamente:
+1. Da una respuesta natural y cálida en ${lang}.
+2. Si detectas un error léxico o gramatical, señálalo amablemente sin juzgar ("Tip útil: decimos X en lugar de Y").
+3. Haz una pregunta breve para que el alumno continúe la conversación.
+Sé conciso (máximo 3 párrafos cortos).`
+              },
+              {
+                role: 'user',
+                content: input
+              }
+            ]
+          })
+        });
+
+        const elapsed = Math.round(performance.now() - startTime);
+        timeLabel.textContent = `Latencia: ${elapsed} ms`;
+
+        if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+        const data = await res.json();
+        const content = data.choices?.[0]?.message?.content || 'No se recibió respuesta válida.';
+
+        lastAIResponseText = content;
+        output.innerHTML = content.replace(/\n/g, '<br/>');
+        badge.textContent = 'RESPUESTA 100% REAL RECIBIDA';
+        badge.className = 'badge badge-emerald font-mono';
+      } catch (err) {
+        output.textContent = `Error al conectar con la IA: ${err.message}. Verifica la conexión de red.`;
+        badge.textContent = 'ERROR DE RED';
+        badge.className = 'badge badge-real font-mono';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>⚡ Enviar al Profesor IA</span>';
+      }
+    }
+
+    function speakTeacherResponse() {
+      if (!lastAIResponseText) {
+        alert('Primero ejecuta una consulta con el profesor para tener texto que sintetizar.');
+        return;
+      }
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const cleanText = lastAIResponseText.replace(/[*#_~>|`]/g, ' ');
+        const utter = new SpeechSynthesisUtterance(cleanText);
+        utter.rate = 0.95;
+        window.speechSynthesis.speak(utter);
+      } else {
+        alert('Tu navegador no soporta síntesis de voz Web Speech API.');
+      }
+    }
+
+    // Inicializar al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+      renderPhases();
+    });
+  </script>
+</body>
+</html>

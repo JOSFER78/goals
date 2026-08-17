@@ -1,39 +1,67 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from './AuthContext';
-import { db, doc, setDoc, getDoc } from '../config/firebase';
-import { UserData, LessonProgress, EvolutionEntry, RetoItem, RankInfo } from '../types';
+import { db, doc, setDoc, onSnapshot } from '../config/firebase';
+import { UserData, LessonProgress, EvolutionEntry, RetoItem, RankInfo, ExperienceId } from '../types';
 import { LESSONS } from '../../experiences/astro/data/lessonsData';
 import { checkStreak } from '../../experiences/astro/utils/streak';
+import { PresentationEngine } from '../services/PresentationEngine';
 
 interface ProgressContextType {
   userData: UserData;
+  adminBypass: boolean;
+  toggleAdminBypass: () => void;
+  adminSimulatedAge: number | null;
+  setAdminSimulatedAge: (age: number | null) => void;
+  effectiveAge: number;
   lessonProg: (id: number) => LessonProgress;
   lessonUnlocked: (id: number) => boolean;
-  completeStep: (lessonId: number) => void;
+  isLessonUnlocked: (id: number) => boolean;
+  isTestUnlocked: (id: number) => boolean;
+  completeStep: (lessonId: number, stepIndex?: number) => void;
   finishTest: (lessonId: number, score: number, total: number) => { stars: number; xpGained: number; isFirstCompletion: boolean };
   totalStars: () => number;
   maxStars: () => number;
   claimReto: (id: string, xpReward: number) => void;
   getRankInfo: (xp: number) => RankInfo;
   getRetosList: () => RetoItem[];
-  addXP: (amount: number, expId?: string, reason?: string) => void;
+  addXP: (amount: number, expId?: ExperienceId | string, reason?: string) => void;
+  addCustomEvolution: (entry: Omit<EvolutionEntry, 'id' | 'timestamp' | 'dateStr'>) => void;
+  saveChildProfileData: (profile: Record<string, any>) => void;
+  saveMascotData: (mascot: Record<string, any>) => void;
   toastMsg: string | null;
   showToast: (msg: string) => void;
   hideToast: () => void;
   resetProgress: () => void;
 }
 
+const getInitialWeeklyActivity = (): boolean[] => {
+  const day = new Date().getDay(); // 0 = Dom, 1 = Lun, ... 6 = Sab
+  const weekdayIndex = day === 0 ? 6 : day - 1; // Lun=0 ... Dom=6
+  const activity = [false, false, false, false, false, false, false];
+  activity[weekdayIndex] = true;
+  return activity;
+};
+
+const updateWeeklyActivityToday = (current?: boolean[]): boolean[] => {
+  const day = new Date().getDay();
+  const weekdayIndex = day === 0 ? 6 : day - 1;
+  const base = current && current.length === 7 ? [...current] : [false, false, false, false, false, false, false];
+  base[weekdayIndex] = true;
+  return base;
+};
+
 const DEFAULT_USER_DATA: UserData = {
   xp: 0,
   streak: 1,
   lastDay: new Date().toDateString(),
   claimedRetos: {},
-  weeklyActivity: [true, false, false, false, false, false, false],
+  weeklyActivity: getInitialWeeklyActivity(),
   experiences: {
-    astro: {
-      xp: 0,
-      lessons: {}
-    }
+    astro: { xp: 0, lessons: {} },
+    school: { xp: 0, lessons: {} },
+    languages: { xp: 0, lessons: {} },
+    verify: { xp: 0, lessons: {} },
+    'ai-lab': { xp: 0, lessons: {} }
   },
   lessons: {},
   evolutions: []
@@ -53,30 +81,31 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { user, isCloud } = useAuth();
   const [userData, setUserData] = useState<UserData>(DEFAULT_USER_DATA);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const isSyncingFromRemote = useRef(false);
 
-  const dataKey = useCallback(() => {
-    return 'goals_data_' + (user?.uid || 'guest');
-  }, [user]);
+  const dataKey = useCallback(() => 'goals_data_' + (user?.uid || 'guest'), [user]);
+  const legacyKey = useCallback(() => 'al_data_' + (user?.uid || 'guest'), [user]);
 
-  const legacyKey = useCallback(() => {
-    return 'al_data_' + (user?.uid || 'guest');
-  }, [user]);
-
-  const showToast = (msg: string) => {
+  const showToast = useCallback((msg: string) => {
     setToastMsg(msg);
     setTimeout(() => {
       setToastMsg((prev) => (prev === msg ? null : prev));
     }, 4500);
-  };
+  }, []);
 
-  const hideToast = () => {
+  const hideToast = useCallback(() => {
     setToastMsg(null);
+  }, []);
+
+  const sanitizeExperienceKey = (expId: string): string => {
+    if (expId === 'aiLab') return 'ai-lab';
+    return expId;
   };
 
   const persistData = useCallback(async (data: UserData) => {
-    const key = dataKey();
+    // 1. Persistencia síncrona en LocalStorage
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      localStorage.setItem(dataKey(), JSON.stringify(data));
       localStorage.setItem(legacyKey(), JSON.stringify({
         xp: data.xp,
         streak: data.streak,
@@ -88,6 +117,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       console.warn("LocalStorage save error", e);
     }
 
+    // 2. Persistencia en la nube con Firestore Merge
     if (isCloud && db && user?.uid && !user.isAnonymous) {
       try {
         await setDoc(doc(db, 'users', user.uid), data, { merge: true });
@@ -97,133 +127,187 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [dataKey, legacyKey, isCloud, user]);
 
+  // SUSCRIPCIÓN EN TIEMPO REAL CON onSnapshot (Firestore)
   useEffect(() => {
-    let isMounted = true;
-    const load = async () => {
-      let loadedData: UserData | null = null;
+    let unsubscribeSnapshot: (() => void) | null = null;
 
-      if (isCloud && db && user?.uid && !user.isAnonymous) {
-        try {
-          const snap = await getDoc(doc(db, 'users', user.uid));
-          if (snap.exists()) {
-            loadedData = snap.data() as UserData;
-          }
-        } catch (e) {
-          console.warn("Firestore load error, falling back to local", e);
-        }
+    // Cargar datos locales de arranque inmediato
+    try {
+      const raw = localStorage.getItem(dataKey()) || localStorage.getItem(legacyKey());
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setUserData((prev) => ({ ...prev, ...parsed }));
       }
+    } catch (e) {}
 
-      if (!loadedData) {
-        try {
-          const raw = localStorage.getItem(dataKey()) || localStorage.getItem(legacyKey());
-          if (raw) loadedData = JSON.parse(raw);
-        } catch (e) {
-          console.warn("LocalStorage parse error", e);
-        }
-      }
-
-      if (!loadedData) {
-        loadedData = JSON.parse(JSON.stringify(DEFAULT_USER_DATA));
-      }
-
-      const isAdminUser = user?.email === 'josferestudio@gmail.com';
-      if (isAdminUser) {
-        loadedData.isApproved = true;
-      } else if (loadedData.isApproved === undefined) {
-        loadedData.isApproved = false;
-      }
-
-      loadedData.lessons = loadedData.lessons || {};
-      loadedData.claimedRetos = loadedData.claimedRetos || {};
-      loadedData.weeklyActivity = loadedData.weeklyActivity || [true, true, true, false, false, false, false];
-      loadedData.evolutions = loadedData.evolutions || [];
-      loadedData.experiences = loadedData.experiences || {};
-      if (!loadedData.experiences.astro) {
-        loadedData.experiences.astro = {
-          xp: loadedData.xp || 0,
-          lessons: loadedData.lessons || {}
-        };
-      }
-
-      const streakResult = checkStreak(loadedData.lastDay, loadedData.streak);
-      loadedData.streak = streakResult.streak;
-      loadedData.lastDay = streakResult.lastDay;
-
-      if (isMounted) {
-        setUserData(loadedData);
-        if (isCloud && db && user?.uid && !user.isAnonymous) {
-          try {
-            const updatePayload: any = {
-              email: user.email,
-              displayName: user.displayName,
+    if (isCloud && db && user?.uid && !user.isAnonymous) {
+      const userDocRef = doc(db, 'users', user.uid);
+      unsubscribeSnapshot = onSnapshot(userDocRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const remoteData = docSnap.data() as UserData;
+          isSyncingFromRemote.current = true;
+          
+          setUserData((prev) => {
+            const merged: UserData = {
+              ...DEFAULT_USER_DATA,
+              ...prev,
+              ...remoteData,
+              weeklyActivity: updateWeeklyActivityToday(remoteData.weeklyActivity || prev.weeklyActivity),
+              experiences: {
+                ...DEFAULT_USER_DATA.experiences,
+                ...(prev.experiences || {}),
+                ...(remoteData.experiences || {})
+              },
+              evolutions: remoteData.evolutions || prev.evolutions || []
             };
-            if (loadedData.isApproved === true || isAdminUser) {
-              updatePayload.isApproved = true;
+
+            const streakRes = checkStreak(merged.lastDay, merged.streak);
+            merged.streak = streakRes.streak;
+            merged.lastDay = streakRes.lastDay;
+
+            if (user?.email === 'josferestudio@gmail.com') {
+              merged.isApproved = true;
             }
-            setDoc(doc(db, 'users', user.uid), updatePayload, { merge: true });
-          } catch (e) {}
+
+            try {
+              localStorage.setItem(dataKey(), JSON.stringify(merged));
+            } catch (e) {}
+
+            return merged;
+          });
+
+          setTimeout(() => { isSyncingFromRemote.current = false; }, 100);
+        } else {
+          // Documento inicial nuevo en Firestore
+          const initial = { ...DEFAULT_USER_DATA, email: user.email, displayName: user.displayName };
+          setDoc(userDocRef, initial, { merge: true }).catch(console.warn);
         }
-        persistData(loadedData);
-      }
+      }, (err) => {
+        console.warn("Error en suscripción Firestore onSnapshot:", err);
+      });
+    }
+
+    return () => {
+      if (unsubscribeSnapshot) unsubscribeSnapshot();
     };
-
-    load();
-
-    return () => { isMounted = false; };
-  }, [user, isCloud, dataKey, legacyKey, persistData]);
+  }, [user, isCloud, dataKey, legacyKey]);
 
   const getAstroLessons = (data: UserData) => {
     return data.experiences?.astro?.lessons || data.lessons || {};
   };
 
+  const [adminBypass, setAdminBypass] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('goals_admin_bypass') === 'true';
+    } catch {
+      return false;
+    }
+  });
+
+  const toggleAdminBypass = useCallback(() => {
+    setAdminBypass(prev => {
+      const next = !prev;
+      try {
+        localStorage.setItem('goals_admin_bypass', String(next));
+      } catch {}
+      return next;
+    });
+  }, []);
+
+  const [adminSimulatedAge, setAdminSimulatedAgeState] = useState<number | null>(() => {
+    try {
+      const stored = localStorage.getItem('goals_admin_simulated_age');
+      return stored ? parseInt(stored, 10) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const setAdminSimulatedAge = useCallback((age: number | null) => {
+    setAdminSimulatedAgeState(age);
+    try {
+      if (age !== null) {
+        localStorage.setItem('goals_admin_simulated_age', String(age));
+      } else {
+        localStorage.removeItem('goals_admin_simulated_age');
+      }
+    } catch {}
+  }, []);
+
+  const isUserAdmin = Boolean(user?.email === 'josferestudio@gmail.com' || userData?.role === 'admin');
+  const effectiveAge = (isUserAdmin && adminSimulatedAge !== null)
+    ? adminSimulatedAge
+    : (userData?.childProfile?.age || 9);
+
   const lessonProg = (id: number): LessonProgress => {
     const astroLessons = getAstroLessons(userData);
-    if (!astroLessons[id]) {
-      return { steps: 0, testDone: false, stars: 0 };
-    }
-    return astroLessons[id];
+    return astroLessons[id] || { steps: 0, testDone: false, stars: 0 };
   };
 
   const lessonUnlocked = (id: number): boolean => {
     if (id === 1) return true;
+    if (isUserAdmin && adminBypass) return true;
     const prevProg = lessonProg(id - 1);
-    return prevProg.testDone;
+    const prevDef = LESSONS.find(l => l.id === id - 1);
+    const maxSteps = prevDef ? prevDef.steps.length : 4;
+    return Boolean(prevProg.testDone || prevProg.read || prevProg.steps >= maxSteps);
   };
 
-  const completeStep = (lessonId: number) => {
+  const isLessonUnlocked = lessonUnlocked;
+
+  const isTestUnlocked = (id: number): boolean => {
+    if (isUserAdmin && adminBypass) return true;
+    if (!isLessonUnlocked(id)) return false;
+    if (id === 1) return true;
+    const current = lessonProg(id);
+    const lessonDef = LESSONS.find((l) => l.id === id);
+    const maxSteps = lessonDef ? lessonDef.steps.length : 4;
+    return Boolean(current.read || current.steps >= maxSteps || current.testDone);
+  };
+
+  const completeStep = (lessonId: number, stepIndex?: number) => {
+    const lessonDef = LESSONS.find((l) => l.id === lessonId);
+    const maxSteps = lessonDef ? lessonDef.steps.length : 4;
+
     setUserData((prev) => {
       const astroLessons = { ...getAstroLessons(prev) };
-      const current = astroLessons[lessonId] || { steps: 0, testDone: false, stars: 0 };
-      const lessonDef = LESSONS.find((l) => l.id === lessonId);
-      const maxSteps = lessonDef ? lessonDef.steps.length : 4;
+      const current = astroLessons[lessonId] || { steps: 0, testDone: false, stars: 0, read: false };
       
-      const newSteps = Math.min(maxSteps, current.steps + 1);
-      const newXp = prev.xp + 10;
-      
-      astroLessons[lessonId] = { ...current, steps: newSteps };
+      const newSteps = stepIndex !== undefined ? Math.max(current.steps, stepIndex + 1) : Math.min(maxSteps, current.steps + 1);
+      const isNewlyFinished = newSteps >= maxSteps && !current.read;
+      const addedXp = isNewlyFinished ? 25 : 5;
+      const newXp = prev.xp + addedXp;
+
+      astroLessons[lessonId] = { 
+        ...current, 
+        steps: newSteps,
+        read: current.read || isNewlyFinished
+      };
 
       const newEvolutions: EvolutionEntry[] = [...(prev.evolutions || [])];
-      if (newSteps === maxSteps && current.steps < maxSteps) {
-        showToast('🎯 ¡Test de Astro desbloqueado!');
+      if (isNewlyFinished) {
+        showToast(`📖 ¡Lección ${lessonId} leída! (+25 XP y Test desbloqueado)`);
         newEvolutions.unshift({
           id: 'evo_' + Date.now(),
           timestamp: Date.now(),
-          dateStr: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }),
+          dateStr: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
           type: 'lesson_finished',
-          title: `Astro - Lección ${lessonId}: ${lessonDef?.title || 'Completada'}`,
-          xpEarned: 10,
-          experienceId: 'astro'
+          title: `📖 Cosmos 3D - Lección ${lessonId}: ${lessonDef?.title || 'Completada'}`,
+          xpEarned: 25,
+          experienceId: 'astro',
+          details: `Completada lectura de ${maxSteps} pasos conceptuales`
         });
       }
 
       const updated: UserData = {
         ...prev,
         xp: newXp,
+        weeklyActivity: updateWeeklyActivityToday(prev.weeklyActivity),
         lessons: astroLessons,
         experiences: {
           ...prev.experiences,
           astro: {
-            xp: (prev.experiences?.astro?.xp || 0) + 10,
+            xp: ((prev.experiences?.astro?.xp || 0) + addedXp),
             lessons: astroLessons
           }
         },
@@ -239,7 +323,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const pct = score / total;
     const stars = pct >= 0.99 ? 3 : pct >= 0.6 ? 2 : 1;
     const xpGained = score * 15 + 10;
-
+    const lessonDef = LESSONS.find((l) => l.id === lessonId);
     let isFirstCompletion = false;
 
     setUserData((prev) => {
@@ -248,20 +332,23 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       isFirstCompletion = !current.testDone;
 
       const newStars = Math.max(current.stars || 0, stars);
-      astroLessons[lessonId] = { ...current, testDone: true, stars: newStars };
+      astroLessons[lessonId] = { ...current, testDone: true, stars: newStars, score };
 
-      const lessonDef = LESSONS.find((l) => l.id === lessonId);
+      const starsEmoji = stars === 3 ? '⭐⭐⭐' : stars === 2 ? '⭐⭐' : '⭐';
+      const evolutionTitle = `⭐ Superado Test de ${lessonDef?.title || `Lección ${lessonId}`} con ${stars} ${stars === 1 ? 'estrella' : 'estrellas'} (+${xpGained} XP)`;
+
       const newEvolutions: EvolutionEntry[] = [
         {
           id: 'evo_' + Date.now(),
           timestamp: Date.now(),
           dateStr: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
           type: 'test_completed',
-          title: `Astro - Test ${lessonId}: ${lessonDef?.title || ''}`,
+          title: evolutionTitle,
           score: `${score}/${total}`,
           stars,
           xpEarned: xpGained,
-          experienceId: 'astro'
+          experienceId: 'astro',
+          details: `Aciertos: ${score} de ${total} preguntas (${Math.round(pct * 100)}%)`
         },
         ...(prev.evolutions || [])
       ];
@@ -269,6 +356,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const updated: UserData = {
         ...prev,
         xp: prev.xp + xpGained,
+        weeklyActivity: updateWeeklyActivityToday(prev.weeklyActivity),
         lessons: astroLessons,
         experiences: {
           ...prev.experiences,
@@ -280,6 +368,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         evolutions: newEvolutions
       };
 
+      showToast(`🎉 ¡${starsEmoji} Test superado! (+${xpGained} XP)`);
       persistData(updated);
       return updated;
     });
@@ -302,15 +391,19 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       claimed[id] = true;
       const newXp = prev.xp + xpReward;
 
+      const retos = getRetosList();
+      const retoDef = retos.find(r => r.id === id);
+
       const newEvolutions: EvolutionEntry[] = [
         {
           id: 'evo_' + Date.now(),
           timestamp: Date.now(),
           dateStr: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
           type: 'reto_claimed',
-          title: `Reto Reclamado: +${xpReward} XP`,
+          title: `🏆 Reto Reclamado: ${retoDef?.title || 'Misión Cumplida'} (+${xpReward} XP)`,
           xpEarned: xpReward,
-          experienceId: 'astro'
+          experienceId: 'astro',
+          details: retoDef?.desc || 'Reto de gamificación'
         },
         ...(prev.evolutions || [])
       ];
@@ -318,11 +411,12 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       const updated: UserData = {
         ...prev,
         xp: newXp,
+        weeklyActivity: updateWeeklyActivityToday(prev.weeklyActivity),
         claimedRetos: claimed,
         evolutions: newEvolutions
       };
 
-      showToast(`🎉 ¡Has reclamado +${xpReward} XP de tu reto!`);
+      showToast(`🎉 ¡Has reclamado +${xpReward} XP del reto "${retoDef?.title || ''}"!`);
       persistData(updated);
       return updated;
     });
@@ -334,46 +428,11 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const claimed = userData.claimedRetos || {};
 
     const RETOS: Omit<RetoItem, 'claimed'>[] = [
-      {
-        id: 'r1',
-        icon: '🔥',
-        title: 'Racha de Fuego',
-        desc: 'Alcanza o mantén 3 días seguidos de racha.',
-        xp: 50,
-        cond: userData.streak >= 3
-      },
-      {
-        id: 'r2',
-        icon: '⭐',
-        title: 'Dominio de Artemis',
-        desc: 'Consigue 3 estrellas en el Test de la Lección 1.',
-        xp: 100,
-        cond: astroLessons[1]?.stars === 3
-      },
-      {
-        id: 'r3',
-        icon: '📖',
-        title: 'Lectura Cósmica',
-        desc: 'Completa al menos 2 lecciones de astrofísica.',
-        xp: 75,
-        cond: lessonValues.filter((l) => l.testDone || (l.steps && l.steps >= 3)).length >= 2
-      },
-      {
-        id: 'r4',
-        icon: '🚀',
-        title: 'Explorador 3D NASA',
-        desc: 'Realiza cualquier test o lección en AstroLingo 3D.',
-        xp: 120,
-        cond: lessonValues.some((l) => l.testDone || l.steps > 0)
-      },
-      {
-        id: 'r5',
-        icon: '🏆',
-        title: 'Examen Perfecto',
-        desc: 'Supera cualquier test con el 100% de aciertos (3 estrellas).',
-        xp: 150,
-        cond: lessonValues.some((l) => l.stars === 3)
-      }
+      { id: 'r1', icon: '🔥', title: 'Racha de Fuego', desc: 'Alcanza o mantén 3 días seguidos de racha.', xp: 50, cond: userData.streak >= 3 },
+      { id: 'r2', icon: '⭐', title: 'Dominio de Artemis', desc: 'Consigue 3 estrellas en el Test de la Lección 1.', xp: 100, cond: astroLessons[1]?.stars === 3 },
+      { id: 'r3', icon: '📖', title: 'Lectura Cósmica', desc: 'Completa al menos 2 lecciones de astrofísica.', xp: 75, cond: lessonValues.filter((l) => l.testDone || (l.steps && l.steps >= 3)).length >= 2 },
+      { id: 'r4', icon: '🚀', title: 'Explorador 3D NASA', desc: 'Realiza cualquier test o lección en AstroLingo 3D.', xp: 120, cond: lessonValues.some((l) => l.testDone || l.steps > 0) },
+      { id: 'r5', icon: '🏆', title: 'Examen Perfecto', desc: 'Supera cualquier test con el 100% de aciertos (3 estrellas).', xp: 150, cond: lessonValues.some((l) => l.stars === 3) }
     ];
 
     return RETOS.map((r) => ({
@@ -382,18 +441,93 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   };
 
-  const addXP = useCallback((amount: number, _expId: string = 'general', reason?: string) => {
+  // addXP MULTI-EXPERIENCIA REAL CON REPARTO DE XP Y EVOLUCIONES DINÁMICAS
+  const addXP = useCallback((amount: number, expId: ExperienceId | string = 'astro', reason?: string) => {
+    const cleanExpId = sanitizeExperienceKey(expId) as ExperienceId;
+
     setUserData((prev) => {
       const newXp = prev.xp + amount;
+      const currentExperiences = prev.experiences || {};
+      const expData = currentExperiences[cleanExpId] || { xp: 0, lessons: {} };
+      const updatedExpXp = (expData.xp || 0) + amount;
+
+      const EXP_NAMES: Record<string, string> = {
+        astro: 'Cosmos 3D',
+        school: 'Escuela IA',
+        languages: 'Idiomas',
+        verify: 'Criterio',
+        'ai-lab': 'IA Lab'
+      };
+
+      const expLabel = EXP_NAMES[cleanExpId] || cleanExpId;
+      const evoTitle = reason ? `✨ [${expLabel}] ${reason} (+${amount} XP)` : `✨ [${expLabel}] Progreso completado (+${amount} XP)`;
+
+      const newEvolutions: EvolutionEntry[] = [
+        {
+          id: 'evo_' + Date.now(),
+          timestamp: Date.now(),
+          dateStr: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
+          type: 'experience_activity',
+          title: evoTitle,
+          xpEarned: amount,
+          experienceId: cleanExpId,
+          details: reason || 'Actividad formativa'
+        },
+        ...(prev.evolutions || [])
+      ];
+
       const updated: UserData = {
         ...prev,
-        xp: newXp
+        xp: newXp,
+        weeklyActivity: updateWeeklyActivityToday(prev.weeklyActivity),
+        experiences: {
+          ...currentExperiences,
+          [cleanExpId]: {
+            ...expData,
+            xp: updatedExpXp
+          }
+        },
+        evolutions: newEvolutions
       };
+
       persistData(updated);
       if (reason) showToast(`+${amount} XP: ${reason}`);
       return updated;
     });
-  }, [showToast]);
+  }, [persistData, showToast]);
+
+  const addCustomEvolution = useCallback((entry: Omit<EvolutionEntry, 'id' | 'timestamp' | 'dateStr'>) => {
+    setUserData((prev) => {
+      const newEvolutions: EvolutionEntry[] = [
+        {
+          ...entry,
+          id: 'evo_' + Date.now(),
+          timestamp: Date.now(),
+          dateStr: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+        },
+        ...(prev.evolutions || [])
+      ];
+      const updated: UserData = { ...prev, evolutions: newEvolutions };
+      persistData(updated);
+      return updated;
+    });
+  }, [persistData]);
+
+  const saveChildProfileData = useCallback((profile: Record<string, any>) => {
+    setUserData((prev) => {
+      const updated: UserData = { ...prev, childProfile: profile };
+      persistData(updated);
+      return updated;
+    });
+  }, [persistData]);
+
+  const saveMascotData = useCallback((mascot: Record<string, any>) => {
+    setUserData((prev) => {
+      const updated: UserData = { ...prev, mascotConfig: mascot };
+      persistData(updated);
+      return updated;
+    });
+  }, [persistData]);
 
   const resetProgress = () => {
     const empty: UserData = JSON.parse(JSON.stringify(DEFAULT_USER_DATA));
@@ -405,8 +539,15 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   return (
     <ProgressContext.Provider value={{
       userData,
+      adminBypass,
+      toggleAdminBypass,
+      adminSimulatedAge,
+      setAdminSimulatedAge,
+      effectiveAge,
       lessonProg,
       lessonUnlocked,
+      isLessonUnlocked,
+      isTestUnlocked,
       completeStep,
       finishTest,
       totalStars,
@@ -415,6 +556,9 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       getRankInfo,
       getRetosList,
       addXP,
+      addCustomEvolution,
+      saveChildProfileData,
+      saveMascotData,
       toastMsg,
       showToast,
       hideToast,
@@ -430,3 +574,4 @@ export const useProgress = () => {
   if (!context) throw new Error("useProgress debe usarse dentro de ProgressProvider");
   return context;
 };
+

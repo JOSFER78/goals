@@ -1,0 +1,27 @@
+{
+  "slug": "sol",
+  "name": "El Sol (NASA SDO 4K AIA)",
+  "category": "Astrofísica Solar",
+  "description": "Imágenes espectrales reales capturadas por el Solar Dynamics Observatory (SDO) en AIA 304 Å y AIA 171 Å.",
+  "modelUrl": "",
+  "downloadDate": "2026-08-14T15:30:13.063Z",
+  "imagesCount": 2,
+  "images": [
+    {
+      "id": "view_01_aia304",
+      "title": "SDO AIA 304 Å - Plasma Cromosférico",
+      "url": "https://images-assets.nasa.gov/image/GSFC_20171208_Archive_e001435/GSFC_20171208_Archive_e001435~orig.jpg",
+      "source": "NASA Goddard Space Flight Center",
+      "localPath": "/downloads/datasets/sol/images/view_01_aia304.jpg",
+      "sizeBytes": 949475
+    },
+    {
+      "id": "view_02_aia171",
+      "title": "SDO AIA 171 Å - Bucles Coronales de Plasma",
+      "url": "https://images-assets.nasa.gov/image/GSFC_20171208_Archive_e000494/GSFC_20171208_Archive_e000494~orig.jpg",
+      "source": "NASA SDO Team",
+      "localPath": "/downloads/datasets/sol/images/view_02_aia171.jpg",
+      "sizeBytes": 1434434
+    }
+  ]
+}

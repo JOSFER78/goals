@@ -38,7 +38,12 @@ export interface LessonStep {
   text: string;
   wow: string;
   now?: string;
-  scene: string;
+  scene?: string;
+  photo?: {
+    url: string;
+    caption?: string;
+    credit?: string;
+  };
 }
 
 export interface ChoiceQuestion {
@@ -46,6 +51,9 @@ export interface ChoiceQuestion {
   question: string;
   options: string[];
   answer: number;
+  explanation?: string;
+  photo?: string;
+  xp?: number;
 }
 
 export interface OrderQuestion {
@@ -53,6 +61,9 @@ export interface OrderQuestion {
   question: string;
   items: string[];
   correctOrder: string[];
+  explanation?: string;
+  photo?: string;
+  xp?: number;
 }
 
 export type Question = ChoiceQuestion | OrderQuestion;

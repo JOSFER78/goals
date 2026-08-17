@@ -1,0 +1,20 @@
+{
+  "prompt": "Sistema Nervioso",
+  "domain": "ANATOMY",
+  "shader_type": "biological_translucent_synapse",
+  "scientific_summary": {
+    "title": "Sistema nervioso",
+    "description": "sistema vital para controlar las funciones corporales",
+    "extract": "El sistema nervioso es un conjunto de células especializadas en la conducción de señales eléctricas, está formado por neuronas y células gliales. Las neuronas reciben, procesan y transmiten la información que de esta forma puede viajar de un lugar a otro del organismo. La mayor parte de los animales pluricelulares tienen sistemas nerviosos con funciones básicas similares, aunque con un grado de complejidad muy variable. Únicamente carecen de él los animales que no tienen tejidos y órganos bien diferenciados, como los poríferos (esponjas), placozoos y mesozoos.",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Chemical_synapse_schema_cropped_es.jpg/330px-Chemical_synapse_schema_cropped_es.jpg?utm_source=es.wikipedia.org&utm_campaign=api&utm_content=thumbnail"
+  },
+  "dataset_images": [],
+  "threejs_config": {
+    "camera_fov": 45,
+    "orbit_damping": 0.05,
+    "min_zoom_distance": 0.6,
+    "enable_xray": true,
+    "enable_volumetric_bloom": true,
+    "enable_particles": true
+  }
+}

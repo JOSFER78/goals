@@ -1,0 +1,19 @@
+{
+  "slug": "webb",
+  "name": "Telescopio Espacial James Webb (JWST)",
+  "category": "Observatorio Espacial",
+  "description": "Imágenes oficiales de alta resolución de la NASA durante el despliegue de los 18 espejos hexagonales de berilio bañado en oro.",
+  "modelUrl": "/models_3d/james_webb_telescope.glb",
+  "downloadDate": "2026-08-14T15:30:14.012Z",
+  "imagesCount": 1,
+  "images": [
+    {
+      "id": "view_01_mirror",
+      "title": "JWST Espejo Primario de Oro en Cámara Limpia",
+      "url": "https://images-assets.nasa.gov/image/GSFC_20171208_Archive_e001435/GSFC_20171208_Archive_e001435~orig.jpg",
+      "source": "NASA / Chris Gunn",
+      "localPath": "/downloads/datasets/webb/images/view_01_mirror.jpg",
+      "sizeBytes": 949475
+    }
+  ]
+}

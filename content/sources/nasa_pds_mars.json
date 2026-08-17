@@ -1,0 +1,15 @@
+{
+  "sourceId": "src_nasa_mars_pds",
+  "name": "NASA Planetary Data System (PDS) - Mars Geosciences & Atmospheric Node",
+  "shortName": "NASA PDS Mars",
+  "url": "https://pds-geosciences.wustl.edu/missions/mro/",
+  "authority": "space_agency",
+  "organization": "NASA Jet Propulsion Laboratory & Washington University in St. Louis",
+  "country": "USA",
+  "dateAccessed": "2026-08-14",
+  "version": "2026.2",
+  "doiOrCitation": "10.17189/1519495",
+  "description": "Repositorio primario revisado por pares de datos geocientíficos, espectrometría CRISM y perfiles atmosféricos MCS de las misiones MRO, Curiosity y Perseverance.",
+  "isVerified": true,
+  "lastVerifiedAt": 1786685000000
+}

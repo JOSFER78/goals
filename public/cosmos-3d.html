@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
 <title>GOALS 3D Cosmos - Aprende, Explora y Domina el Universo</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -35,22 +36,28 @@
   #obj-panel{transform:translateY(105%);transition:transform .35s cubic-bezier(.4,0,.2,1);}
   #obj-panel.panel-open{transform:translateY(0)!important;}
   .neon-text{background:linear-gradient(90deg,#818cf8,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent;}
-  input{outline:none;}
-  #mini-holder canvas{width:100%!important;height:100%!important;display:block;touch-action:none;}
+  html.is-embedded #astrolingo-internal-header,
+  body.is-embedded #astrolingo-internal-header,
+  .is-embedded #astrolingo-internal-header,
+  html.is-embedded #cookie-banner,
+  body.is-embedded #cookie-banner,
+  .is-embedded #cookie-banner {
+    display: none !important;
+  }
 </style>
+<script>
+  if (window.self !== window.top || window.location.search.includes('embedded')) {
+    document.documentElement.classList.add('is-embedded');
+  }
+</script>
 </head>
 <body class="h-screen w-screen overflow-hidden bg-slate-950">
 <div id="star-container" class="fixed inset-0 z-0 pointer-events-none"></div>
 
 <div id="app" class="relative z-10 flex flex-col h-screen max-h-screen overflow-hidden w-full bg-slate-950 transition-all duration-300">
 
-  <!-- HEADER SUPERIOR RESPONSIVO & LIMPIO (Oculto automáticamente cuando se carga en el iframe de GOALS) -->
+  <!-- HEADER SUPERIOR RESPONSIVO & LIMPIO (Oculto cuando está embebido en GOALS) -->
   <header id="astrolingo-internal-header" class="px-4 sm:px-6 lg:px-8 py-3.5 flex justify-between items-center border-b border-slate-800 bg-slate-950/90 z-20 sticky top-0">
-    <script>
-      if (window.parent !== window) {
-        document.getElementById('astrolingo-internal-header')?.classList.add('hidden');
-      }
-    </script>
     <div class="flex items-center gap-2.5">
       <!-- GOALS ICON AND BUTTON -->
       <button onclick="window.parent.postMessage('back-to-goals', '*')" title="Volver al Inicio de GOALS" class="flex items-center gap-2 px-2 py-1.5 sm:px-3 sm:mr-3 rounded-xl bg-slate-900 border border-slate-700 hover:border-emerald-500/50 text-xs font-bold text-slate-300 hover:text-white transition-all shadow-sm group">
@@ -91,6 +98,99 @@
     </div>
 
 
+
+    <!-- ================= HUD ESPECÍFICO ESCENA 1/12: LA TIERRA Y SATÉLITES NASA ================= -->
+
+    <!-- INSPECTOR TELEMÉTRICO DE SATÉLITES Y CUERPOS CELESTES (LATERAL DERECHO) -->
+    <div id="earth-inspector-hud" class="absolute top-20 right-3 sm:right-4 z-10 hidden pointer-events-auto max-w-[240px] sm:max-w-xs glass p-3 sm:p-4 rounded-2xl border border-indigo-500/40 bg-slate-950/90 backdrop-blur-xl shadow-2xl transition-all duration-300">
+      <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-2">
+        <div class="flex items-center gap-1.5">
+          <span id="earth-ins-icon" class="text-base">🛰️</span>
+          <span id="earth-ins-name" class="font-display font-bold text-xs sm:text-sm text-white truncate max-w-[150px]">Estación Espacial (ISS)</span>
+        </div>
+        <button onclick="closeEarthInspector()" class="text-slate-400 hover:text-white text-xs p-1">✖</button>
+      </div>
+      <div class="space-y-2 text-xs">
+        <div class="text-[11px] text-cyan-300 font-semibold" id="earth-ins-tagline">Laboratorio Científico en LEO</div>
+        <p class="text-slate-300 text-[11px] leading-relaxed line-clamp-3" id="earth-ins-desc">Habitada desde el año 2000 a 408 km de altitud.</p>
+        
+        <div class="grid grid-cols-2 gap-1.5 bg-slate-900/80 p-2 rounded-xl border border-slate-800 font-mono text-[10px]">
+          <div><span class="text-slate-400 block">Altitud / Dist:</span><span id="earth-ins-alt" class="font-bold text-white">408 km</span></div>
+          <div><span class="text-slate-400 block">Velocidad:</span><span id="earth-ins-vel" class="font-bold text-emerald-400">7,66 km/s</span></div>
+          <div><span class="text-slate-400 block">Periodo:</span><span id="earth-ins-period" class="font-bold text-amber-300">92,7 min</span></div>
+          <div><span class="text-slate-400 block">Inclinación:</span><span id="earth-ins-inc" class="font-bold text-indigo-300">51,6°</span></div>
+        </div>
+
+        <div id="earth-ins-actions" class="flex flex-col gap-1 pt-1">
+          <button id="earth-ins-track-btn" onclick="trackSelectedEntity()" class="w-full py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow transition-all active:scale-95 flex items-center justify-center gap-1">
+            <span>🔭 Fijar Cámara</span>
+          </button>
+          <button id="earth-ins-farside-btn" onclick="toggleEarthMoonFarSide()" class="hidden w-full py-1.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-xs shadow transition-all active:scale-95 flex items-center justify-center gap-1">
+            <span>🔄 Girar a Cara Oculta</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTROLES INFERIORES ESCENA 1 (PRESETS + SLIDER DE ESCALA REAL 1:1) -->
+    <div id="earth-controls-hud" class="absolute bottom-20 inset-x-3 sm:inset-x-6 z-20 hidden pointer-events-auto max-w-2xl mx-auto glass p-2.5 sm:p-3.5 rounded-2xl border border-cyan-500/30 bg-slate-950/95 backdrop-blur-xl shadow-2xl flex flex-col gap-2.5 transition-all duration-300">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+          <span class="text-[9px] font-extrabold uppercase text-slate-400 shrink-0">Enfoque:</span>
+          <button onclick="focusEarthTarget('earth')" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 text-[10px] font-bold shrink-0 border border-slate-800 hover:border-cyan-500/40">🌍 Tierra</button>
+          <button onclick="focusEarthTarget('iss')" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-emerald-300 text-[10px] font-bold shrink-0 border border-slate-800 hover:border-emerald-500/40">🛰️ ISS</button>
+          <button onclick="focusEarthTarget('hubble')" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-cyan-300 text-[10px] font-bold shrink-0 border border-slate-800 hover:border-cyan-500/40">🔭 Hubble</button>
+          <button onclick="focusEarthTarget('landsat')" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-amber-300 text-[10px] font-bold shrink-0 border border-slate-800 hover:border-amber-500/40">📡 Landsat</button>
+          <button onclick="focusEarthTarget('moon')" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-200 text-[10px] font-bold shrink-0 border border-slate-800 hover:border-slate-500/40">🌕 Luna</button>
+          <button onclick="focusEarthTarget('jwst')" class="px-2 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-rose-300 text-[10px] font-bold shrink-0 border border-slate-800 hover:border-rose-500/40">🌌 L2 JWST</button>
+        </div>
+        
+        <div class="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 shrink-0">
+          <button onclick="setSimSpeed(1.0)" class="speed-btn px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-600 text-white">1x</button>
+          <button onclick="setSimSpeed(5.0)" class="speed-btn px-2 py-0.5 rounded text-[10px] font-extrabold text-slate-400 hover:text-white">5x</button>
+          <button onclick="setSimSpeed(20.0)" class="speed-btn px-2 py-0.5 rounded text-[10px] font-extrabold text-slate-400 hover:text-white">20x</button>
+        </div>
+      </div>
+
+      <!-- SLIDER INTERACTIVO DE ESCALA REAL 1:1 -->
+      <div class="flex flex-col gap-1 pt-1 border-t border-white/10">
+        <div class="flex justify-between items-center text-[10px] font-bold">
+          <span class="text-slate-300 flex items-center gap-1">📏 Escala Tierra-Luna: <span id="earth-scale-label" class="text-cyan-300 font-mono">Didáctica (Compacta)</span></span>
+          <span id="earth-scale-km" class="text-amber-300 font-mono">384.400 km (~30 Tierras)</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-[9px] text-slate-400 font-bold">Didáctica</span>
+          <input id="earth-scale-slider" type="range" min="0" max="1" step="0.01" value="0" oninput="onEarthScaleChange(this.value)" class="flex-1 h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+          <span class="text-[9px] text-cyan-300 font-bold">Real 1:1</span>
+        </div>
+      </div>
+
+      <!-- GUÍA DE NAVEGACIÓN Y GESTOS -->
+      <div class="flex items-center justify-between text-[8px] text-slate-400 font-mono pt-0.5 border-t border-white/5">
+        <span>🖐️ <strong>Móvil:</strong> 1 dedo rota • 2 dedos para Zoom & Moverse</span>
+        <span class="hidden sm:inline">⌨️ <strong>PC:</strong> Mantén <kbd class="px-1 py-0.5 rounded bg-slate-800 text-cyan-300 border border-slate-700">Espacio</kbd> + Arrastra para moverte</span>
+      </div>
+    </div>
+
+    <!-- MODAL DE MICRO-RETO / TEST FORMATIVO DE ESCENA 1 -->
+    <div id="earth-quiz-modal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md hidden flex items-center justify-center p-4">
+      <div class="max-w-md w-full glass p-5 sm:p-6 rounded-3xl border border-cyan-500/40 bg-slate-950/95 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🎓</span>
+            <div>
+              <h3 class="font-display font-bold text-lg text-white">Desafío: Guardián Terrestre</h3>
+              <p class="text-xs text-cyan-300">Escena 1/12 • Astrofísica NASA</p>
+            </div>
+          </div>
+          <button onclick="closeEarthQuiz()" class="text-slate-400 hover:text-white text-sm">✖</button>
+        </div>
+
+        <div id="earth-quiz-content" class="space-y-3 text-xs">
+          <!-- Quiz step loaded dynamically -->
+        </div>
+      </div>
+    </div>
 
     <!-- TARJETA TELEMÉTRICA FLOTANTE (SUPERIOR IZQUIERDA) -->
     <div id="telemetry-card" class="absolute top-20 left-3 sm:left-4 z-10 hidden pointer-events-auto max-w-[210px] sm:max-w-xs glass p-2.5 sm:p-3 rounded-2xl border border-cyan-500/30 bg-slate-950/85 backdrop-blur-md shadow-2xl transition-all duration-300">
@@ -372,7 +472,7 @@ if(firebaseReady){try{firebase.initializeApp(FIREBASE_CONFIG);fbAuth=firebase.au
 
 /* ================= ESTADO & AVATARES ================= */
 const AVATARS = ['👨‍🚀', '👩‍🚀', '👽', '🚀', '🛰️', '🪐', '☄️', '🛸', '🌌', '⭐'];
-let state={view:'home',tab:'home',xp:0,streak:1,lastDay:null,lessons:{},avatar:'👨‍🚀',claimedRetos:{}};
+let state={view:'home',tab:'explore',xp:0,streak:1,lastDay:null,lessons:{},avatar:'👨‍🚀',claimedRetos:{}};
 let quiz=null;
 function lessonProg(id){ if(!state.lessons[id])state.lessons[id]={read:false,testDone:false,stars:0}; return state.lessons[id]; }
 const lessonUnlocked=id=>id===1||lessonProg(id-1).testDone;
@@ -590,24 +690,74 @@ window.closeGoogleGuestModal = function(){
 
 
 /* ================= LECCIONES ================= */
+const REAL_PHOTOS = {
+  earthrise_apollo8: {
+    url: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=1200&q=80',
+    credit: 'NASA / William Anders (Apolo 8)',
+    caption: 'Fotografía original "Earthrise" (Salida de la Tierra) tomada en órbita lunar.'
+  },
+  apollo11_moon: {
+    url: 'https://images.unsplash.com/photo-1522030299830-16b8d3d049fe?auto=format&fit=crop&w=1200&q=80',
+    credit: 'NASA / Neil Armstrong (Apolo 11)',
+    caption: 'Superficie y regolito lunar en el Mar de la Tranquilidad.'
+  },
+  artemis_rocket: {
+    url: 'https://images.unsplash.com/photo-1517976487502-d7e0ee845e11?auto=format&fit=crop&w=1200&q=80',
+    credit: 'NASA / Artemis Program',
+    caption: 'El megacohete SLS y la nave espacial Orión del programa Artemis en Cabo Cañaveral.'
+  },
+  iss_orbit: {
+    url: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80',
+    credit: 'NASA / Roscosmos / ESA',
+    caption: 'La Tierra y su atmósfera azul vista desde la Estación Espacial Internacional (ISS).'
+  },
+  hubble_space: {
+    url: 'https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1200&q=80',
+    credit: 'NASA / ESA / Hubble',
+    caption: 'Fotografía en espacio profundo tomada por el Telescopio Espacial Hubble.'
+  },
+  landsat_earth: {
+    url: 'https://images.unsplash.com/photo-1541185933-ef5d8ed016c2?auto=format&fit=crop&w=1200&q=80',
+    credit: 'NASA Earth Observatory / USGS',
+    caption: 'Observación satelital multiespectral de la superficie terrestre.'
+  }
+};
+
 const HERO={
- moon:'https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1e1f4b306-4777-4b8a-bd3a-4de4161ab38a.png',
+ moon: REAL_PHOTOS.earthrise_apollo8.url,
  ship:'https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/19fd8d080-3345-4985-94ed-58e1accecc5d.png',
  voyager:'https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1664f2481-e2f3-4dce-8626-a3ddcb2d3232.png',
  bh:'https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/19e6dfd14-75aa-46f0-a8bb-6125c8d64644.png'
 };
+
 const LESSONS=[
- {id:1,title:"Objetivo Luna: Artemis",icon:"🌙",hero:HERO.moon,tag:"La nueva carrera lunar",
+ {id:1,title:"La Tierra, su Atmósfera y Satélites",icon:"🌍",hero:REAL_PHOTOS.earthrise_apollo8.url,tag:"Tema 1/12 • Nuestro Oasis Cósmico",
   steps:[
-   {icon:"🌙",t:"53 años después, volvemos",text:"En diciembre de 1972, el Apolo 17 despegó de la Luna y la humanidad no volvió a salir de la órbita baja… hasta ahora. El programa Artemis de NASA tiene un objetivo claro: volver a la Luna, y esta vez para quedarse.",wow:"Entre el último Apolo y Artemis II pasó más tiempo del que existe internet. ¡Déjalo ahí! 🤯",now:"Artemis II ya rodeó la Luna en abril de 2026 con 4 astronautas: el primer vuelo tripulado más allá de la órbita baja en 50 años.",scene:"earth-moon"},
-   {icon:"🧑🚀",t:"Artemis II: el ensayo con humanos",text:"Durante ~10 días, Reid Wiseman, Victor Glover, Christina Koch y Jeremy Hansen probaron la cápsula Orión alrededor de la Luna: soporte vital, pilotaje manual y una reentrada a casi 40.000 km/h, como una piedra que rebota en la atmósfera.",wow:"A esa velocidad, el escudo térmico de Orión soporta ~2.800 °C: más caliente que la superficie de algunas estrellas frías.",now:"El 6 de abril de 2026 la tripulación rodeó la cara oculta de la Luna y el 10 de abril amerizó sin problemas. Hasta el astronauta del Apolo 13, Jim Lovell, les mandó un saludo por radio.",scene:"earth-moon"},
-   {icon:"🐉",t:"La nueva carrera: ¿quién llega antes?",text:"Esta vez EE.UU. no está solo: China planea llevar taikonautas a la Luna en 2029-2030 con su cohete Larga Marcha 10, el módulo de aterrizaje Lanyue y la nave Mengzhou… y quiere construir una base permanente.",wow:"Por primera vez en la historia, dos superpotencias compiten por vivir en la Luna a la vez.",now:"China ya probó con éxito su nave lunar en 2026, y NASA 'pausó' la estación Gateway para centrar recursos en pisar la superficie cuanto antes.",scene:"moon"},
-   {icon:"🏗️",t:"Vivir en la Luna: el plan real",text:"La meta no es plantar una bandera: es construir. El polo sur lunar tiene hielo de agua en cráteres en sombra (agua = oxígeno + combustible). Landers reutilizables, reactores nucleares compactos y la Luna como banco de pruebas para Marte.",wow:"Una noche lunar dura 14 días terrestres y baja a -170 °C: sin energía, no sobrevives ni a la primera noche.",now:"Artemis III (prueba tripulada en órbita terrestre) apunta a finales de 2027 y Artemis IV a principios de 2028: NASA quiere cadencia de misiones como nunca antes.",scene:"moon"}],
+   {icon:"🌍",t:"1. La Canica Azul y su Escudo Protector",photo:REAL_PHOTOS.earthrise_apollo8,
+    text:"A 150 millones de kilómetros del Sol, la Tierra es el único planeta conocido con vida. Su atmósfera tiene un grosor finísimo de apenas 100 km (la Línea de Kármán). Está compuesta en un 78% de Nitrógeno y un 21% de Oxígeno: una mezcla que frena meteoritos, absorbe la radiación ultravioleta del Sol y retiene el calor justo para que tengamos agua líquida y océanos.",
+    wow:"Si la Tierra fuera del tamaño de una manzana, la atmósfera protectora que nos mantiene vivos sería más fina que la piel de la fruta. 🍎",
+    now:"En agosto de 2026, la red de satélites climáticos de la NASA y la ESA monitoriza en tiempo real la salud de la atmósfera, los océanos y los polos.",
+    scene:"earth-moon"},
+   {icon:"🛰️",t:"2. La Estación Espacial Internacional (ISS)",photo:REAL_PHOTOS.iss_orbit,
+    text:"A 418 kilómetros sobre nuestras cabezas vuela la Estación Espacial Internacional (ISS), un laboratorio del tamaño de un campo de fútbol que viaja a 27.600 km/h. A esa velocidad, da una vuelta completa a la Tierra cada 92 minutos: los astronautas ven 16 amaneceres y 16 atardeceres cada día.",
+    wow:"En la ISS los astronautas flotan no porque no haya gravedad (hay un 90% de la gravedad terrestre), sino porque están en 'caída libre continua' alrededor del planeta. 🧑‍🚀",
+    now:"La tripulación actual de la Expedición 71 realiza experimentos de cristalización de proteínas y botánica espacial para preparar futuros viajes a Marte.",
+    scene:"earth-moon"},
+   {icon:"🔭",t:"3. Telescopios y Satélites en Órbita Baja",photo:REAL_PHOTOS.hubble_space,
+    text:"Por encima de la atmósfera vuelan telescopios como el Hubble (a 535 km) y satélites de observación como Landsat 9 (a 705 km). Al estar libres de las nubes y turbulencias del aire terrestre, pueden fotografiar galaxias lejanas con una nitidez imposible desde tierra y escanear la vegetación del planeta.",
+    wow:"El Telescopio Hubble ha tomado más de 1,5 millones de observaciones y ha viajado más de 6.000 millones de kilómetros en su órbita circular.",
+    now:"El Hubble colabora estrechamente con el Telescopio James Webb combinando luz visible, ultravioleta e infrarroja para resolver enigmas cósmicos.",
+    scene:"earth-moon"},
+   {icon:"🌕",t:"4. La Luna y el Retorno Humano con Artemis",photo:REAL_PHOTOS.artemis_rocket,
+    text:"A 384.400 km de distancia (~30 Tierras alineadas), la Luna estabiliza la inclinación del eje de la Tierra (23,44°), permitiendo las cuatro estaciones del año y generando las mareas oceánicas. Con el programa Artemis de la NASA, la humanidad regresa a la Luna para establecer una base habitable permanente.",
+    wow:"La Luna se aleja lentamente de la Tierra a un ritmo de 3,8 centímetros por año, la misma velocidad a la que crecen tus uñas. 💅",
+    now:"Artemis II completó con éxito el sobrevuelo lunar tripulado con 4 astronautas, allanando el camino para que Artemis III pise el polo sur lunar.",
+    scene:"moon"}],
   test:[
-   {type:"choice",question:"¿Cuándo rodeó la Luna la misión tripulada Artemis II?",options:["Abril de 2026","En 1972","En 2022","En 2030"],answer:0},
-   {type:"choice",question:"¿Cuántos astronautas llevaba Artemis II?",options:["4","2","7","12"],answer:0},
-   {type:"order",question:"Ordena la historia lunar:",items:["Artemis II (tripulada)","Apolo 17","Artemis III (prueba)","Artemis I (sin tripulación)"],correctOrder:["Apolo 17","Artemis I (sin tripulación)","Artemis II (tripulada)","Artemis III (prueba)"]},
-   {type:"choice",question:"¿Qué país planea llevar taikonautas a la Luna hacia 2030?",options:["China","India","Rusia","Japón"],answer:0}]},
+   {type:"choice",photo:REAL_PHOTOS.earthrise_apollo8.url,question:"¿Cuáles son los dos gases principales que forman más del 99% de la atmósfera terrestre?",options:["Nitrógeno (78%) y Oxígeno (21%)","Dióxido de Carbono (80%) y Metano (19%)","Hidrógeno (75%) y Helio (24%)","Oxígeno (50%) y Vapor de Agua (50%)"],answer:0},
+   {type:"choice",photo:REAL_PHOTOS.iss_orbit.url,question:"¿A qué velocidad aproximada viaja la Estación Espacial Internacional (ISS) en órbita?",options:["~27.600 km/h (da una vuelta cada 92 minutos)","~1.000 km/h (como un avión comercial)","~100.000 km/h (velocidad de la luz)","100 km/h (como un coche)"],answer:0},
+   {type:"order",question:"Ordena estos objetos desde el MÁS CERCANO a la Tierra hasta el MÁS LEJANO:",items:["La Luna (384.400 km)","Telescopio Hubble (535 km)","Estación Espacial ISS (418 km)","Satélite Landsat 9 (705 km)"],correctOrder:["Estación Espacial ISS (418 km)","Telescopio Hubble (535 km)","Satélite Landsat 9 (705 km)","La Luna (384.400 km)"]},
+   {type:"choice",photo:REAL_PHOTOS.artemis_rocket.url,question:"¿Cuál de las siguientes afirmaciones sobre la Luna y las misiones Artemis es FALSA?",options:["La Luna no tiene ningún efecto en las mareas ni en el eje terrestre","Artemis busca establecer una presencia humana sostenible en la Luna","La Luna se encuentra a unos 384.400 km de la Tierra","En el polo sur lunar hay hielo de agua en cráteres en sombra"],answer:0}]},
  {id:2,title:"Starship: el cohete que lo cambia todo",icon:"🚀",hero:HERO.ship,tag:"124 m de acero inoxidable",
   steps:[
    {icon:"🏢",t:"El edificio que vuela",text:"Starship es el cohete más grande y potente jamás construido: ~124 metros de alto (un edificio de 40 pisos), 9 m de diámetro, y 33 motores que generan ~81.000 kN de empuje al despegar: el doble que el Saturno V de Apolo.",wow:"Su empuje al despegue equivale a ~8.000 coches deportivos acelerando a la vez. 🏎️",now:"La versión V3 ya vuela en 2026: más alta y potente que la V2, y su booster se atrapa en el aire con los 'chopsticks' de la torre.",scene:"starship"},
@@ -1106,44 +1256,84 @@ window.openLesson=function(id){
 function renderLessonStep(){
   const L=currentLesson,S=L.steps[currentStepIdx],total=L.steps.length;
   let html=`
-  <div class="space-y-4 pb-4">
-    <div class="flex items-center justify-between">
-      <button onclick="showTab('learn')" class="text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1">← Lecciones</button>
-      <div class="text-xs font-bold text-cyan-300 font-display font-bold">${L.icon} ${L.title}</div>
-      <span class="text-xs text-slate-400 font-bold">${currentStepIdx+1} / ${total}</span>
+  <div class="max-w-lg mx-auto space-y-3 pb-8">
+    <div class="flex items-center justify-between gap-2">
+      <button onclick="showTab('learn')" title="Volver al Catálogo" class="p-1.5 px-2.5 rounded-xl glass border border-white/10 text-xs font-bold text-slate-300 hover:text-white transition-all active:scale-95">←</button>
+      <div class="text-xs font-bold text-cyan-300 font-display flex items-center gap-1.5 truncate">
+        <span>${L.icon}</span> <span class="truncate">${L.title}</span>
+      </div>
+      <span class="text-xs text-slate-300 font-mono font-extrabold px-2.5 py-0.5 rounded-full bg-slate-900 border border-slate-700 shrink-0">${currentStepIdx+1}/${total}</span>
     </div>
-    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+
+    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
       <div class="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full progress-fill" style="width:${((currentStepIdx+1)/total)*100}%"></div>
     </div>`;
 
-  if(currentStepIdx===0&&L.hero){
-    html+=`<div class="rounded-2xl overflow-hidden border border-white/10 shadow-lg"><img src="${L.hero}" class="w-full h-44 object-cover"></div>`;
-  }
-  if(S.scene){
+  // FOTOGRAFÍA REAL OFICIAL DE LA NASA
+  if(S.photo && S.photo.url){
     html+=`
-    <div class="glass rounded-2xl p-2 border border-cyan-500/30">
-      <div id="mini-holder" class="w-full h-48 sm:h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden relative">
-        <div class="absolute bottom-2 left-2 z-10 pointer-events-none px-2 py-0.5 rounded-md glass text-[9px] font-extrabold text-cyan-200">🖱️ Arrastra en 3D</div>
+    <div class="glass rounded-2xl overflow-hidden border border-cyan-500/40 shadow-xl space-y-0">
+      <div class="relative w-full h-40 sm:h-52 bg-slate-950 overflow-hidden group">
+        <img src="${S.photo.url}" referrerpolicy="no-referrer" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="${S.t}">
+        <div class="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-slate-950/80 backdrop-blur-md border border-cyan-400/40 text-[9px] font-extrabold text-cyan-300 flex items-center gap-1.5 shadow">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span>FOTOGRAFÍA REAL NASA</span>
+        </div>
+        <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-transparent p-2.5 pt-4">
+          <p class="text-slate-200 text-[11px] font-medium leading-tight">${S.photo.caption || ''}</p>
+          <span class="text-[9px] text-cyan-300/80 font-mono mt-0.5 block">${S.photo.credit ? 'Crédito: ' + S.photo.credit : ''}</span>
+        </div>
       </div>
     </div>`;
+  } else if(currentStepIdx===0&&L.hero){
+    html+=`<div class="rounded-2xl overflow-hidden border border-white/10 shadow-lg"><img src="${L.hero}" class="w-full h-40 object-cover"></div>`;
   }
+
+  // TARJETA DE TEORÍA PEDAGÓGICA (6-15 AÑOS)
   html+=`
-    <div class="glass rounded-2xl p-4 space-y-3">
-      <div class="flex items-center gap-2">
-        <span class="text-2xl">${S.icon}</span>
-        <h3 class="font-display font-bold text-lg text-white">${S.t}</h3>
+    <div class="glass rounded-2xl p-4 sm:p-5 space-y-3 border border-white/15 shadow-xl bg-slate-900/90 backdrop-blur-xl">
+      <div class="flex items-center justify-between border-b border-white/10 pb-2">
+        <div class="flex items-center gap-2">
+          <span class="text-xl p-1.5 rounded-xl bg-slate-950 border border-slate-800">${S.icon}</span>
+          <h3 class="font-display font-bold text-sm sm:text-base text-white leading-tight">${S.t}</h3>
+        </div>
+        <button onclick="showTab('explore')" title="Ver en Mapa 3D" class="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold text-xs shadow transition-all active:scale-95">
+          <span>🌌 3D</span>
+        </button>
       </div>
-      <p class="text-sm text-slate-200 leading-relaxed">${S.text}</p>
-      ${S.wow?`<div class="bg-indigo-500/10 border border-indigo-400/30 rounded-xl p-3 text-xs text-indigo-200"><b>💡 Curiosidad:</b> ${S.wow}</div>`:''}
-      ${S.now?`<div class="bg-green-500/10 border border-green-400/30 rounded-xl p-3 text-xs text-green-200"><b>🔥 Agosto 2026:</b> ${S.now}</div>`:''}
+
+      <p class="text-xs sm:text-sm text-slate-100 leading-relaxed font-normal">${S.text}</p>
+
+      ${S.wow?`
+      <div class="bg-gradient-to-br from-indigo-950/60 to-purple-950/40 border border-indigo-500/40 rounded-xl p-2.5 sm:p-3 space-y-0.5 shadow-md">
+        <div class="flex items-center gap-1 text-[11px] font-bold text-indigo-300">
+          <span>💡</span> <span>Dato WOW 🤯</span>
+        </div>
+        <p class="text-xs text-indigo-100 leading-relaxed">${S.wow}</p>
+      </div>`:''}
+
+      ${S.now?`
+      <div class="bg-gradient-to-br from-cyan-950/60 to-slate-950 border border-cyan-500/40 rounded-xl p-2.5 sm:p-3 space-y-0.5 shadow-md">
+        <div class="flex items-center gap-1 text-[11px] font-bold text-cyan-300">
+          <span>🔥</span> <span>Agosto 2026: Actualidad Espacial</span>
+        </div>
+        <p class="text-xs text-slate-200 leading-relaxed font-mono">${S.now}</p>
+      </div>`:''}
+
+      <div class="sm:hidden pt-0.5">
+        <button onclick="showTab('explore')" class="w-full py-1.5 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow">
+          <span>🌌 Ver en Mapa 3D</span>
+        </button>
+      </div>
     </div>
-    <div class="flex gap-2 pt-2">
-      ${currentStepIdx>0?`<button onclick="prevStep()" class="flex-1 py-3 rounded-xl font-display font-bold text-sm glass border-b-4 border-black/40 btn-option">◀ Anterior</button>`:''}
-      <button onclick="nextStep()" class="flex-1 py-3 rounded-xl font-display font-bold text-sm uppercase tracking-wide btn-option btn-primary text-white shadow-[0_4px_0_#15803d]">${currentStepIdx<total-1?'Siguiente ▶':'Completar Lección 🚀'}</button>
+
+    <!-- BOTONERA DE NAVEGACIÓN ENTRE PASOS -->
+    <div class="flex gap-2.5 pt-1">
+      ${currentStepIdx>0?`<button onclick="prevStep()" class="flex-1 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm glass border border-slate-700 hover:bg-slate-800 text-slate-200 btn-option">◀ Anterior</button>`:''}
+      <button onclick="nextStep()" class="flex-1 py-2.5 rounded-xl font-display font-bold text-xs sm:text-sm uppercase tracking-wide btn-option btn-primary text-white shadow-[0_3px_0_#15803d]">${currentStepIdx<total-1?'Siguiente ▶':'Completar Lección 🚀'}</button>
     </div>
   </div>`;
   mainContent.innerHTML=html;
-  if(S.scene)setTimeout(()=>miniMount(S.scene),50);
 }
 window.nextStep=function(){
   if(currentStepIdx<currentLesson.steps.length-1){
@@ -1234,16 +1424,28 @@ function renderTestQuestion(){
   const Q=quiz[testIdx],total=quiz.length;
   selectedOption=null;
   let html=`
-  <div class="space-y-4 pb-4">
+  <div class="max-w-2xl mx-auto space-y-4 pb-12">
     <div class="flex items-center justify-between">
-      <span class="text-xs font-bold text-cyan-300 uppercase tracking-widest font-display">🎯 Test Final · Pregunta ${testIdx+1}/${total}</span>
-      <span class="text-xs text-slate-400 font-bold">${currentLesson.title}</span>
+      <span class="text-xs font-bold text-cyan-300 uppercase tracking-widest font-display flex items-center gap-1.5">
+        <span>🎯 Test de Verificación</span>
+        <span class="text-slate-400 font-mono">Pregunta ${testIdx+1}/${total}</span>
+      </span>
+      <span class="text-xs text-slate-300 font-bold">${currentLesson.title}</span>
     </div>
     <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
       <div class="bg-indigo-500 h-full progress-fill" style="width:${((testIdx+1)/total)*100}%"></div>
     </div>
-    <div class="glass rounded-2xl p-4">
-      <h3 class="font-display font-bold text-base text-white mb-4">${Q.question}</h3>`;
+    <div class="glass rounded-2xl p-5 sm:p-6 space-y-4 border border-white/15 shadow-2xl bg-slate-900/90 backdrop-blur-xl">`;
+
+  if(Q.photo){
+    html+=`
+    <div class="rounded-xl overflow-hidden border border-cyan-500/30 shadow-md relative h-40 bg-slate-950">
+      <img src="${Q.photo}" class="w-full h-full object-cover" alt="Fotografía Pregunta">
+      <div class="absolute top-2 left-2 px-2 py-0.5 rounded bg-slate-950/80 text-[9px] font-extrabold text-cyan-300 border border-cyan-400/30">FOTO REAL NASA</div>
+    </div>`;
+  }
+
+  html+=`<h3 class="font-display font-bold text-base sm:text-lg text-white leading-snug">${Q.question}</h3>`;
 
   if(Q.type==='choice'){
     html+=`<div class="space-y-2">`;
@@ -1980,52 +2182,139 @@ function getCountryInfo(lat, lon){
   };
 }
 
-/* ================= SATÉLITES REALES (MICRO-POINTS) ================= */
+/* ================= SATÉLITES REALES NASA & GUÍA PEDAGÓGICA (ESCENA 1/12) ================= */
 const SATELLITE_DATA = [
   {
     key: 'iss',
     name: 'Estación Espacial Internacional (ISS)',
     alt: '408 km',
-    radius: 2.15,
-    speedFactor: 0.2,
+    radius: 2.14,
+    speedFactor: 0.32,
+    inclination: 51.6,
+    color: 0x10b981,
     info: {
       icon: '🛰️',
       name: 'Estación Espacial Internacional (ISS)',
-      tagline: 'Laboratorio Científico en Órbita Baja (408 km)',
-      desc: 'Habitada de forma ininterrumpida desde el año 2000. Orbita la Tierra a 408 km de altitud a una velocidad de 27.600 km/h, completando 16 órbitas al día (un amanecer cada 90 minutos).',
-      stats: [['Altitud', '408 km'], ['Velocidad', '7,66 km/s']],
-      facts: ['Mide 109 metros de largo (el tamaño de un campo de fútbol).', 'En su interior conviven astronautas de NASA, ESA, JAXA, CSA y Roscosmos.', 'Es visible a simple vista desde el suelo como un punto brillante en movimiento.']
+      tagline: 'Laboratorio Científico en Órbita Baja LEO (408 km)',
+      desc: 'Habitada de forma ininterrumpida desde el año 2000. Orbita la Tierra a 408 km a una velocidad de 27.600 km/h (7,66 km/s), completando una vuelta cada 92,7 minutos (16 amaneceres al día).',
+      stats: [['Altitud', '408 km'], ['Velocidad', '7,66 km/s'], ['Periodo', '92,7 min'], ['Inclinación', '51,6°']],
+      facts: ['Mide 109 metros de largo (como un campo de fútbol).', 'En su interior conviven astronautas de NASA, ESA, JAXA, CSA y Roscosmos.', 'Es visible a simple vista desde la Tierra como una estrella fugaz constante brillante.']
     }
   },
   {
     key: 'hubble',
-    name: 'Telescopio Espacial Hubble',
+    name: 'Telescopio Espacial Hubble (HST)',
     alt: '535 km',
     radius: 2.22,
-    speedFactor: 0.15,
+    speedFactor: 0.28,
+    inclination: 28.5,
+    color: 0x06b6d4,
     info: {
       icon: '🔭',
       name: 'Telescopio Espacial Hubble',
-      tagline: 'Observatorio Óptico en Órbita (535 km)',
-      desc: 'Lanzado en 1990 a bordo del transbordador Discovery. Ha realizado más de 1,5 millones de observaciones, ayudando a determinar la edad exacta del universo (13.800 millones de años).',
-      stats: [['Lanzamiento', '1990'], ['Espejo', '2,4 metros']],
-      facts: ['Ha ayudado a descubrir la aceleración de la expansión del universo por la energía oscura.', 'Sus famosas fotografías de los "Pilares de la Creación" revolucionaron la divulgación astronómica.', 'Sigue plenamente operativo trabajando en equipo con el James Webb.']
+      tagline: 'Observatorio Óptico en Órbita LEO (535 km)',
+      desc: 'Lanzado en 1990 por la NASA a bordo del transbordador Discovery. Ha realizado más de 1,5 millones de observaciones científicas, determinando la edad del universo en 13.800 millones de años.',
+      stats: [['Altitud', '535 km'], ['Velocidad', '7,59 km/s'], ['Espejo', '2,4 metros'], ['Inclinación', '28,5°']],
+      facts: ['Ayudó a descubrir que la expansión del universo se está acelerando debido a la energía oscura.', 'Sus fotografías de los "Pilares de la Creación" revolucionaron la astrofísica mundial.', 'Trabaja activamente en conjunto con el James Webb.']
+    }
+  },
+  {
+    key: 'landsat',
+    name: 'Satélite de Observación Landsat 9',
+    alt: '705 km',
+    radius: 2.32,
+    speedFactor: 0.22,
+    inclination: 98.2, // Órbita polar heliosincrónica
+    color: 0xf59e0b,
+    info: {
+      icon: '📡',
+      name: 'Landsat 9 (NASA / USGS)',
+      tagline: 'Centinela de la Tierra en Órbita Polar (705 km)',
+      desc: 'Lanzado por la NASA y el USGS. Su órbita heliosincrónica polar a 705 km le permite escanear toda la superficie terrestre cada 16 días con sensores multiespectrales de alta resolución.',
+      stats: [['Altitud', '705 km'], ['Velocidad', '7,50 km/s'], ['Órbita', 'Heliosincrónica'], ['Inclinación', '98,2°']],
+      facts: ['Monitoriza en tiempo real la deforestación, glaciares, sequías e incendios forestales en todo el planeta.', 'Los datos de Landsat son 100% públicos y gratuitos para científicos de todo el mundo.', 'Es el programa satelital de observación de la Tierra más longevo de la historia (desde 1972).']
     }
   },
   {
     key: 'jwst',
     name: 'Telescopio James Webb (JWST)',
-    alt: '1,5 M km (L2)',
-    radius: 4.8,
-    speedFactor: 0.05,
+    alt: '1,5 M km (Lagrange L2)',
+    radius: 7.8, // En escala didáctica; ampliable a 32 en escala real
+    speedFactor: 0.04,
+    inclination: 5.0,
+    color: 0xfbbf24,
     info: {
       icon: '🌌',
       name: 'Telescopio Espacial James Webb (JWST)',
       tagline: 'Observatorio Infrarrojo de Primera Generación (Punto L2)',
-      desc: 'Ubicado en el punto de Lagrange L2 a 1,5 millones de km de la Tierra. Su espejo de berilio chapado en oro de 6,5 m detecta la luz infrarroja de las primeras galaxias nacidas tras el Big Bang.',
-      stats: [['Ubicación', 'Punto L2'], ['Espejo Dorado', '6,5 metros']],
-      facts: ['Opera a una temperatura criogénica de -233 °C gracias a su parasol de 5 capas de Kapton.', 'En 2026 confirmó a MoM-z14 como la galaxia más lejana del universo primigenio.', 'Analiza la atmósfera de exoplanetas lejanos buscando vapor de agua y dióxido de carbono.']
+      desc: 'Ubicado en el punto de equilibrio gravitatorio Lagrange L2 a 1,5 millones de km de la Tierra. Su espejo de berilio chapado en oro de 6,5 m detecta la luz infrarroja de las primeras galaxias del cosmos.',
+      stats: [['Ubicación', 'Lagrange L2 (1,5 M km)'], ['Espejo Dorado', '6,5 metros'], ['Temperatura', '-233 °C'], ['Parasol', '5 capas Kapton']],
+      facts: ['Opera a temperaturas criogénicas extremas (-233 °C) protegido por un escudo térmico del tamaño de una pista de tenis.', 'En 2026 confirmó galaxias nacidas solo 280 millones de años tras el Big Bang.', 'Analiza la atmósfera de exoplanetas lejanos buscando firmas biológicas de agua y CO₂.']
     }
+  }
+];
+
+const EARTH_STEPS = [
+  {
+    id: 0,
+    badge: 'Paso 1 de 4: Escudo Atmosférico',
+    title: 'La Canica Azul y su Escudo',
+    narrative: 'A 150 millones de km del Sol, la Tierra es nuestro oasis. Su atmósfera de apenas 100 km (Línea de Kármán) filtra la radiación cósmica y retiene el calor que permite los océanos líquidos.',
+    challengeText: 'Gira la Tierra para ubicar la línea del amanecer y comprobar el efecto de las luces nocturnas en las ciudades.',
+    actionLabel: '🌅 Enfoque Terminador Solar',
+    camPos: [0, 1.2, 5.8],
+    camTarget: [0, 0, 0]
+  },
+  {
+    id: 1,
+    badge: 'Paso 2 de 4: Órbita Baja (LEO)',
+    title: 'La Autopista Espacial en LEO',
+    narrative: 'A solo 400–700 km de altitud, la Estación Espacial Internacional (ISS), el Hubble y Landsat 9 viajan a más de 27.000 km/h: completan un giro al planeta cada 90 minutos.',
+    challengeText: 'Toca la ISS o el Hubble para fijar la cámara y observar la Tierra a 7,66 km por segundo.',
+    actionLabel: '🛰️ Enfoque Órbita ISS',
+    camPos: [1.6, 0.7, 2.9],
+    camTarget: [0, 0, 0]
+  },
+  {
+    id: 2,
+    badge: 'Paso 3 de 4: La Luna y Mareas',
+    title: 'La Luna y su Cara Oculta',
+    narrative: 'La Luna tiene 1/4 del diámetro terrestre y tarda 27,3 días en completar su órbita. Debido al bloqueo de marea gravitatorio, siempre muestra la misma cara hacia la Tierra.',
+    challengeText: 'Pulsa el botón de girar a la Cara Oculta para descubrir los cráteres que nunca se ven desde el suelo.',
+    actionLabel: '🌕 Explorar Cara Oculta',
+    camPos: [4.8, 1.0, 5.2],
+    camTarget: [6.2, 0.4, 0]
+  },
+  {
+    id: 3,
+    badge: 'Paso 4 de 4: Escala Real 1:1',
+    title: 'El Desafío de la Escala Real',
+    narrative: 'Para estudiar los astros en pantalla solemos mostrarlos juntos, pero en la realidad cabrían 30 Tierras alineadas entre nosotros y la Luna. ¡Desliza el control a Escala Real!',
+    challengeText: 'Supera el Test de Maestría Terrestre para consolidar tus conocimientos y ganar +100 XP.',
+    actionLabel: '🎓 Iniciar Test de Maestría (+100 XP)',
+    camPos: [0, 9.0, 22.0],
+    camTarget: [0, 0, 0]
+  }
+];
+
+const EARTH_QUIZ_DATA = [
+  {
+    q: '¿A qué velocidad viaja la Estación Espacial Internacional (ISS) en órbita baja (LEO)?',
+    options: ['A ~27.600 km/h (7,66 km/s)', 'A 1.000 km/h (velocidad del sonido)', 'A 300.000 km/s (velocidad de la luz)', 'Permanece completamente inmóvil'],
+    answer: 0,
+    explanation: 'La ISS vuela a 7,66 km/s (27.600 km/h) a 408 km de altitud, completando una vuelta al planeta cada 92,7 minutos.'
+  },
+  {
+    q: '¿Por qué desde la Tierra nunca podemos ver la "Cara Oculta" de la Luna a simple vista?',
+    options: ['Por el acoplamiento de marea: su rotación y traslación tardan exactamente 27,3 días', 'Porque la cara oculta no recibe nunca la luz del Sol', 'Porque los satélites de la NASA bloquean la visión', 'Porque la Luna no rota sobre su propio eje'],
+    answer: 0,
+    explanation: 'La gravedad terrestre frenó la rotación lunar hasta sincronizarla con su órbita (acoplamiento sincrónico), haciendo que siempre nos encare el mismo hemisferio.'
+  },
+  {
+    q: 'Si pusiéramos la distancia Tierra-Luna a escala real, ¿cuántas Tierras cabrían en medio?',
+    options: ['Aproximadamente 30 Tierras (384.400 km)', 'Solo 2 Tierras', 'Más de 10.000 Tierras', 'Ninguna, la Luna está pegada a la atmósfera'],
+    answer: 0,
+    explanation: 'Con un diámetro terrestre de 12.742 km y una distancia lunar de 384.400 km, cabrían unas 30 Tierras alineadas en ese espacio vacío.'
   }
 ];
 
@@ -2034,6 +2323,9 @@ let scene,camera,renderer,controls,clock,intro=null,updaters=[],journeyBuilt=fal
 let clickables=[];
 const raycaster=new THREE.Raycaster(),pointerV=new THREE.Vector2();let downPos=null;
 const TEX={};
+const textureLoader = new THREE.TextureLoader();
+textureLoader.crossOrigin = 'anonymous';
+
 function loadProcessed(url,fill){
   const cvs=document.createElement('canvas');const tex=new THREE.CanvasTexture(cvs);
   const img=new Image();img.crossOrigin='anonymous';
@@ -2044,90 +2336,34 @@ function loadProcessed(url,fill){
     tex.needsUpdate=true;};
   img.src=url;tex.colorSpace=THREE.SRGBColorSpace;return tex;
 }
+
 function loadTextures(){
-  TEX.earth=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1f8c38e10-0b48-4d2f-8d7b-3af6964d132c.png',[20,64,107]);
-  TEX.moon=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1f80076fd-5334-4647-8dbb-08153c607c71.png',null);
-  TEX.sun=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1a9cf4919-f919-4044-9f2a-d03b9fb4d5bd.png',[255,150,40]);
-  TEX.mars=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/15ce82c4a-59c7-4a8f-8dea-671c208d50e4.png',[110,58,32]);
-  TEX.jupiter=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1550971c8-4e80-48a3-89dc-afece31c7d2c.png',[200,160,110]);
-  TEX.saturn=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/143a458a2-b53b-493d-82a2-8172a65f7eef.png',[232,217,176]);
-  TEX.galaxy=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1f1319534-2cbf-4e73-8509-296a56757632.png',null);
-  TEX.nebula=loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/177f87097-1dc6-4249-b985-5b778e09a9c7.png',null);
-  TEX.earthNight=makeNightTexture();
-  TEX.clouds=makeCloudTexture();
-}
+  // 1. Texturas Satelitales Oficiales de la NASA (Alta Resolución 2K)
+  TEX.earth = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_atmos_2048.jpg');
+  TEX.earth.colorSpace = THREE.SRGBColorSpace;
 
-function makeNightTexture() {
-  const c = document.createElement('canvas');
-  c.width = 2048; c.height = 1024;
-  const x = c.getContext('2d');
-  x.fillStyle = '#01030a';
-  x.fillRect(0, 0, 2048, 1024);
+  TEX.earthNight = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_lights_2048.png');
+  TEX.earthNight.colorSpace = THREE.SRGBColorSpace;
 
-  const clusters = [
-    { x: 960, y: 300, r: 85, d: 240 },  // Europa
-    { x: 940, y: 350, r: 45, d: 160 },  // España / Madrid / Portugal
-    { x: 520, y: 320, r: 95, d: 260 },  // EE.UU. Este
-    { x: 380, y: 360, r: 65, d: 150 },  // EE.UU. Oeste
-    { x: 1640, y: 360, r: 100, d: 280 }, // Asia Este / Japón
-    { x: 1740, y: 340, r: 55, d: 160 }, 
-    { x: 1400, y: 440, r: 75, d: 190 },  // India
-    { x: 1220, y: 400, r: 55, d: 130 },  // Oriente Medio
-    { x: 700, y: 680, r: 65, d: 140 },  // América del Sur
-    { x: 1720, y: 700, r: 55, d: 110 },  // Australia
-    { x: 1060, y: 600, r: 65, d: 110 }   // África
-  ];
+  TEX.earthNormal = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_normal_2048.jpg');
+  TEX.earthSpecular = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_specular_2048.jpg');
 
-  clusters.forEach(cl => {
-    for (let i = 0; i < cl.d; i++) {
-      const ang = Math.random() * Math.PI * 2;
-      const dist = Math.pow(Math.random(), 0.65) * cl.r;
-      const px = cl.x + Math.cos(ang) * dist;
-      const py = cl.y + Math.sin(ang) * dist;
-      const radius = 1.0 + Math.random() * 2.2;
-      const alpha = 0.35 + Math.random() * 0.65;
+  TEX.earthClouds = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/earth_clouds_1024.png');
+  TEX.earthClouds.colorSpace = THREE.SRGBColorSpace;
 
-      const grad = x.createRadialGradient(px, py, 0, px, py, radius * 2);
-      grad.addColorStop(0, `rgba(255, 205, 100, ${alpha})`);
-      grad.addColorStop(0.4, `rgba(255, 150, 30, ${alpha * 0.5})`);
-      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+  TEX.moon = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js@master/examples/textures/planets/moon_1024.jpg');
+  TEX.moon.colorSpace = THREE.SRGBColorSpace;
 
-      x.fillStyle = grad;
-      x.beginPath();
-      x.arc(px, py, radius * 2, 0, Math.PI * 2);
-      x.fill();
-    }
-  });
+  TEX.nightSky = textureLoader.load('https://unpkg.com/three-globe/example/img/night-sky.png');
+  TEX.nightSky.colorSpace = THREE.SRGBColorSpace;
+  TEX.nebula = TEX.nightSky;
 
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
-}
-
-function makeCloudTexture() {
-  const c = document.createElement('canvas');
-  c.width = 1024; c.height = 512;
-  const x = c.getContext('2d');
-  x.fillStyle = 'rgba(0,0,0,0)';
-  x.fillRect(0, 0, 1024, 512);
-
-  for (let i = 0; i < 180; i++) {
-    const cx = Math.random() * 1024;
-    const cy = 60 + Math.random() * 390;
-    const rx = 40 + Math.random() * 120;
-    const ry = 10 + Math.random() * 35;
-    const g = x.createRadialGradient(cx, cy, 0, cx, cy, rx);
-    g.addColorStop(0, `rgba(255, 255, 255, ${0.18 + Math.random() * 0.32})`);
-    g.addColorStop(0.6, `rgba(240, 245, 255, ${0.05 + Math.random() * 0.12})`);
-    g.addColorStop(1, 'rgba(255, 255, 255, 0)');
-    x.fillStyle = g;
-    x.beginPath();
-    x.ellipse(cx, cy, rx, ry, (Math.random() - 0.5) * 0.4, 0, Math.PI * 2);
-    x.fill();
-  }
-  const t = new THREE.CanvasTexture(c);
-  t.colorSpace = THREE.SRGBColorSpace;
-  return t;
+  // Planetas y objetos del sistema solar
+  TEX.sun = loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1a9cf4919-f919-4044-9f2a-d03b9fb4d5bd.png',[255,150,40]);
+  TEX.mars = loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/15ce82c4a-59c7-4a8f-8dea-671c208d50e4.png',[110,58,32]);
+  TEX.jupiter = loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1550971c8-4e80-48a3-89dc-afece31c7d2c.png',[200,160,110]);
+  TEX.saturn = loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/143a458a2-b53b-493d-82a2-8172a65f7eef.png',[232,217,176]);
+  TEX.galaxy = loadProcessed('https://image.qwenlm.ai/public_source/3fb8701a-d9e7-41d8-9b02-6513c343669c/1f1319534-2cbf-4e73-8509-296a56757632.png',null);
 }
 
 function createEarthDayNightMaterial(sunDirVector) {
@@ -2135,8 +2371,9 @@ function createEarthDayNightMaterial(sunDirVector) {
     uniforms: {
       uDayTex: { value: TEX.earth },
       uNightTex: { value: TEX.earthNight },
-      uSunDir: { value: sunDirVector || new THREE.Vector3(1, 0.2, 0.5).normalize() },
-      uShininess: { value: 32.0 }
+      uSpecularMap: { value: TEX.earthSpecular },
+      uSunDir: { value: sunDirVector || new THREE.Vector3(8.0, 4.0, 14.0).normalize() },
+      uShininess: { value: 36.0 }
     },
     vertexShader: `
       varying vec3 vWorldNormal;
@@ -2146,7 +2383,6 @@ function createEarthDayNightMaterial(sunDirVector) {
 
       void main() {
         vUv = uv;
-        // Transform normal to WORLD SPACE (independent of OrbitControls camera matrix)
         vWorldNormal = normalize(mat3(modelMatrix) * normal);
         vec4 worldPos = modelMatrix * vec4(position, 1.0);
         vWorldPosition = worldPos.xyz;
@@ -2158,6 +2394,7 @@ function createEarthDayNightMaterial(sunDirVector) {
     fragmentShader: `
       uniform sampler2D uDayTex;
       uniform sampler2D uNightTex;
+      uniform sampler2D uSpecularMap;
       uniform vec3 uSunDir;
       uniform float uShininess;
 
@@ -2171,29 +2408,40 @@ function createEarthDayNightMaterial(sunDirVector) {
         vec3 lightDir = normalize(uSunDir);
         vec3 viewDir = normalize(vViewPosition);
 
-        // Calculate dotNL in World Space so shadow stays fixed relative to the Sun when camera moves
         float dotNL = dot(norm, lightDir);
-        float dayFactor = smoothstep(-0.15, 0.15, dotNL);
+        float dayFactor = smoothstep(-0.15, 0.25, dotNL);
+        float nightFactor = smoothstep(0.18, -0.15, dotNL);
 
         vec4 dayColor = texture2D(uDayTex, vUv);
         vec4 nightColor = texture2D(uNightTex, vUv);
+        float specMask = texture2D(uSpecularMap, vUv).r;
 
-        vec3 nightGlow = nightColor.rgb * 2.2;
+        // Luces nocturnas satelitales NASA Black Marble VIIRS
+        vec3 nightLights = nightColor.rgb * nightFactor * 3.2;
 
-        float twilightRim = smoothstep(-0.25, 0.05, dotNL) * smoothstep(0.25, -0.05, dotNL);
-        vec3 sunsetColor = vec3(1.0, 0.45, 0.12) * twilightRim * 0.85;
+        // Banda crepuscular Rayleigh (atardecer naranja/ámbar en el terminador)
+        float twilight = smoothstep(-0.2, 0.05, dotNL) * smoothstep(0.25, -0.05, dotNL);
+        vec3 twilightColor = vec3(1.0, 0.45, 0.12) * twilight * 1.15;
 
-        float isOcean = step(0.08, dayColor.b - dayColor.r);
+        // Reflejo especular solar sobre los océanos
         vec3 halfDir = normalize(lightDir + viewDir);
         float specComp = pow(max(dot(norm, halfDir), 0.0), uShininess);
-        vec3 specular = vec3(1.0, 0.95, 0.85) * specComp * isOcean * dayFactor * 1.4;
+        vec3 specular = vec3(0.9, 0.95, 1.0) * specComp * specMask * dayFactor * 2.0;
 
-        vec3 finalColor = mix(nightGlow, dayColor.rgb, dayFactor) + sunsetColor + specular;
+        // Fresnel atmosférico suave en el horizonte iluminado
+        float fresnel = pow(1.0 - max(dot(norm, viewDir), 0.0), 3.0);
+        vec3 atmoRim = vec3(0.2, 0.65, 1.0) * fresnel * max(dotNL + 0.3, 0.0) * 0.75;
+
+        // Mezcla equilibrada: Día vivo + Luces de ciudad + Atardecer + Reflejo
+        vec3 dayAmbient = dayColor.rgb * 0.06;
+        vec3 finalColor = dayColor.rgb * dayFactor + dayAmbient + nightLights + twilightColor + specular + atmoRim;
+
         gl_FragColor = vec4(finalColor, 1.0);
       }
     `
   });
 }
+
 function makePlanetTexture(colors,speckle){
   const c=document.createElement('canvas');c.width=512;c.height=256;const x=c.getContext('2d');
   const g=x.createLinearGradient(0,0,0,256);
@@ -2203,30 +2451,66 @@ function makePlanetTexture(colors,speckle){
   for(let i=0;i<(speckle||1500);i++){x.fillStyle=`rgba(0,0,0,${Math.random()*0.12})`;x.fillRect(Math.random()*512,Math.random()*256,1.5,1.5);}
   const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;
 }
+
 let glowTex=null;
-function makeGlowTexture(){const c=document.createElement('canvas');c.width=c.height=256;const x=c.getContext('2d');
+function makeGlowTexture(){
+  const c=document.createElement('canvas');c.width=256;c.height=256;const x=c.getContext('2d');
   const g=x.createRadialGradient(128,128,0,128,128,128);
-  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(0.25,'rgba(255,255,255,0.4)');g.addColorStop(1,'rgba(255,255,255,0)');
-  x.fillStyle=g;x.fillRect(0,0,256,256);return new THREE.CanvasTexture(c);}
+  g.addColorStop(0,'rgba(255,255,255,1)');
+  g.addColorStop(0.2,'rgba(56,189,248,0.7)');
+  g.addColorStop(0.5,'rgba(14,165,233,0.25)');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=g;x.fillRect(0,0,256,256);
+  return new THREE.CanvasTexture(c);
+}
+
 function addGlow(size,color,opacity=1){
   const s=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color,transparent:true,opacity,depthWrite:false,blending:THREE.AdditiveBlending}));
-  s.scale.set(size,size,1);return s;}
-function makeAtmosphere(radius,color){
-  return new THREE.Mesh(new THREE.SphereGeometry(radius*1.025,64,64),new THREE.ShaderMaterial({
-    vertexShader:'varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-    fragmentShader:'varying vec3 vN;uniform vec3 uC;void main(){float i=pow(0.72-dot(vN,vec3(0.,0.,1.)),3.0);gl_FragColor=vec4(uC,1.0)*i;}',
-    uniforms:{uC:{value:new THREE.Color(color)}},blending:THREE.AdditiveBlending,side:THREE.BackSide,transparent:true,depthWrite:false}));
+  s.scale.set(size,size,1);return s;
 }
+
+function makeAtmosphere(radius,color){
+  return new THREE.Mesh(new THREE.SphereGeometry(radius*1.018,64,64),new THREE.ShaderMaterial({
+    vertexShader:`
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+      void main(){
+        vNormal=normalize(normalMatrix*normal);
+        vPosition=(modelViewMatrix*vec4(position,1.0)).xyz;
+        gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);
+      }
+    `,
+    fragmentShader:`
+      varying vec3 vNormal;
+      varying vec3 vPosition;
+      uniform vec3 uColor;
+      void main(){
+        vec3 viewDir=normalize(-vPosition);
+        float intensity=pow(0.55-dot(vNormal,viewDir),3.5);
+        gl_FragColor=vec4(uColor*1.2,intensity*0.65);
+      }
+    `,
+    uniforms:{uColor:{value:new THREE.Color(color)}},
+    blending:THREE.AdditiveBlending,
+    side:THREE.BackSide,
+    transparent:true,
+    depthWrite:false
+  }));
+}
+
 function addStars(count,spread,size=0.3,opacity=0.8,color=0xffffff){
   const pos=new Float32Array(count*3);
   for(let i=0;i<count;i++){const r=spread*(0.55+Math.random()*0.45),th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1);
     pos[i*3]=r*Math.sin(ph)*Math.cos(th);pos[i*3+1]=r*Math.sin(ph)*Math.sin(th);pos[i*3+2]=r*Math.cos(ph);}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
   const p=new THREE.Points(g,new THREE.PointsMaterial({color,size,transparent:true,opacity,depthWrite:false}));
-  scene.add(p);return p;}
+  scene.add(p);return p;
+}
+
 function addBackdrop(){
-  const sky=new THREE.Mesh(new THREE.SphereGeometry(600,32,32),new THREE.MeshBasicMaterial({map:TEX.nebula,side:THREE.BackSide,transparent:true,opacity:0.35,depthWrite:false}));
-  scene.add(sky);}
+  const sky=new THREE.Mesh(new THREE.SphereGeometry(750,48,48),new THREE.MeshBasicMaterial({map:TEX.nightSky||TEX.nebula,side:THREE.BackSide,depthWrite:false}));
+  scene.add(sky);
+}
 function addClickProxy(parent,radius,info,pos){
   const proxy=new THREE.Mesh(new THREE.SphereGeometry(radius,12,12),new THREE.MeshBasicMaterial({visible:false}));
   proxy.userData.info=info;
@@ -2251,30 +2535,61 @@ function initThree(){
   if(renderer)return;
   loadTextures();glowTex=makeGlowTexture();
   scene=new THREE.Scene();scene.background=new THREE.Color(0x010204);
-  camera=new THREE.PerspectiveCamera(45,1,0.1,4000);
-  renderer=new THREE.WebGLRenderer({antialias:true,logarithmicDepthBuffer:true});
+  camera=new THREE.PerspectiveCamera(45,1,0.01,1e12);
+  renderer=new THREE.WebGLRenderer({antialias:true,logarithmicDepthBuffer:true,powerPreference:'high-performance',alpha:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.2;
+  renderer.toneMappingExposure=1.25;
   renderer.domElement.style.touchAction='none';
   document.getElementById('canvas-3d').appendChild(renderer.domElement);
   controls=new THREE.OrbitControls(camera,renderer.domElement);
   controls.enableDamping=true;
   controls.dampingFactor=0.05;
   controls.enableZoom=true;
-  controls.zoomSpeed=1.2;
+  controls.zoomSpeed=1.3;
   controls.rotateSpeed=0.8;
   controls.enablePan=true;
-  controls.panSpeed=0.8;
+  controls.panSpeed=1.0;
+  controls.screenSpacePanning=true;
+  controls.minDistance=0.02;
+  controls.maxDistance=800.0;
   controls.touches={
     ONE: THREE.TOUCH.ROTATE,
     TWO: THREE.TOUCH.DOLLY_PAN
   };
+  controls.mouseButtons={
+    LEFT: THREE.MOUSE.ROTATE,
+    MIDDLE: THREE.MOUSE.DOLLY,
+    RIGHT: THREE.MOUSE.PAN
+  };
+
+  // SOPORTE ESPACIO + ARRASTRAR EN PC PARA MOVERSE POR EL ESPACIO (PAN)
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && !e.repeat && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+      controls.mouseButtons.LEFT = THREE.MOUSE.PAN;
+      renderer.domElement.style.cursor = 'grab';
+    }
+  });
+  window.addEventListener('keyup', (e) => {
+    if (e.code === 'Space') {
+      controls.mouseButtons.LEFT = THREE.MOUSE.ROTATE;
+      renderer.domElement.style.cursor = 'default';
+    }
+  });
+
   clock=new THREE.Clock();
   const el=renderer.domElement;
-  el.addEventListener('pointerdown',e=>{downPos={x:e.clientX,y:e.clientY};});
+  el.addEventListener('pointerdown',e=>{
+    downPos={x:e.clientX,y:e.clientY};
+    if (controls.mouseButtons.LEFT === THREE.MOUSE.PAN) {
+      renderer.domElement.style.cursor = 'grabbing';
+    }
+  });
   el.addEventListener('pointerup',e=>{
+    if (controls.mouseButtons.LEFT === THREE.MOUSE.PAN) {
+      renderer.domElement.style.cursor = 'grab';
+    }
     if(!downPos)return;
     const d=Math.hypot(e.clientX-downPos.x,e.clientY-downPos.y);downPos=null;
     // CERO DISPAROS ACCIDENTALES AL ARRASTRAR LA CÁMARA (Límite estricto de 6px)
@@ -2290,8 +2605,16 @@ function initThree(){
     if (hits.length) {
       for (const hit of hits) {
         const hitObj = hit.object;
+        if (currentLevel === 0 && hitObj.userData && hitObj.userData.entityKey) {
+          inspectEarthEntity(hitObj.userData.entityKey);
+          return;
+        }
         if (hitObj.userData && hitObj.userData.info) {
-          openObjPanel(hitObj.userData.info);
+          if (currentLevel === 0 && hitObj.userData.entityKey) {
+            inspectEarthEntity(hitObj.userData.entityKey);
+          } else {
+            openObjPanel(hitObj.userData.info);
+          }
           return;
         }
         if (hitObj.userData && hitObj.userData.isEarthMesh) {
@@ -2299,7 +2622,11 @@ function initThree(){
           const localHit = hit.point.clone().applyMatrix4(invEarthMat);
           const geo = vectorToLatLon(localHit);
           const countryData = getCountryInfo(geo.lat, geo.lon);
-          openObjPanel(countryData);
+          if (currentLevel === 0) {
+            inspectEarthEntity('earth');
+          } else {
+            openObjPanel(countryData);
+          }
           return;
         }
       }
@@ -2364,113 +2691,929 @@ const INFO={
 
 /* ================= NIVELES EXPLORAR (DECLARADOS MÁS ABAJO) ================= */
 
-/* ================= PANTALLA 1: LA TIERRA 4-CAPAS (HIPERREALISTA NASA) ================= */
+/* ================= PANTALLA 1: LA TIERRA Y SATÉLITES NASA (ESCENA MAESTRA 1/12) ================= */
+let earthScaleRatio = 0.0; // 0.0 = didáctica (6.2 u), 1.0 = real 1:1 (~26.0 u)
+let earthCurrentStep = 0;
+let moonFarSideActive = false;
+let earthTrackedTarget = null;
+let earthQuizScore = 0;
+let earthQuizCurrentQ = 0;
+
+let earthMeshes = {
+  earth: null,
+  clouds: null,
+  atmosphere: null,
+  moon: null,
+  moonOrbitLine: null,
+  satellites: {},
+  sunDir: new THREE.Vector3(20, 6, 15).normalize()
+};
+
+// FACTORÍA: Órbitas Cinemáticas con Shaders Ribbon Volumétricos y Glow Anti-Aliased
+function createOrbitalRibbon(radius, colorHex, inclinationDeg, width = 0.04) {
+  const group = new THREE.Group();
+  group.rotation.x = THREE.MathUtils.degToRad(inclinationDeg);
+
+  const segments = 128;
+  const positions = new Float32Array((segments + 1) * 2 * 3);
+  const uvs = new Float32Array((segments + 1) * 2 * 2);
+  const indices = [];
+
+  for (let i = 0; i <= segments; i++) {
+    const theta = (i / segments) * Math.PI * 2;
+    const cosT = Math.cos(theta);
+    const sinT = Math.sin(theta);
+    const rInner = radius - width * 0.5;
+    const rOuter = radius + width * 0.5;
+
+    positions[i * 6] = cosT * rInner;
+    positions[i * 6 + 1] = 0;
+    positions[i * 6 + 2] = sinT * rInner;
+
+    positions[i * 6 + 3] = cosT * rOuter;
+    positions[i * 6 + 4] = 0;
+    positions[i * 6 + 5] = sinT * rOuter;
+
+    const u = i / segments;
+    uvs[i * 4] = u;
+    uvs[i * 4 + 1] = 0.0;
+    uvs[i * 4 + 2] = u;
+    uvs[i * 4 + 3] = 1.0;
+
+    if (i < segments) {
+      const idx = i * 2;
+      indices.push(idx, idx + 1, idx + 2);
+      indices.push(idx + 1, idx + 3, idx + 2);
+    }
+  }
+
+  const geom = new THREE.BufferGeometry();
+  geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geom.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+  geom.setIndex(indices);
+
+  const mat = new THREE.ShaderMaterial({
+    uniforms: {
+      uColor: { value: new THREE.Color(colorHex) },
+      uHeadAngle: { value: 0.0 },
+      uGlowIntensity: { value: 2.4 }
+    },
+    vertexShader: `
+      varying vec2 vUv;
+      varying vec3 vWorldPos;
+      void main() {
+        vUv = uv;
+        vec4 wp = modelMatrix * vec4(position, 1.0);
+        vWorldPos = wp.xyz;
+        gl_Position = projectionMatrix * viewMatrix * wp;
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 uColor;
+      uniform float uHeadAngle;
+      uniform float uGlowIntensity;
+      varying vec2 vUv;
+      varying vec3 vWorldPos;
+
+      void main() {
+        float distFromCenter = abs(vUv.y - 0.5) * 2.0;
+        float edgeAA = smoothstep(1.0, 0.72, distFromCenter);
+        float core = exp(-distFromCenter * distFromCenter * 6.5);
+        float halo = exp(-distFromCenter * 2.4) * 0.4;
+        float glow = core * uGlowIntensity + halo;
+
+        float currentU = fract(uHeadAngle / 6.2831853);
+        float diff = fract(currentU - vUv.x);
+        float trailFade = pow(1.0 - diff, 1.6) * 0.82 + 0.18;
+
+        // Oclusión suave detrás del planeta Tierra
+        float isBehind = step(vWorldPos.z, -0.2) * step(length(vWorldPos.xy), 1.96);
+        float occlusion = mix(1.0, 0.08, isBehind);
+
+        float alpha = glow * edgeAA * trailFade * occlusion;
+        if (alpha < 0.015) discard;
+
+        gl_FragColor = vec4(uColor * glow, alpha * 0.9);
+      }
+    `,
+    side: THREE.DoubleSide,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending
+  });
+
+  const mesh = new THREE.Mesh(geom, mat);
+  group.add(mesh);
+  return { group, material: mat, mesh, radius };
+}
+
+// FACTORÍA: Estación Espacial Internacional (ISS) Hiperrealista PBR
+function buildISSModel() {
+  const root = new THREE.Group();
+
+  const labMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, metalness: 0.85, roughness: 0.2 });
+  const trussMat = new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.9, roughness: 0.35 });
+  const solarMat = new THREE.MeshStandardMaterial({ color: 0x1e40af, metalness: 0.95, roughness: 0.12, emissive: 0x082f49 });
+  const goldFoilMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.95, roughness: 0.15 });
+
+  // 1. Módulos Presurizados (Destiny, Kibo, Zvezda)
+  const destGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.085, 16);
+  destGeo.rotateZ(Math.PI / 2);
+  root.add(new THREE.Mesh(destGeo, labMat));
+
+  const zaryaGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.07, 16);
+  zaryaGeo.rotateZ(Math.PI / 2);
+  const zarya = new THREE.Mesh(zaryaGeo, goldFoilMat);
+  zarya.position.x = -0.075;
+  root.add(zarya);
+
+  const kiboGeo = new THREE.CylinderGeometry(0.026, 0.026, 0.065, 16);
+  kiboGeo.rotateX(Math.PI / 2);
+  const kibo = new THREE.Mesh(kiboGeo, labMat);
+  kibo.position.z = 0.035;
+  root.add(kibo);
+
+  // Cúpula de observación (vidrio polarizado)
+  const cupola = new THREE.Mesh(new THREE.SphereGeometry(0.013, 12, 12), new THREE.MeshBasicMaterial({ color: 0x38bdf8 }));
+  cupola.position.set(0, -0.022, 0.015);
+  root.add(cupola);
+
+  // 2. Viga Maestra Truss (ITS)
+  const trussGeo = new THREE.BoxGeometry(0.42, 0.012, 0.012);
+  const truss = new THREE.Mesh(trussGeo, trussMat);
+  truss.position.y = 0.022;
+  root.add(truss);
+
+  // 3. Paneles Solares Fotovoltaicos (4 alas dobles = 8 paneles)
+  const wingPositions = [-0.18, -0.13, 0.13, 0.18];
+  wingPositions.forEach(wx => {
+    [-0.065, 0.065].forEach(wz => {
+      const panelGeo = new THREE.BoxGeometry(0.036, 0.003, 0.095);
+      const panel = new THREE.Mesh(panelGeo, solarMat);
+      panel.position.set(wx, 0.025, wz);
+      root.add(panel);
+    });
+  });
+
+  root.scale.set(1.4, 1.4, 1.4);
+  return root;
+}
+
+// FACTORÍA: Telescopio Espacial Hubble (HST) Hiperrealista PBR
+function buildHubbleModel() {
+  const root = new THREE.Group();
+
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe5e7eb, metalness: 0.92, roughness: 0.15 });
+  const goldMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.95, roughness: 0.18 });
+  const solarMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.92, roughness: 0.15, emissive: 0x075985 });
+
+  // Tubo óptico principal
+  const tubeGeo = new THREE.CylinderGeometry(0.03, 0.03, 0.13, 24);
+  const tube = new THREE.Mesh(tubeGeo, bodyMat);
+  tube.rotation.z = Math.PI / 2;
+  root.add(tube);
+
+  // Sección trasera de instrumentos
+  const aftGeo = new THREE.CylinderGeometry(0.036, 0.036, 0.055, 24);
+  const aft = new THREE.Mesh(aftGeo, goldMat);
+  aft.rotation.z = Math.PI / 2;
+  aft.position.x = -0.075;
+  root.add(aft);
+
+  // Compuerta frontal abierta a 45°
+  const doorGeo = new THREE.CircleGeometry(0.03, 16);
+  const door = new THREE.Mesh(doorGeo, bodyMat);
+  door.rotation.y = Math.PI / 4;
+  door.position.set(0.07, 0.02, 0);
+  root.add(door);
+
+  // Espejo primario interior plateado
+  const mirrorGeo = new THREE.CircleGeometry(0.026, 16);
+  const mirror = new THREE.Mesh(mirrorGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1.0, roughness: 0.04 }));
+  mirror.rotation.y = Math.PI / 2;
+  mirror.position.x = 0.025;
+  root.add(mirror);
+
+  // Paneles Solares
+  [-0.075, 0.075].forEach(sy => {
+    const pGeo = new THREE.BoxGeometry(0.022, 0.003, 0.12);
+    const panel = new THREE.Mesh(pGeo, solarMat);
+    panel.position.set(-0.02, sy, 0);
+    root.add(panel);
+  });
+
+  root.scale.set(1.5, 1.5, 1.5);
+  return root;
+}
+
+// FACTORÍA: Satélite Landsat 9 Hiperrealista PBR con Sensor OLI-2
+function buildLandsatModel() {
+  const root = new THREE.Group();
+
+  const busMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.95, roughness: 0.2 });
+  const instMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.85, roughness: 0.25 });
+  const solarMat = new THREE.MeshStandardMaterial({ color: 0x0369a1, metalness: 0.92, roughness: 0.18 });
+
+  // Bus cúbico con aislamiento térmico MLI dorado
+  const bus = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.055, 0.065), busMat);
+  root.add(bus);
+
+  // Sensores OLI-2 / TIRS-2 apuntando a la Tierra
+  const instGeo = new THREE.CylinderGeometry(0.016, 0.022, 0.035, 16);
+  const inst = new THREE.Mesh(instGeo, instMat);
+  inst.position.y = -0.038;
+  root.add(inst);
+
+  // Panel solar articulado
+  const solar = new THREE.Mesh(new THREE.BoxGeometry(0.032, 0.004, 0.15), solarMat);
+  solar.position.set(0, 0.045, 0.085);
+  root.add(solar);
+
+  root.scale.set(1.5, 1.5, 1.5);
+  return root;
+}
+
+// FACTORÍA: Telescopio Espacial James Webb (JWST) Hiperrealista PBR
+function buildJWSTModel() {
+  const root = new THREE.Group();
+
+  const goldMirrorMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.98, roughness: 0.06 });
+  const kaptonMat = new THREE.MeshStandardMaterial({ color: 0xdb2777, metalness: 0.85, roughness: 0.35, side: THREE.DoubleSide });
+  const busMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8, roughness: 0.4 });
+
+  // 1. Parasol Kapton de 5 capas en forma de cometa/diamante
+  const shieldShape = new THREE.Shape();
+  shieldShape.moveTo(0, 0.18);
+  shieldShape.lineTo(0.1, 0);
+  shieldShape.lineTo(0, -0.18);
+  shieldShape.lineTo(-0.1, 0);
+  shieldShape.closePath();
+
+  const shieldGeo = new THREE.ShapeGeometry(shieldShape);
+  const shield = new THREE.Mesh(shieldGeo, kaptonMat);
+  shield.rotation.x = Math.PI / 2;
+  root.add(shield);
+
+  // 2. Malla Honeycomb de 18 Espejos Hexagonales Dorados
+  const mirrorGroup = new THREE.Group();
+  for (let q = -2; q <= 2; q++) {
+    for (let r = -2; r <= 2; r++) {
+      if (Math.abs(q + r) <= 2 && !(q === 0 && r === 0)) {
+        const hexGeo = new THREE.CircleGeometry(0.017, 6);
+        const hex = new THREE.Mesh(hexGeo, goldMirrorMat);
+        const hx = 0.03 * (q + r * 0.5);
+        const hy = 0.03 * (r * Math.sqrt(3) / 2);
+        hex.position.set(hx, hy + 0.032, 0.038);
+        mirrorGroup.add(hex);
+      }
+    }
+  }
+  mirrorGroup.rotation.x = -Math.PI / 6;
+  root.add(mirrorGroup);
+
+  // 3. Espejo Secundario sobre mástil
+  const secMirror = new THREE.Mesh(new THREE.CircleGeometry(0.01, 6), goldMirrorMat);
+  secMirror.position.set(0, 0.065, 0.085);
+  root.add(secMirror);
+
+  // Bus de nave espacial en lado caliente
+  const bus = new THREE.Mesh(new THREE.BoxGeometry(0.045, 0.032, 0.045), busMat);
+  bus.position.set(0, -0.032, 0);
+  root.add(bus);
+
+  root.scale.set(1.5, 1.5, 1.5);
+  return root;
+}
+
 function buildEarth(){
   clearScene();
+  earthScaleRatio = 0.0;
+  earthCurrentStep = 0;
+  moonFarSideActive = false;
+  earthTrackedTarget = null;
 
-  const sunDir = new THREE.Vector3(20, 6, 15).normalize();
+  const sunDir = new THREE.Vector3(8.0, 4.0, 14.0).normalize();
+  earthMeshes.sunDir = sunDir;
 
   // 1. CORTEZA TERRESTRE (Crust: ShaderMaterial Día/Noche GLSL + Specular Océanos)
   const earthMat = createEarthDayNightMaterial(sunDir);
   const earth = new THREE.Mesh(new THREE.SphereGeometry(2.0, 96, 96), earthMat);
-  earth.rotation.z = THREE.MathUtils.degToRad(23.44); // Inclinación axial inercial real
+  earth.rotation.z = THREE.MathUtils.degToRad(23.44); // Inclinación axial inercial real (23.44°)
   earth.userData.isEarthMesh = true;
+  earth.userData.entityKey = 'earth';
   scene.add(earth);
   clickables.push(earth);
+  earthMeshes.earth = earth;
 
-  // 2. NUBES INDEPENDIENTES (Clouds: Radio 2.016 animadas independientemente)
+  // 2. NUBES REALES NASA (Clouds: Radio 2.012 con rotación diferencial y canal alfa)
   const cloudsMat = new THREE.MeshStandardMaterial({
-    map: TEX.clouds,
+    map: TEX.earthClouds,
     transparent: true,
-    opacity: 0.38,
+    opacity: 0.65,
     depthWrite: false,
-    blending: THREE.AdditiveBlending
-  });
-  const clouds = new THREE.Mesh(new THREE.SphereGeometry(2.016, 96, 96), cloudsMat);
-  earth.add(clouds);
-
-  // 3. DISPERSIÓN ATMOSFÉRICA (Atmosphere: Halo Rayleigh Fresnel)
-  const atmosphere = makeAtmosphere(2.0, 0x3b82f6);
-  scene.add(atmosphere);
-
-  // 4. SATÉLITES REALES (ISS, Hubble, JWST) & LUNA
-  const satPositions = new Float32Array(SATELLITE_DATA.length * 3);
-  const satColors = new Float32Array(SATELLITE_DATA.length * 3);
-
-  SATELLITE_DATA.forEach((satData, i) => {
-    satPositions[i * 3] = satData.radius;
-    satPositions[i * 3 + 1] = 0;
-    satPositions[i * 3 + 2] = 0;
-
-    satColors[i * 3] = 0.2;
-    satColors[i * 3 + 1] = 0.85;
-    satColors[i * 3 + 2] = 1.0;
-
-    const proxy = new THREE.Mesh(new THREE.SphereGeometry(0.18, 8, 8), new THREE.MeshBasicMaterial({ visible: false }));
-    proxy.userData.info = satData.info;
-    scene.add(proxy);
-    clickables.push(proxy);
-
-    let angle = Math.random() * Math.PI * 2;
-    updaters.push((t, dt) => {
-      angle += dt * satData.speedFactor;
-      const x = Math.cos(angle) * satData.radius;
-      const z = Math.sin(angle) * satData.radius;
-      const y = Math.sin(angle * 0.5) * 0.3;
-      proxy.position.set(x, y, z);
-
-      const posArr = satGeo.attributes.position.array;
-      posArr[i * 3] = x;
-      posArr[i * 3 + 1] = y;
-      posArr[i * 3 + 2] = z;
-      satGeo.attributes.position.needsUpdate = true;
-    });
-  });
-
-  const satGeo = new THREE.BufferGeometry();
-  satGeo.setAttribute('position', new THREE.BufferAttribute(satPositions, 3));
-  satGeo.setAttribute('color', new THREE.BufferAttribute(satColors, 3));
-
-  const satPoints = new THREE.Points(satGeo, new THREE.PointsMaterial({
-    size: 4,
-    sizeAttenuation: false,
-    vertexColors: true,
-    transparent: true,
-    opacity: 0.95
-  }));
-  scene.add(satPoints);
-
-  // Luna
-  const moonMat = new THREE.MeshStandardMaterial({
-    map: TEX.moon,
     roughness: 0.95,
     metalness: 0.0
   });
+  const clouds = new THREE.Mesh(new THREE.SphereGeometry(2.012, 96, 96), cloudsMat);
+  earth.add(clouds);
+  earthMeshes.clouds = clouds;
+
+  // 3. DISPERSIÓN ATMOSFÉRICA (Atmosphere: Halo Rayleigh Fresnel)
+  const atmosphere = makeAtmosphere(2.0, 0x38bdf8);
+  scene.add(atmosphere);
+  earthMeshes.atmosphere = atmosphere;
+
+  // 4. LUNA CON ACOPLAMIENTO DE MAREA Y DISTANCIA ESCALABLE
+  const moonMat = new THREE.MeshStandardMaterial({
+    map: TEX.moon,
+    roughness: 0.88,
+    metalness: 0.04
+  });
   const moon = new THREE.Mesh(new THREE.SphereGeometry(0.54, 64, 64), moonMat);
+  moon.position.set(6.2, 0.4, 0);
+  moon.userData.entityKey = 'moon';
   scene.add(moon);
+  earthMeshes.moon = moon;
   addClickProxy(moon, 0.85, INFO.moon);
 
-  // Iluminación cinematográfica
-  const sunLight = new THREE.DirectionalLight(0xfffaed, 3.0);
-  sunLight.position.set(20, 6, 15);
-  sunLight.castShadow = true;
-  scene.add(sunLight);
-  scene.add(new THREE.AmbientLight(0x0a0f1d, 0.12));
+  // Órbita visual lunar (Ribbon suave)
+  const moonOrbit = createOrbitalRibbon(6.2, 0x94a3b8, 5.14, 0.06);
+  scene.add(moonOrbit.group);
+  earthMeshes.moonOrbitLine = moonOrbit;
 
-  addBackdrop();
-  addStars(2200, 180, 0.35, 0.7);
+  // 5. SISTEMA DE SATÉLITES REALES DE LA NASA (ISS, Hubble, Landsat 9, JWST)
+  earthMeshes.satellites = {};
 
-  let ma = 0;
-  updaters.push((t, dt) => {
-    earth.rotation.y += dt * 0.06;
-    clouds.rotation.y += dt * 0.09;
-    ma += dt * 0.08;
-    moon.position.set(Math.cos(ma) * 6.2, 0.4, Math.sin(ma) * 6.2);
-    moon.rotation.y += dt * 0.04;
+  SATELLITE_DATA.forEach((satData) => {
+    // Trazado de órbita Ribbon suave con Glow
+    const ribbon = createOrbitalRibbon(satData.radius, satData.color, satData.inclination, 0.038);
+    scene.add(ribbon.group);
+
+    // Contenedor del satélite
+    const satMarker = new THREE.Group();
+
+    // Modelo 3D Hiperrealista específico
+    let model3D = null;
+    if (satData.key === 'iss') model3D = buildISSModel();
+    else if (satData.key === 'hubble') model3D = buildHubbleModel();
+    else if (satData.key === 'landsat') model3D = buildLandsatModel();
+    else if (satData.key === 'jwst') model3D = buildJWSTModel();
+
+    if (model3D) satMarker.add(model3D);
+
+    // Halo sprite brillante
+    if (glowTex) {
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({
+        map: glowTex,
+        color: satData.color,
+        transparent: true,
+        opacity: 0.75,
+        blending: THREE.AdditiveBlending
+      }));
+      halo.scale.set(0.4, 0.4, 1);
+      satMarker.add(halo);
+    }
+
+    // Hitbox invisible de interacción para clics y raycasting
+    const clickProxy = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshBasicMaterial({ visible: false }));
+    clickProxy.userData.info = satData.info;
+    clickProxy.userData.entityKey = satData.key;
+    satMarker.add(clickProxy);
+    clickables.push(clickProxy);
+
+    ribbon.group.add(satMarker);
+
+    // Si es Landsat 9, cono de escaneo multiespectral hacia la Tierra
+    if (satData.key === 'landsat') {
+      const coneGeo = new THREE.ConeGeometry(0.28, satData.radius - 2.0, 16, 1, true);
+      coneGeo.rotateX(Math.PI);
+      const coneMat = new THREE.MeshBasicMaterial({
+        color: 0xf59e0b,
+        transparent: true,
+        opacity: 0.22,
+        wireframe: true,
+        blending: THREE.AdditiveBlending
+      });
+      const scanCone = new THREE.Mesh(coneGeo, coneMat);
+      satMarker.add(scanCone);
+    }
+
+    earthMeshes.satellites[satData.key] = {
+      data: satData,
+      group: ribbon.group,
+      marker: satMarker,
+      ribbon: ribbon,
+      angle: Math.random() * Math.PI * 2
+    };
   });
 
-  setCamera(new THREE.Vector3(0, 1.2, 6.2), 2.2, 60);
+  // Iluminación solar cinematográfica de alta potencia
+  const sunLight = new THREE.DirectionalLight(0xfffbf2, 4.2);
+  sunLight.position.set(16, 8, 28);
+  scene.add(sunLight);
+  scene.add(new THREE.AmbientLight(0x0a1020, 0.15));
+
+  addBackdrop();
+  // Estrellas multicapa con temperatura de color real
+  addStars(1200, 350, 0.4, 0.9, 0xbfdbfe); // O/B azuladas
+  addStars(1800, 300, 0.35, 0.8, 0xfffaed); // Solares G
+  addStars(450, 260, 0.5, 0.95, 0xfdba74); // Gigantes rojas
+
+  // Actualizador continuo de física orbital y animaciones (60 FPS)
+  let moonAngle = 0;
+  updaters.push((t, dt) => {
+    // 1. Rotación de la Tierra (1 vuelta = 24h)
+    earth.rotation.y += dt * 0.08;
+    // 2. Rotación de nubes a velocidad diferencial (+15%)
+    clouds.rotation.y += dt * 0.11;
+
+    // 3. Posicionamiento dinámico de la Luna según Slider de Escala
+    const targetMoonDist = THREE.MathUtils.lerp(6.2, 26.0, earthScaleRatio);
+    moonAngle += dt * 0.07;
+    
+    // Plano con inclinación de 5.14°
+    const mx = Math.cos(moonAngle) * targetMoonDist;
+    const mz = Math.sin(moonAngle) * targetMoonDist;
+    const my = 0.4 + Math.sin(moonAngle) * (targetMoonDist * 0.09);
+    moon.position.set(mx, my, mz);
+
+    // Actualizar escala del anillo orbital lunar
+    if (earthMeshes.moonOrbitLine && earthMeshes.moonOrbitLine.group) {
+      const s = targetMoonDist / 6.2;
+      earthMeshes.moonOrbitLine.group.scale.set(s, 1, s);
+      if (earthMeshes.moonOrbitLine.material) {
+        earthMeshes.moonOrbitLine.material.uniforms.uHeadAngle.value = moonAngle;
+      }
+    }
+
+    // Acoplamiento de marea: La Luna siempre mira hacia la Tierra
+    if (moonFarSideActive) {
+      moon.rotation.y = -moonAngle + Math.PI; // 180° para cara oculta
+    } else {
+      moon.rotation.y = -moonAngle; // Cara visible hacia la Tierra
+    }
+
+    // 4. Actualizar órbita de satélites y shader de estela
+    Object.keys(earthMeshes.satellites).forEach(key => {
+      const sat = earthMeshes.satellites[key];
+      sat.angle += dt * sat.data.speedFactor;
+      const currentRadius = sat.data.key === 'jwst' 
+        ? THREE.MathUtils.lerp(sat.data.radius, 32.0, earthScaleRatio) 
+        : sat.data.radius;
+      
+      const sx = Math.cos(sat.angle) * currentRadius;
+      const sz = Math.sin(sat.angle) * currentRadius;
+      sat.marker.position.set(sx, 0, sz);
+      
+      // Orientación del satélite hacia la tangente de vuelo
+      sat.marker.rotation.y = -sat.angle + Math.PI / 2;
+
+      // Actualizar ángulo en el shader ribbon para la estela cometa
+      if (sat.ribbon && sat.ribbon.material) {
+        sat.ribbon.material.uniforms.uHeadAngle.value = sat.angle;
+        if (sat.data.key === 'jwst') {
+          const s = currentRadius / sat.data.radius;
+          sat.ribbon.group.scale.set(s, 1, s);
+        }
+      }
+    });
+
+    // 5. Si hay seguimiento de cámara a un satélite o Luna:
+    if (earthTrackedTarget && controls) {
+      let targetPos = null;
+      if (earthTrackedTarget === 'earth') {
+        targetPos = earth.position;
+      } else if (earthTrackedTarget === 'moon') {
+        targetPos = moon.position;
+      } else if (earthMeshes.satellites[earthTrackedTarget]) {
+        targetPos = new THREE.Vector3();
+        earthMeshes.satellites[earthTrackedTarget].marker.getWorldPosition(targetPos);
+      }
+      if (targetPos) {
+        controls.target.lerp(targetPos, 0.09);
+      }
+    }
+  });
+
+  // Inicializar UI de la Escena 1
+  updateEarthStepUI();
+  setEarthStep(0);
 }
+
+/* ================= CONTROLADORES DE INTERACCIÓN ESCENA 1 ================= */
+window.setEarthStep = function(stepIdx) {
+  if (stepIdx < 0 || stepIdx >= EARTH_STEPS.length) return;
+  earthCurrentStep = stepIdx;
+  const step = EARTH_STEPS[stepIdx];
+
+  // Animar cámara a la posición del paso con frustum amplio
+  if (typeof setCamera === 'function') {
+    setCamera(new THREE.Vector3(step.camPos[0], step.camPos[1], step.camPos[2]), 0.05, 500);
+    if (controls) {
+      controls.target.set(step.camTarget[0], step.camTarget[1], step.camTarget[2]);
+    }
+  }
+
+  // Si estamos en el paso 3 (Escala Real), animar slider
+  if (stepIdx === 3) {
+    const slider = document.getElementById('earth-scale-slider');
+    if (slider && Number(slider.value) < 0.8) {
+      let v = Number(slider.value);
+      const interval = setInterval(() => {
+        v += 0.05;
+        if (v >= 0.95) {
+          v = 1.0;
+          clearInterval(interval);
+        }
+        slider.value = v;
+        onEarthScaleChange(v);
+      }, 30);
+    }
+  } else if (stepIdx < 3 && earthScaleRatio > 0.3) {
+    const slider = document.getElementById('earth-scale-slider');
+    if (slider) {
+      slider.value = 0;
+      onEarthScaleChange(0);
+    }
+  }
+
+  updateEarthStepUI();
+};
+
+window.navigateEarthStep = function(delta) {
+  setEarthStep(earthCurrentStep + delta);
+};
+
+window.updateEarthStepUI = function() {
+  const step = EARTH_STEPS[earthCurrentStep];
+  if (!step) return;
+
+  const badgeEl = document.getElementById('earth-step-badge');
+  const titleEl = document.getElementById('earth-step-title');
+  const narrEl = document.getElementById('earth-step-narrative');
+  const chalTextEl = document.getElementById('earth-step-challenge-text');
+  const actionBtnEl = document.getElementById('earth-challenge-action-btn');
+  const prevBtn = document.getElementById('earth-prev-step-btn');
+  const nextBtn = document.getElementById('earth-next-step-btn');
+  const dotsEl = document.getElementById('earth-step-dots');
+
+  if (badgeEl) badgeEl.textContent = step.badge;
+  if (titleEl) titleEl.textContent = step.title;
+  if (narrEl) narrEl.textContent = step.narrative;
+  if (chalTextEl) chalTextEl.textContent = step.challengeText;
+  if (actionBtnEl) actionBtnEl.innerHTML = `<span>${step.actionLabel}</span>`;
+
+  if (prevBtn) prevBtn.disabled = earthCurrentStep === 0;
+  if (nextBtn) {
+    nextBtn.disabled = earthCurrentStep === EARTH_STEPS.length - 1;
+    nextBtn.innerHTML = earthCurrentStep === EARTH_STEPS.length - 1 ? '🏁 Fin' : 'Sig ▶';
+  }
+
+  if (dotsEl) {
+    dotsEl.innerHTML = EARTH_STEPS.map((_, i) => `
+      <button onclick="setEarthStep(${i})" title="Paso ${i + 1}" class="w-2.5 h-2.5 rounded-full transition-all ${i === earthCurrentStep ? 'bg-cyan-400 scale-125 shadow-[0_0_8px_#22d3ee]' : 'bg-slate-700 hover:bg-slate-500'}"></button>
+    `).join('');
+  }
+};
+
+window.triggerEarthStepAction = function() {
+  if (earthCurrentStep === 0) {
+    // Paso 1: Enfoque al terminador solar
+    focusEarthTarget('earth');
+  } else if (earthCurrentStep === 1) {
+    // Paso 2: Enfoque a la ISS con Deep Zoom
+    focusEarthTarget('iss');
+  } else if (earthCurrentStep === 2) {
+    // Paso 3: Explorar cara oculta de la Luna
+    toggleEarthMoonFarSide();
+  } else if (earthCurrentStep === 3) {
+    // Paso 4: Iniciar Quiz de Maestría
+    openEarthQuiz();
+  }
+};
+
+window.onEarthScaleChange = function(val) {
+  earthScaleRatio = parseFloat(val);
+  const label = document.getElementById('earth-scale-label');
+  const kmEl = document.getElementById('earth-scale-km');
+  
+  if (earthScaleRatio <= 0.1) {
+    if (label) label.textContent = 'Didáctica (Compacta)';
+    if (kmEl) kmEl.textContent = '384.400 km (~30 Tierras)';
+  } else if (earthScaleRatio >= 0.9) {
+    if (label) label.textContent = 'Real 1:1 Fotorrealista';
+    if (kmEl) kmEl.textContent = '384.400 km (30 Diámetros Exactos)';
+  } else {
+    const pct = Math.round(earthScaleRatio * 100);
+    if (label) label.textContent = `Escalando (${pct}%)`;
+    if (kmEl) kmEl.textContent = `${Math.round(THREE.MathUtils.lerp(78000, 384400, earthScaleRatio)).toLocaleString()} km`;
+  }
+};
+
+window.focusEarthTarget = function(key) {
+  earthTrackedTarget = key;
+  closeEarthInspector();
+
+  if (key === 'earth') {
+    setCamera(new THREE.Vector3(0, 1.2, 5.8), 2.0, 300);
+    if (controls) controls.target.set(0, 0, 0);
+    inspectEarthEntity('earth');
+  } else if (key === 'moon') {
+    if (earthMeshes.moon) {
+      const p = earthMeshes.moon.position;
+      setCamera(new THREE.Vector3(p.x + 1.2, p.y + 0.5, p.z + 1.6), 0.3, 300);
+      if (controls) controls.target.copy(p);
+      inspectEarthEntity('moon');
+    }
+  } else if (earthMeshes.satellites[key]) {
+    const sat = earthMeshes.satellites[key];
+    const p = new THREE.Vector3();
+    sat.marker.getWorldPosition(p);
+    // DEEP ZOOM: Cámara ultracercana a 0.35 unidades para inspeccionar paneles y detalles 3D
+    setCamera(new THREE.Vector3(p.x + 0.32, p.y + 0.18, p.z + 0.42), 0.02, 300);
+    if (controls) controls.target.copy(p);
+    inspectEarthEntity(key);
+  }
+};
+
+window.inspectEarthEntity = function(key) {
+  const inspector = document.getElementById('earth-inspector-hud');
+  if (!inspector) return;
+
+  let info = null;
+
+  if (key === 'earth') {
+    info = {
+      icon: '🌍',
+      name: 'Planeta Tierra',
+      tagline: 'El Oasis Azul del Sistema Solar',
+      desc: 'Hogar de la humanidad. Diámetro medio de 12.742 km, 71% de superficie oceánica y atmósfera de 100 km de espesor.',
+      stats: [['Diámetro', '12.742 km'], ['Velocidad', '107.000 km/h'], ['Inclinación', '23,44°'], ['Atmósfera', '78% N₂ / 21% O₂']]
+    };
+  } else if (key === 'moon') {
+    info = {
+      icon: '🌕',
+      name: 'La Luna',
+      tagline: 'Satélite Natural Terrestre',
+      desc: 'Diámetro de 3.474 km (27% de la Tierra). En bloqueo sincrónico por mareas: su periodo orbital y rotacional es de 27,3 días.',
+      stats: [['Distancia Media', '384.400 km'], ['Diámetro', '3.474 km'], ['Periodo', '27,3 días'], ['Gravedad', '1,62 m/s² (16%)']]
+    };
+  } else {
+    const sat = SATELLITE_DATA.find(s => s.key === key);
+    if (sat) info = sat.info;
+  }
+
+  if (!info) return;
+
+  const iconEl = document.getElementById('earth-ins-icon');
+  const nameEl = document.getElementById('earth-ins-name');
+  const tagEl = document.getElementById('earth-ins-tagline');
+  const descEl = document.getElementById('earth-ins-desc');
+  const altEl = document.getElementById('earth-ins-alt');
+  const velEl = document.getElementById('earth-ins-vel');
+  const perEl = document.getElementById('earth-ins-period');
+  const incEl = document.getElementById('earth-ins-inc');
+  const farSideBtn = document.getElementById('earth-ins-farside-btn');
+
+  if (iconEl) iconEl.textContent = info.icon;
+  if (nameEl) nameEl.textContent = info.name;
+  if (tagEl) tagEl.textContent = info.tagline;
+  if (descEl) descEl.textContent = info.desc;
+
+  if (info.stats) {
+    if (altEl) altEl.textContent = info.stats[0] ? info.stats[0][1] : '--';
+    if (velEl) velEl.textContent = info.stats[1] ? info.stats[1][1] : '--';
+    if (perEl) perEl.textContent = info.stats[2] ? info.stats[2][1] : '--';
+    if (incEl) incEl.textContent = info.stats[3] ? info.stats[3][1] : '--';
+  }
+
+  if (farSideBtn) {
+    farSideBtn.classList.toggle('hidden', key !== 'moon');
+  }
+
+  inspector.classList.remove('hidden');
+};
+
+window.closeEarthInspector = function() {
+  const inspector = document.getElementById('earth-inspector-hud');
+  if (inspector) inspector.classList.add('hidden');
+};
+
+window.trackSelectedEntity = function() {
+  if (earthTrackedTarget) {
+    focusEarthTarget(earthTrackedTarget);
+  }
+};
+
+window.toggleEarthMoonFarSide = function() {
+  moonFarSideActive = !moonFarSideActive;
+  const btn = document.getElementById('earth-ins-farside-btn');
+  if (btn) {
+    btn.innerHTML = moonFarSideActive 
+      ? '<span>🔄 Girar a Cara Visible</span>' 
+      : '<span>🔄 Girar a Cara Oculta</span>';
+    btn.classList.toggle('bg-emerald-600', moonFarSideActive);
+    btn.classList.toggle('bg-amber-600', !moonFarSideActive);
+  }
+  focusEarthTarget('moon');
+};
+
+/* ================= BOTTOM SHEET PLEGABLE DE LECCIONES SOBRE EL 3D ================= */
+window.currentFloatingStep = 0;
+
+window.expandFloatingLesson = function() {
+  const pill = document.getElementById('floating-lesson-pill');
+  const expanded = document.getElementById('floating-lesson-expanded');
+  if (pill) pill.classList.add('hidden');
+  if (expanded) {
+    expanded.classList.remove('hidden');
+    renderFloatingLessonContent();
+  }
+};
+
+window.collapseFloatingLesson = function() {
+  const pill = document.getElementById('floating-lesson-pill');
+  const expanded = document.getElementById('floating-lesson-expanded');
+  if (expanded) expanded.classList.add('hidden');
+  if (pill) pill.classList.remove('hidden');
+};
+
+window.navigateFloatingStep = function(dir) {
+  const lesson = LESSONS[0]; // Tema 1
+  const nextIdx = window.currentFloatingStep + dir;
+  if (nextIdx >= 0 && nextIdx < lesson.steps.length) {
+    window.currentFloatingStep = nextIdx;
+    renderFloatingLessonContent();
+    
+    // Enfocar automáticamente el astro correspondiente en el 3D
+    if (nextIdx === 0) focusEarthTarget('earth');
+    else if (nextIdx === 1) focusEarthTarget('iss');
+    else if (nextIdx === 2) focusEarthTarget('hubble');
+    else if (nextIdx === 3) focusEarthTarget('moon');
+  } else if (nextIdx >= lesson.steps.length) {
+    // Ha terminado de leer la lección: marcar como leída y abrir el test
+    const prog = lessonProg(1);
+    prog.read = true;
+    persist();
+    try { window.parent.postMessage({ type: 'STEP_COMPLETED', lessonId: 1 }, '*'); } catch(e) {}
+    toast('🎉 ¡Lección 1 completada! Test desbloqueado 🎯');
+    collapseFloatingLesson();
+    openEarthQuiz();
+  }
+};
+
+function renderFloatingLessonContent() {
+  const lesson = LESSONS[0];
+  const step = lesson.steps[window.currentFloatingStep] || lesson.steps[0];
+  const total = lesson.steps.length;
+  const idx = window.currentFloatingStep;
+
+  // Pill
+  const pillIcon = document.getElementById('pill-icon');
+  const pillBadge = document.getElementById('pill-badge');
+  const pillTitle = document.getElementById('pill-title');
+  if (pillIcon) pillIcon.textContent = step.icon;
+  if (pillBadge) pillBadge.textContent = `Paso ${idx + 1} de ${total} • Lección 1`;
+  if (pillTitle) pillTitle.textContent = step.t;
+
+  // Sheet
+  const sheetIcon = document.getElementById('sheet-icon');
+  const sheetStepBadge = document.getElementById('sheet-step-badge');
+  const sheetTitle = document.getElementById('sheet-title');
+  const sheetNarrative = document.getElementById('sheet-narrative');
+  const sheetPhotoImg = document.getElementById('sheet-photo-img');
+  const sheetPhotoCaption = document.getElementById('sheet-photo-caption');
+  const sheetPhotoCredit = document.getElementById('sheet-photo-credit');
+  const sheetWowText = document.getElementById('sheet-wow-text');
+  const sheetNowText = document.getElementById('sheet-now-text');
+  const sheetPrevBtn = document.getElementById('sheet-prev-btn');
+  const sheetNextBtn = document.getElementById('sheet-next-btn');
+  const sheetDots = document.getElementById('sheet-step-dots');
+
+  if (sheetIcon) sheetIcon.textContent = step.icon;
+  if (sheetStepBadge) sheetStepBadge.textContent = `Paso ${idx + 1} de ${total}`;
+  if (sheetTitle) sheetTitle.textContent = step.t;
+  if (sheetNarrative) sheetNarrative.textContent = step.text;
+
+  if (sheetPhotoImg && step.photo) {
+    sheetPhotoImg.src = step.photo.url;
+    if (sheetPhotoCaption) sheetPhotoCaption.textContent = step.photo.caption || '';
+    if (sheetPhotoCredit) sheetPhotoCredit.textContent = 'Crédito: ' + (step.photo.credit || 'NASA / ESA');
+  }
+
+  if (sheetWowText) sheetWowText.textContent = step.wow || '';
+  if (sheetNowText) sheetNowText.textContent = step.now || '';
+
+  if (sheetPrevBtn) sheetPrevBtn.disabled = (idx === 0);
+  if (sheetNextBtn) {
+    sheetNextBtn.innerHTML = (idx < total - 1) ? 'Siguiente Paso ▶' : 'Completar y Test 🎯';
+  }
+
+  if (sheetDots) {
+    sheetDots.innerHTML = lesson.steps.map((_, i) => `
+      <div onclick="window.currentFloatingStep = ${i}; renderFloatingLessonContent();" class="w-2 h-2 rounded-full cursor-pointer transition-all ${i === idx ? 'bg-cyan-400 scale-125 shadow-sm' : (i < idx ? 'bg-indigo-500' : 'bg-slate-700')}"></div>
+    `).join('');
+  }
+}
+
+/* ================= QUIZ DE MAESTRÍA ESCENA 1 (+100 XP) ================= */
+window.openEarthQuiz = function() {
+  earthQuizCurrentQ = 0;
+  earthQuizScore = 0;
+  renderEarthQuizQuestion();
+  const modal = document.getElementById('earth-quiz-modal');
+  if (modal) modal.classList.remove('hidden');
+};
+
+window.closeEarthQuiz = function() {
+  const modal = document.getElementById('earth-quiz-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+function renderEarthQuizQuestion() {
+  const container = document.getElementById('earth-quiz-content');
+  if (!container) return;
+
+  if (earthQuizCurrentQ >= EARTH_QUIZ_DATA.length) {
+    // Resumen de éxito
+    container.innerHTML = `
+      <div class="text-center py-4 space-y-3">
+        <div class="text-4xl animate-bounce">🏆</div>
+        <h4 class="font-display font-bold text-lg text-white">¡Desafío Terrestre Completado!</h4>
+        <p class="text-slate-300 text-xs">Puntuación: <span class="font-bold text-cyan-300">${earthQuizScore} de ${EARTH_QUIZ_DATA.length} aciertos</span></p>
+        <div class="p-3 bg-emerald-950/40 border border-emerald-500/40 rounded-2xl flex items-center justify-center gap-2">
+          <span class="text-emerald-400 font-bold text-sm">⚡ +100 XP Ganados</span>
+          <span class="text-xs text-slate-300">• Medalla 'Guardián Terrestre'</span>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button onclick="closeEarthQuiz(); goToLevel(1);" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg transition-all active:scale-95">
+            Saltar a Escena 2: Eclipses ▶
+          </button>
+          <button onclick="closeEarthQuiz()" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold">
+            Seguir Explorando
+          </button>
+        </div>
+      </div>
+    `;
+
+    // Sincronizar con el progreso del usuario
+    if (window.parent && window.parent.postMessage) {
+      window.parent.postMessage({
+        type: 'CELESTIAL_RETO_COMPLETED',
+        retoId: 'reto_tierra_guardian',
+        xp: 100
+      }, '*');
+      window.parent.postMessage({
+        type: 'STEP_COMPLETED',
+        lessonId: 'earth_mastery'
+      }, '*');
+    }
+    return;
+  }
+
+  const q = EARTH_QUIZ_DATA[earthQuizCurrentQ];
+  container.innerHTML = `
+    <div class="space-y-3">
+      <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+        <span>Pregunta ${earthQuizCurrentQ + 1} de ${EARTH_QUIZ_DATA.length}</span>
+        <span class="text-amber-300 font-mono">Aciertos: ${earthQuizScore}</span>
+      </div>
+      <p class="font-bold text-white text-xs sm:text-sm leading-snug">${q.q}</p>
+      <div class="space-y-1.5 pt-1">
+        ${q.options.map((opt, i) => `
+          <button onclick="submitEarthQuizOption(${i})" class="w-full text-left p-2.5 rounded-xl bg-slate-900/90 hover:bg-indigo-950/60 border border-slate-800 hover:border-indigo-500/50 text-slate-200 text-xs font-medium transition-all active:scale-[0.98]">
+            <span class="inline-block w-5 h-5 rounded-lg bg-slate-800 text-center leading-5 text-[10px] font-bold text-cyan-300 mr-2">${String.fromCharCode(65 + i)}</span>
+            ${opt}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+window.submitEarthQuizOption = function(selectedIdx) {
+  const q = EARTH_QUIZ_DATA[earthQuizCurrentQ];
+  const isCorrect = selectedIdx === q.answer;
+  if (isCorrect) earthQuizScore++;
+
+  const container = document.getElementById('earth-quiz-content');
+  if (!container) return;
+
+  container.innerHTML = `
+    <div class="space-y-3">
+      <div class="flex items-center gap-2 p-3 rounded-2xl ${isCorrect ? 'bg-emerald-950/50 border border-emerald-500/40 text-emerald-300' : 'bg-rose-950/50 border border-rose-500/40 text-rose-300'}">
+        <span class="text-xl">${isCorrect ? '✅' : '❌'}</span>
+        <div>
+          <h4 class="font-bold text-xs">${isCorrect ? '¡Respuesta Correcta!' : 'Respuesta Incorrecta'}</h4>
+          <p class="text-[11px] text-slate-300 mt-0.5">${q.explanation}</p>
+        </div>
+      </div>
+      <button onclick="earthQuizCurrentQ++; renderEarthQuizQuestion();" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all active:scale-95">
+        ${earthQuizCurrentQ < EARTH_QUIZ_DATA.length - 1 ? 'Siguiente Pregunta ▶' : 'Ver Resultados 🏆'}
+      </button>
+    </div>
+  `;
+};
 
 const PLANET_DATA=[
  {key:'mercury',name:'Mercurio',tex:()=>makePlanetTexture(['#8a8a8a','#6e6e6e','#9c9c9c'],2600),size:0.32,dist:6,speed:1.6},
@@ -2812,7 +3955,16 @@ window.setSimSpeed = function(spd) {
 window.isCinemaMode = false;
 window.toggleCinemaMode = function() {
   window.isCinemaMode = !window.isCinemaMode;
-  const ids = ['telemetry-card', 'celestial-hud-controls', 'celestial-time-hud'];
+  const ids = [
+    'floating-lesson-container',
+    'earth-inspector-hud',
+    'earth-controls-hud',
+    'bottom-nav',
+    'astrolingo-internal-header',
+    'telemetry-card',
+    'celestial-hud-controls',
+    'celestial-time-hud'
+  ];
   ids.forEach(id => {
     const el = document.getElementById(id);
     if (el) {
@@ -2827,12 +3979,26 @@ window.toggleCinemaMode = function() {
   });
   const btn = document.getElementById('cinema-btn');
   if (btn) {
-    btn.innerHTML = window.isCinemaMode ? '<span>🙈</span> <span>Mostrar HUD</span>' : '<span>👁️</span> <span>Modo Cine</span>';
+    btn.innerHTML = window.isCinemaMode ? '<span>🙈</span> <span>Salir Modo Cine</span>' : '<span>👁️</span> <span>Modo Cine</span>';
     btn.className = window.isCinemaMode 
-      ? 'px-3 py-1.5 rounded-xl bg-amber-500/80 hover:bg-amber-500 text-xs font-extrabold text-white border border-amber-400/50 shadow-xl transition-all flex items-center gap-1.5 animate-pulse'
-      : 'px-3 py-1.5 rounded-xl glass text-xs font-extrabold text-cyan-300 hover:bg-cyan-500/20 border border-cyan-500/30 transition-all flex items-center gap-1.5 shadow-lg';
+      ? 'px-3 py-1.5 rounded-xl bg-amber-500/90 hover:bg-amber-500 text-xs font-extrabold text-white border border-amber-400 shadow-2xl transition-all flex items-center gap-1.5 animate-pulse pointer-events-auto'
+      : 'px-3 py-1.5 rounded-xl glass text-xs font-extrabold text-cyan-300 hover:bg-cyan-500/20 border border-cyan-500/30 transition-all flex items-center gap-1.5 shadow-lg pointer-events-auto';
   }
 };
+
+// ATAJOS DE TECLADO: [H] MODO CINE / ZEN, [F] PANTALLA COMPLETA
+window.addEventListener('keydown', (e) => {
+  if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+  if (e.key === 'h' || e.key === 'H') {
+    window.toggleCinemaMode();
+  } else if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+});
 
 window.toggleTelemetryCollapse = function() {
   const body = document.getElementById('tel-body');
@@ -3332,13 +4498,22 @@ function updateLevelUI(){
   nb.innerHTML=currentLevel===LEVELS.length-1?'🏁':'Saltar ▶';
 
   const isPhenomenon = ['eclipses', 'daynight', 'orbit', 'seasons'].includes(L.buildKey);
+  const isEarthScene = (L.buildKey === 'earth');
+
   const telCard = document.getElementById('telemetry-card');
   const hudControls = document.getElementById('celestial-hud-controls');
   const timeHud = document.getElementById('celestial-time-hud');
+  const earthInspectorHud = document.getElementById('earth-inspector-hud');
+  const earthControlsHud = document.getElementById('earth-controls-hud');
+
   if (telCard) telCard.classList.toggle('hidden', !isPhenomenon);
   if (hudControls) hudControls.classList.toggle('hidden', !isPhenomenon);
   if (timeHud) timeHud.classList.toggle('hidden', !isPhenomenon);
   if (isPhenomenon) updateCelestialTelemetry();
+
+  if (earthControlsHud) earthControlsHud.classList.toggle('hidden', !isEarthScene);
+  if (earthInspectorHud && !isEarthScene) earthInspectorHud.classList.add('hidden');
+  if (isEarthScene && typeof updateEarthStepUI === 'function') updateEarthStepUI();
 }
 
 window.goToLevel=(i,opts={})=>{

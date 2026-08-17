@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS — LANGUAGES | Profesor Particular IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #030712;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --card-border: rgba(6, 182, 212, 0.25);
+      --primary: #06b6d4;
+      --primary-glow: rgba(6, 182, 212, 0.4);
+      --emerald: #10b981;
+      --emerald-glow: rgba(16, 185, 129, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(ellipse at top right, rgba(6, 182, 212, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at bottom left, rgba(16, 185, 129, 0.1) 0%, transparent 60%);
+      line-height: 1.6;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      border-color: rgba(6, 182, 212, 0.45);
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.15);
+      border: 1px solid rgba(6, 182, 212, 0.4);
+      color: #67e8f9;
+    }
+    .pulse-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.3); }
+    }
+    .nav-btn {
+      padding: 0.65rem 1.25rem;
+      border-radius: 1rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.825rem;
+      cursor: pointer;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: all 0.2s ease;
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .nav-btn.active {
+      background: var(--primary);
+      color: #030712;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+    .nav-btn:hover:not(.active) {
+      border-color: rgba(6, 182, 212, 0.3);
+      color: #fff;
+    }
+    .lang-chip {
+      padding: 0.6rem 1rem;
+      border-radius: 1rem;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .lang-chip.active {
+      border-color: var(--primary);
+      background: rgba(6, 182, 212, 0.15);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+    }
+  </style>
+</head>
+<body class="p-3 md:p-6 pb-20">
+
+  <!-- Contenedor Maestro -->
+  <div class="max-w-7xl mx-auto space-y-6">
+
+    <!-- Header Principal -->
+    <header class="glass-card p-6 relative overflow-hidden">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+        
+        {/* Info del Profesor */}
+        <div class="flex items-center gap-4">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-emerald-400 p-0.5 shadow-lg shadow-cyan-500/25 shrink-0">
+            <div class="w-full h-full bg-slate-950 rounded-2xl flex items-center justify-center text-3xl">
+              👨‍🏫
+            </div>
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="badge badge-cyan">
+                <span class="pulse-dot"></span>
+                PROFESOR PARTICULAR IA
+              </span>
+              <span class="text-xs font-mono font-bold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/30" id="cefrBadge">
+                NIVEL CEFR B2
+              </span>
+            </div>
+            <h1 class="text-2xl md:text-3xl font-extrabold text-white mt-1">
+              GOALS — <span style="background: linear-gradient(135deg, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Idiomas & Voz IA</span>
+            </h1>
+          </div>
+        </div>
+
+        {/* Acciones Rápidas */}
+        <div class="flex items-center gap-3">
+          <button onclick="triggerVoiceSpeak()" class="px-5 py-3 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs transition-all shadow-lg shadow-cyan-500/25 cursor-pointer flex items-center gap-2">
+            <span>🎙️ Hablar con mi Profesor</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Selector de Idiomas -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5" id="langSelector">
+      <button onclick="setLanguage('Inglés', 'en-US')" class="lang-chip active text-left" id="chip-Inglés">
+        <span class="text-xl">🇬🇧</span>
+        <p class="font-extrabold text-xs text-white mt-1">Inglés</p>
+        <span class="text-[10px] text-slate-400">Oxford & US</span>
+      </button>
+      <button onclick="setLanguage('Francés', 'fr-FR')" class="lang-chip text-left" id="chip-Francés">
+        <span class="text-xl">🇫🇷</span>
+        <p class="font-extrabold text-xs text-white mt-1">Francés</p>
+        <span class="text-[10px] text-slate-400">Français Standard</span>
+      </button>
+      <button onclick="setLanguage('Alemán', 'de-DE')" class="lang-chip text-left" id="chip-Alemán">
+        <span class="text-xl">🇩🇪</span>
+        <p class="font-extrabold text-xs text-white mt-1">Alemán</p>
+        <span class="text-[10px] text-slate-400">Hochdeutsch</span>
+      </button>
+      <button onclick="setLanguage('Japonés', 'ja-JP')" class="lang-chip text-left" id="chip-Japonés">
+        <span class="text-xl">🇯🇵</span>
+        <p class="font-extrabold text-xs text-white mt-1">Japonés</p>
+        <span class="text-[10px] text-slate-400">Tokyo Hyojungo</span>
+      </button>
+      <button onclick="setLanguage('Italiano', 'it-IT')" class="lang-chip text-left" id="chip-Italiano">
+        <span class="text-xl">🇮🇹</span>
+        <p class="font-extrabold text-xs text-white mt-1">Italiano</p>
+        <span class="text-[10px] text-slate-400">Italiano Standard</span>
+      </button>
+      <button onclick="setLanguage('Portugués', 'pt-PT')" class="lang-chip text-left" id="chip-Portugués">
+        <span class="text-xl">🇵🇹</span>
+        <p class="font-extrabold text-xs text-white mt-1">Portugués</p>
+        <span class="text-[10px] text-slate-400">Europeu / Brasil</span>
+      </button>
+    </div>
+
+    <!-- Navegación de Pestañas -->
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      <button onclick="switchTab('tutor')" class="nav-btn active" id="tab-tutor">💬 Tutor Conversacional</button>
+      <button onclick="switchTab('practice')" class="nav-btn" id="tab-practice">⚡ Práctica Adaptativa</button>
+      <button onclick="switchTab('roleplay')" class="nav-btn" id="tab-roleplay">🎭 Roleplay Studio</button>
+      <button onclick="switchTab('stories')" class="nav-btn" id="tab-stories">📖 Cuentos Interactivos</button>
+      <button onclick="switchTab('phonetics')" class="nav-btn" id="tab-phonetics">🎙️ Fonética & Ondas</button>
+      <button onclick="switchTab('mastery')" class="nav-btn" id="tab-mastery">📊 Dominio CEFR</button>
+    </div>
+
+    <!-- PESTAÑA 1: TUTOR CONVERSACIONAL -->
+    <div id="view-tutor" class="glass-card p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="font-extrabold text-sm text-white flex items-center gap-2">
+          <span>Diálogo Pedagógico en Vivo con el Profesor IA</span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        </h3>
+        <span class="text-xs text-cyan-400 font-mono" id="activeLangLabel">Idioma: Inglés</span>
+      </div>
+
+      <div id="chatFeed" class="bg-slate-950 p-4 rounded-2xl min-h-[300px] max-h-[400px] overflow-y-auto space-y-3">
+        <div class="flex items-start gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-sm shrink-0">👨‍🏫</div>
+          <div class="bg-slate-900 border border-cyan-500/30 p-3 rounded-2xl text-xs text-slate-200 leading-relaxed max-w-[85%]">
+            Hello Alex! I am your personal language tutor. What would you like to explore today? We can practice conversation, prepare for travel, or explore science in English!
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de Input -->
+      <div class="flex gap-2">
+        <input type="text" id="chatInput" placeholder="Escribe o formula tu frase en el idioma..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-cyan-200 placeholder-slate-500 focus:outline-none focus:border-cyan-400">
+        <button onclick="sendChatMessage()" class="px-5 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs transition-all cursor-pointer">
+          Enviar Frase
+        </button>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 2: PRÁCTICA ADAPTATIVA -->
+    <div id="view-practice" class="glass-card p-5 space-y-4 hidden">
+      <h3 class="font-extrabold text-sm text-white">Práctica Adaptativa de Estructuras</h3>
+      <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3">
+        <p class="text-xs text-slate-400">Completa con la forma correcta del verbo en pasado:</p>
+        <h4 class="text-base font-bold text-white">Yesterday we ___ (fly) to London for a tech conference.</h4>
+        <div class="grid grid-cols-2 gap-2 pt-2">
+          <button onclick="checkPractice('flied', false)" class="p-3 bg-slate-900 hover:bg-slate-850 rounded-xl border border-slate-800 text-xs font-bold text-slate-300 text-left">A) flied</button>
+          <button onclick="checkPractice('flew', true)" class="p-3 bg-slate-900 hover:bg-slate-850 rounded-xl border border-slate-800 text-xs font-bold text-slate-300 text-left">B) flew</button>
+          <button onclick="checkPractice('flown', false)" class="p-3 bg-slate-900 hover:bg-slate-850 rounded-xl border border-slate-800 text-xs font-bold text-slate-300 text-left">C) flown</button>
+          <button onclick="checkPractice('flying', false)" class="p-3 bg-slate-900 hover:bg-slate-850 rounded-xl border border-slate-800 text-xs font-bold text-slate-300 text-left">D) flying</button>
+        </div>
+        <div id="practiceFeedback" class="hidden p-3 rounded-xl text-xs font-medium"></div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 3: ROLEPLAY STUDIO -->
+    <div id="view-roleplay" class="glass-card p-5 space-y-4 hidden">
+      <h3 class="font-extrabold text-sm text-white">Simulador de Roleplay: Aeropuerto & Embarque</h3>
+      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+        <p class="text-xs text-cyan-300">Agente de Facturación: "Good morning! May I see your passport and boarding pass, please?"</p>
+        <input type="text" id="roleplayInput" placeholder="Responde como pasajero..." class="w-full bg-slate-900 border border-slate-800 rounded-xl p-3 text-xs text-cyan-200">
+        <button onclick="sendRoleplayTurn()" class="px-4 py-2 bg-cyan-500 text-slate-950 font-bold rounded-xl text-xs cursor-pointer">Responder en el Roleplay</button>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 4: CUENTOS INTERACTIVOS -->
+    <div id="view-stories" class="glass-card p-5 space-y-4 hidden">
+      <h3 class="font-extrabold text-sm text-white">Cuento Interactivo: The Mars Explorer</h3>
+      <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs leading-relaxed text-slate-200">
+        <p>Leo stepped out of the habitat into the red Martian dust. The sunset painted the sky in shades of deep blue and violet. Suddenly, his rover sensor detected a faint radio signal from the Olympus Mons crater.</p>
+        <div class="pt-2 flex gap-2">
+          <button onclick="alert('Explorando el cráter...');" class="px-4 py-2 bg-purple-950/60 border border-purple-500/40 text-purple-200 rounded-xl text-xs font-bold">Investigar el cráter ➔</button>
+          <button onclick="alert('Transmitiendo a la Tierra...');" class="px-4 py-2 bg-slate-900 border border-slate-800 text-slate-300 rounded-xl text-xs font-bold">Transmitir a la base ➔</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 5: FONÉTICA & ONDAS -->
+    <div id="view-phonetics" class="glass-card p-5 space-y-4 hidden">
+      <h3 class="font-extrabold text-sm text-white">Análisis Fonético: "comfortable" (/ˈkʌmftəbl/)</h3>
+      <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 text-center space-y-3">
+        <div class="h-16 flex items-center justify-center gap-1">
+          <div class="w-1 h-8 bg-cyan-400 rounded-full"></div>
+          <div class="w-1 h-12 bg-cyan-300 rounded-full"></div>
+          <div class="w-1 h-16 bg-cyan-400 rounded-full"></div>
+          <div class="w-1 h-10 bg-cyan-500 rounded-full"></div>
+          <div class="w-1 h-6 bg-cyan-300 rounded-full"></div>
+        </div>
+        <p class="text-xs text-slate-300">Pronuncia en 3 sílabas compactas: <strong>KUMF-tuh-bl</strong></p>
+        <button onclick="speakTextDemo('comfortable')" class="px-4 py-2 bg-cyan-500 text-slate-950 font-bold rounded-xl text-xs">🔊 Escuchar Modelo Nativo</button>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 6: DOMINIO CEFR -->
+    <div id="view-mastery" class="glass-card p-5 space-y-4 hidden">
+      <h3 class="font-extrabold text-sm text-white">Dominio por Competencias CEFR</h3>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+          <span class="text-[10px] text-slate-400 block">Speaking</span>
+          <span class="text-base font-bold text-cyan-300 font-mono">75% (B2)</span>
+        </div>
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+          <span class="text-[10px] text-slate-400 block">Listening</span>
+          <span class="text-base font-bold text-emerald-300 font-mono">82% (B2+)</span>
+        </div>
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+          <span class="text-[10px] text-slate-400 block">Reading</span>
+          <span class="text-base font-bold text-indigo-300 font-mono">88% (C1)</span>
+        </div>
+        <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
+          <span class="text-[10px] text-slate-400 block">Writing</span>
+          <span class="text-base font-bold text-amber-300 font-mono">68% (B1+)</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let currentLang = 'Inglés';
+    let currentVoiceCode = 'en-US';
+
+    function setLanguage(name, voiceCode) {
+      currentLang = name;
+      currentVoiceCode = voiceCode;
+      document.querySelectorAll('.lang-chip').forEach(c => c.classList.remove('active'));
+      const chip = document.getElementById(`chip-${name}`);
+      if (chip) chip.classList.add('active');
+      document.getElementById('activeLangLabel').textContent = `Idioma: ${name}`;
+    }
+
+    function switchTab(tabId) {
+      const views = ['tutor', 'practice', 'roleplay', 'stories', 'phonetics', 'mastery'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`tab-${v}`);
+        if (el) el.classList.add('hidden');
+        if (btn) btn.classList.remove('active');
+      });
+      const activeEl = document.getElementById(`view-${tabId}`);
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeEl) activeEl.classList.remove('hidden');
+      if (activeBtn) activeBtn.classList.add('active');
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const feed = document.getElementById('chatFeed');
+      feed.innerHTML += `
+        <div class="flex justify-end">
+          <div class="bg-cyan-600 text-white p-3 rounded-2xl text-xs font-medium max-w-[85%]">
+            ${text}
+          </div>
+        </div>
+      `;
+      feed.scrollTop = feed.scrollHeight;
+
+      try {
+        const res = await fetch('/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer freellmapi-bc5d56dc6a1548c6c11a0d409008b1ed0273e4105cd64784'
+          },
+          body: JSON.stringify({
+            model: 'auto',
+            messages: [
+              {
+                role: 'system',
+                content: `Eres el Teacher Agent de GOALS Languages (${currentLang}). Responde en 2 frases en ${currentLang} y haz una pregunta para continuar.`
+              },
+              { role: 'user', content: text }
+            ]
+          })
+        });
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || 'Great sentence! Keep practicing.';
+
+        feed.innerHTML += `
+          <div class="flex items-start gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center text-sm shrink-0">👨‍🏫</div>
+            <div class="bg-slate-900 border border-cyan-500/30 p-3 rounded-2xl text-xs text-slate-200 leading-relaxed max-w-[85%]">
+              ${reply}
+              <button onclick="speakTextDemo('${reply.replace(/'/g, "\\'")}')" class="mt-2 block text-[10px] text-cyan-400 hover:underline">🔊 Escuchar pronunciación</button>
+            </div>
+          </div>
+        `;
+        feed.scrollTop = feed.scrollHeight;
+        speakTextDemo(reply);
+      } catch (err) {
+        feed.innerHTML += `<div class="text-xs text-rose-400">Error al conectar con la IA.</div>`;
+      }
+    }
+
+    function checkPractice(word, isCorrect) {
+      const fb = document.getElementById('practiceFeedback');
+      fb.classList.remove('hidden');
+      if (isCorrect) {
+        fb.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-500/20 border border-emerald-500 text-emerald-300';
+        fb.textContent = '¡Correcto! "Flew" es el pasado simple irregular del verbo "fly". (+15 XP)';
+      } else {
+        fb.className = 'p-3 rounded-xl text-xs font-bold bg-rose-500/20 border border-rose-500 text-rose-300';
+        fb.textContent = 'Incorrecto. La forma correcta en pasado simple es "flew".';
+      }
+    }
+
+    function triggerVoiceSpeak() {
+      switchTab('tutor');
+      speakTextDemo("Hello! I am ready to talk with you. What would you like to practice today?");
+    }
+
+    function speakTextDemo(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = currentVoiceCode;
+        utter.rate = 0.95;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+  </script>
+</body>
+</html>

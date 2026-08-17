@@ -1,25 +1,29 @@
-export type ExperienceId = 'school' | 'languages' | 'astro' | 'verify';
+export type ExperienceId = 'school' | 'languages' | 'astro' | 'verify' | 'criterio' | 'ai-lab';
+export type AppViewMode = ExperienceId | 'admin' | 'profile' | null;
 
 export interface UserProfile {
   uid: string;
-  email: string;
-  displayName: string;
-  photoURL?: string;
-  role: 'admin' | 'user';
+  email: string | null;
+  displayName: string | null;
+  photoURL?: string | null;
+  role?: 'admin' | 'user';
+  isAnonymous?: boolean;
+  providerId?: string;
   isApproved?: boolean;
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface EvolutionEntry {
   id: string;
   timestamp: number;
   dateStr: string;
-  type: 'lesson_finished' | 'test_completed' | 'reto_claimed';
+  type: 'lesson_finished' | 'test_completed' | 'reto_claimed' | 'experience_activity' | 'streak_level';
   title: string;
   score?: string;
-  stars?: number;
+  stars?: number; // 0-3
   xpEarned: number;
   experienceId: ExperienceId;
+  details?: string;
 }
 
 export interface LessonProgress {
@@ -28,6 +32,12 @@ export interface LessonProgress {
   stars: number; // 0 a 3
   read?: boolean;
   score?: number;
+  completedAt?: string;
+}
+
+export interface ExperienceProgress {
+  xp: number;
+  lessons: Record<number | string, LessonProgress>;
 }
 
 export interface UserData {
@@ -37,29 +47,31 @@ export interface UserData {
   lastActiveDate?: string;
   avatar?: string;
   bio?: string;
+  role?: 'admin' | 'student' | 'teacher';
   isApproved?: boolean;
   claimedRetos?: Record<string, boolean>;
   weeklyActivity?: boolean[]; // [Lun, Mar, Mie, Jue, Vie, Sab, Dom]
   experiences?: {
-    astro?: {
-      xp: number;
-      lessons: Record<number, LessonProgress>;
-    };
-    school?: {
-      xp: number;
-      lessons: Record<number, LessonProgress>;
-    };
-    languages?: {
-      xp: number;
-      lessons: Record<number, LessonProgress>;
-    };
-    verify?: {
-      xp: number;
-      lessons: Record<number, LessonProgress>;
-    };
+    astro?: ExperienceProgress;
+    school?: ExperienceProgress;
+    languages?: ExperienceProgress;
+    verify?: ExperienceProgress;
+    criterio?: ExperienceProgress;
+    'ai-lab'?: ExperienceProgress;
+    aiLab?: ExperienceProgress;
   };
   lessons?: Record<number, LessonProgress>;
   evolutions: EvolutionEntry[];
+  childProfile?: Record<string, any>;
+  learnerProfile?: import('./adaptiveCurriculum').LearnerProfile;
+  mascotConfig?: {
+    skinId?: string;
+    customName?: string;
+    soulPrompt?: string;
+    scale?: number;
+    pitch?: number;
+    rate?: number;
+  };
 }
 
 export interface RetoItem {
@@ -122,7 +134,6 @@ export interface Lesson {
   steps: StepDef[];
   questions: QuestionDef[];
 }
-
 export interface SpaceObjectInfo {
   id: string;
   name: string;
@@ -135,3 +146,5 @@ export interface SpaceObjectInfo {
   modelType: string;
   color: string;
 }
+
+export * from './adaptiveCurriculum';

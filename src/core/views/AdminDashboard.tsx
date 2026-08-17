@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { defaultFirebaseConfig, getStoredFirebaseConfig, db, collection, getDocs, doc, setDoc, deleteDoc, onSnapshot } from '../config/firebase';
-import { X, Shield, Sliders, Users, BarChart3, Key, CheckCircle2, AlertTriangle, Check, UserX, Clock, RefreshCw, Trash2, Bot, Mic, Sparkles, Crown } from 'lucide-react';
+import { X, Shield, Sliders, Users, BarChart3, Key, CheckCircle2, AlertTriangle, Check, UserX, Clock, RefreshCw, Trash2, Bot, Mic, Sparkles, Crown, BookOpen, Box } from 'lucide-react';
 import { UserData } from '../types';
 import { getAdminAiApiKey, setAdminAiApiKey } from '../services/aiService';
+import { CurriculumMarkdownStudio } from '../components/admin/CurriculumMarkdownStudio';
+import { Omni3DStudioAdmin } from '../components/admin/Omni3DStudioAdmin';
 
 interface AdminDashboardProps {
   isOpen: boolean;
   onClose: () => void;
+  isEmbedded?: boolean;
   graphicsConfig: {
     sunIntensity: number;
     ambientIntensity: number;
@@ -28,22 +31,36 @@ interface UserRecord {
   isApproved: boolean;
   xp: number;
   streak: number;
+  age?: number;
+  grade?: string;
+  ageTranche?: string;
+  educationalStage?: string;
+  interests?: string[];
+  onboardingCompleted?: boolean;
   createdAt?: string;
+  rawUserData?: UserData;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   isOpen,
   onClose,
+  isEmbedded = false,
   graphicsConfig,
   onUpdateGraphicsConfig
 }) => {
   const { user, isAdmin } = useAuth();
   const { userData, showToast } = useProgress();
 
-  const [activeTab, setActiveTab] = useState<'users' | 'apps' | 'analytics' | 'firebase' | 'ai_voice'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'apps' | 'analytics' | 'firebase' | 'ai_voice' | 'curriculum' | 'omni_3d'>('omni_3d');
   const [usersList, setUsersList] = useState<UserRecord[]>([]);
   const [loadingUsers, setLoadingUsers] = useState<boolean>(false);
   const [customAiApiKey, setCustomAiApiKey] = useState(() => getAdminAiApiKey());
+
+  // Filtros de Alumnos
+  const [filterAgeTranche, setFilterAgeTranche] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending'>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedStudentForModal, setSelectedStudentForModal] = useState<UserRecord | null>(null);
 
   // Apps Status State (Admin control)
   const [appsStatus, setAppsStatus] = useState({
@@ -68,8 +85,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         const data = docSnap.data() as UserData & { email?: string; displayName?: string; isApproved?: boolean };
         const uid = docSnap.id;
         const userEmail = data.email || (uid === user?.uid ? user?.email : `${uid.slice(0, 6)}@estudiante.com`);
-        const name = data.displayName || (uid === user?.uid ? user?.displayName : 'Estudiante registrado');
+        const name = data.learnerProfile?.identity?.name || data.displayName || data.childProfile?.childName || (uid === user?.uid ? user?.displayName : 'Estudiante');
         const isAdminUser = userEmail === 'josferestudio@gmail.com';
+        const studentAge = data.learnerProfile?.education?.age || (data.childProfile?.age ? Number(data.childProfile.age) : undefined);
+        const studentGrade = data.learnerProfile?.education?.grade || data.childProfile?.grade;
+        const studentTranche = data.learnerProfile?.education?.ageTranche || (studentAge ? (studentAge <= 7 ? '6-7' : studentAge <= 9 ? '8-9' : studentAge <= 11 ? '10-11' : studentAge <= 13 ? '12-13' : '14-15') : undefined);
+        const studentStage = data.learnerProfile?.education?.educationalStage || data.childProfile?.educationalStage;
+        const studentInterests = data.learnerProfile?.preferences?.interests || data.childProfile?.interests || [];
+        const onboardingDone = data.learnerProfile?.onboarding?.globalCompleted ?? (Boolean(data.childProfile?.age) && Number(data.childProfile?.age) >= 6);
 
         records.push({
           uid,
@@ -77,7 +100,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           displayName: name || 'Estudiante',
           isApproved: isAdminUser || data.isApproved === true,
           xp: data.xp || 0,
-          streak: data.streak || 1
+          streak: data.streak || 1,
+          age: studentAge,
+          grade: studentGrade,
+          ageTranche: studentTranche,
+          educationalStage: studentStage,
+          interests: studentInterests,
+          onboardingCompleted: onboardingDone,
+          rawUserData: data
         });
       });
 
@@ -88,7 +118,12 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           displayName: user.displayName || 'Super Admin',
           isApproved: true,
           xp: userData.xp,
-          streak: userData.streak
+          streak: userData.streak,
+          age: 9,
+          grade: 'Super Admin',
+          ageTranche: '8-9',
+          onboardingCompleted: true,
+          rawUserData: userData
         });
       }
 
@@ -201,33 +236,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const pendingCount = usersList.filter(u => !u.isApproved && u.email !== 'josferestudio@gmail.com').length;
 
-  return (
-    <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn font-display cursor-pointer">
-      <div onClick={(e) => e.stopPropagation()} className="bg-slate-950 border border-slate-800 rounded-3xl w-full max-w-2xl h-[85vh] max-h-[680px] overflow-hidden shadow-2xl flex flex-col relative cursor-default">
-        
-        {/* Header del Admin Dashboard */}
-        <div className="p-4 px-5 border-b border-slate-800/80 bg-slate-900/60 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
-              <Shield className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="font-bold text-sm text-white flex items-center gap-2">
-                <span>Panel de Autorización & Admin</span>
-                <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-mono">
-                  josferestudio@gmail.com
-                </span>
-              </h2>
-              <p className="text-[10px] text-slate-400">Gestión de accesos, aprobación de cuentas y analíticas</p>
-            </div>
+  const dashboardContent = (
+    <div className={`bg-slate-950/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl sm:rounded-3xl w-full h-full flex flex-col relative shadow-2xl overflow-hidden font-display transition-all duration-300`}>
+      
+      {/* Header del Admin Dashboard */}
+      <div className="p-3.5 sm:p-4 px-4 sm:px-6 border-b border-slate-800/80 bg-slate-900/60 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="p-2 sm:p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+            <Shield className="w-5 h-5" />
           </div>
-
-          <button onClick={onClose} className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer">
-            <X className="w-4 h-4" />
-          </button>
+          <div>
+            <h2 className="font-bold text-xs sm:text-sm text-white flex items-center gap-2 flex-wrap">
+              <span>Panel de Autorización & Admin</span>
+              <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-mono">
+                josferestudio@gmail.com
+              </span>
+            </h2>
+            <p className="text-[10px] sm:text-[11px] text-slate-400">Gestión de accesos, aprobación de cuentas y analíticas</p>
+          </div>
         </div>
 
-        {/* Banner Alerta de Solicitudes Pendientes */}
+        <button 
+          onClick={onClose} 
+          className="px-3 py-1.5 rounded-xl text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+          title="Volver a GOALS"
+        >
+          <X className="w-4 h-4" />
+          <span className="hidden sm:inline">Cerrar</span>
+        </button>
+      </div>
+
+      {/* Banner Alerta de Solicitudes Pendientes */}
         {pendingCount > 0 && (
           <div className="bg-amber-500/10 border-b border-amber-500/20 p-3 px-5 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs font-bold text-amber-300">
@@ -245,10 +284,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         )}
 
         {/* Pestañas de Administración */}
-        <div className="flex border-b border-slate-800 bg-slate-950/60 text-xs font-bold">
+        <div className="flex border-b border-slate-800 bg-slate-950/60 text-xs font-bold overflow-x-auto">
           <button
             onClick={() => setActiveTab('users')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 min-w-[90px] py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'users' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -263,7 +302,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             onClick={() => setActiveTab('apps')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 min-w-[90px] py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'apps' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -272,8 +311,18 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           </button>
 
           <button
+            onClick={() => setActiveTab('omni_3d')}
+            className={`flex-1 min-w-[120px] py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === 'omni_3d' ? 'border-cyan-400 text-cyan-300 bg-cyan-500/10' : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Box className="w-4 h-4 text-cyan-400" />
+            <span>3D Genesis IA</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('analytics')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 min-w-[90px] py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'analytics' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -283,7 +332,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             onClick={() => setActiveTab('firebase')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 min-w-[90px] py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'firebase' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
@@ -293,12 +342,22 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
           <button
             onClick={() => setActiveTab('ai_voice')}
-            className={`flex-1 py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+            className={`flex-1 min-w-[90px] py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
               activeTab === 'ai_voice' ? 'border-amber-500 text-amber-400 bg-amber-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
             }`}
           >
             <Bot className="w-4 h-4 text-purple-400" />
-            <span>IA & Cuotas</span>
+            <span>IA</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('curriculum')}
+            className={`flex-1 min-w-[110px] py-3 border-b-2 text-center transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+              activeTab === 'curriculum' ? 'border-cyan-500 text-cyan-400 bg-cyan-500/5' : 'border-transparent text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <BookOpen className="w-4 h-4 text-cyan-400" />
+            <span>Currículum MD</span>
           </button>
         </div>
 
@@ -310,8 +369,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-bold text-xs text-white">Solicitudes de Registro & Control de Acceso</h3>
-                  <p className="text-[10px] text-slate-400">Los usuarios registrados deben ser autorizados para acceder.</p>
+                  <h3 className="font-bold text-xs text-white">Gestión y Filtro Educativo de Alumnos</h3>
+                  <p className="text-[10px] text-slate-400">Supervisa perfiles, etapas LOMLOE y autoriza accesos en tiempo real.</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -333,85 +392,311 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
 
+              {/* BARRA DE FILTROS ADAPTATIVOS */}
+              <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-wrap items-center gap-2 text-xs">
+                {/* FILTRO POR TRAMO DE EDAD */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tramo:</span>
+                  <select
+                    value={filterAgeTranche}
+                    onChange={(e) => setFilterAgeTranche(e.target.value)}
+                    className="bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-400 cursor-pointer"
+                  >
+                    <option value="all">Todas las edades</option>
+                    <option value="6-7">6–7 años (1º-2º Primaria)</option>
+                    <option value="8-9">8–9 años (3º-4º Primaria)</option>
+                    <option value="10-11">10–11 años (5º-6º Primaria)</option>
+                    <option value="12-13">12–13 años (1º-2º ESO)</option>
+                    <option value="14-15">14–15 años (3º-4º ESO)</option>
+                  </select>
+                </div>
+
+                {/* FILTRO POR ESTADO DE ACCESO */}
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Estado:</span>
+                  <select
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value as any)}
+                    className="bg-slate-950 border border-slate-700 rounded-xl px-2.5 py-1 text-slate-200 text-xs focus:outline-none focus:border-amber-400 cursor-pointer"
+                  >
+                    <option value="all">Todos ({usersList.length})</option>
+                    <option value="approved">Aprobados ({usersList.filter(u => u.isApproved).length})</option>
+                    <option value="pending">Pendientes ({pendingCount})</option>
+                  </select>
+                </div>
+
+                {/* BUSCADOR */}
+                <div className="flex-1 min-w-[140px]">
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre o email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-1 text-slate-200 text-xs placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+              </div>
+
+              {/* TABLA DE ALUMNOS */}
               <div className="border border-slate-800 rounded-2xl overflow-hidden bg-slate-950/80">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-slate-900/60 border-b border-slate-800 text-[10px] uppercase text-slate-400 font-bold">
                     <tr>
-                      <th className="p-3">Usuario / Email</th>
+                      <th className="p-3">Alumno / Email</th>
+                      <th className="p-3">Tramo & LOMLOE</th>
                       <th className="p-3">Estado</th>
                       <th className="p-3">Progreso</th>
-                      <th className="p-3 text-right">Acción</th>
+                      <th className="p-3 text-right">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/80 text-slate-300">
-                    {usersList.map((u) => {
-                      const isSuperAdmin = u.email === 'josferestudio@gmail.com';
-                      return (
-                        <tr key={u.uid} className="hover:bg-slate-900/50 transition-colors">
-                          <td className="p-3">
-                            <div className="font-bold text-white text-xs">{u.displayName}</div>
-                            <div className="text-[10px] text-slate-400">{u.email}</div>
-                          </td>
-                          <td className="p-3">
-                            {isSuperAdmin ? (
-                              <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
-                                <Crown className="w-3 h-3 text-amber-400" /> Super Admin
-                              </span>
-                            ) : u.isApproved ? (
-                              <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
-                                <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Aprobado
-                              </span>
-                            ) : (
-                              <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
-                                <Clock className="w-3 h-3 text-amber-400" /> Pendiente
-                              </span>
-                            )}
-                          </td>
-                          <td className="p-3 text-[11px]">
-                            <div className="text-amber-400 font-bold">{u.xp} XP</div>
-                            <div className="text-rose-400 text-[10px]">{u.streak} Días racha</div>
-                          </td>
-                          <td className="p-3 text-right">
-                            {isSuperAdmin ? (
-                              <span className="text-[10px] text-slate-500 italic">Super Admin</span>
-                            ) : (
-                              <div className="flex items-center justify-end gap-1.5">
-                                <button
-                                  onClick={() => handleToggleUserApproval(u.uid, u.isApproved)}
-                                  className={`px-2.5 py-1.5 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95 cursor-pointer ${
-                                    u.isApproved
-                                      ? 'bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300'
-                                      : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-sm'
-                                  }`}
-                                >
-                                  {u.isApproved ? (
-                                    <>
-                                      <UserX className="w-3.5 h-3.5" />
-                                      <span>Revocar</span>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Check className="w-3.5 h-3.5" />
-                                      <span>Aprobar</span>
-                                    </>
-                                  )}
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteUserDoc(u.uid, u.email)}
-                                  className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 transition-all active:scale-95 cursor-pointer"
-                                  title="Eliminar registro"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                    {usersList
+                      .filter((u) => {
+                        if (filterStatus === 'approved' && !u.isApproved) return false;
+                        if (filterStatus === 'pending' && (u.isApproved || u.email === 'josferestudio@gmail.com')) return false;
+                        if (filterAgeTranche !== 'all' && u.ageTranche !== filterAgeTranche) return false;
+                        if (searchQuery.trim()) {
+                          const q = searchQuery.toLowerCase();
+                          const matchName = u.displayName.toLowerCase().includes(q);
+                          const matchEmail = u.email.toLowerCase().includes(q);
+                          const matchGrade = u.grade?.toLowerCase().includes(q);
+                          if (!matchName && !matchEmail && !matchGrade) return false;
+                        }
+                        return true;
+                      })
+                      .map((u) => {
+                        const isSuperAdmin = u.email === 'josferestudio@gmail.com';
+                        return (
+                          <tr key={u.uid} className="hover:bg-slate-900/50 transition-colors">
+                            <td className="p-3">
+                              <div className="font-bold text-white text-xs flex items-center gap-1.5">
+                                <span>{u.displayName}</span>
+                                {u.onboardingCompleted && (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Onboarding completado">
+                                    ✓ Onboard
+                                  </span>
+                                )}
                               </div>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
+                              <div className="text-[10px] text-slate-400">{u.email}</div>
+                            </td>
+                            <td className="p-3">
+                              {u.age ? (
+                                <div className="space-y-0.5">
+                                  <span className="px-2 py-0.5 rounded-md bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[10px] font-bold inline-block">
+                                    {u.age} años • {u.ageTranche}
+                                  </span>
+                                  {u.grade && (
+                                    <div className="text-[10px] text-slate-400 truncate max-w-[120px]">{u.grade}</div>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-[10px] text-slate-500 italic">Sin edad asignada</span>
+                              )}
+                            </td>
+                            <td className="p-3">
+                              {isSuperAdmin ? (
+                                <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
+                                  <Crown className="w-3 h-3 text-amber-400" /> Super Admin
+                                </span>
+                              ) : u.isApproved ? (
+                                <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
+                                  <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Aprobado
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-bold flex items-center gap-1 w-fit">
+                                  <Clock className="w-3 h-3 text-amber-400" /> Pendiente
+                                </span>
+                              )}
+                            </td>
+                            <td className="p-3 text-[11px]">
+                              <div className="text-amber-400 font-bold">{u.xp} XP</div>
+                              <div className="text-rose-400 text-[10px]">{u.streak} Días racha</div>
+                            </td>
+                            <td className="p-3 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                {/* BOTÓN VER FICHA DEL ALUMNO */}
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedStudentForModal(u)}
+                                  className="px-2 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-[10px] transition-all cursor-pointer"
+                                  title="Ver expediente detallado del alumno"
+                                >
+                                  Ficha 👁️
+                                </button>
+
+                                {!isSuperAdmin && (
+                                  <>
+                                    <button
+                                      onClick={() => handleToggleUserApproval(u.uid, u.isApproved)}
+                                      className={`px-2 py-1 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all flex items-center gap-1 active:scale-95 cursor-pointer ${
+                                        u.isApproved
+                                          ? 'bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 text-amber-300'
+                                          : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 shadow-sm'
+                                      }`}
+                                    >
+                                      {u.isApproved ? (
+                                        <>
+                                          <UserX className="w-3 h-3" />
+                                          <span>Revocar</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Check className="w-3 h-3" />
+                                          <span>Aprobar</span>
+                                        </>
+                                      )}
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteUserDoc(u.uid, u.email)}
+                                      className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 transition-all active:scale-95 cursor-pointer"
+                                      title="Eliminar registro"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               </div>
+
+              {/* MODAL DE FICHA DETALLADA DEL ALUMNO */}
+              {selectedStudentForModal && (
+                <div
+                  onClick={() => setSelectedStudentForModal(null)}
+                  className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/80 backdrop-blur-sm animate-fadeIn"
+                >
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-slate-950 border border-slate-700 rounded-3xl p-5 sm:p-6 max-w-lg w-full space-y-4 shadow-2xl text-white"
+                  >
+                    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-xl">
+                          👨‍🎓
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-base text-white">{selectedStudentForModal.displayName}</h3>
+                          <p className="text-xs text-slate-400">{selectedStudentForModal.email}</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setSelectedStudentForModal(null)}
+                        className="p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    {/* SECCIÓN 1: PERFIL EDUCATIVO GLOBAL */}
+                    <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-white/5 space-y-2 text-xs">
+                      <h4 className="font-mono text-[11px] uppercase tracking-wider text-amber-400 font-bold">
+                        1. Perfil del Alumno (SSOT)
+                      </h4>
+                      <div className="grid grid-cols-2 gap-2 text-slate-300">
+                        <div><b>Edad:</b> {selectedStudentForModal.age || 'No declarada'} años</div>
+                        <div><b>Tramo LOMLOE:</b> {selectedStudentForModal.ageTranche || 'Sin tramo'}</div>
+                        <div><b>Curso:</b> {selectedStudentForModal.grade || 'Sin curso'}</div>
+                        <div><b>Onboarding:</b> {selectedStudentForModal.onboardingCompleted ? '✅ Completado' : '⏳ Pendiente'}</div>
+                      </div>
+                      {selectedStudentForModal.interests && selectedStudentForModal.interests.length > 0 && (
+                        <div className="pt-1">
+                          <span className="text-[10px] text-slate-400 block">Intereses declarados:</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {selectedStudentForModal.interests.map((it, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded-md bg-slate-800 text-[10px] text-cyan-300 border border-slate-700">
+                                {it}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* SECCIÓN 2: ESTADO GLOBAL GOALS */}
+                    <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-white/5 space-y-2 text-xs">
+                      <h4 className="font-mono text-[11px] uppercase tracking-wider text-cyan-400 font-bold">
+                        2. Rendimiento Global GOALS
+                      </h4>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="p-2 rounded-xl bg-slate-950 border border-white/5 text-center">
+                          <span className="text-[10px] text-slate-400 block">XP Total</span>
+                          <span className="text-sm font-bold text-amber-400">{selectedStudentForModal.xp}</span>
+                        </div>
+                        <div className="p-2 rounded-xl bg-slate-950 border border-white/5 text-center">
+                          <span className="text-[10px] text-slate-400 block">Racha</span>
+                          <span className="text-sm font-bold text-rose-400">{selectedStudentForModal.streak} días</span>
+                        </div>
+                        <div className="p-2 rounded-xl bg-slate-950 border border-white/5 text-center">
+                          <span className="text-[10px] text-slate-400 block">Estado Acceso</span>
+                          <span className={`text-[11px] font-bold ${selectedStudentForModal.isApproved ? 'text-emerald-400' : 'text-amber-400'}`}>
+                            {selectedStudentForModal.isApproved ? 'Aprobado' : 'Pendiente'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* SECCIÓN 3: DESGLOSE POR MINIAPPS */}
+                    <div className="p-3.5 rounded-2xl bg-slate-900/80 border border-white/5 space-y-2 text-xs">
+                      <h4 className="font-mono text-[11px] uppercase tracking-wider text-purple-400 font-bold">
+                        3. Progreso Desglosado por MiniApps
+                      </h4>
+                      <div className="space-y-1.5 text-slate-300">
+                        <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-white/5">
+                          <span className="flex items-center gap-1.5">
+                            <span>🌌</span>
+                            <b>Cosmos 3D:</b>
+                          </span>
+                          <span className="font-mono text-cyan-300">
+                            {selectedStudentForModal.rawUserData?.experiences?.astro?.xp || 0} XP • {Object.keys(selectedStudentForModal.rawUserData?.experiences?.astro?.lessons || {}).length} Unidades
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-white/5">
+                          <span className="flex items-center gap-1.5">
+                            <span>📚</span>
+                            <b>Escuela IA:</b>
+                          </span>
+                          <span className="font-mono text-cyan-300">
+                            {selectedStudentForModal.rawUserData?.experiences?.school?.xp || 0} XP
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-white/5">
+                          <span className="flex items-center gap-1.5">
+                            <span>🌍</span>
+                            <b>Idiomas:</b>
+                          </span>
+                          <span className="font-mono text-cyan-300">
+                            {selectedStudentForModal.rawUserData?.experiences?.languages?.xp || 0} XP
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between p-2 rounded-xl bg-slate-950/70 border border-white/5">
+                          <span className="flex items-center gap-1.5">
+                            <span>🔍</span>
+                            <b>Criterio / Verifica:</b>
+                          </span>
+                          <span className="font-mono text-cyan-300">
+                            {selectedStudentForModal.rawUserData?.experiences?.verify?.xp || selectedStudentForModal.rawUserData?.experiences?.criterio?.xp || 0} XP
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedStudentForModal(null)}
+                        className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs cursor-pointer"
+                      >
+                        Cerrar Ficha
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -627,8 +912,37 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </div>
           )}
 
+          {/* TAB 6: CURRICULUM MARKDOWN STUDIO */}
+          {activeTab === 'curriculum' && (
+            <div className="h-full">
+              <CurriculumMarkdownStudio />
+            </div>
+          )}
+
+          {/* TAB 7: OMNI-3D GENESIS IA STUDIO */}
+          {activeTab === 'omni_3d' && (
+            <div className="h-full flex-1 flex flex-col min-h-[560px] -m-4 sm:-m-5">
+              <Omni3DStudioAdmin />
+            </div>
+          )}
+
         </div>
 
+      </div>
+  );
+
+  if (isEmbedded) {
+    return (
+      <div className="w-full h-full flex-1 flex flex-col p-1 sm:p-2.5">
+        {dashboardContent}
+      </div>
+    );
+  }
+
+  return (
+    <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn font-display cursor-pointer">
+      <div onClick={(e) => e.stopPropagation()} className="w-full max-w-6xl h-[95vh] flex flex-col cursor-default">
+        {dashboardContent}
       </div>
     </div>
   );

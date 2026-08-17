@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Investigación Oficial: Recursos 3D NASA / ESA & WebGL Hiperrealista</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    .glass { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.12); backdrop-filter: blur(16px); }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-8">
+  <div class="max-w-6xl mx-auto space-y-8">
+    
+    <!-- HEADER -->
+    <header class="glass p-6 sm:p-8 rounded-3xl border border-cyan-500/30 bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950">
+      <div class="flex items-center gap-3 mb-2">
+        <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/40">NASA & ESA 3D STACK</span>
+        <span class="text-xs text-slate-400">• Informe Oficial Multi-Agente</span>
+      </div>
+      <h1 class="font-display text-2xl sm:text-4xl font-extrabold text-white tracking-tight">Recursos y Arquitectura para Cosmos 3D Hiperrealista</h1>
+      <p class="text-slate-300 text-sm sm:text-base mt-2 max-w-3xl">Catálogo verificado de repositorios oficiales de la NASA, datasets de texturas satelitales en 8K/16K, renderizadores de 3D Tiles de NASA JPL y shaders físicos de dispersión Rayleigh-Mie.</p>
+    </header>
+
+    <!-- GRID 4 PILARES -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- PILAR 1: MODELOS 3D NASA/ESA -->
+      <div class="glass p-6 rounded-3xl border border-emerald-500/30 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-xl">🛰️</div>
+          <div>
+            <h2 class="font-display font-bold text-lg text-white">1. Modelos 3D Oficiales NASA / ESA</h2>
+            <p class="text-xs text-emerald-400 font-mono">glTF 2.0 / GLB • Dominio Público CC0</p>
+          </div>
+        </div>
+        <ul class="space-y-2 text-xs text-slate-300">
+          <li class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">NASA-3D-Resources (GitHub)</div>
+            <p class="text-[11px] text-slate-400">Repositorio oficial con ISS modular completa, Hubble (HST), James Webb (JWST) y Landsat 9.</p>
+            <a href="https://github.com/nasa/NASA-3D-Resources" target="_blank" class="inline-block mt-2 text-cyan-400 hover:underline font-mono text-[10px]">🔗 github.com/nasa/NASA-3D-Resources →</a>
+          </li>
+          <li class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">NASA Science 3D Portal & Smithsonian 3D</div>
+            <p class="text-[11px] text-slate-400">Modelos PBR de alta fidelidad fotogramétrica de misiones espaciales.</p>
+            <a href="https://science.nasa.gov/get-involved/3d-resources/" target="_blank" class="inline-block mt-2 text-cyan-400 hover:underline font-mono text-[10px]">🔗 science.nasa.gov/get-involved/3d-resources →</a>
+          </li>
+        </ul>
+        <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 font-mono text-[10px] text-emerald-300">
+          # Optimización Draco recomendada:<br>
+          <span class="text-slate-400">gltf-pipeline -i iss.gltf -o iss_draco.glb -d --draco.compressionLevel 10</span>
+        </div>
+      </div>
+
+      <!-- PILAR 2: TEXTURAS 8K/16K & DEEP ZOOM -->
+      <div class="glass p-6 rounded-3xl border border-cyan-500/30 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-xl">🗺️</div>
+          <div>
+            <h2 class="font-display font-bold text-lg text-white">2. Texturas 8K/16K & Streaming 3D Tiles</h2>
+            <p class="text-xs text-cyan-400 font-mono">NASA Visible Earth • USGS LOLA Moon</p>
+          </div>
+        </div>
+        <ul class="space-y-2 text-xs text-slate-300">
+          <li class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">NASA-AMMOS / 3DTilesRendererJS (NASA JPL)</div>
+            <p class="text-[11px] text-slate-400">Renderizador OGC 3D Tiles de NASA JPL para Three.js con streaming de cuadrantes por Screen Space Error (SSE).</p>
+            <a href="https://github.com/NASA-AMMOS/3DTilesRendererJS" target="_blank" class="inline-block mt-2 text-cyan-400 hover:underline font-mono text-[10px]">🔗 github.com/NASA-AMMOS/3DTilesRendererJS →</a>
+          </li>
+          <li class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">NASA Blue Marble & Black Marble (8K/43K)</div>
+            <p class="text-[11px] text-slate-400">Mosaicos globales de 500m/px derivados de MODIS y VIIRS Night Lights.</p>
+            <a href="https://visibleearth.nasa.gov/collection/1484/blue-marble" target="_blank" class="inline-block mt-2 text-cyan-400 hover:underline font-mono text-[10px]">🔗 visibleearth.nasa.gov →</a>
+          </li>
+          <li class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">USGS Astrogeology & NASA CGI Moon Kit</div>
+            <p class="text-[11px] text-slate-400">Mapas de elevación topográfica (LOLA DEM) y albedo 8K/16K del LRO.</p>
+            <a href="https://svs.gsfc.nasa.gov/4720" target="_blank" class="inline-block mt-2 text-cyan-400 hover:underline font-mono text-[10px]">🔗 svs.gsfc.nasa.gov/4720 →</a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- PILAR 3: SHADERS DE ATMÓSFERA FÍSICA -->
+      <div class="glass p-6 rounded-3xl border border-indigo-500/30 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-xl">🌌</div>
+          <div>
+            <h2 class="font-display font-bold text-lg text-white">3. Shaders de Atmósfera Física (Nishita/Bruneton)</h2>
+            <p class="text-xs text-indigo-400 font-mono">Rayleigh & Mie Scattering • Raymarching</p>
+          </div>
+        </div>
+        <div class="space-y-2 text-xs text-slate-300">
+          <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">@takram/three-atmosphere & glsl-atmosphere</div>
+            <p class="text-[11px] text-slate-400">Implementación de Precomputed Atmospheric Scattering de Eric Bruneton y módulos GLSL para dispersión Rayleigh-Mie.</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <span class="px-2 py-0.5 rounded bg-indigo-950 border border-indigo-500/40 font-mono text-[10px] text-indigo-300">npm i @takram/three-atmosphere</span>
+              <span class="px-2 py-0.5 rounded bg-indigo-950 border border-indigo-500/40 font-mono text-[10px] text-indigo-300">npm i glsl-atmosphere</span>
+            </div>
+          </div>
+          <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">Fondo Espacial 360° HDR de la ESO</div>
+            <p class="text-[11px] text-slate-400">Panoramas equirrectangulares 8K reales del Observatorio Paranal en Atacama (Vía Láctea viva).</p>
+            <a href="https://www.eso.org/public/images/archive/category/360pano/" target="_blank" class="inline-block mt-2 text-cyan-400 hover:underline font-mono text-[10px]">🔗 eso.org/public/images/archive/category/360pano →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PILAR 4: ÓRBITAS RIBBON & POST-PROCESSING -->
+      <div class="glass p-6 rounded-3xl border border-amber-500/30 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-xl">📐</div>
+          <div>
+            <h2 class="font-display font-bold text-lg text-white">4. Órbitas Cinemáticas & Post-Processing</h2>
+            <p class="text-xs text-amber-400 font-mono">MeshLine Ribbons • Selective Bloom • LogDepth</p>
+          </div>
+        </div>
+        <div class="space-y-2 text-xs text-slate-300">
+          <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">three.meshline & Line2 (Fat Lines)</div>
+            <p class="text-[11px] text-slate-400">Trazado volumétrico con grosor regulable, Glow gaussiano y desvanecimiento de estela (comet trail).</p>
+            <span class="inline-block mt-1 px-2 py-0.5 rounded bg-amber-950 border border-amber-500/40 font-mono text-[10px] text-amber-300">npm i three.meshline</span>
+          </div>
+          <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800">
+            <div class="font-bold text-white mb-0.5">Logarithmic Depth Buffer + Selective Bloom</div>
+            <p class="text-[11px] text-slate-400">Elimina el Z-fighting en escalas de 10^12 metros y añade resplandor solar sin emborronar el planeta.</p>
+            <span class="inline-block mt-1 px-2 py-0.5 rounded bg-slate-800 font-mono text-[10px] text-cyan-300">new THREE.WebGLRenderer({ logarithmicDepthBuffer: true })</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- TABLA DE PAQUETES NPM -->
+    <div class="glass p-6 rounded-3xl border border-white/10 space-y-4">
+      <h2 class="font-display font-bold text-lg text-white">📦 Pila de Paquetes NPM Recomendados para el Proyecto</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs font-mono">
+          <thead>
+            <tr class="border-b border-white/10 text-slate-400">
+              <th class="pb-2">Paquete</th>
+              <th class="pb-2">Comando de Instalación</th>
+              <th class="pb-2">Propósito Clave</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/5 text-slate-300">
+            <tr>
+              <td class="py-2.5 text-cyan-300 font-bold">3d-tiles-renderer</td>
+              <td class="py-2.5 text-emerald-400">npm i 3d-tiles-renderer</td>
+              <td class="py-2.5 text-slate-400">Renderizador OGC 3D Tiles de NASA AMMOS/JPL para Three.js</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 text-cyan-300 font-bold">three.meshline</td>
+              <td class="py-2.5 text-emerald-400">npm i three.meshline</td>
+              <td class="py-2.5 text-slate-400">Trazado de órbitas volumétricas con glow y antialiasing</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 text-cyan-300 font-bold">@gltf-transform/cli</td>
+              <td class="py-2.5 text-emerald-400">npm i -g @gltf-transform/cli</td>
+              <td class="py-2.5 text-slate-400">Compresión Draco y optimización de modelos 3D NASA</td>
+            </tr>
+            <tr>
+              <td class="py-2.5 text-cyan-300 font-bold">postprocessing</td>
+              <td class="py-2.5 text-emerald-400">npm i postprocessing</td>
+              <td class="py-2.5 text-slate-400">Selective Bloom cinemático de alto rendimiento</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

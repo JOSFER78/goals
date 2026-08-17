@@ -9,17 +9,23 @@ import { Toast } from './core/components/Toast';
 import { GoalsLanding } from './core/views/GoalsLanding';
 import { AuthView } from './core/views/AuthView';
 import { GoalsHome } from './core/views/GoalsHome';
-import { ExperienceId } from './core/types';
+import { ExperienceId, AppViewMode } from './core/types';
+import { GOALS_EXPERIENCES } from './core/config/experiencesConfig';
 
 // Mini Apps Integradas
 import { SchoolView } from './experiences/school/SchoolView';
 import { LanguagesView } from './experiences/languages/LanguagesView';
 import { VerifyView } from './experiences/verify/VerifyView';
 import { AstroExperience } from './experiences/astro/AstroExperience';
+import { AILabExperience } from './experiences/ai-lab/AILabExperience';
 import { PendingApprovalView } from './core/views/PendingApprovalView';
 import { CookieBanner } from './core/components/CookieBanner';
 import { ApkDownloadGuideModal } from './core/components/ApkDownloadGuideModal';
 import { FloatingAIContextWidget } from './core/components/FloatingAIContextWidget';
+import { InitialOnboardingGate } from './core/components/onboarding/InitialOnboardingGate';
+import { PendingApprovalGate } from './core/components/auth/PendingApprovalGate';
+import { MiniAppPortalGate } from './core/components/miniapps/MiniAppPortalGate';
+import { MiniAppsDrawer } from './core/components/navigation/MiniAppsDrawer';
 
 const StarField: React.FC = () => {
   useEffect(() => {
@@ -48,15 +54,17 @@ const MainContent: React.FC = () => {
   // Modo de Vista Global
   const [authViewMode, setAuthViewMode] = useState<'login' | 'signup'>('login');
   const [isAuthViewOpen, setIsAuthViewOpen] = useState<boolean>(false);
-  const [activeExperience, setActiveExperience] = useState<ExperienceId | null>(null);
+  const [activeExperience, setActiveExperience] = useState<AppViewMode>(null);
 
-  // Modales
+  // Modales y Drawers
   const [isProfileOpen, setIsProfileOpen] = useState<boolean>(false);
   const [isAdminDashboardOpen, setIsAdminDashboardOpen] = useState<boolean>(false);
+  const [isMiniAppsDrawerOpen, setIsMiniAppsDrawerOpen] = useState<boolean>(false);
   const [isPendingDismissed, setIsPendingDismissed] = useState<boolean>(false);
   const [isGuideOpen, setIsGuideOpen] = useState<boolean>(false);
+  const [toast, setToast] = useState<{ message: string; type?: 'info' | 'success' | 'warning' } | null>(null);
 
-  // Configuración de Gráficos de Astro 3D
+  // Configuración de Calidad Gráfica
   const [graphicsConfig, setGraphicsConfig] = useState({
     sunIntensity: 2.2,
     ambientIntensity: 0.7,
@@ -64,15 +72,23 @@ const MainContent: React.FC = () => {
     atmosphereGlow: true,
     highResTextures: true,
     shadowsEnabled: true,
-    xpMultiplier: 1
+    xpMultiplier: 1,
+    fpsLimit: 60,
+    fxaa: true,
+    shadows: true,
+    pixelRatio: typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1
   });
 
-  // Estado de Minimización / Asomado de la Mascota
+  // Estado minimizado de la mascota
   const [isMascotMinimized, setIsMascotMinimized] = useState<boolean>(() => {
-    return localStorage.getItem('goals_mascot_minimized') === 'true';
+    try {
+      return localStorage.getItem('goals_mascot_minimized') === 'true';
+    } catch {
+      return false;
+    }
   });
 
-  const handleToggleMascot = () => {
+  const handleToggleMascotMinimize = () => {
     setIsMascotMinimized((prev) => {
       const next = !prev;
       localStorage.setItem('goals_mascot_minimized', String(next));
@@ -82,6 +98,11 @@ const MainContent: React.FC = () => {
 
   const isAuthenticated = !!(user && !user.isAnonymous);
   const isApproved = isAdmin || userData?.isApproved === true || user?.isApproved === true;
+  const hasCompletedOnboarding = isAdmin || (
+    Boolean(userData?.learnerProfile?.onboarding?.globalCompleted) ||
+    (Boolean(userData?.learnerProfile?.education?.age) && Number(userData?.learnerProfile?.education?.age) >= 6) ||
+    (Boolean(userData?.childProfile?.age) && Number(userData?.childProfile?.age) >= 6)
+  );
 
   const handleUpdateGraphicsConfig = (newCfg: Partial<typeof graphicsConfig>) => {
     setGraphicsConfig((prev) => ({ ...prev, ...newCfg }));
@@ -90,28 +111,44 @@ const MainContent: React.FC = () => {
   const handleNavigateHome = () => {
     setActiveExperience(null);
     setIsAuthViewOpen(false);
+    setIsProfileOpen(false);
+    setIsAdminDashboardOpen(false);
+    setIsMiniAppsDrawerOpen(false);
+    setIsGuideOpen(false);
+    const mainEl = document.querySelector('main');
+    if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="relative z-10 flex flex-col h-screen w-full mx-auto overflow-hidden bg-slate-950/95 backdrop-blur-xl">
       
+      {/* Halo de luz ambiental reactivo por Mini App */}
+      {activeExperience && GOALS_EXPERIENCES[activeExperience] && (
+        <div 
+          className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-700 opacity-60"
+          style={{
+            background: `radial-gradient(ellipse 80% 50% at 50% 0%, ${GOALS_EXPERIENCES[activeExperience].ambientGlow} 0%, transparent 70%)`
+          }}
+        />
+      )}
+
       {/* Sticky Header Estandarizado de GOALS (Unificado para todas las páginas) */}
       <Header
         activeExperience={activeExperience}
         onNavigateHome={handleNavigateHome}
-        onOpenProfile={() => setIsProfileOpen(true)}
-        onOpenAdmin={() => setIsAdminDashboardOpen(true)}
+        onOpenProfile={() => setActiveExperience('profile')}
+        onOpenAdmin={() => setActiveExperience('admin')}
+        onOpenMiniApps={() => setIsMiniAppsDrawerOpen(true)}
         onOpenAuth={(mode) => {
           setAuthViewMode(mode);
           setIsAuthViewOpen(true);
         }}
-        isMascotMinimized={isMascotMinimized}
-        onToggleMascot={handleToggleMascot}
       />
 
       {/* Área Principal de Contenido */}
-      <main className={activeExperience === 'astro' ? 'flex-1 relative p-0 overflow-hidden h-full w-full flex flex-col' : isAuthViewOpen ? 'flex-1 overflow-y-auto relative flex flex-col items-center justify-start p-4 scrollbar-thin' : 'flex-1 overflow-y-auto snap-y snap-mandatory scroll-smooth relative flex flex-col justify-between'}>
-        <div className={activeExperience === 'astro' ? 'flex-1 w-full h-full relative p-0' : 'p-0 sm:p-2 flex-1 w-full flex flex-col items-center justify-start'}>
+      <main className={(activeExperience === 'astro' || activeExperience === 'admin' || activeExperience === 'profile') ? 'flex-1 relative p-0 overflow-hidden h-full w-full flex flex-col' : isAuthViewOpen ? 'flex-1 overflow-y-auto relative flex flex-col items-center justify-start p-4 scrollbar-thin' : 'flex-1 overflow-y-auto snap-y snap-mandatory scroll-smooth relative flex flex-col justify-between'}>
+        <div className={(activeExperience === 'astro' || activeExperience === 'admin' || activeExperience === 'profile') ? 'flex-1 w-full h-full relative p-0 flex flex-col' : 'p-0 sm:p-2 flex-1 w-full flex flex-col items-center justify-start h-full'}>
           {isAuthViewOpen ? (
             /* Pantalla Estándar de Autenticación de Firebase */
             <AuthView
@@ -145,52 +182,82 @@ const MainContent: React.FC = () => {
               }}
               onOpenDownloadGuide={() => setIsGuideOpen(true)}
             />
+          ) : !isApproved ? (
+            /* Compuerta de Autorización: Cuenta pendiente de aprobación por el Administrador */
+            <PendingApprovalGate />
+          ) : !hasCompletedOnboarding ? (
+            /* Onboarding Gate Obligatorio: Presentación de GOALS + Ficha Alumno */
+            <InitialOnboardingGate
+              onComplete={() => {
+                handleNavigateHome();
+              }}
+            />
           ) : !activeExperience ? (
-            /* Dashboard Principal para Usuario Registrado */
+            /* Dashboard Principal para Usuario Registrado, Aprobado y Calibrado */
             <GoalsHome
               onSelectExperience={(expId) => {
                 setActiveExperience(expId);
               }}
-              onOpenProfile={() => setIsProfileOpen(true)}
+              onOpenProfile={() => setActiveExperience('profile')}
+              onOpenMiniApps={() => setIsMiniAppsDrawerOpen(true)}
             />
-          ) : activeExperience === 'school' ? (
-            /* Mini App Escuela Integradora */
-            <SchoolView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
-          ) : activeExperience === 'languages' ? (
-            /* Mini App Idiomas Integradora */
-            <LanguagesView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
-          ) : activeExperience === 'verify' ? (
-            /* Mini App Verifica Integradora */
-            <VerifyView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
-          ) : activeExperience === 'astro' ? (
-            /* Mini App AstroLingo 100% IDÉNTICA A LA APP ORIGINAL */
-            <AstroExperience
+          ) : activeExperience === 'admin' ? (
+            /* Vista Integrada de Super Administración y 3D Genesis IA Studio */
+            <AdminDashboard
+              isOpen={true}
+              isEmbedded={true}
+              onClose={handleNavigateHome}
+              graphicsConfig={graphicsConfig}
+              onUpdateGraphicsConfig={handleUpdateGraphicsConfig}
+            />
+          ) : activeExperience === 'profile' ? (
+            /* Vista Integrada del Perfil de Usuario y Gamificación */
+            <ProfileModal
+              isOpen={true}
+              isEmbedded={true}
+              onClose={handleNavigateHome}
+              onOpenAdminDashboard={() => setActiveExperience('admin')}
+            />
+          ) : (
+            /* Cada MiniApp cuenta con su Mini-Portada Inmersiva y Prueba de Nivel Específica */
+            <MiniAppPortalGate
+              experienceId={activeExperience}
               onBackToGoals={handleNavigateHome}
-              onOpenProfile={() => setIsProfileOpen(true)}
-              onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }}
-            />
-          ) : null}
+            >
+              {activeExperience === 'school' ? (
+                <SchoolView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+              ) : activeExperience === 'languages' ? (
+                <LanguagesView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+              ) : activeExperience === 'verify' ? (
+                <VerifyView onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+              ) : activeExperience === 'ai-lab' ? (
+                <AILabExperience onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} />
+              ) : activeExperience === 'astro' ? (
+                <AstroExperience
+                  onBackToGoals={handleNavigateHome}
+                  onOpenProfile={() => setActiveExperience('profile')}
+                  onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }}
+                />
+              ) : null}
+            </MiniAppPortalGate>
+          )}
         </div>
 
-        {/* Footer elegante para navegación estándar */}
-        {activeExperience !== 'astro' && (
+        {/* Footer únicamente en la Landing Page pública sin logearse */}
+        {!isAuthenticated && !activeExperience && !isAuthViewOpen && (
           <Footer onSelectExperience={(expId) => setActiveExperience(expId)} />
         )}
       </main>
 
-      {/* Modal de Perfil del Estudiante */}
-      <ProfileModal
-        isOpen={isProfileOpen}
-        onClose={() => setIsProfileOpen(false)}
-        onOpenAdminDashboard={() => setIsAdminDashboardOpen(true)}
-      />
-
-      {/* Dashboard Completo de Super Administración */}
-      <AdminDashboard
-        isOpen={isAdminDashboardOpen}
-        onClose={() => setIsAdminDashboardOpen(false)}
-        graphicsConfig={graphicsConfig}
-        onUpdateGraphicsConfig={handleUpdateGraphicsConfig}
+      {/* Drawer Desplegable de MiniApps */}
+      <MiniAppsDrawer
+        isOpen={isMiniAppsDrawerOpen}
+        onClose={() => setIsMiniAppsDrawerOpen(false)}
+        onSelectExperience={(expId) => {
+          setActiveExperience(expId);
+          setIsMiniAppsDrawerOpen(false);
+        }}
+        activeExperience={activeExperience}
       />
 
       {/* Modal Explicativo de Instalación en Android */}
@@ -213,7 +280,7 @@ const MainContent: React.FC = () => {
           setIsAuthViewOpen(true);
         }}
         isMinimized={isMascotMinimized}
-        onToggleMinimize={handleToggleMascot}
+        onToggleMinimize={handleToggleMascotMinimize}
       />
 
     </div>

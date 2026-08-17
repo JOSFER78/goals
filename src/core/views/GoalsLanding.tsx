@@ -86,20 +86,38 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
     },
     {
       id: 'verify',
-      name: 'Verifica',
+      name: 'Criterio',
       icon: ShieldCheck,
-      tagline: 'Auditor Científico de Noticias & Contraste de Evidencia',
-      badgeTag: 'Rigor & Fuentes Primarias',
+      tagline: 'Alfabetización Informativa, Algoritmos & Seguridad en IA',
+      badgeTag: 'Pensamiento Crítico & IA',
       badgeBg: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
       btnBg: 'bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold',
-      heading: 'Investigación y Verificación de Titulares en Tiempo Real',
-      description: 'Analiza la veracidad de cualquier titular o afirmación científica contrastándola con repositorios de la ESA, NASA y publicaciones académicas primarias.',
+      heading: 'Aprende a Informarte en la Era de los Algoritmos y la IA',
+      description: 'Descubre cómo los algoritmos de recomendación moldean lo que ves, detecta alucinaciones de la IA, audita deepfakes y contrasta con fuentes científicas oficiales.',
       image: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?q=80&w=800&auto=format&fit=crop',
       bullets: [
-        'Cálculo de índice de credibilidad basado en revisión por pares',
-        'Citas directas y referencias verificadas a artículos originales',
-        'Desglose analítico de sesgos, manipulaciones o afirmaciones reales',
-        'Desarrollo del pensamiento crítico y rigor metodológico'
+        'Comprensión real de la economía de la atención y cámaras de eco',
+        'Laboratorio forense para cazar alucinaciones y medios sintéticos',
+        'Método PAUSA y 60 misiones cotidianas con dificultad adaptativa',
+        'Estación de análisis estructurado MATIZA en 4 capas de rigor'
+      ]
+    },
+    {
+      id: 'ai-lab',
+      name: 'IA Lab',
+      icon: Brain,
+      tagline: 'Laboratorio de Inteligencia Artificial: Redes, Tokens, Visión & Ética',
+      badgeTag: 'Laboratorio de IA',
+      badgeBg: 'bg-purple-500/10 text-purple-400 border-purple-500/30',
+      btnBg: 'bg-purple-600 hover:bg-purple-500 text-white font-bold',
+      heading: 'Descubre, Entiende, Experimenta y Crea con Inteligencia Artificial',
+      description: 'Entrena redes neuronales 2D en tiempo real, comprende la tokenización y probabilidad de los LLMs, aplica filtros de convolución sobre píxeles y audita alucinaciones forenses.',
+      image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=800&auto=format&fit=crop',
+      bullets: [
+        'Simulador 2D interactivo de redes neuronales y fronteras de decisión',
+        'Explorador en vivo de tokens, embeddings y temperatura en LLMs',
+        'Laboratorio de convoluciones 3x3 y visión artificial celda a celda',
+        'Arena de sesgos algorítmicos, privacidad y Ley de IA de la UE'
       ]
     }
   ];

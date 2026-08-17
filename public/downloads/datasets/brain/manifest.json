@@ -1,0 +1,22 @@
+{
+  "slug": "brain",
+  "name": "Encéfalo y Sistema Nervioso",
+  "category": "Neuroanatomía Médica",
+  "modelUrl": "/models_3d/brain.glb",
+  "downloadDate": "2026-08-14T15:30:39.232Z",
+  "imagesCount": 2,
+  "images": [
+    {
+      "id": "view_01_nih_brain",
+      "title": "Resonancia Magnética 3D Encéfalo NIH",
+      "localPath": "/downloads/datasets/brain/images/view_01_nih_brain.png",
+      "sizeBytes": 138261
+    },
+    {
+      "id": "view_02_mri_side",
+      "title": "Corte Sagital de Resonancia Magnética Cabeza Humana",
+      "localPath": "/downloads/datasets/brain/images/view_02_mri_side.jpg",
+      "sizeBytes": 9771
+    }
+  ]
+}

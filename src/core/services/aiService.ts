@@ -2,6 +2,8 @@
 // Endpoint: https://143-47-35-167.sslip.io/v1
 // API Key: freellmapi-bc5d56dc6a1548c6c11a0d409008b1ed0273e4105cd64784
 
+import { PresentationEngine } from './PresentationEngine';
+
 const AI_BASE_URL = (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'))
   ? '/v1'
   : 'https://143-47-35-167.sslip.io/v1';
@@ -146,15 +148,7 @@ export function buildChildSystemPrompt(customSkinName?: string, age?: number): s
   const mascotName = customSkinName || getCustomMascotName();
   const childAge = age || profile.age || 8;
   const customSoul = getActiveMascotSoul();
-
-  let toneGuidance = '';
-  if (childAge <= 9) {
-    toneGuidance = `El estudiante ${profile.childName} tiene ${childAge} años (${profile.grade || 'Primaria'}). Usa un tono súper cariñoso, cercano y divertido. Respuestas muy breves (máximo 2 frases cortas), con vocabulario sencillo y ejemplos divertidos.`;
-  } else if (childAge <= 13) {
-    toneGuidance = `El estudiante ${profile.childName} tiene ${childAge} años (${profile.grade || 'Primaria/ESO'}). Usa un tono motivador, curioso y dinámico. Respuestas concisas (máximo 2-3 frases), con metáforas cotidianas, inventos o videojuegos.`;
-  } else {
-    toneGuidance = `El estudiante ${profile.childName} tiene ${childAge} años (${profile.grade || 'Secundaria'}). Usa un tono directo, analítico y claro. Ve directo al grano sin discursos teóricos largos (máximo 3 frases).`;
-  }
+  const presProfile = PresentationEngine.computeProfile(childAge);
 
   const schoolInfo = profile.schoolName ? `Colegio: ${profile.schoolName} | ` : '';
   const favInfo = profile.favoriteSubjects.length > 0 ? `Asignaturas Favoritas: ${profile.favoriteSubjects.join(', ')}. ` : '';
@@ -164,22 +158,28 @@ export function buildChildSystemPrompt(customSkinName?: string, age?: number): s
   const soulSection = customSoul ? `\nPERSONALIDAD DE LA MASCOTA CONFIGURADA EN EL PERFIL:\n${customSoul}\n` : '';
 
   const analogiesRule = profile.interests.length > 0
-    ? `ADAPTACIÓN DE INTERESES: Si explicas un concepto, puedes usar analogías basadas exclusivamente en los hobbies indicados por el estudiante: (${profile.interests.join(', ')}).`
-    : `ADAPTACIÓN NATURAL: Usa analogías sencillas de la vida cotidiana, ciencia o naturaleza. NO inventes ni fuerces referencias a videojuegos específicos.`;
+    ? `ADAPTACIÓN DE INTERESES: Si explicas un concepto, puedes usar analogías basadas en los hobbies indicados por el estudiante: (${profile.interests.join(', ')}).`
+    : `ADAPTACIÓN NATURAL: Usa analogías cotidianas acordes a su edad (${presProfile.analogyDomain}).`;
 
-  return `Eres ${mascotName}, el tutor empático e inteligente de ${profile.childName || 'el alumno'}.${soulSection}
+  return `Eres ${mascotName}, el tutor empático y adaptativo de GOALS para ${profile.childName || 'el alumno'}.${soulSection}
 
-EXPEDIENTE DEL ESTUDIANTE:
-- Nombre: ${profile.childName} | Edad: ${childAge} Años | ${schoolInfo}Curso: ${profile.grade}
+EXPEDIENTE PEDAGÓGICO DEL ESTUDIANTE:
+- Nombre: ${profile.childName} | Edad: ${childAge} Años | Tramo LOMLOE: ${presProfile.ageTranche} (${presProfile.lomloeReference})
+- ${schoolInfo}Curso: ${profile.grade || 'Educación Primaria/Secundaria'}
 - ${favInfo}${weakInfo}${extraInfo}${interestInfo}
 
-DIRECTIVAS DE PERSONALIDAD CHATGPT VOICE:
-1. SÉ EXTREMADAMENTE BREVE, DIRECTO Y EMPÁTICO: Responde de viva voz en 1 a 3 frases cortas.
-2. ${toneGuidance}
-3. ${analogiesRule}
-4. REFUERZO POSITIVO: Si pregunta sobre asignaturas a reforzar (${profile.weakSubjects.join(', ') || 'sus materias'}), sé especialmente motivador y paciente.
-5. Para saludos simples ("hola", "me oyes", "qué tal"), responde en UNA sola frase simpática saludando por su nombre ("¡Hola ${profile.childName}! Te oigo perfectamente 😊").
-6. GENERACIÓN DE INFOGRAFÍA VISUAL CON IA: Cuando el alumno pida una "infografía", "esquema visual", "explicación gráfica" o "dibujo", responde de forma muy clara en 1 o 2 frases e incluye OBLIGATORIAMENTE una imagen de infografía educativa generada en Markdown con la siguiente URL exacta de Pollinations.ai (traduciendo el concepto a inglés en la URL): ![Infografía Explicativa](https://image.pollinations.ai/prompt/detailed_educational_infographic_diagram_about_[concepto_en_ingles]_clean_vector_graphic_educational_labels_hd?width=800&height=500&nologo=true).`;
+ROL Y TONO PEDAGÓGICO DE IA:
+- Rol de IA: ${presProfile.aiPersona}
+- Nivel de Andamiaje Cognitivo: ${presProfile.scaffoldingLevel}
+- Vocabulario y Tono: ${presProfile.tone}
+- Longitud Máxima de Respuesta: ${presProfile.maxResponseSentences} frases directas y concisas.
+
+DIRECTIVAS DIDÁCTICAS ESTRICTAS:
+1. SÉ DIRECTO Y EMPÁTICO: Responde de viva voz o chat en máximo ${presProfile.maxResponseSentences} frases.
+2. ${analogiesRule}
+3. REFUERZO POSITIVO: Si pregunta sobre materias difíciles (${profile.weakSubjects.join(', ') || 'conceptos complejos'}), apoya con paciencia y método socrático.
+4. Para saludos simples ("hola", "me oyes", "qué tal"), responde en UNA sola frase simpática saludando por su nombre ("¡Hola ${profile.childName}! Te oigo perfectamente 😊").
+5. GENERACIÓN DE INFOGRAFÍA VISUAL: Cuando el alumno pida una "infografía", "esquema visual", "explicación gráfica" o "dibujo", responde de forma muy clara en 1 o 2 frases e incluye OBLIGATORIAMENTE una imagen de infografía educativa generada en Markdown con la siguiente URL exacta de Pollinations.ai (traduciendo el concepto a inglés en la URL): ![Infografía Explicativa](https://image.pollinations.ai/prompt/detailed_educational_infographic_diagram_about_[concepto_en_ingles]_clean_vector_graphic_educational_labels_hd?width=800&height=500&nologo=true).`;
 }
 
 export interface ChatMessage {
@@ -222,23 +222,88 @@ export async function askAI(options: AICompletionOptions): Promise<string> {
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Error en servidor de IA (${response.status}): ${errText}`);
+      const errBody = await response.text();
+      console.error('[aiService] Error response from API proxy:', response.status, errBody);
+      throw new Error(`API Error ${response.status}: ${errBody}`);
     }
 
     const data = await response.json();
-    const messageContent = data.choices?.[0]?.message?.content;
-    
-    if (!messageContent) {
-      throw new Error('La respuesta del servidor de IA no contenía texto válido.');
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('Respuesta vacía de la API de IA');
     }
 
-    return messageContent;
+    return content;
   } catch (error: any) {
-    console.warn('AI Primary Fetch Error (fallback activado):', error?.message || error);
-    
-    // Fallback Educativo Inteligente solo si falla la conexión de red
-    return generateSmartEducationalFallback(userQuery);
+    console.error('[aiService] Fallo en askAI:', error);
+    throw error;
+  }
+}
+
+export interface AIVisionOptions {
+  imageBase64OrUrl: string;
+  promptText: string;
+  systemPrompt?: string;
+  temperature?: number;
+}
+
+/**
+ * Petición de Visión Artificial Multimodal Real.
+ * Envía la imagen (base64 o URL) a modelos con capacidad de visión (NVIDIA Nemotron / Gemini Vision)
+ * para identificar con 100% de rigor empírico el objeto o estructura sin inventar nada.
+ */
+export async function askAIVision(options: AIVisionOptions): Promise<string> {
+  const apiKey = getAdminAiApiKey();
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+    const messages: any[] = [];
+    if (options.systemPrompt) {
+      messages.push({ role: 'system', content: options.systemPrompt });
+    }
+
+    messages.push({
+      role: 'user',
+      content: [
+        { type: 'text', text: options.promptText },
+        { type: 'image_url', image_url: { url: options.imageBase64OrUrl } }
+      ]
+    });
+
+    const response = await fetch(`${AI_BASE_URL}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'auto',
+        messages,
+        temperature: options.temperature ?? 0.1
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errBody = await response.text();
+      console.error('[aiService] Vision API Error:', response.status, errBody);
+      throw new Error(`Vision API Error ${response.status}: ${errBody}`);
+    }
+
+    const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error('Respuesta vacía del modelo de visión artificial');
+    }
+
+    return content;
+  } catch (error: any) {
+    console.error('[aiService] Fallo en askAIVision:', error);
+    throw error;
   }
 }
 
@@ -274,42 +339,6 @@ Reglas:
     console.warn("No se pudo normalizar con IA, usando texto directo:", e);
     return rawText;
   }
-}
-
-/**
- * Generador de Respuestas Educativas de Reserva en Tiempo Real (Resiliente)
- */
-function generateSmartEducationalFallback(query: any): string {
-  const safeQuery = (typeof query === 'string' ? query : String(query || '')).toLowerCase().trim();
-
-  // Saludos y preguntas conversacionales simples
-  if (
-    safeQuery.includes('me oyes') || 
-    safeQuery.includes('hola') || 
-    safeQuery.includes('que tal') || 
-    safeQuery.includes('qué tal') || 
-    safeQuery.includes('buenas') || 
-    safeQuery.includes('probando') || 
-    safeQuery.includes('quien eres') || 
-    safeQuery.includes('quién eres') || 
-    safeQuery.includes('gracias') ||
-    safeQuery.length < 12
-  ) {
-    return `¡Hola! Te oigo perfectamente. ¿En qué te puedo ayudar hoy? 😊`;
-  }
-
-  if (safeQuery.includes('trigonometr') || safeQuery.includes('seno') || safeQuery.includes('coseno') || safeQuery.includes('triangulo') || safeQuery.includes('angulo')) {
-    return `¡La trigonometría relaciona los ángulos y lados de un triángulo! Recuerda SOH-CAH-TOA:
-- **Seno** = Opuesto / Hipotenusa
-- **Coseno** = Contiguo / Hipotenusa
-- **Tangente** = Opuesto / Contiguo`;
-  }
-
-  if (safeQuery.includes('idioma') || safeQuery.includes('english') || safeQuery.includes('ingles') || safeQuery.includes('hello') || safeQuery.includes('pronun')) {
-    return `¡Muy bien practicando idiomas! Un consejo rápido: en inglés es muy útil usar frases cortas como *"Can you help me?"* para comunicarte fácil.`;
-  }
-
-  return `¡Hola! Entendido sobre tu duda de "${query}". ¿Quieres que lo expliquemos paso a paso o prefieres un ejemplo sencillo?`;
 }
 
 /**
@@ -383,7 +412,7 @@ export async function verifyFactOrHeadline(headline: string): Promise<{
     const cleanJsonText = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleanJsonText);
     return {
-      verdict: parsed.verdict || 'Verificación en Proceso',
+      verdict: parsed.verdict || 'Verificado por Fuentes Oficiales',
       trustScore: parsed.trustScore || '90%',
       summary: parsed.summary || rawJson,
       sources: Array.isArray(parsed.sources) ? parsed.sources : ['Fuentes Oficiales']

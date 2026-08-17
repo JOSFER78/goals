@@ -1,0 +1,19 @@
+name: example-explorer
+domain: custom
+audience: general
+mode: guided-exploration
+realism: evidence-grounded
+scale:
+  smallest: null
+  largest: null
+  units: []
+data_sources: []
+assets: []
+representations: []
+interactions:
+  - select
+  - focus
+  - inspect
+education:
+  objectives: []
+  missions: []

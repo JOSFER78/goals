@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOALS — Matriz Psicopedagógica y Curricular de Astronomía (6 a 15 Años)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: radial-gradient(circle at 50% 0%, #0c1527 0%, #030712 100%);
+      color: #f3f4f6;
+    }
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .glass-card:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+    .badge-stage {
+      transition: all 0.2s ease;
+    }
+    .glow-cyan {
+      box-shadow: 0 0 25px -5px rgba(6, 182, 212, 0.25);
+    }
+  </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 flex flex-col items-center">
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="max-w-6xl w-full space-y-8">
+
+    <!-- CABECERA PRINCIPAL -->
+    <header class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden border-cyan-500/20 glow-cyan">
+      <div class="absolute -right-12 -top-12 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-xs font-bold uppercase tracking-wider">
+              Investigación Multi-Agente • Agosto 2026
+            </span>
+            <span class="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 font-mono text-xs font-bold">
+              LOMLOE • NGSS • IAU OAE
+            </span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            Matriz Psicopedagógica y Curricular de Astronomía
+          </h1>
+          <p class="text-slate-400 mt-1 max-w-2xl text-sm sm:text-base">
+            Progresión en espiral desde los 6 hasta los 15 años (Piaget, Vygotsky ZDP, Bruner) y desglose exhaustivo de las 12 Lecciones Cósmicas de GOALS.
+          </p>
+        </div>
+
+        <!-- STATS RÁPIDOS -->
+        <div class="grid grid-cols-3 gap-3 w-full md:w-auto">
+          <div class="glass-card p-3 rounded-2xl text-center">
+            <span class="block text-2xl font-black text-cyan-400">12</span>
+            <span class="text-[10px] text-slate-400 font-mono uppercase">Lecciones</span>
+          </div>
+          <div class="glass-card p-3 rounded-2xl text-center">
+            <span class="block text-2xl font-black text-purple-400">3</span>
+            <span class="text-[10px] text-slate-400 font-mono uppercase">Franjas</span>
+          </div>
+          <div class="glass-card p-3 rounded-2xl text-center">
+            <span class="block text-2xl font-black text-emerald-400">100%</span>
+            <span class="text-[10px] text-slate-400 font-mono uppercase">Verificado</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- SELECTOR DE FRANJAS DE EDAD (TABS) -->
+    <div class="flex items-center justify-center gap-2 sm:gap-4 p-1.5 glass-card rounded-2xl max-w-xl mx-auto">
+      <button onclick="setFilter('all')" id="btn-all" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-cyan-600 text-white">
+        Todas las Edades (6-15 a)
+      </button>
+      <button onclick="setFilter('6-8')" id="btn-6-8" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-400 hover:text-white">
+        🐣 6 - 8 Años (1º-3º Prim)
+      </button>
+      <button onclick="setFilter('9-11')" id="btn-9-11" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-400 hover:text-white">
+        🔭 9 - 11 Años (4º-6º Prim)
+      </button>
+      <button onclick="setFilter('12-15')" id="btn-12-15" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-400 hover:text-white">
+        📐 12 - 15 Años (1º-4º ESO)
+      </button>
+    </div>
+
+    <!-- SECCIÓN: LAS 4 GRANDES CONCEPCIONES ERRÓNEAS (MISCONCEPTIONS) -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <span>🧠 Protocolo de Disolución de Concepciones Erróneas (Misconceptions)</span>
+        </h2>
+        <span class="text-xs text-slate-400 font-mono">Stella Vosniadou & Philip Sadler (MOSART)</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Misconception 1 -->
+        <div class="glass-card rounded-2xl p-5 space-y-2 border-l-4 border-l-rose-500">
+          <div class="flex items-center justify-between text-xs font-bold">
+            <span class="text-rose-400 font-mono uppercase">1. Estaciones del Año</span>
+            <span class="px-2 py-0.5 rounded bg-rose-950/60 text-rose-300 text-[10px]">Error Frecuente</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-200">❌ "En verano hace calor porque estamos más cerca del Sol"</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <strong>Conflicto Provocado:</strong> En julio España está en verano pero Argentina en invierno. Además, en enero estamos a 147 Mkm (perihelio, más cerca).
+          </p>
+          <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300">
+            <strong>✅ Realidad Científica:</strong> La inclinación de <strong>23,44°</strong> concentra los rayos solares (<span class="font-mono">$I_0 \cos \theta_z$</span>) y alarga los días.
+          </div>
+        </div>
+
+        <!-- Misconception 2 -->
+        <div class="glass-card rounded-2xl p-5 space-y-2 border-l-4 border-l-amber-500">
+          <div class="flex items-center justify-between text-xs font-bold">
+            <span class="text-amber-400 font-mono uppercase">2. Fases de la Luna</span>
+            <span class="px-2 py-0.5 rounded bg-amber-950/60 text-amber-300 text-[10px]">Error Frecuente</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-200">❌ "La sombra de la Tierra produce las fases lunares"</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <strong>Conflicto Provocado:</strong> Vemos la media Luna de día con el Sol al lado; la Tierra no está entre ambos.
+          </p>
+          <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300">
+            <strong>✅ Realidad Científica:</strong> Siempre hay media Luna iluminada. Vemos diferente ángulo de esa mitad según orbita cada 29,5 días.
+          </div>
+        </div>
+
+        <!-- Misconception 3 -->
+        <div class="glass-card rounded-2xl p-5 space-y-2 border-l-4 border-l-cyan-500">
+          <div class="flex items-center justify-between text-xs font-bold">
+            <span class="text-cyan-400 font-mono uppercase">3. Gravedad Cero en Órbita</span>
+            <span class="px-2 py-0.5 rounded bg-cyan-950/60 text-cyan-300 text-[10px]">Error Frecuente</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-200">❌ "En el espacio no hay gravedad y por eso flotan"</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <strong>Conflicto Provocado:</strong> Si no hubiera gravedad, la Luna se escaparía del Sistema Solar en línea recta.
+          </p>
+          <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300">
+            <strong>✅ Realidad Científica:</strong> En la ISS la gravedad es del <strong>90% ($g \approx 8,7\text{ m/s}^2$)</strong>. Flotan por <strong>caída libre continua</strong> a 27.600 km/h.
+          </div>
+        </div>
+
+        <!-- Misconception 4 -->
+        <div class="glass-card rounded-2xl p-5 space-y-2 border-l-4 border-l-purple-500">
+          <div class="flex items-center justify-between text-xs font-bold">
+            <span class="text-purple-400 font-mono uppercase">4. Centro del Universo</span>
+            <span class="px-2 py-0.5 rounded bg-purple-950/60 text-purple-300 text-[10px]">Error Frecuente</span>
+          </div>
+          <h3 class="text-sm font-bold text-slate-200">❌ "El Sol está en el centro de la Galaxia o del Universo"</h3>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            <strong>Conflicto Provocado:</strong> Mapas del telescopio Gaia y JWST desvelan la posición periférica solar.
+          </p>
+          <div class="p-2.5 rounded-xl bg-emerald-950/40 border border-emerald-500/20 text-xs text-emerald-300">
+            <strong>✅ Realidad Científica:</strong> El Sol está a 26.000 al del centro de la Vía Láctea. El Universo en expansión no tiene centro geométrico.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPLORADOR DE LAS 12 LECCIONES CÓSMICAS -->
+    <section class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+          <span>🌌 Matriz de las 12 Lecciones Cósmicas (Progresión 6 a 15 Años)</span>
+        </h2>
+        <span class="text-xs text-slate-400 font-mono">12 Órdenes de Magnitud</span>
+      </div>
+
+      <div id="lessons-container" class="space-y-3">
+        <!-- Generado dinámicamente con JavaScript -->
+      </div>
+    </section>
+
+    <!-- FOOTER DE FUENTES OFICIALES -->
+    <footer class="glass-card rounded-3xl p-6 text-center text-xs text-slate-400 space-y-2 border-white/5">
+      <p class="font-bold text-slate-300">GOALS Knowledge & Curriculum Architecture • Versión 2.5.0</p>
+      <p>Alineado oficialmente con el Currículo LOMLOE de España (RD 157/2022 y RD 217/2022), NGSS Earth & Space Sciences (ESS1) y la Unión Astronómica Internacional (IAU OAE).</p>
+    </footer>
+
+  </div>
+
+  <!-- SCRIPT DE INTERACTIVIDAD Y DATOS -->
+  <script>
+    const LESSONS_DATA = [
+      {
+        id: 1,
+        title: "La Tierra, su Atmósfera y Satélites",
+        icon: "🌍",
+        scale: "100 km a 1.500.000 km",
+        bigIdea: "Oasis protegido por una piel gaseosa fina con satélites en diferentes órbitas.",
+        stage68: "La piel mágica de la manzana azul. La ISS es una casa flotante con alas solares donde viven astronautas y ven salir el Sol 16 veces al día.",
+        stage911: "La atmósfera (78% N2, 21% O2) frena meteoritos. La ISS viaja a 27.600 km/h en caída libre continua. Hubble esquiva el aire y Webb observa desde L2 a 1.500.000 km.",
+        stage1215: "Gradiente barométrico P(z) = P0 exp(-z/H). Velocidad orbital v = sqrt(GM/r) = 7,66 km/s. Puntos de Lagrange Sol-Tierra y monitoreo Sentinel 2026.",
+        questionChoice: "¿Por qué flotan los astronautas en la ISS a 418 km? -> [x] Porque están en caída libre continua alrededor de la Tierra a 27.600 km/h.",
+        questionOrder: "1. Línea de Kármán (100 km) -> 2. ISS (418 km) -> 3. Hubble (535 km) -> 4. JWST en L2 (1.500.000 km)"
+      },
+      {
+        id: 2,
+        title: "Eclipses y el Gran Eclipse Solar 2026 en España",
+        icon: "🌑",
+        scale: "384.400 km",
+        bigIdea: "El Sol es 400 veces mayor que la Luna pero está 400 veces más lejos (coincidencia de 0,5°). Al cruzar los nodos se produce la ocultación total.",
+        stage68: "La moneda que tapa una farola lejana. El 12 de agosto de 2026 en España el cielo se oscurecerá a media tarde y saldrá un anillo de diamantes.",
+        stage911: "Inclinación orbital de 5,14°. Solo hay eclipses cuando la Luna Nueva cruza los nodos. El eclipse de 2026 cruzará España de A Coruña a Baleares.",
+        stage1215: "Ciclo de Saros (18 años y 11 días). Corona solar a >1.000.000 K por reconexión magnética. Pico del Ciclo Solar 25 y misión ESA PROBA-3 en 2026.",
+        questionChoice: "¿Por qué no hay eclipse de Sol cada mes? -> [x] Porque la órbita lunar está inclinada 5,14° y suele pasar por encima o por debajo.",
+        questionOrder: "1. Primer Contacto C1 -> 2. Perlas de Baily -> 3. Anillo de Diamantes -> 4. Totalidad C2-C3"
+      },
+      {
+        id: 3,
+        title: "Rotación Terrestre, Día/Noche y Husos Horarios",
+        icon: "⏳",
+        scale: "12.742 km (24h)",
+        bigIdea: "El giro inercial de Oeste a Este marca los 24 husos horarios de 15° y el viaje del terminador solar.",
+        stage68: "El gran tiovivo que gira suave hacia el este con su manta de aire. El Sol parece moverse, pero somos nosotros quienes giramos.",
+        stage911: "Velocidad ecuatorial de 1.670 km/h. 360° / 24h = 15° por hora. Meridiano de Greenwich (UTC) y Línea de Cambio de Fecha.",
+        stage1215: "Día Sidéreo (23h 56m) vs Día Solar (24h 00m, requiere 1° extra). Geometría de Eratóstenes y variación de rotación terrestre (LOD) en 2026.",
+        questionChoice: "¿Por qué el día solar dura 24h si la Tierra gira 360° en 23h 56m? -> [x] Porque al avanzar en su órbita debe girar 1° extra para encarar al Sol.",
+        questionOrder: "1. Puesta de Sol (0°) -> 2. Crepúsculo Civil (-6°) -> 3. Crepúsculo Náutico (-12°) -> 4. Crepúsculo Astronómico (-18°)"
+      },
+      {
+        id: 4,
+        title: "Traslación Anual Kepleriana y Afelio/Perihelio",
+        icon: "🛰️",
+        scale: "1 UA (149,6 Mkm)",
+        bigIdea: "Órbita elíptica donde el momento angular acelera a la Tierra en perihelio (enero) y la frena en afelio (julio).",
+        stage68: "La pista de patinaje ovalada. Cada vuelta completa es un año y festejamos un cumpleaños.",
+        stage911: "En perihelio (enero) estamos a 147 Mkm viajando a 30,3 km/s; en afelio (julio) a 152 Mkm a 29,3 km/s. ¡En enero estamos más cerca y es invierno!",
+        stage1215: "1ª, 2ª y 3ª Ley de Kepler (P² = a³). Excentricidad e = 0,0167. Perihelio de Parker Solar Probe a 692.000 km/h en 2026.",
+        questionChoice: "¿Cuándo viaja la Tierra a su máxima velocidad orbital (~30,3 km/s)? -> [x] En el Perihelio (principios de enero), más cerca del Sol.",
+        questionOrder: "1. Perihelio (~3 enero) -> 2. Equinoccio Primavera (~20 marzo) -> 3. Afelio (~4 julio) -> 4. Solsticio Invierno (~21 dic)"
+      },
+      {
+        id: 5,
+        title: "Estaciones del Año y Oblicuidad de 23,44°",
+        icon: "☀️",
+        scale: "23,44° Inclinación",
+        bigIdea: "La inclinación fija del eje polar modula la densidad de flujo de energía solar (W/m²) según la ley de Lambert.",
+        stage68: "Linterna recta (círculo concentrado caliente) vs linterna inclinada (óvalo pálido frío). La cabeza ladeada de la Tierra.",
+        stage911: "Solsticio de junio (verano norte, invierno sur) vs Solsticio de diciembre. Equinoccios con 12h de luz en todo el planeta.",
+        stage1215: "Ley del coseno de Lambert: I = I0 cos(theta). Estabilización giroscópica lunar, ciclos de Milankovitch y balance radiativo CERES 2026.",
+        questionChoice: "¿Por qué en verano hace más calor? -> [x] Porque la inclinación de 23,44° hace que los rayos caigan más perpendiculares (más W/m²).",
+        questionOrder: "1. Equinoccio Primavera -> 2. Solsticio Verano -> 3. Equinoccio Otoño -> 4. Solsticio Invierno"
+      },
+      {
+        id: 6,
+        title: "El Sistema Solar y los 8 Planetas",
+        icon: "🪐",
+        scale: "60 UA (9.000 Mkm)",
+        bigIdea: "El Sol acapara el 99,86% de la masa. La línea de hielo dividió el disco en 4 rocosos y 4 gigantes.",
+        stage68: "4 hermanitos de piedra cerca del fuego y 4 gigantes helados con anillos y lunas bailarinas.",
+        stage911: "Rocosos (Mercurio, Venus 465°C, Tierra, Marte) vs Gigantes (Júpiter, Saturno, Urano, Neptuno). Cinturón de Asteroides.",
+        stage1215: "Línea de nieve (2,7 UA, T < 150 K). Resonancias de Kirkwood con Júpiter. Misiones Europa Clipper y Psyche 2026.",
+        questionChoice: "¿Por qué Venus es el más caliente (~465 °C)? -> [x] Por su desbocado efecto invernadero con atmósfera de 96% CO₂.",
+        questionOrder: "1. Mercurio -> 2. Venus -> 3. Tierra -> 4. Marte -> 5. Júpiter -> 6. Saturno -> 7. Urano -> 8. Neptuno"
+      },
+      {
+        id: 7,
+        title: "La Nube de Oort y la Sonda Voyager 1",
+        icon: "☄️",
+        scale: "100.000 UA (1,5 al)",
+        bigIdea: "El confín del Sistema Solar es una esfera de cometas protegida por la Heliopausa a 120 UA.",
+        stage68: "La gran burbuja de viento del Sol y la botellita de oro que lleva canciones de la Tierra por el mar de estrellas.",
+        stage911: "Cinturón de Kuiper -> Heliopausa (120 UA) -> Nube de Oort hasta 1,5 años luz. La señal a Voyager 1 tarda 22 horas.",
+        stage1215: "Salto en rayos cósmicos galácticos (GCRs) al cruzar la heliopausa. En 2026 Voyager 1 alcanza 1 Día-Luz de distancia de la Tierra.",
+        questionChoice: "¿Qué hito alcanzará Voyager 1 en 2026? -> [x] Situarse a 1 Día-Luz de distancia de la Tierra (~25.900 millones de km).",
+        questionOrder: "1. Cinturón de Kuiper -> 2. Termination Shock -> 3. Heliopausa -> 4. Nube de Oort exterior"
+      },
+      {
+        id: 8,
+        title: "Estrellas Vecinas, Alfa y Próxima Centauri",
+        icon: "✨",
+        scale: "4,2 a 11 Años Luz",
+        bigIdea: "El espacio interestelar requiere el Año Luz como unidad. Alfa Centauri alberga el exoplaneta Próxima b en zona habitable.",
+        stage68: "Los vecinos de otra ciudad lejana. Mirar las estrellas es mirar hacia atrás en el tiempo.",
+        stage911: "Próxima Centauri a 4,24 al. Su planeta Próxima b tarda 11,2 días en dar una vuelta. Vecinos: Sirio a 8,6 al.",
+        stage1215: "Paralaje d = 1/p. Diagrama HR, enanas rojas con convección total y proyectos de velas láser al 20% c (Breakthrough Starshot).",
+        questionChoice: "¿Cuánto tarda una señal de ida y vuelta a Próxima b (4,24 al)? -> [x] 8,48 años terrestres a la velocidad de la luz.",
+        questionOrder: "1. Próxima Centauri (4,24 al) -> 2. Alfa Centauri A/B (4,37 al) -> 3. Barnard (5,96 al) -> 4. Sirio A/B (8,60 al)"
+      },
+      {
+        id: 9,
+        title: "La Vía Láctea y el Agujero Negro Sagitario A*",
+        icon: "🌌",
+        scale: "100.000 Años Luz",
+        bigIdea: "Galaxia espiral barrada con 200.000 millones de estrellas gobernada por un halo de Materia Oscura y Sagitario A*.",
+        stage68: "El gran remolino de fuegos artificiales con un gigante gravitatorio en el corazón que hace girar la ronda.",
+        stage911: "Diámetro de 100.000 al. El Sol está a 26.000 al del centro y tarda 230 Ma en dar una vuelta (Año Galáctico).",
+        stage1215: "Ondas de densidad de Lin-Shu. Curvas de rotación planas (v ~ 220 km/s) que demuestran la Materia Oscura. EHT / ngEHT 2026.",
+        questionChoice: "¿Qué demostró el halo de Materia Oscura? -> [x] Que las estrellas del borde giran a 220 km/s en vez de frenarse.",
+        questionOrder: "1. Sagitario A* -> 2. Bulbo Galáctico -> 3. Brazo de Orión (Sol) -> 4. Halo de Materia Oscura"
+      },
+      {
+        id: 10,
+        title: "El Grupo Local y Andrómeda (M31)",
+        icon: "🌀",
+        scale: "10 Millones al",
+        bigIdea: "Archipiélago de 80 galaxias rumbo a la colisión gravitatoria Milkomeda en 4.500 millones de años.",
+        stage68: "Dos hermanas gigantes que patinan hacia un gran abrazo para formar una supergalaxia sin chocar sus estrellas.",
+        stage911: "Andrómeda a 2,5 Mal visible a simple vista. 1 billón de estrellas. Galaxias satélites: Nubes de Magallanes y Triángulo.",
+        stage1215: "Blueshift Doppler (-110 km/s) superando la expansión cósmica local. Mareas galácticas y simulaciones JWST 2026.",
+        questionChoice: "¿Por qué Andrómeda se acerca a 110 km/s? -> [x] Porque la gravedad mutua vence a la expansión cósmica a distancias cortas.",
+        questionOrder: "1. Gran Nube de Magallanes -> 2. Andrómeda M31 -> 3. Triángulo M33 -> 4. Límite del Grupo Local"
+      },
+      {
+        id: 11,
+        title: "La Red Cósmica Laniakea y el Gran Atractor",
+        icon: "🕸️",
+        scale: "520 Millones al",
+        bigIdea: "La materia se ordena en filamentos de telaraña que fluyen hacia la anomalía de masa del Gran Atractor.",
+        stage68: "La telaraña con gotas de rocío iluminadas. Las galaxias viajan por ríos invisibles de gravedad.",
+        stage911: "Laniakea ('Cielos Inmensos') abarca 520 Mal y 100.000 galaxias. La Vía Láctea viaja a 600 km/s hacia el Gran Atractor.",
+        stage1215: "Campos de velocidad peculiar y tensor de corte gravitacional. Modelo Lambda-CDM y primeros mapas 3D del telescopio Euclid 2026.",
+        questionChoice: "¿Qué define la frontera de Laniakea? -> [x] La divisoria donde las galaxias dejan de fluir hacia el Gran Atractor.",
+        questionOrder: "1. Sistema Solar -> 2. Vía Láctea -> 3. Grupo Local -> 4. Supercúmulo Laniakea"
+      },
+      {
+        id: 12,
+        title: "El Universo Observable, el Fondo Cósmico (CMB) y el Big Bang",
+        icon: "🔥",
+        scale: "93.000 Millones al",
+        bigIdea: "El espacio emergió hace 13.800 Ma y se expande acelerado por la Energía Oscura, conservando el fósil térmico del CMB (2,725 K).",
+        stage68: "El globo mágico que se infla y la foto de bebé del Universo cocinado en el gran inicio.",
+        stage911: "El Big Bang fue la expansión del espacio mismo. Diámetro observable de 93.000 Mal con 2 billones de galaxias. 95% es oscuro.",
+        stage1215: "Métrica FLRW y desacoplamiento de fotones a z = 1100 (2,725 K). Mediciones de polarización de modos B con Simons Observatory 2026.",
+        questionChoice: "¿Por qué mide 93.000 Mal si tiene 13.800 Ma? -> [x] Porque el espacio se ha expandido continuamente mientras la luz viajaba.",
+        questionOrder: "1. Big Bang e Inflación -> 2. Emisión del CMB (380.000 a) -> 3. Primeras Galaxias (300 Ma) -> 4. Universo Actual (13.800 Ma)"
+      }
+    ];
+
+    let currentFilter = 'all';
+
+    function renderLessons() {
+      const container = document.getElementById('lessons-container');
+      container.innerHTML = '';
+
+      LESSONS_DATA.forEach(lesson => {
+        const div = document.createElement('div');
+        div.className = 'glass-card rounded-2xl p-5 space-y-3 transition-all';
+        
+        div.innerHTML = `
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl p-2 rounded-xl bg-slate-900 border border-slate-800">${lesson.icon}</span>
+              <div>
+                <span class="text-[10px] font-mono text-cyan-400 font-bold uppercase tracking-wider">Lección ${lesson.id} • ${lesson.scale}</span>
+                <h3 class="text-base font-bold text-white">${lesson.title}</h3>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-slate-900 text-slate-400 font-mono text-xs border border-white/5 self-start sm:self-center">
+              Big Idea: ${lesson.bigIdea}
+            </span>
+          </div>
+
+          <!-- BLOQUES POR EDAD -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+            <!-- 6-8 Años -->
+            <div class="p-3.5 rounded-xl bg-cyan-950/20 border border-cyan-500/20 space-y-1.5 ${currentFilter !== 'all' && currentFilter !== '6-8' ? 'opacity-30' : ''}">
+              <div class="flex items-center justify-between text-xs font-bold text-cyan-400 font-mono">
+                <span>🐣 6-8 Años (Sensorial)</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">${lesson.stage68}</p>
+            </div>
+
+            <!-- 9-11 Años -->
+            <div class="p-3.5 rounded-xl bg-amber-950/20 border border-amber-500/20 space-y-1.5 ${currentFilter !== 'all' && currentFilter !== '9-11' ? 'opacity-30' : ''}">
+              <div class="flex items-center justify-between text-xs font-bold text-amber-400 font-mono">
+                <span>🔭 9-11 Años (Causal / Escalas)</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">${lesson.stage911}</p>
+            </div>
+
+            <!-- 12-15 Años -->
+            <div class="p-3.5 rounded-xl bg-purple-950/20 border border-purple-500/20 space-y-1.5 ${currentFilter !== 'all' && currentFilter !== '12-15' ? 'opacity-30' : ''}">
+              <div class="flex items-center justify-between text-xs font-bold text-purple-400 font-mono">
+                <span>📐 12-15 Años (Física & 2026)</span>
+              </div>
+              <p class="text-xs text-slate-300 leading-relaxed">${lesson.stage1215}</p>
+            </div>
+          </div>
+
+          <!-- EVALUACIONES CALIBRADAS -->
+          <div class="pt-2 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-950/60 border border-white/5">
+              <span class="font-bold text-cyan-300 font-mono block mb-1">🎯 Pregunta Choice Diagnóstica:</span>
+              <span class="text-slate-300">${lesson.questionChoice}</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-950/60 border border-white/5">
+              <span class="font-bold text-purple-300 font-mono block mb-1">🔢 Pregunta de Ordenación Causal:</span>
+              <span class="text-slate-300">${lesson.questionOrder}</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      ['all', '6-8', '9-11', '12-15'].forEach(f => {
+        const btn = document.getElementById(`btn-${f}`);
+        if (f === filter) {
+          btn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all bg-cyan-600 text-white';
+        } else {
+          btn.className = 'px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all text-slate-400 hover:text-white';
+        }
+      });
+      renderLessons();
+    }
+
+    // Inicializar
+    renderLessons();
+  </script>
+</body>
+</html>

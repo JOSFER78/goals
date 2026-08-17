@@ -4,7 +4,7 @@ import { useProgress } from '../context/ProgressContext';
 import { 
   X, Zap, Check, Gift, Download, Brain, RefreshCw, CheckCircle2, Sliders, Volume2, 
   Target, Flame, Star, Bot, User, Smartphone, ShieldCheck, Sparkles, Award, BarChart3,
-  Eye, Headphones, Wrench, BookOpen, Compass, Orbit
+  Eye, Headphones, Wrench, BookOpen, Compass, Orbit, LogOut
 } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
 import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
@@ -14,10 +14,12 @@ import { MascotPet } from './mascot/MascotPet';
 import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
 import { getChildAge, setChildAge, getChildProfile, setChildProfile, getCustomMascotName, setCustomMascotName } from '../services/aiService';
 import { ChildLearningProfile, AVAILABLE_GRADES, AVAILABLE_SUBJECTS, AVAILABLE_EXTRACURRICULARS, AVAILABLE_INTERESTS } from '../types/childProfile';
+import { PresentationEngine } from '../services/PresentationEngine';
 
 interface ProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
+  isEmbedded?: boolean;
   onOpenAdminDashboard: () => void;
 }
 
@@ -39,44 +41,64 @@ const WEEKDAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 export const ProfileModal: React.FC<ProfileModalProps> = ({
   isOpen,
   onClose,
+  isEmbedded = false,
   onOpenAdminDashboard
 }) => {
   const { user, isCloud, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut, updateUserProfileData, authError, setAuthError } = useAuth();
-  const { userData, totalStars, maxStars, claimReto, getRankInfo, getRetosList, showToast } = useProgress();
+  const { userData, totalStars, maxStars, claimReto, getRankInfo, getRetosList, showToast, saveChildProfileData, saveMascotData } = useProgress();
 
-  const [activeTab, setActiveTab] = useState<'retos' | 'racha' | 'stats' | 'ficha_niño' | 'mascota' | 'cuenta' | 'about' | 'admin'>('retos');
+  const [activeTab, setActiveTab] = useState<'retos' | 'evoluciones' | 'racha' | 'stats' | 'ficha_niño' | 'mascota' | 'cuenta' | 'about' | 'admin'>('retos');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
-  const [childProfile, setChildProfileState] = useState<ChildLearningProfile>(() => getChildProfile());
+  const [childProfile, setChildProfileState] = useState<ChildLearningProfile>(() => {
+    return userData.childProfile ? (userData.childProfile as ChildLearningProfile) : getChildProfile();
+  });
+
+  useEffect(() => {
+    if (userData.childProfile) {
+      setChildProfileState(userData.childProfile as ChildLearningProfile);
+    }
+  }, [userData.childProfile]);
 
   const handleSaveChildProfile = (updated: ChildLearningProfile) => {
     setChildProfileState(updated);
     setChildProfile(updated);
-    showToast('Ficha del Alumno guardada e inyectada en la IA');
+    saveChildProfileData(updated);
+    showToast('Ficha del Alumno guardada y sincronizada en la nube');
   };
 
-  const [customMascotName, setCustomMascotNameState] = useState<string>(() => getCustomMascotName());
+  const [customMascotName, setCustomMascotNameState] = useState<string>(() => {
+    return userData.mascotConfig?.customName || getCustomMascotName();
+  });
   const [mascotSkinId, setMascotSkinId] = useState<MascotSkinId>(() => {
-    return (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
+    return (userData.mascotConfig?.skinId as MascotSkinId) || (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
   });
   const [mascotScale, setMascotScale] = useState<number>(() => {
-    return parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
+    return userData.mascotConfig?.scale || parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
   });
   const [mascotAnimState, setMascotAnimState] = useState<'idle' | 'hover' | 'thinking' | 'speaking' | 'dragging'>('idle');
   const [mascotSoulPrompt, setMascotSoulPrompt] = useState<string>(() => {
     const skinName = MASCOT_SKINS[mascotSkinId]?.name || 'el tutor de GOALS';
-    return localStorage.getItem('goals_mascot_soul') || `Eres ${skinName}, un mentor didáctico y sabio experto en ciencia, idiomas y tecnología. Explicas conceptos complejos con analogías claras.`;
+    return userData.mascotConfig?.soulPrompt || localStorage.getItem('goals_mascot_soul') || `Eres ${skinName}, un mentor didáctico y sabio experto en ciencia, idiomas y tecnología. Explicas conceptos complejos con analogías claras.`;
   });
   const [mascotPitch, setMascotPitch] = useState<number>(() => {
-    return parseFloat(localStorage.getItem('goals_mascot_pitch') || '1.15');
+    return userData.mascotConfig?.pitch || parseFloat(localStorage.getItem('goals_mascot_pitch') || '1.15');
   });
   const [mascotRate, setMascotRate] = useState<number>(() => {
-    return parseFloat(localStorage.getItem('goals_mascot_rate') || '1.0');
+    return userData.mascotConfig?.rate || parseFloat(localStorage.getItem('goals_mascot_rate') || '1.0');
   });
 
   const handleSelectMascotSkin = (skinId: MascotSkinId) => {
     setMascotSkinId(skinId);
     localStorage.setItem('goals_mascot_skin', skinId);
+    saveMascotData({
+      skinId,
+      customName: customMascotName,
+      soulPrompt: mascotSoulPrompt,
+      scale: mascotScale,
+      pitch: mascotPitch,
+      rate: mascotRate
+    });
     window.dispatchEvent(new CustomEvent('goals_mascot_updated', { detail: { skinId, scale: mascotScale } }));
     showToast(`Mascota cambiada a ${MASCOT_SKINS[skinId].name}`);
   };
@@ -84,14 +106,30 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const handleScaleChange = (scale: number) => {
     setMascotScale(scale);
     localStorage.setItem('goals_mascot_scale', String(scale));
+    saveMascotData({
+      skinId: mascotSkinId,
+      customName: customMascotName,
+      soulPrompt: mascotSoulPrompt,
+      scale,
+      pitch: mascotPitch,
+      rate: mascotRate
+    });
     window.dispatchEvent(new CustomEvent('goals_mascot_updated', { detail: { skinId: mascotSkinId, scale } }));
   };
 
   const handleSoulPromptChange = (prompt: string) => {
     setMascotSoulPrompt(prompt);
     localStorage.setItem('goals_mascot_soul', prompt);
+    saveMascotData({
+      skinId: mascotSkinId,
+      customName: customMascotName,
+      soulPrompt: prompt,
+      scale: mascotScale,
+      pitch: mascotPitch,
+      rate: mascotRate
+    });
     window.dispatchEvent(new CustomEvent('goals_mascot_updated', { detail: { soulPrompt: prompt } }));
-    showToast("Personalidad IA actualizada");
+    showToast("Personalidad IA actualizada y sincronizada");
   };
 
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
@@ -119,7 +157,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isGuest = !user || user.isAnonymous;
-  const rank = getRankInfo(userData?.xp || 0);
+  const currentXp = Number(userData?.xp || 0);
+  const rank = getRankInfo(currentXp);
 
   const currentStars = typeof totalStars === 'function' ? totalStars() : 0;
   const maxPossibleStars = typeof maxStars === 'function' ? maxStars() : 18;
@@ -183,102 +222,177 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const currentAvatarConfig = AVATAR_OPTIONS.find(a => a.id === selectedAvatar || a.label === selectedAvatar) || AVATAR_OPTIONS[0];
   const CurrentAvatarIcon = currentAvatarConfig.iconComp;
 
-  return (
-    <>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn font-display">
-        <div className="w-full max-w-lg bg-slate-950 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-          
-          <div className="px-5 py-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/60 shrink-0">
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-2xl border flex items-center justify-center ${currentAvatarConfig.color} shadow-sm shrink-0`}>
-                <CurrentAvatarIcon className="w-5 h-5" />
-              </div>
-              <div>
-                <h2 className="font-extrabold text-sm text-white flex items-center gap-2">
-                  <span className="max-w-[180px] sm:max-w-[280px] truncate">{user?.displayName || 'Centro de Usuario'}</span>
-                  {user?.email === 'josferestudio@gmail.com' && (
-                    <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 shrink-0">
-                      ADMIN
-                    </span>
-                  )}
-                </h2>
-                <p className="text-[10px] text-slate-400 font-mono">
-                  {rank.title}
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-400 hover:text-white transition-all active:scale-95 cursor-pointer shrink-0"
-            >
-              <X className="w-4 h-4" />
-            </button>
+  const profileContent = (
+    <div className="w-full h-full flex-1 flex flex-col bg-slate-950/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden font-display">
+      
+      <div className="px-4 sm:px-6 py-3.5 border-b border-slate-800/80 flex items-center justify-between bg-slate-900/60 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className={`w-9 h-9 rounded-xl border flex items-center justify-center ${currentAvatarConfig.color} shadow-sm shrink-0`}>
+            <CurrentAvatarIcon className="w-4 h-4" />
           </div>
+          <div>
+            <h2 className="font-extrabold text-xs sm:text-sm text-white flex items-center gap-2 flex-wrap">
+              <span className="max-w-[200px] sm:max-w-[320px] truncate">{user?.displayName || 'Centro de Usuario'}</span>
+              {user?.email === 'josferestudio@gmail.com' && (
+                <button
+                  type="button"
+                  onClick={() => { onClose(); onOpenAdminDashboard(); }}
+                  className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-bold border border-amber-500/30 hover:bg-amber-500/30 cursor-pointer transition-colors"
+                  title="Abrir Panel de Administración"
+                >
+                  ADMIN
+                </button>
+              )}
+            </h2>
+            <p className="text-[10px] text-slate-400 font-mono">
+              {rank.title}
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="px-3 py-1.5 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white transition-all active:scale-95 cursor-pointer shrink-0 text-xs font-semibold flex items-center gap-1.5"
+          title="Volver a GOALS"
+        >
+          <X className="w-4 h-4" />
+          <span className="hidden sm:inline">Cerrar</span>
+        </button>
+      </div>
 
           <div className="p-4 flex-1 overflow-y-auto space-y-4">
             
-            <div className="flex items-center gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-bold overflow-x-auto scrollbar-none shrink-0">
+            <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-bold shrink-0">
               <button 
                 onClick={() => setActiveTab('retos')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'retos' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'retos' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
-                <Target className="w-4 h-4 text-amber-400" />
-                <span>Retos</span>
+                <Target className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span className="text-[11px] truncate">Retos</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('evoluciones')}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'evoluciones' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
+                <span className="text-[11px] truncate">Hitos</span>
               </button>
               <button 
                 onClick={() => setActiveTab('racha')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'racha' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'racha' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
-                <Flame className="w-4 h-4 text-orange-400" />
-                <span>Racha</span>
+                <Flame className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+                <span className="text-[11px] truncate">Racha</span>
               </button>
               <button 
                 onClick={() => setActiveTab('stats')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'stats' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'stats' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
-                <BarChart3 className="w-4 h-4 text-amber-300" />
-                <span>Estadísticas</span>
+                <BarChart3 className="w-3.5 h-3.5 text-blue-300 shrink-0" />
+                <span className="text-[11px] truncate">Stats</span>
               </button>
               <button 
                 onClick={() => setActiveTab('mascota')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'mascota' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'mascota' ? 'bg-purple-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
               >
-                <Bot className="w-4 h-4 text-purple-300" />
-                <span>Mascota</span>
+                <Bot className="w-3.5 h-3.5 text-purple-300 shrink-0" />
+                <span className="text-[11px] truncate">Mascota</span>
               </button>
               <button 
                 onClick={() => setActiveTab('ficha_niño')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'ficha_niño' ? 'bg-pink-600 text-white shadow-sm' : 'text-pink-300 hover:text-white'}`}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'ficha_niño' ? 'bg-pink-600 text-white shadow-sm' : 'text-pink-300 hover:text-white'}`}
               >
-                <Brain className="w-4 h-4 text-pink-300" />
-                <span>Ficha Alumno</span>
+                <Brain className="w-3.5 h-3.5 text-pink-300 shrink-0" />
+                <span className="text-[11px] truncate">Ficha</span>
               </button>
               <button 
                 onClick={() => setActiveTab('cuenta')}
-                className={`px-3 py-2 rounded-xl transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${activeTab === 'cuenta' ? 'bg-cyan-600 text-white shadow-sm' : 'text-cyan-300 hover:text-white'}`}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'cuenta' ? 'bg-cyan-600 text-white shadow-sm' : 'text-cyan-300 hover:text-white'}`}
               >
-                <User className="w-4 h-4 text-cyan-300" />
-                <span>Perfil</span>
+                <User className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
+                <span className="text-[11px] truncate">Perfil</span>
               </button>
-              {user?.email === 'josferestudio@gmail.com' && (
-                <button 
-                  onClick={() => { onClose(); onOpenAdminDashboard(); }}
-                  className="px-3 py-2 rounded-xl transition-all whitespace-nowrap text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 flex items-center gap-1.5 ml-auto cursor-pointer"
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Admin</span>
-                </button>
-              )}
             </div>
 
-            {/* PESTAÑA 1: RETOS Y MISIONES */}
+            {/* PESTAÑA HITOS Y EVOLUCIÓN EN VIVO */}
+            {activeTab === 'evoluciones' && (
+              <div className="space-y-3 animate-fadeIn">
+                <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                      <Award className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-xs text-white">Línea Temporal de Evolución y Logros</h3>
+                      <p className="text-[10px] text-slate-400">
+                        {userData.evolutions?.length || 0} hitos educativos registrados en la nube
+                      </p>
+                    </div>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-300 border border-amber-500/20 text-xs font-mono font-bold">
+                    {currentXp} XP Total
+                  </span>
+                </div>
+
+                <div className="space-y-2 max-h-[50vh] overflow-y-auto pr-1">
+                  {(!userData.evolutions || userData.evolutions.length === 0) ? (
+                    <div className="p-8 text-center bg-slate-900/40 border border-slate-800 rounded-2xl space-y-2">
+                      <Sparkles className="w-8 h-8 text-slate-600 mx-auto" />
+                      <p className="text-xs text-slate-400 font-medium">Aún no hay hitos registrados.</p>
+                      <p className="text-[10px] text-slate-500">Completa lecciones, supera tests o habla con el tutor para registrar tus logros.</p>
+                    </div>
+                  ) : (
+                    userData.evolutions.map((evo) => {
+                      const isTest = evo.type === 'test_completed';
+                      const isLesson = evo.type === 'lesson_finished';
+                      const isReto = evo.type === 'reto_claimed';
+
+                      return (
+                        <div 
+                          key={evo.id} 
+                          className="bg-slate-950 p-3 rounded-2xl border border-slate-800/80 flex items-center justify-between gap-3 text-xs"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-sm border ${
+                              isTest ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' :
+                              isLesson ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' :
+                              'bg-cyan-500/10 border-cyan-500/30 text-cyan-400'
+                            }`}>
+                              {isTest ? <Star className="w-4 h-4" /> : isLesson ? <BookOpen className="w-4 h-4" /> : <Sparkles className="w-4 h-4" />}
+                            </div>
+                            <div>
+                              <p className="font-bold text-white text-[11px] leading-tight">{evo.title}</p>
+                              <div className="flex items-center gap-2 text-[9px] text-slate-400 mt-0.5">
+                                <span>{evo.dateStr}</span>
+                                {evo.score && (
+                                  <span className="font-mono text-amber-300 font-bold">• Nota: {evo.score}</span>
+                                )}
+                                {typeof evo.stars === 'number' && evo.stars > 0 && (
+                                  <span className="text-amber-400">
+                                    {'★'.repeat(evo.stars)}{'☆'.repeat(3 - evo.stars)}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                          <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 font-mono font-bold text-[10px] shrink-0 flex items-center gap-1">
+                            <Zap className="w-3 h-3" /> +{evo.xpEarned} XP
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB: RETOS DIARIOS */}
             {activeTab === 'retos' && (
               <div className="space-y-3 animate-fadeIn">
                 <div className="bg-slate-900/60 border border-amber-500/20 rounded-2xl p-3.5 text-center relative overflow-hidden">
                   <div className="flex items-center justify-between text-xs mb-1.5">
                     <span className="font-bold text-amber-300 flex items-center gap-1">
-                      <Zap className="w-3.5 h-3.5 text-amber-400" /> {userData.xp} XP Acumulados
+                      <Zap className="w-3.5 h-3.5 text-amber-400" /> {currentXp} XP Acumulados
                     </span>
                     <span className="font-bold text-indigo-300 text-[10px]">
                       Nivel {rank.level}: {rank.title}
@@ -288,7 +402,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800">
                     <div 
                       className="bg-gradient-to-r from-amber-400 via-amber-500 to-indigo-500 h-full transition-all duration-500 rounded-full" 
-                      style={{ width: `${Math.min(100, (userData.xp / rank.nextXp) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (currentXp / (rank.nextXp || 100)) * 100)}%` }}
                     />
                   </div>
                 </div>
@@ -409,7 +523,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
                           <p className="text-[10px] text-slate-400 font-medium">XP Total</p>
                           <p className="font-bold text-sm text-amber-400 flex items-center justify-center gap-1 mt-0.5">
-                            <Zap className="w-3.5 h-3.5 text-amber-400" /> {userData.xp}
+                            <Zap className="w-3.5 h-3.5 text-amber-400" /> {currentXp}
                           </p>
                         </div>
                         <div className="bg-slate-950 p-2.5 rounded-xl border border-slate-800">
@@ -434,7 +548,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
                       {Object.values(GOALS_EXPERIENCES).map((exp) => {
                         const IconComp = exp.icon;
-                        const expXp = userData.experiences?.[exp.id]?.xp || (exp.id === 'astro' ? userData.xp : 0);
+                        const expXp = (userData.experiences as any)?.[exp.id]?.xp || (exp.id === 'astro' ? userData.xp : 0);
                         return (
                           <div 
                             key={exp.id} 
@@ -696,12 +810,17 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                             onChange={(e) => setChildProfileState({ ...childProfile, age: parseInt(e.target.value, 10) })}
                             className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-amber-300 font-bold focus:border-pink-500 outline-none transition-colors cursor-pointer"
                           >
-                            {Array.from({ length: 11 }, (_, i) => i + 6).map((a) => (
+                            {Array.from({ length: 10 }, (_, i) => i + 6).map((a) => (
                               <option key={a} value={a} className="bg-slate-900 text-white">
-                                {a} Años
+                                {a} Años • {PresentationEngine.getLevelBadge(a).label.split(' (')[0]}
                               </option>
                             ))}
                           </select>
+                          <div className="mt-1">
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[9px] font-bold border ${PresentationEngine.getLevelBadge(childProfile.age).color}`}>
+                              {PresentationEngine.getLevelBadge(childProfile.age).label}
+                            </span>
+                          </div>
                         </div>
 
                         <div>
@@ -948,19 +1067,40 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         </button>
                       </div>
                     ) : (
-                      <button
-                        onClick={signOut}
-                        className="w-full py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-400 font-bold text-xs transition-all cursor-pointer"
-                      >
-                        Cerrar Sesión
-                      </button>
+                      <div className="pt-2 border-t border-slate-800/80 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose();
+                            signOut();
+                          }}
+                          className="px-3 py-1.5 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-slate-900 border border-slate-800 hover:border-rose-500/30 font-medium text-xs transition-all cursor-pointer flex items-center gap-1.5"
+                          title="Cerrar sesión de GOALS"
+                        >
+                          <LogOut className="w-3.5 h-3.5" />
+                          <span>Cerrar Sesión</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 )}
+              </div>
+            </div>
+  );
 
+  return (
+    <>
+      {isEmbedded ? (
+        <div className="w-full h-full flex-1 flex flex-col p-2 sm:p-4 max-w-5xl mx-auto">
+          {profileContent}
+        </div>
+      ) : (
+        <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn font-display cursor-pointer">
+          <div onClick={(e) => e.stopPropagation()} className="w-full max-w-3xl max-h-[90vh] flex flex-col cursor-default">
+            {profileContent}
           </div>
         </div>
-      </div>
+      )}
 
       <ApkDownloadGuideModal
         isOpen={isGuideOpen}

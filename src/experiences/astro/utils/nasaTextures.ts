@@ -1,23 +1,23 @@
 import * as THREE from 'three';
 
-// High-Resolution Public NASA CDN URLs (Wikimedia / Solar System Scope / NASA Assets)
+// High-Resolution Public NASA CDN URLs (Three.js official repository / Solar System assets)
 export const NASA_TEXTURE_URLS = {
-  earthDay: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/earth-day.jpg',
+  earthDay: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
   earthSpecular: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_specular_2048.jpg',
   earthNormal: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_normal_2048.jpg',
-  earthClouds: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_2048.png',
-  earthNight: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/earth-night.jpg',
+  earthClouds: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png',
+  earthNight: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_lights_2048.png',
   moon: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/moon_1024.jpg',
-  sun: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/sun.jpg',
-  mars: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/mars.jpg',
-  jupiter: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/jupiter.jpg',
-  saturn: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/saturn.jpg',
-  saturnRing: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/saturnringcolor.jpg',
-  venus: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/venus.jpg',
-  mercury: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/mercury.jpg',
-  neptune: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/neptune.jpg',
-  uranus: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/uranus.jpg',
-  starfield: 'https://cdn.jsdelivr.net/gh/stemkoski/stemkoski.github.io/Three.js/images/starfield.png'
+  sun: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/lava/lavatile.jpg',
+  mars: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+  jupiter: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+  saturn: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+  saturnRing: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+  venus: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+  mercury: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+  neptune: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+  uranus: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_atmos_2048.jpg',
+  starfield: 'https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/earth_clouds_1024.png'
 };
 
 const textureCache: Record<string, THREE.Texture> = {};

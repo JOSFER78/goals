@@ -124,3 +124,17 @@ export function triggerApkInstall(downloadUrl?: string): void {
     document.body.removeChild(a);
   }, 100);
 }
+
+export function markUpdateDismissed(version: string): void {
+  try {
+    localStorage.setItem('goals_dismissed_update_version', version);
+  } catch (e) {}
+}
+
+export function isUpdateDismissed(version: string): boolean {
+  try {
+    return localStorage.getItem('goals_dismissed_update_version') === version;
+  } catch (e) {
+    return false;
+  }
+}

@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOALS Languages — Master Plan & 26 Engineering Blocks Playbook</title>
+  
+  <!-- Google Fonts: Outfit, Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --bg-deep: #020617;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(6, 182, 212, 0.2);
+      --card-hover-border: rgba(6, 182, 212, 0.5);
+      --accent-cyan: #06b6d4;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(16, 185, 129, 0.06) 0%, transparent 40%);
+    }
+
+    .font-mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(2, 6, 23, 0.8);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(6, 182, 212, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(6, 182, 212, 0.6);
+    }
+
+    /* Glassmorphism Styles */
+    .glass-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 1.25rem;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .glass-card:hover {
+      border-color: var(--card-hover-border);
+      box-shadow: 0 12px 30px -10px rgba(6, 182, 212, 0.15);
+      transform: translateY(-2px);
+    }
+
+    /* Equalizer Wave Animations */
+    @keyframes wave {
+      0%, 100% { height: 6px; }
+      50% { height: 24px; }
+    }
+    .wave-bar {
+      width: 3px;
+      background: var(--accent-cyan);
+      border-radius: 2px;
+      animation: wave 1.2s ease-in-out infinite;
+    }
+    .wave-bar:nth-child(1) { animation-delay: 0.0s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 16px; }
+    .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 22px; }
+    .wave-bar:nth-child(4) { animation-delay: 0.1s; height: 14px; }
+    .wave-bar:nth-child(5) { animation-delay: 0.3s; height: 18px; }
+
+    /* Tabs & Buttons */
+    .btn-tab {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 0.75rem;
+      font-size: 0.825rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+    }
+    .btn-tab:hover {
+      color: var(--accent-cyan);
+      border-color: rgba(6, 182, 212, 0.4);
+      background: rgba(15, 23, 42, 0.95);
+    }
+    .btn-tab.active {
+      background: var(--accent-cyan);
+      color: #020617;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-cyan {
+      background: rgba(6, 182, 212, 0.12);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      color: #38bdf8;
+    }
+    .badge-emerald {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      padding: 1rem;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .modal-content {
+      background: #090e1a;
+      border: 1px solid var(--card-hover-border);
+      border-radius: 1.5rem;
+      max-width: 850px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+      overflow: hidden;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-overlay.open .modal-content {
+      transform: scale(1);
+    }
+
+    /* Tooltip Toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #0f172a;
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 0.75rem 1.25rem;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      z-index: 200;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-10 max-w-7xl mx-auto space-y-8">
+
+  <!-- Header & Status Bar -->
+  <header class="glass-card p-6 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
+    
+    <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div class="space-y-2">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-cyan-500/15 border border-cyan-500/30 rounded-2xl text-cyan-400">
+            <i data-lucide="sparkles" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2.5">
+              <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">GOALS — Languages</h1>
+              <span class="badge badge-cyan">v1.0 MASTER PLAN</span>
+            </div>
+            <p class="text-xs sm:text-sm text-cyan-200/70 mt-0.5">
+              Profesor Particular de Idiomas Multimodal, Persistente, Conversacional y Adaptativo
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Audio Wave Equalizer & Stats -->
+      <div class="flex items-center gap-3 bg-slate-900/90 border border-slate-800 p-3 rounded-2xl shrink-0">
+        <div class="flex items-end gap-1 h-7 px-2">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <div class="border-l border-slate-800 pl-3">
+          <div class="text-[10px] font-mono text-slate-400 uppercase">26 Bloques AGY</div>
+          <div class="text-xs font-mono font-bold text-emerald-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            100% DEFINIDOS
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mode Selector & Global Filter Tabs -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mt-6 pt-6 border-t border-slate-800/80">
+      <div class="flex flex-wrap gap-2" id="phase-filter-bar">
+        <button class="btn-tab active" data-phase="all"><i data-lucide="layers" class="w-4 h-4"></i> Todos (26)</button>
+        <button class="btn-tab" data-phase="0"><i data-lucide="cpu" class="w-4 h-4"></i> 0. Fundaciones (3)</button>
+        <button class="btn-tab" data-phase="1"><i data-lucide="user-check" class="w-4 h-4"></i> 1. Perfil & Estado (2)</button>
+        <button class="btn-tab" data-phase="2"><i data-lucide="bot" class="w-4 h-4"></i> 2. Profesor & Memoria (3)</button>
+        <button class="btn-tab" data-phase="3"><i data-lucide="mic" class="w-4 h-4"></i> 3. Voz & Acústica (2)</button>
+        <button class="btn-tab" data-phase="4"><i data-lucide="book-open" class="w-4 h-4"></i> 4. Generadores (8)</button>
+        <button class="btn-tab" data-phase="5"><i data-lucide="compass" class="w-4 h-4"></i> 5. Currículo & NBA (2)</button>
+        <button class="btn-tab" data-phase="6"><i data-lucide="award" class="w-4 h-4"></i> 6. Gamificación (3)</button>
+        <button class="btn-tab" data-phase="7"><i data-lucide="shield-check" class="w-4 h-4"></i> 7. QA & Release (3)</button>
+      </div>
+
+      <!-- Raw Markdown / Interactive Toggle -->
+      <div class="flex items-center gap-2 bg-slate-900/90 border border-slate-800 p-1.5 rounded-xl">
+        <button id="view-mode-interactive" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 flex items-center gap-1.5 transition-all">
+          <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> Vista Interactiva
+        </button>
+        <button id="view-mode-raw" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 transition-all">
+          <i data-lucide="file-code" class="w-3.5 h-3.5"></i> Markdown Playbook
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Section: Next Best Action & CEFR Mastery Radar Simulation -->
+  <section id="interactive-hero-section" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Next Best Action Live Simulator -->
+    <div class="glass-card p-6 space-y-4 lg:col-span-2">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 bg-cyan-500/10 border border-cyan-500/30 rounded-xl text-cyan-400">
+            <i data-lucide="target" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-extrabold text-white">Simulador de Next Best Action (NBA)</h2>
+            <p class="text-xs text-slate-400">Heurística adaptativa en tiempo real basada en el expediente pedagógico</p>
+          </div>
+        </div>
+        <span class="badge badge-emerald">MOTOR EN VIVO</span>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-slate-950/80 border border-cyan-500/30 space-y-3" id="nba-card-content">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+            <i data-lucide="activity" class="w-4 h-4"></i> ACCIÓN RECOMENDADA #1:
+          </span>
+          <span class="text-[10px] font-mono bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30">
+            PRIORIDAD: ERROR RECURRENTE
+          </span>
+        </div>
+        <h3 class="text-sm font-bold text-white">Refuerzo Inmediato: Pasado Irregular ("went" vs "goed")</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          El alumno Alex (9 años, Nivel A2) ha cometido 4 veces la confusión de "goed" en las últimas 48 horas. El motor prescribe un micro-ejercicio de 3 minutos para consolidar verbos de alta frecuencia.
+        </p>
+        <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+          <span class="text-[11px] text-slate-400">Habilidad Diana: <strong class="text-cyan-300">Grammar & Speaking</strong></span>
+          <button onclick="simulateNextAction()" class="px-3.5 py-1.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-transform active:scale-95 cursor-pointer">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Simular Siguiente Estado
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CEFR 8-Skill Radar / Progress -->
+    <div class="glass-card p-6 space-y-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i data-lucide="pie-chart" class="w-5 h-5 text-emerald-400"></i>
+          <h2 class="text-base font-extrabold text-white">Radar de 8 Competencias</h2>
+        </div>
+        <span class="badge badge-cyan">CEFR A2</span>
+      </div>
+
+      <div class="space-y-2.5 pt-1 text-xs">
+        <div>
+          <div class="flex justify-between text-slate-300 mb-1">
+            <span>Reading</span>
+            <strong class="text-cyan-400 font-mono">80% (B1)</strong>
+          </div>
+          <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-cyan-400 h-full rounded-full" style="width: 80%"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-slate-300 mb-1">
+            <span>Listening</span>
+            <strong class="text-cyan-400 font-mono">75% (A2+)</strong>
+          </div>
+          <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-cyan-400 h-full rounded-full" style="width: 75%"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-slate-300 mb-1">
+            <span>Speaking</span>
+            <strong class="text-emerald-400 font-mono">68% (A2)</strong>
+          </div>
+          <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-emerald-400 h-full rounded-full" style="width: 68%"></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between text-slate-300 mb-1">
+            <span>Pronunciation</span>
+            <strong class="text-amber-400 font-mono">60% (A1+)</strong>
+          </div>
+          <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-amber-400 h-full rounded-full" style="width: 60%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Search & Stats Bar -->
+  <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="relative w-full sm:w-80">
+      <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"></i>
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="Buscar bloque, prompt o competencia..." 
+        class="w-full bg-slate-900/90 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition-all font-sans"
+      />
+    </div>
+
+    <div class="flex items-center gap-3 text-xs text-slate-400">
+      <span>Progreso de Verificación:</span>
+      <span id="completed-count-badge" class="badge badge-emerald">0 / 26 Verificados</span>
+    </div>
+  </div>
+
+  <!-- 26 Engineering Blocks Grid -->
+  <main id="blocks-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <!-- Bloques generados dinámicamente con JavaScript -->
+  </main>
+
+  <!-- Raw Markdown View Container (Hidden by default) -->
+  <section id="raw-markdown-view" class="glass-card p-6 sm:p-8 space-y-6 hidden">
+    <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+      <div class="flex items-center gap-2">
+        <i data-lucide="file-text" class="w-5 h-5 text-cyan-400"></i>
+        <h2 class="text-lg font-bold text-white">GOALS Languages Playbook (Markdown Raw)</h2>
+      </div>
+      <button onclick="copyRawPlaybook()" class="btn-tab text-xs">
+        <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Playbook Completo
+      </button>
+    </div>
+    <pre class="bg-slate-950 p-5 rounded-2xl border border-slate-800 text-xs font-mono text-cyan-200 overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-[70vh]" id="markdown-raw-content">
+Cargando documento maestro...
+    </pre>
+  </section>
+
+  <!-- Modal de Detalle y Prompt de Bloque -->
+  <div class="modal-overlay" id="block-modal">
+    <div class="modal-content">
+      <div class="p-5 sm:p-6 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+        <div class="flex items-center gap-3">
+          <span class="badge badge-cyan" id="modal-block-id">BLOQUE 01</span>
+          <h3 class="text-base sm:text-lg font-extrabold text-white" id="modal-block-title">Título del Bloque</h3>
+        </div>
+        <button onclick="closeModal()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="p-5 sm:p-6 space-y-5 overflow-y-auto max-h-[calc(90vh-140px)]">
+        <!-- Objetivo -->
+        <div class="space-y-1.5">
+          <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">Objetivo Técnico & Pedagógico</h4>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed" id="modal-block-objective"></p>
+        </div>
+
+        <!-- Archivos & Responsabilidades -->
+        <div class="space-y-1.5">
+          <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">Archivos & Estructura Modular</h4>
+          <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs font-mono text-slate-300" id="modal-block-files"></div>
+        </div>
+
+        <!-- Prompt Ejecutable para AGY -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <h4 class="text-xs font-bold text-emerald-400 uppercase tracking-wider font-mono flex items-center gap-1.5">
+              <i data-lucide="terminal" class="w-4 h-4"></i> Prompt Ejecutable para AGY
+            </h4>
+            <button onclick="copyCurrentPrompt()" class="px-3 py-1 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 rounded-lg text-xs font-bold flex items-center gap-1 transition-all cursor-pointer">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar Prompt
+            </button>
+          </div>
+          <pre class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto whitespace-pre-wrap leading-relaxed" id="modal-block-prompt"></pre>
+        </div>
+
+        <!-- Criterios de Aceptación & Checklist -->
+        <div class="space-y-2">
+          <h4 class="text-xs font-bold text-cyan-400 uppercase tracking-wider font-mono">Checklist de Verificación (Definition of Done)</h4>
+          <div class="space-y-2 text-xs text-slate-300" id="modal-block-checklist"></div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-slate-800 bg-slate-950/60 flex items-center justify-between">
+        <span class="text-xs text-slate-400" id="modal-block-filename">01_ARCHITECTURE.md</span>
+        <button onclick="closeModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <i data-lucide="check" class="w-4 h-4"></i>
+    <span id="toast-text">¡Prompt copiado al portapapeles!</span>
+  </div>
+
+  <!-- JavaScript Logics & 26 Blocks Database -->
+  <script>
+    const BLOCKS = [
+      {
+        id: "01",
+        phase: 0,
+        phaseName: "0. Fundaciones",
+        title: "Architecture & Modular Structure",
+        file: "01_ARCHITECTURE.md",
+        icon: "layout",
+        objective: "Establecer la infraestructura modular en src/experiences/languages/ sin archivos monolíticos (<250 líneas) y tipado estricto.",
+        files: "src/experiences/languages/types/index.ts\nsrc/experiences/languages/services/memoryService.ts\nsrc/experiences/languages/components/layout/LanguagesHeader.tsx\nsrc/experiences/languages/LanguagesView.tsx",
+        prompt: `[PROMPT BLOQUE 01 — ARCHITECTURE]
+Actúa como Arquitecto Principal de Software de GOALS.
+Tu tarea es implementar la arquitectura base modular de la experiencia Languages en \`src/experiences/languages/\`.
+
+REGLAS OBLIGATORIAS:
+1. Divide la lógica en submódulos dentro de \`components/\` y \`services/\`.
+2. El archivo orquestador \`LanguagesView.tsx\` NO debe ser monolítico (máximo 250 líneas).
+3. Define los tipos base en \`types/index.ts\` con tipado estricto (sin any).
+4. Conecta con ProgressContext y AuthContext de GOALS sin romper Astro.
+5. Ejecuta npm run build y asegura cero errores de compilación.`,
+        checklist: [
+          "¿Existe el directorio components/ con submódulos claros?",
+          "¿LanguagesView.tsx mide menos de 250 líneas?",
+          "¿Los contratos de datos están en types/index.ts sin tipos any?",
+          "¿La compilación pasa limpia con cero advertencias?"
+        ]
+      },
+      {
+        id: "02",
+        phase: 0,
+        phaseName: "0. Fundaciones",
+        title: "Design System & Visual Harmony",
+        file: "02_DESIGN_SYSTEM.md",
+        icon: "palette",
+        objective: "Desarrollar la paleta Dark Glassmorphism, tokens HSL, gradientes cian/esmeralda y animaciones de ondas de audio.",
+        files: "src/experiences/languages/components/ui/EqualizerWave.tsx\nsrc/experiences/languages/components/ui/PedagogicalBadge.tsx\nsrc/index.css (tokens HSL)",
+        prompt: `[PROMPT BLOQUE 02 — DESIGN SYSTEM]
+Actúa como Diseñador UI/UX y Especialista Frontend en GOALS.
+Tu tarea es implementar el sistema de diseño visual de Languages en \`src/experiences/languages/\`.
+
+REGLAS DE DISEÑO:
+1. Aplica la estética Dark Glassmorphism sobre fondos bg-slate-950 con bordes sutiles border-cyan-500/20.
+2. Crea el componente EqualizerWave.tsx con animaciones CSS fluidas para representar la actividad acústica real.
+3. Asegura micro-interacciones pulidas y responsive total desde 320px hasta 4K.
+4. NO uses placeholders: utiliza íconos de lucide-react y gradientes SVG matemáticos.`,
+        checklist: [
+          "¿Los botones e inputs tienen feedback táctil y visual inmediato?",
+          "¿El fondo incorpora el resplandor ambiental cian?",
+          "¿El ecualizador de audio reacciona a los estados de voz?",
+          "¿Se verificó en móvil que no haya márgenes rotos?"
+        ]
+      },
+      {
+        id: "03",
+        phase: 0,
+        phaseName: "0. Fundaciones",
+        title: "Firebase & Data Model",
+        file: "03_FIREBASE_DATA_MODEL.md",
+        icon: "database",
+        objective: "Definición de colecciones Firestore y sincronización bidireccional offline-first con LocalStorage.",
+        files: "src/experiences/languages/types/index.ts\nsrc/experiences/languages/services/memoryService.ts\nfirestore.rules",
+        prompt: `[PROMPT BLOQUE 03 — FIREBASE & DATA MODEL]
+Actúa como Arquitecto de Datos y Backend en GOALS.
+Tu tarea es implementar el modelo de datos unificado y el servicio de persistencia en \`src/experiences/languages/services/memoryService.ts\`.
+
+REGLAS:
+1. Define las interfaces en types/index.ts reflejando colecciones de Firestore: StudentLanguageProfile, SkillMastery, VocabularyItem, ErrorPattern, EpisodicMemory.
+2. Implementa persistencia híbrida (Firestore cuando esté logueado, LocalStorage como fallback offline transparente).
+3. Asegura que ninguna actualización lance excepciones no controladas.`,
+        checklist: [
+          "¿Los esquemas están sincronizados entre types/index.ts y Firestore?",
+          "¿Al modificar el perfil se emiten eventos y se actualiza el storage?",
+          "¿Las funciones capturan errores de red con try/catch?",
+          "¿El borrado y adición actualiza el estado inmediatamente?"
+        ]
+      },
+      {
+        id: "04",
+        phase: 1,
+        phaseName: "1. Perfil & Estado",
+        title: "Learner Profile & Adaptive Onboarding",
+        file: "04_LEARNER_PROFILE.md",
+        icon: "user-check",
+        objective: "Captura y edición del perfil del estudiante, personalización por franja etaria (6-10 vs 11-15+) e intereses.",
+        files: "src/experiences/languages/components/profile/LearnerProfileModal.tsx\nsrc/experiences/languages/components/profile/InterestTagPicker.tsx",
+        prompt: `[PROMPT BLOQUE 04 — LEARNER PROFILE]
+Actúa como Especialista en UX Educativa y Frontend en GOALS.
+Tu tarea es implementar el módulo de Perfil del Estudiante y Onboarding Adaptativo en \`src/experiences/languages/components/profile/\`.
+
+REGLAS:
+1. Desarrolla LearnerProfileModal.tsx con: Nombre, Edad, Nivel CEFR, Selector de más de 15 intereses y Preferencia de corrección pedagógica.
+2. Conecta con MemoryService.updateProfile().
+3. Integra el disparador en la cabecera con avatar interactivo.`,
+        checklist: [
+          "¿El modal de perfil se abre y cierra limpiamente?",
+          "¿Al cambiar el nivel CEFR o intereses se actualiza el MemoryService?",
+          "¿El formulario valida los datos antes de guardar?",
+          "¿Se emite el evento goals_languages_profile_updated?"
+        ]
+      },
+      {
+        id: "05",
+        phase: 1,
+        phaseName: "1. Perfil & Estado",
+        title: "Learning State & CEFR Mastery",
+        file: "05_LEARNING_STATE.md",
+        icon: "activity",
+        objective: "Motor de cálculo y visualización del dominio en 8 competencias lingüísticas CEFR (0-100%).",
+        files: "src/experiences/languages/components/mastery/MasteryRadarChart.tsx\nsrc/experiences/languages/components/mastery/MasteryBreakdownList.tsx",
+        prompt: `[PROMPT BLOQUE 05 — LEARNING STATE]
+Actúa como Ingeniero de Datos Pedagógicos y Desarrollador Frontend en GOALS.
+Tu tarea es implementar el motor de cálculo y visualización de Mastery en \`src/experiences/languages/components/mastery/\`.
+
+REGLAS:
+1. Construye MasteryRadarChart.tsx en SVG puro con polígono de 8 vértices y degradado cian-esmeralda.
+2. Construye MasteryBreakdownList.tsx con las 8 barras de progreso y badges CEFR.
+3. Implementa en MemoryService.updateSkillMastery() la ponderación adecuada.`,
+        checklist: [
+          "¿El radar SVG se dibuja sin deformaciones?",
+          "¿Los tooltips muestran la competencia y su porcentaje exacto?",
+          "¿Al invocar updateSkillMastery se actualiza en tiempo real?",
+          "¿Se destaca la habilidad que necesita refuerzo?"
+        ]
+      },
+      {
+        id: "06",
+        phase: 2,
+        phaseName: "2. Profesor & Memoria",
+        title: "Teacher Text Brain (Socratic AI)",
+        file: "06_TEACHER_TEXT.md",
+        icon: "bot",
+        objective: "Agente inteligente con IA real, respuesta estructurada en JSON, corrección empática y preguntas socráticas.",
+        files: "src/experiences/languages/services/teacherAgent.ts",
+        prompt: `[PROMPT BLOQUE 06 — TEACHER TEXT]
+Actúa como Especialista en IA Educativa y Backend en GOALS.
+Tu tarea es implementar el servicio TeacherAgent.ts en \`src/experiences/languages/services/teacherAgent.ts\`.
+
+REGLAS:
+1. Conecta con askAI() usando el endpoint real configurado.
+2. Inyecta dinámicamente MemoryService.getPedagogicalContextSummary().
+3. Maneja respuestas en JSON estructurado con fallback resiliente.
+4. Registra automáticamente errores detectados y vocabulario nuevo.
+5. Garantiza latencia de respuesta inferior a 2.5 segundos.`,
+        checklist: [
+          "¿El Teacher Agent responde respetando la edad y nivel CEFR?",
+          "¿Los errores detectados traen explicación en español?",
+          "¿Se otorga XP al completar un turno conversacional?",
+          "¿El fallback de error muestra mensaje de aliento si falla la red?"
+        ]
+      },
+      {
+        id: "07",
+        phase: 2,
+        phaseName: "2. Profesor & Memoria",
+        title: "Memory Service (Lexical, Errors & Episodic)",
+        file: "07_MEMORY.md",
+        icon: "brain",
+        objective: "Gestión de memoria léxica de 6 estados, catálogo de errores recurrentes y memoria de sesiones previas.",
+        files: "src/experiences/languages/services/memoryService.ts\nsrc/experiences/languages/components/memory/VocabularyDeck.tsx\nsrc/experiences/languages/components/memory/ErrorPatternsCard.tsx",
+        prompt: `[PROMPT BLOQUE 07 — MEMORY SERVICE]
+Actúa como Ingeniero de Memoria Pedagógica y Persistencia en GOALS.
+Tu tarea es implementar y expandir \`memoryService.ts\` y sus componentes visuales en \`components/memory/\`.
+
+REGLAS:
+1. Implementa métodos para vocabulario, errores recurrentes y sesiones episódicas.
+2. Desarrolla VocabularyDeck.tsx con filtros por estado.
+3. Desarrolla ErrorPatternsCard.tsx con botón "Practicar este error".
+4. Desarrolla RecentSessionsTimeline.tsx con línea temporal de sesiones.`,
+        checklist: [
+          "¿El catálogo de vocabulario permite filtrar por categoría?",
+          "¿Los errores se pueden marcar como resueltos tras una práctica?",
+          "¿La memoria episódica registra automáticamente un resumen?",
+          "¿Los datos se recuperan fielmente tras refrescar el navegador?"
+        ]
+      },
+      {
+        id: "08",
+        phase: 2,
+        phaseName: "2. Profesor & Memoria",
+        title: "Conversation Engine (Free & Directed)",
+        file: "08_CONVERSATION.md",
+        icon: "message-square",
+        objective: "Sala de diálogo dinámico con control de turnos, sugerencias socráticas y alternancia libre/guiada.",
+        files: "src/experiences/languages/components/conversation/ConversationView.tsx\nsrc/experiences/languages/components/conversation/ChatBubble.tsx\nsrc/experiences/languages/components/conversation/TopicSuggestionsBar.tsx",
+        prompt: `[PROMPT BLOQUE 08 — CONVERSATION ENGINE]
+Actúa como Especialista en Interfaces Conversacionales y Frontend en GOALS.
+Tu tarea es implementar el módulo de Conversación Libre y Guiada en \`components/conversation/\`.
+
+REGLAS:
+1. Desarrolla ConversationView.tsx con desplazamiento automático, burbujas de audio TTS y feedback desplegable.
+2. Añade TopicSuggestionsBar.tsx con chips de temas dinámicos según intereses.
+3. Envía los últimos 6 turnos a TeacherAgent.interact() para mantener coherencia.
+4. Muestra animación de "Pensando..." durante la llamada a la IA.`,
+        checklist: [
+          "¿El chat hace scroll automático al recibir un nuevo mensaje?",
+          "¿Los mensajes del profesor muestran el badge de nivel y vocabulario?",
+          "¿El botón de audio reproduce la síntesis con la velocidad adecuada?",
+          "¿Se guardan los turnos en la memoria episódica al concluir?"
+        ]
+      },
+      {
+        id: "09",
+        phase: 3,
+        phaseName: "3. Voz & Acústica",
+        title: "Voice MVP & Bidirectional Speech",
+        file: "09_VOICE_MVP.md",
+        icon: "mic",
+        objective: "Reconocimiento de voz STT y síntesis TTS neuronal en tiempo real con manejo de interrupciones.",
+        files: "src/experiences/languages/services/voiceEngine.ts\nsrc/experiences/languages/components/voice/VoiceStudioModal.tsx",
+        prompt: `[PROMPT BLOQUE 09 — VOICE MVP]
+Actúa como Ingeniero de Audio y Voz en GOALS.
+Tu tarea es implementar el motor de voz en \`services/voiceEngine.ts\` y su interfaz \`VoiceStudioModal.tsx\`.
+
+REGLAS:
+1. Implementa startListening(), speakText(), stopListening() y stopSpeaking().
+2. Desarrolla VoiceStudioModal.tsx con botón de micrófono central, estados visuales (Escuchando/Pensando/Hablando) y subtítulos en vivo.
+3. Añade botón de interrupción que detiene la voz del profesor al instante.`,
+        checklist: [
+          "¿El reconocimiento de voz transcribe correctamente en tiempo real?",
+          "¿La síntesis de voz pronuncia con entonación y velocidad natural?",
+          "¿Al colgar se detiene inmediatamente el audio y el micrófono?",
+          "¿Funciona en Chrome, Edge y Safari sin errores?"
+        ]
+      },
+      {
+        id: "10",
+        phase: 3,
+        phaseName: "3. Voz & Acústica",
+        title: "Speech Analysis & Acoustic Waveforms",
+        file: "10_SPEECH_ANALYSIS.md",
+        icon: "waves",
+        objective: "Visualizador de ondas con Web Audio API, análisis de formantes, pausas y evaluación fonética.",
+        files: "src/experiences/languages/components/speech/LiveWaveformCanvas.tsx\nsrc/experiences/languages/components/speech/PronunciationDrillCard.tsx",
+        prompt: `[PROMPT BLOQUE 10 — SPEECH ANALYSIS]
+Actúa como Ingeniero de Procesamiento de Señales de Audio en GOALS.
+Tu tarea es implementar el Entrenador Fonético en \`components/speech/\`.
+
+REGLAS:
+1. Desarrolla LiveWaveformCanvas.tsx conectando AudioContext y AnalyserNode dibujando a 60 FPS en un canvas con gradiente cian.
+2. Desarrolla PronunciationDrillCard.tsx para practicar fonemas complejos con audio modelo a 0.75x y 1.0x.
+3. Actualiza el mastery de pronunciation en MemoryService.`,
+        checklist: [
+          "¿El canvas osciloscopio reacciona a los picos de voz a 60 FPS?",
+          "¿Se limpian correctamente los flujos de AudioContext al cerrar?",
+          "¿Se ofrece feedback visual inmediato tras repetir una palabra?",
+          "¿No se producen bloqueos en dispositivos móviles?"
+        ]
+      },
+      {
+        id: "11",
+        phase: 4,
+        phaseName: "4. Generadores",
+        title: "Practice Generator (6 Exercise Types)",
+        file: "11_PRACTICE_GENERATOR.md",
+        icon: "check-circle-2",
+        objective: "Generador bajo demanda de 6 tipos de ejercicios adaptativos mediante IA real.",
+        files: "src/experiences/languages/components/practice/PracticeDeckView.tsx\nsrc/experiences/languages/components/practice/FillBlankCard.tsx\nsrc/experiences/languages/components/practice/OrderWordsCard.tsx",
+        prompt: `[PROMPT BLOQUE 11 — PRACTICE GENERATOR]
+Actúa como Especialista en Pedagogía Interactiva y Desarrollador Frontend en GOALS.
+Tu tarea es implementar el Generador de Prácticas Adaptativas en \`components/practice/\`.
+
+REGLAS:
+1. Desarrolla generadores para 6 tipos: Fill in the blank, Order words, Multiple choice, Error correction, Translate y Create sentences.
+2. Otorga +15 a +25 XP por acierto y actualiza el mastery de la habilidad.
+3. Muestra una tarjeta explicativa razonando el porqué gramatical de la solución.`,
+        checklist: [
+          "¿Los ejercicios de ordenar palabras permiten tocar para armar la frase?",
+          "¿La corrección de mayúsculas/minúsculas es flexible?",
+          "¿Se muestra la explicación gramatical al comprobar?",
+          "¿Los ejercicios completados suman XP y actualizan el Mastery?"
+        ]
+      },
+      {
+        id: "12",
+        phase: 4,
+        phaseName: "4. Generadores",
+        title: "Story Engine (Personalized Narratives)",
+        file: "12_STORIES.md",
+        icon: "book",
+        objective: "Generación de cuentos ilustrados personalizados según nivel CEFR, edad e intereses.",
+        files: "src/experiences/languages/components/stories/StoryReaderView.tsx\nsrc/experiences/languages/components/stories/StoryPromptModal.tsx",
+        prompt: `[PROMPT BLOQUE 12 — STORY ENGINE]
+Actúa como Diseñador de Narrativas Pedagógicas y Desarrollador Frontend en GOALS.
+Tu tarea es implementar el Motor de Cuentos Personalizados en \`components/stories/\`.
+
+REGLAS:
+1. Desarrolla StoryReaderView.tsx con resaltado de palabras clave y tooltips interactivos con traducción.
+2. Integra reproductor de audio TTS para narrar el cuento con voz nativa.
+3. Genera historias en JSON mediante la API de IA respetando la interfaz StoryChapter.
+4. Incluye pregunta de comprensión final que otorga +40 XP.`,
+        checklist: [
+          "¿El cuento se genera adaptado a la temática e intereses del alumno?",
+          "¿Al tocar una palabra destacada se abre el tooltip con traducción?",
+          "¿El botón de audio narra el párrafo con entonación natural?",
+          "¿La pregunta de comprensión final valida el entendimiento lector?"
+        ]
+      },
+      {
+        id: "13",
+        phase: 4,
+        phaseName: "4. Generadores",
+        title: "Reading Deck & Comprehension",
+        file: "13_READING.md",
+        icon: "glasses",
+        objective: "Módulo de lectura en 3 modalidades: Guiada, Interactiva y Autónoma con audio sincronizado.",
+        files: "src/experiences/languages/components/reading/ReadingLabView.tsx\nsrc/experiences/languages/components/reading/GuidedReadingDeck.tsx",
+        prompt: `[PROMPT BLOQUE 13 — READING DECK]
+Actúa como Especialista en Comprensión Lectora y Frontend en GOALS.
+Tu tarea es implementar el Laboratorio de Lectura en \`components/reading/\`.
+
+REGLAS:
+1. Desarrolla ReadingLabView.tsx con 3 modos: Guiada, Interactiva (toma de decisiones) y Autónoma.
+2. Añade selector de velocidad (0.8x a 1.2x) y resaltado visual de frase sincronizada con el audio.
+3. Evalúa con quiz de 3 preguntas de inferencia e incrementa el mastery de reading.`,
+        checklist: [
+          "¿El texto es perfectamente legible con espaciado amplio?",
+          "¿Las bifurcaciones en modo interactivo generan una trama coherente?",
+          "¿El quiz evalúa comprensión profunda?",
+          "¿Se otorga XP al completar la lectura y el cuestionario?"
+        ]
+      },
+      {
+        id: "14",
+        phase: 4,
+        phaseName: "4. Generadores",
+        title: "Writing Lab (4-Layer Correction)",
+        file: "14_WRITING.md",
+        icon: "pen-tool",
+        objective: "Taller de redacción con corrección en 4 capas: Error, Razón, Versión Nativa y Práctica Derivada.",
+        files: "src/experiences/languages/components/writing/WritingLabView.tsx\nsrc/experiences/languages/components/writing/FourLayerCorrectionCard.tsx",
+        prompt: `[PROMPT BLOQUE 14 — WRITING LAB]
+Actúa como Profesor de Redacción y Expresión Escrita en GOALS.
+Tu tarea es implementar el Laboratorio de Escritura en \`components/writing/\`.
+
+REGLAS:
+1. Desarrolla WritingLabView.tsx con editor de texto enriquecido y contador de palabras.
+2. Evalúa con IA devolviendo 4 capas: Errores, Explicación pedagógica, Versión nativa elegante y Práctica inmediata.
+3. Suma XP de Writing en MemoryService.updateSkillMastery('writing', +4).`,
+        checklist: [
+          "¿El editor de texto es cómodo en ordenador y móvil?",
+          "¿El análisis resalta las diferencias frente a la versión nativa?",
+          "¿Los errores se registran automáticamente en MemoryService?",
+          "¿Se ofrece la opción de reescribir aplicando sugerencias?"
+        ]
+      },
+      {
+        id: "15",
+        phase: 4,
+        phaseName: "4. Generadores",
+        title: "Pedagogical Translation Bench",
+        file: "15_TRANSLATION.md",
+        icon: "languages",
+        objective: "Traducción pedagógica contextualizada con detección de falsos amigos y audio nativo.",
+        files: "src/experiences/languages/components/translation/TranslationBenchView.tsx",
+        prompt: `[PROMPT BLOQUE 15 — PEDAGOGICAL TRANSLATION]
+Actúa como Especialista en Lingüística Comparada y Frontend en GOALS.
+Tu tarea es implementar el Banco de Traducción Pedagógica en \`components/translation/\`.
+
+REGLAS:
+1. Desarrolla TranslationBenchView.tsx con retos de traducción y notas de contexto situacional.
+2. Evalúa con IA distinguiendo precisión gramatical, naturalidad y alertas de falsos amigos.
+3. Permite escuchar la pronunciación nativa de la solución recomendada.`,
+        checklist: [
+          "¿Ofrece retos variados tanto cotidianos como profesionales?",
+          "¿Destaca diferencias de registro formal vs coloquial?",
+          "¿Se puede escuchar la solución nativa recomendada?",
+          "¿Se premia el uso de estructuras idiomáticas complejas?"
+        ]
+      },
+      {
+        id: "16",
+        phase: 4,
+        phaseName: "4. Generadores",
+        title: "Listening Deck & Audio Comprehension",
+        file: "16_LISTENING.md",
+        icon: "headphones",
+        objective: "Entrenamiento auditivo con velocidades graduables, dictados interactivos y tests de comprensión.",
+        files: "src/experiences/languages/components/listening/ListeningDeckView.tsx\nsrc/experiences/languages/components/listening/DictationCard.tsx",
+        prompt: `[PROMPT BLOQUE 16 — LISTENING DECK]
+Actúa como Especialista en Entrenamiento Auditivo y Frontend en GOALS.
+Tu tarea es implementar el Deck de Listening en \`components/listening/\`.
+
+REGLAS:
+1. Desarrolla ListeningDeckView.tsx con reproductor visual, selector de velocidad (0.75x a 1.0x) y botón de repetir.
+2. Implementa Dictados con tolerancia inteligente de puntuación y cuestionarios de escucha.
+3. Incrementa el mastery de listening en MemoryService.`,
+        checklist: [
+          "¿El reproductor muestra claramente el estado y tiempo?",
+          "¿Los dictados comparan la transcripción constructivamente?",
+          "¿La transcripción solo se revela si el usuario lo solicita?",
+          "¿Se guardan las estadísticas de acierto auditivo?"
+        ]
+      },
+      {
+        id: "17",
+        phase: 4,
+        phaseName: "4. Generadores",
+        title: "Roleplay Engine & Real-Life Simulations",
+        file: "17_ROLEPLAY.md",
+        icon: "users",
+        objective: "Simulador de situaciones reales (aeropuerto, reuniones, entrevistas) con rúbricas de 5 dimensiones.",
+        files: "src/experiences/languages/components/roleplay/RoleplayCatalogView.tsx\nsrc/experiences/languages/components/roleplay/RoleplaySessionView.tsx\nsrc/experiences/languages/components/roleplay/RoleplayScoreModal.tsx",
+        prompt: `[PROMPT BLOQUE 17 — ROLEPLAY ENGINE]
+Actúa como Diseñador de Simulaciones Inmersivas y Frontend en GOALS.
+Tu tarea es implementar el Motor de Roleplay en \`components/roleplay/\`.
+
+REGLAS:
+1. Desarrolla catálogo con 6 escenarios iniciales: Aeropuerto, Cafetería, Hotel, Entrevista, Reunión y Marte.
+2. Desarrolla RoleplaySessionView.tsx con seguimiento en tiempo real de vocabulario meta y diálogo por voz/texto.
+3. Desarrolla RoleplayScoreModal.tsx con rúbrica de 5 dimensiones y +60 XP.`,
+        checklist: [
+          "¿El profesor mantiene su personaje a lo largo de la simulación?",
+          "¿Los objetivos del escenario se marcan al avanzar el diálogo?",
+          "¿La rúbrica final otorga notas numéricas y consejos reales?",
+          "¿La simulación queda registrada en el historial del alumno?"
+        ]
+      },
+      {
+        id: "18",
+        phase: 4,
+        phaseName: "4. Generadores",
+        title: "Multimodal Artifacts & Infographics",
+        file: "18_MULTIMODAL_ARTIFACTS.md",
+        icon: "image",
+        objective: "Infografías vectoriales SVG y tarjetas visuales interactivas con puntos calientes de pronunciación.",
+        files: "src/experiences/languages/components/artifacts/ArtifactModalViewer.tsx\nsrc/experiences/languages/components/artifacts/HotspotMarker.tsx",
+        prompt: `[PROMPT BLOQUE 18 — MULTIMODAL ARTIFACTS]
+Actúa como Especialista en Pedagogía Visual y Frontend en GOALS.
+Tu tarea es implementar el Sistema de Artefactos Multimodales en \`components/artifacts/\`.
+
+REGLAS:
+1. Desarrolla ArtifactModalViewer.tsx con infografías SVG y puntos interactivos que emiten audio nativo al tocarse.
+2. Integra el disparador en el flujo del TeacherAgent cuando se explique un concepto visual.
+3. Añade biblioteca de "Mis Tarjetas Coleccionadas".`,
+        checklist: [
+          "¿Las infografías SVG escalan nítidamente en cualquier pantalla?",
+          "¿Los puntos interactivos son cómodos de pulsar en móvil?",
+          "¿El modal se cierra con Escape o pulsando fuera?",
+          "¿Los artefactos vistos se guardan en la colección del alumno?"
+        ]
+      },
+      {
+        id: "19",
+        phase: 5,
+        phaseName: "5. Currículo & NBA",
+        title: "Curriculum CEFR Matrix (A1 to C2)",
+        file: "19_CURRICULUM.md",
+        icon: "compass",
+        objective: "Matriz curricular oficial de A1 a C2 desglosada por micro-competencias y árbol interactivo.",
+        files: "src/experiences/languages/data/curriculumData.ts\nsrc/experiences/languages/components/curriculum/CurriculumTreeView.tsx",
+        prompt: `[PROMPT BLOQUE 19 — CURRICULUM CEFR]
+Actúa como Diseñador Curricular y Desarrollador Frontend en GOALS.
+Tu tarea es implementar el Explorador de Currículo CEFR en \`components/curriculum/\`.
+
+REGLAS:
+1. Define en curriculumData.ts la matriz de hitos de A1 a C2 para las 8 competencias.
+2. Desarrolla CurriculumTreeView.tsx con árbol de habilidades y badges de estado.
+3. Vincula el progreso con SkillMastery en MemoryService.`,
+        checklist: [
+          "¿El árbol muestra los 6 niveles CEFR con navegación rápida?",
+          "¿Se marcan visualmente los requisitos previos no completados?",
+          "¿Al tocar un nodo se muestra el desglose de resultados?",
+          "¿El progreso de los nodos se guarda en el perfil del alumno?"
+        ]
+      },
+      {
+        id: "20",
+        phase: 5,
+        phaseName: "5. Currículo & NBA",
+        title: "Adaptive Planner (Next Best Action Engine)",
+        file: "20_ADAPTIVE_PLANNING.md",
+        icon: "sparkles",
+        objective: "Algoritmo heurístico que prescribe la siguiente actividad formativa óptima según debilidades y tiempo.",
+        files: "src/experiences/languages/services/nextBestAction.ts\nsrc/experiences/languages/components/home/NextActionBanner.tsx",
+        prompt: `[PROMPT BLOQUE 20 — ADAPTIVE PLANNING]
+Actúa como Ingeniero de Algoritmos Adaptativos en GOALS.
+Tu tarea es implementar NextBestActionEngine.ts en \`services/nextBestAction.ts\` y su tarjeta en Home.
+
+REGLAS:
+1. Implementa las 4 prioridades deterministas: Errores recurrentes, Vocabulario olvidado, Brecha de habilidad más baja e Intereses.
+2. Desarrolla NextActionBanner.tsx con justificación pedagógica y botón "Comenzar Ahora" que enruta directamente a la actividad.`,
+        checklist: [
+          "¿El motor prescribe refuerzo si hay un error recurrente?",
+          "¿El banner se actualiza reactivamente tras completar una sesión?",
+          "¿El botón Comenzar navega a la actividad con datos cargados?",
+          "¿La justificación está redactada con tono motivador?"
+        ]
+      },
+      {
+        id: "21",
+        phase: 6,
+        phaseName: "6. Gamificación",
+        title: "Pedagogical Gamification (No-Anxiety)",
+        file: "21_GAMIFICATION.md",
+        icon: "award",
+        objective: "Sistema de XP ligado al aprendizaje, misiones semanales y rachas empáticas sin castigos.",
+        files: "src/experiences/languages/components/gamification/MissionsTrackerCard.tsx\nsrc/experiences/languages/components/gamification/StreakWarmthBadge.tsx",
+        prompt: `[PROMPT BLOQUE 21 — PEDAGOGICAL GAMIFICATION]
+Actúa como Diseñador de Gamificación Educativa en GOALS.
+Tu tarea es implementar el Sistema de Gamificación Pedagógica en \`components/gamification/\`.
+
+REGLAS:
+1. Otorga XP estrictamente por objetivos cumplidos (diálogos, roleplay, lecturas).
+2. Desarrolla MissionsTrackerCard.tsx con retos semanales formativos.
+3. Diseña StreakWarmthBadge.tsx que dé la bienvenida positiva tras ausencias.`,
+        checklist: [
+          "¿El progreso de las misiones se actualiza automáticamente?",
+          "¿El modal de subida de nivel aparece con animación festiva?",
+          "¿Las medallas muestran la condición para desbloquearlas?",
+          "¿El XP se sincroniza con el perfil global de GOALS?"
+        ]
+      },
+      {
+        id: "22",
+        phase: 6,
+        phaseName: "6. Gamificación",
+        title: "Motivation Engine & Learner Archetypes",
+        file: "22_MOTIVATION.md",
+        icon: "heart-handshake",
+        objective: "Calibración del tono pedagógico según los 5 arquetipos motivacionales (Explorer, Achiever, Storyteller...).",
+        files: "src/experiences/languages/services/motivationEngine.ts",
+        prompt: `[PROMPT BLOQUE 22 — MOTIVATION ENGINE]
+Actúa como Psicólogo Educativo y Diseñador de Prompts en GOALS.
+Tu tarea es implementar el Motor de Motivación en \`services/motivationEngine.ts\`.
+
+REGLAS:
+1. Deduce el arquetipo predominante analizando las sesiones en MemoryService.
+2. Inyecta la directiva psicológica adecuada en el prompt del TeacherAgent.
+3. Ajusta las frases de celebración según el arquetipo activo.`,
+        checklist: [
+          "¿El prompt del profesor incluye la directiva motivacional calibrada?",
+          "¿Las felicitaciones al terminar concuerdan con el arquetipo?",
+          "¿El arquetipo se almacena de forma transparente?",
+          "¿Se garantiza experiencia empática en todas las edades?"
+        ]
+      },
+      {
+        id: "23",
+        phase: 6,
+        phaseName: "6. Gamificación",
+        title: "Cosmos (Parent & Educator Portal)",
+        file: "23_COSMOS.md",
+        icon: "users-2",
+        objective: "Panel de progreso para familias con métricas de tiempo y evolución, protegiendo la privacidad del menor.",
+        files: "src/experiences/languages/components/cosmos/ParentDashboardView.tsx\nsrc/experiences/languages/components/cosmos/WeeklyStudyTimeChart.tsx",
+        prompt: `[PROMPT BLOQUE 23 — COSMOS]
+Actúa como Especialista en Analítica para Familias en GOALS.
+Tu tarea es implementar el Portal de Padres en \`components/cosmos/\`.
+
+REGLAS:
+1. Desarrolla ParentDashboardView.tsx protegido con PIN parental opcional.
+2. Muestra minutos hablados, radar de competencias y últimas palabras aprendidas.
+3. NO expongas nunca transcripciones literales de las conversaciones privadas.`,
+        checklist: [
+          "¿El dashboard se visualiza con diseño limpio y profesional?",
+          "¿Las métricas reflejan datos reales de MemoryService?",
+          "¿El PIN parental protege configuraciones sensibles?",
+          "¿Se ofrece resumen en formato descargable o imprimible?"
+        ]
+      },
+      {
+        id: "24",
+        phase: 7,
+        phaseName: "7. QA & Release",
+        title: "Safety & Privacy Audit (COPPA / GDPR-K)",
+        file: "24_PRIVACY.md",
+        icon: "shield-alert",
+        objective: "Minimización de datos, supresión atómica con un clic y protección de voz infantil.",
+        files: "src/experiences/languages/services/privacyService.ts\nsrc/experiences/languages/components/privacy/PrivacySettingsModal.tsx",
+        prompt: `[PROMPT BLOQUE 24 — SAFETY & PRIVACY]
+Actúa como Ingeniero de Seguridad y Cumplimiento Normativo en GOALS.
+Tu tarea es implementar el Módulo de Privacidad en \`services/privacyService.ts\`.
+
+REGLAS:
+1. Implementa exportStudentData() y eraseAllStudentData() con borrado atómico.
+2. Desarrolla PrivacySettingsModal.tsx con explicaciones transparentes y controles de datos.
+3. Asegura que ningún dato personal sensible se fugue en URLs.`,
+        checklist: [
+          "¿El modal de privacidad explica el uso pedagógico de datos?",
+          "¿La exportación genera un archivo JSON válido?",
+          "¿El borrado limpia todas las claves goals_languages_* de LocalStorage?",
+          "¿Se requiere confirmación antes de eliminar el expediente?"
+        ]
+      },
+      {
+        id: "25",
+        phase: 7,
+        phaseName: "7. QA & Release",
+        title: "Pedagogical QA & Benchmarking Suite",
+        file: "25_QA.md",
+        icon: "check-check",
+        objective: "Batería de 20 pruebas pedagógicas automatizadas para garantizar precisión y cero alucinaciones.",
+        files: "src/experiences/languages/tests/pedagogicalQaRunner.ts\nsrc/experiences/languages/components/qa/QaDashboardView.tsx",
+        prompt: `[PROMPT BLOQUE 25 — PEDAGOGICAL QA]
+Actúa como Ingeniero de Calidad de Software Pedagógico en GOALS.
+Tu tarea es implementar el Banco de Pruebas en \`tests/pedagogicalQaRunner.ts\`.
+
+REGLAS:
+1. Desarrolla runner automatizado con los 20 casos de prueba pedagógicos.
+2. Desarrolla QaDashboardView.tsx mostrando latencias y badges de éxito/fallo.
+3. Asegura que el 100% de los tests pasen exitosamente.`,
+        checklist: [
+          "¿El runner ejecuta los 20 tests sin excepciones?",
+          "¿Se verificó que los tiempos de respuesta son óptimos?",
+          "¿El dashboard de QA es accesible para auditoría técnica?",
+          "¿Se genera informe con tasa de éxito del 100%?"
+        ]
+      },
+      {
+        id: "26",
+        phase: 7,
+        phaseName: "7. QA & Release",
+        title: "Beta Launcher & Multi-Language Suite",
+        file: "26_BETA.md",
+        icon: "rocket",
+        objective: "Integración final en GOALS, soporte para 6 idiomas globales y verificación de build de producción.",
+        files: "src/experiences/languages/LanguagesView.tsx\nsrc/App.tsx",
+        prompt: `[PROMPT BLOQUE 26 — BETA LAUNCHER]
+Actúa como Ingeniero de Release y Líder Técnico en GOALS.
+Tu tarea es realizar el ensamblaje final de Languages en \`src/experiences/languages/\`.
+
+REGLAS:
+1. Valida navegación instantánea entre las 10 pestañas y modalidades.
+2. Verifica selector para los 6 idiomas: Inglés, Francés, Alemán, Japonés, Italiano y Portugués.
+3. Ejecuta npm run build y valida código de salida 0 sin advertencias de tipos.`,
+        checklist: [
+          "¿Se pueden alternar los 6 idiomas con voces calibradas?",
+          "¿El build de Vite finaliza con código de salida 0?",
+          "¿Todas las vistas y modales limpian sus estados al cerrar?",
+          "¿Convive en perfecta armonía con Astro y el resto de GOALS?"
+        ]
+      }
+    ];
+
+    let currentPhase = 'all';
+    let searchQuery = '';
+    let completedBlocks = JSON.parse(localStorage.getItem('goals_verified_blocks') || '[]');
+
+    function renderBlocks() {
+      const container = document.getElementById('blocks-grid');
+      container.innerHTML = '';
+
+      const filtered = BLOCKS.filter(b => {
+        const matchesPhase = currentPhase === 'all' || b.phase.toString() === currentPhase;
+        const matchesSearch = searchQuery === '' || 
+          b.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+          b.objective.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          b.id.includes(searchQuery);
+        return matchesPhase && matchesSearch;
+      });
+
+      filtered.forEach(block => {
+        const isCompleted = completedBlocks.includes(block.id);
+        const card = document.createElement('div');
+        card.className = 'glass-card p-5 space-y-3 cursor-pointer relative flex flex-col justify-between';
+        card.onclick = () => openModal(block.id);
+
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="badge ${isCompleted ? 'badge-emerald' : 'badge-cyan'}">BLOQUE ${block.id}</span>
+                <span class="text-[11px] font-mono text-slate-400">${block.phaseName}</span>
+              </div>
+              <button onclick="event.stopPropagation(); toggleComplete('${block.id}')" class="p-1.5 rounded-lg ${isCompleted ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-slate-300'} transition-colors" title="Marcar como verificado">
+                <i data-lucide="${isCompleted ? 'check-circle-2' : 'circle'}" class="w-4 h-4"></i>
+              </button>
+            </div>
+
+            <h3 class="text-sm font-extrabold text-white group-hover:text-cyan-400 transition-colors flex items-center gap-2">
+              <i data-lucide="${block.icon}" class="w-4 h-4 text-cyan-400 shrink-0"></i>
+              <span>${block.title}</span>
+            </h3>
+
+            <p class="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+              ${block.objective}
+            </p>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px]">
+            <span class="font-mono text-slate-400">${block.file}</span>
+            <span class="text-cyan-400 font-bold flex items-center gap-1 hover:underline">
+              Ver Prompt <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+      updateCompletedCounter();
+    }
+
+    function updateCompletedCounter() {
+      const badge = document.getElementById('completed-count-badge');
+      badge.textContent = `${completedBlocks.length} / 26 Verificados`;
+      if (completedBlocks.length === 26) {
+        badge.className = 'badge badge-emerald font-bold';
+      }
+    }
+
+    function toggleComplete(id) {
+      if (completedBlocks.includes(id)) {
+        completedBlocks = completedBlocks.filter(b => b !== id);
+      } else {
+        completedBlocks.push(id);
+      }
+      localStorage.setItem('goals_verified_blocks', JSON.stringify(completedBlocks));
+      renderBlocks();
+    }
+
+    let activeBlock = null;
+
+    function openModal(id) {
+      const block = BLOCKS.find(b => b.id === id);
+      if (!block) return;
+      activeBlock = block;
+
+      document.getElementById('modal-block-id').textContent = `BLOQUE ${block.id}`;
+      document.getElementById('modal-block-title').textContent = block.title;
+      document.getElementById('modal-block-objective').textContent = block.objective;
+      document.getElementById('modal-block-files').textContent = block.files;
+      document.getElementById('modal-block-prompt').textContent = block.prompt;
+      document.getElementById('modal-block-filename').textContent = block.file;
+
+      const checklistContainer = document.getElementById('modal-block-checklist');
+      checklistContainer.innerHTML = '';
+      block.checklist.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800';
+        row.innerHTML = `
+          <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+          <span>${item}</span>
+        `;
+        checklistContainer.appendChild(row);
+      });
+
+      document.getElementById('block-modal').classList.add('open');
+      lucide.createIcons();
+    }
+
+    function closeModal() {
+      document.getElementById('block-modal').classList.remove('open');
+    }
+
+    function copyCurrentPrompt() {
+      if (!activeBlock) return;
+      navigator.clipboard.writeText(activeBlock.prompt).then(() => {
+        showToast(`¡Prompt del Bloque ${activeBlock.id} copiado al portapapeles!`);
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-text').textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Phase Filter Tabs
+    document.querySelectorAll('#phase-filter-bar button').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('#phase-filter-bar button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPhase = btn.dataset.phase;
+        renderBlocks();
+      };
+    });
+
+    // Search input
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      searchQuery = e.target.value;
+      renderBlocks();
+    });
+
+    // Simulation NBA
+    const NBA_SCENARIOS = [
+      {
+        title: "Refuerzo Inmediato: Pasado Irregular ('went' vs 'goed')",
+        priority: "ERROR RECURRENTE",
+        desc: "El alumno Alex (9 años, A2) ha dudado con verbos irregulares. El motor prescribe un micro-ejercicio de 3 minutos para consolidar 'went'.",
+        skill: "Grammar & Speaking"
+      },
+      {
+        title: "Reactivación Léxica: 'boarding pass' y 'departure gate'",
+        priority: "VOCABULARIO OLVIDADO",
+        desc: "Hace 5 días que no se practica terminología aeroportuaria. El motor prescribe un diálogo de 4 minutos ambientado en la terminal.",
+        skill: "Vocabulary & Listening"
+      },
+      {
+        title: "Nivelación de Fonética: Fonemas 'comfortable' y 'thorough'",
+        priority: "BRECHA DE HABILIDAD",
+        desc: "El dominio de Pronunciación (60%) está por debajo de la media (72%). El motor prescribe 3 repeticiones con el osciloscopio acústico.",
+        skill: "Pronunciation & Fluency"
+      }
+    ];
+    let nbaIndex = 0;
+    function simulateNextAction() {
+      nbaIndex = (nbaIndex + 1) % NBA_SCENARIOS.length;
+      const s = NBA_SCENARIOS[nbaIndex];
+      const card = document.getElementById('nba-card-content');
+      card.innerHTML = `
+        <div class="flex items-center justify-between animate-fadeIn">
+          <span class="text-xs font-bold text-cyan-400 flex items-center gap-1.5">
+            <i data-lucide="activity" class="w-4 h-4"></i> ACCIÓN RECOMENDADA #${nbaIndex + 1}:
+          </span>
+          <span class="text-[10px] font-mono bg-cyan-950 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/30">
+            PRIORIDAD: ${s.priority}
+          </span>
+        </div>
+        <h3 class="text-sm font-bold text-white">${s.title}</h3>
+        <p class="text-xs text-slate-300 leading-relaxed">${s.desc}</p>
+        <div class="flex items-center justify-between pt-2 border-t border-slate-800">
+          <span class="text-[11px] text-slate-400">Habilidad Diana: <strong class="text-cyan-300">${s.skill}</strong></span>
+          <button onclick="simulateNextAction()" class="px-3.5 py-1.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-1.5 transition-transform active:scale-95 cursor-pointer">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Simular Siguiente Estado
+          </button>
+        </div>
+      `;
+      lucide.createIcons();
+      showToast("¡Siguiente estado heurístico calculado!");
+    }
+
+    // View Mode Toggle (Interactive vs Raw Markdown)
+    const btnInteractive = document.getElementById('view-mode-interactive');
+    const btnRaw = document.getElementById('view-mode-raw');
+    const heroSection = document.getElementById('interactive-hero-section');
+    const blocksGrid = document.getElementById('blocks-grid');
+    const rawView = document.getElementById('raw-markdown-view');
+
+    btnInteractive.onclick = () => {
+      btnInteractive.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 flex items-center gap-1.5 transition-all';
+      btnRaw.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 transition-all';
+      heroSection.classList.remove('hidden');
+      blocksGrid.classList.remove('hidden');
+      rawView.classList.add('hidden');
+    };
+
+    btnRaw.onclick = () => {
+      btnRaw.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-cyan-500 text-slate-950 flex items-center gap-1.5 transition-all';
+      btnInteractive.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white flex items-center gap-1.5 transition-all';
+      heroSection.classList.add('hidden');
+      blocksGrid.classList.add('hidden');
+      rawView.classList.remove('hidden');
+      loadRawPlaybook();
+    };
+
+    function loadRawPlaybook() {
+      const content = document.getElementById('markdown-raw-content');
+      let markdownText = `# GOALS LANGUAGES: PLAYBOOK MAESTRO DE LOS 26 BLOQUES DE INGENIERÍA\n\n`;
+      BLOCKS.forEach(b => {
+        markdownText += `## BLOQUE ${b.id} — ${b.title.toUpperCase()}\n`;
+        markdownText += `- **Fase:** ${b.phaseName}\n`;
+        markdownText += `- **Archivo:** ${b.file}\n`;
+        markdownText += `- **Objetivo:** ${b.objective}\n\n`;
+        markdownText += `### Prompt Ejecutable para AGY:\n\`\`\`text\n${b.prompt}\n\`\`\`\n\n`;
+        markdownText += `### Checklist de Verificación:\n`;
+        b.checklist.forEach(c => markdownText += `- [ ] ${c}\n`);
+        markdownText += `\n---\n\n`;
+      });
+      content.textContent = markdownText;
+    }
+
+    function copyRawPlaybook() {
+      const text = document.getElementById('markdown-raw-content').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast("¡Playbook completo copiado al portapapeles!");
+      });
+    }
+
+    // Modal Close on click overlay or Esc
+    window.onclick = (e) => {
+      if (e.target.id === 'block-modal') closeModal();
+    };
+    window.onkeydown = (e) => {
+      if (e.key === 'Escape') closeModal();
+    };
+
+    // Initial render
+    renderBlocks();
+  </script>
+</body>
+</html>

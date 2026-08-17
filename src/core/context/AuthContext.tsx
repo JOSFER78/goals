@@ -7,6 +7,8 @@ import {
   db,
   doc,
   setDoc,
+  getDoc,
+  onSnapshot,
   onAuthStateChanged, 
   signInWithPopup, 
   googleProvider, 
@@ -32,18 +34,49 @@ interface AuthContextType {
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (name: string, email: string, pass: string) => Promise<void>;
   signInGuest: () => Promise<void>;
+  signInAsLocalDevAdmin: () => Promise<void>;
   signOut: () => Promise<void>;
+  logout: () => Promise<void>;
   updateUserProfileData: (name: string, photoURL?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Detección de entorno local
+export const isLocalDev = typeof window !== 'undefined' && (
+  window.location.hostname === 'localhost' ||
+  window.location.hostname === '127.0.0.1' ||
+  window.location.hostname.includes('192.168.') ||
+  Boolean((import.meta as any).env?.DEV)
+);
+
+export const LOCAL_DEV_ADMIN_USER: UserProfile = {
+  uid: 'admin_local_dev_uid',
+  displayName: 'Admin GOALS',
+  email: 'josferestudio@gmail.com',
+  photoURL: undefined,
+  role: 'admin',
+  isApproved: true,
+  isAnonymous: false,
+  providerId: 'local_admin'
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [fbUser, setFbUser] = useState<User | null>(null);
   const [user, setUser] = useState<UserProfile | null>(() => {
     try {
-      const stored = localStorage.getItem('goals_local_user') || localStorage.getItem('astrolingo_local_user');
-      return stored ? JSON.parse(stored) : null;
+      const explicitLogout = localStorage.getItem('goals_explicit_logout') === 'true';
+      if (explicitLogout) return null;
+
+      const stored = localStorage.getItem('goals_local_user');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+      if (isLocalDev) {
+        localStorage.setItem('goals_local_user', JSON.stringify(LOCAL_DEV_ADMIN_USER));
+        return LOCAL_DEV_ADMIN_USER;
+      }
+      return null;
     } catch {
       return null;
     }
@@ -52,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState<boolean>(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const isAdmin = user?.email === 'josferestudio@gmail.com';
+  const isAdmin = user?.email === 'josferestudio@gmail.com' || user?.role === 'admin';
 
   useEffect(() => {
     if (!isFirebaseReady() || !auth) {
@@ -60,47 +93,126 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (u) => {
+    let userDocUnsub: (() => void) | null = null;
+
+    const unsubscribe = onAuthStateChanged(auth, async (u) => {
+      if (userDocUnsub) {
+        userDocUnsub();
+        userDocUnsub = null;
+      }
+
       setFbUser(u);
       if (u) {
+        localStorage.removeItem('goals_explicit_logout');
         setIsCloud(true);
-        const profile: UserProfile = {
+        const isSuperAdmin = u.email === 'josferestudio@gmail.com';
+
+        const baseProfile: UserProfile = {
           uid: u.uid,
           displayName: u.displayName || u.email?.split('@')[0] || 'Estudiante GOALS',
           email: u.email,
           photoURL: u.photoURL,
+          role: isSuperAdmin ? 'admin' : 'user',
+          isApproved: isSuperAdmin, // Super admin siempre aprobado; otros esperan confirmación de Firestore
           isAnonymous: u.isAnonymous,
           providerId: u.providerData[0]?.providerId || (u.isAnonymous ? 'guest' : 'password')
         };
-        setUser(profile);
-        localStorage.setItem('goals_local_user', JSON.stringify(profile));
 
-        // Sincronizar automáticamente la ficha del usuario en Firestore
+        setUser(baseProfile);
+        localStorage.setItem('goals_local_user', JSON.stringify(baseProfile));
+
+        // Comprobar y escuchar en tiempo real la autorización en Firestore
         if (db && u.uid && !u.isAnonymous) {
-          setDoc(doc(db, 'users', u.uid), {
-            uid: u.uid,
-            email: u.email,
-            displayName: profile.displayName,
-            photoURL: u.photoURL,
-            isApproved: true,
-            requestedAt: new Date().toISOString(),
-            status: 'approved'
-          }, { merge: true }).catch(err => console.warn("Error guardando ficha en Firestore:", err));
+          const userDocRef = doc(db, 'users', u.uid);
+
+          try {
+            const snap = await getDoc(userDocRef);
+            if (!snap.exists()) {
+              // Registro nuevo: crear con estado pendiente salvo si es Super Admin
+              const initialData = {
+                uid: u.uid,
+                email: u.email,
+                displayName: baseProfile.displayName,
+                photoURL: u.photoURL,
+                isApproved: isSuperAdmin,
+                role: isSuperAdmin ? 'admin' : 'student',
+                status: isSuperAdmin ? 'approved' : 'pending',
+                requestedAt: new Date().toISOString(),
+                createdAt: new Date().toISOString()
+              };
+              await setDoc(userDocRef, initialData, { merge: true });
+            } else {
+              const existingData = snap.data();
+              const approvedStatus = isSuperAdmin || existingData.isApproved === true;
+              setUser(prev => prev ? {
+                ...prev,
+                isApproved: approvedStatus,
+                role: isSuperAdmin ? 'admin' : (existingData.role || 'user')
+              } : null);
+            }
+          } catch (err) {
+            console.warn("[AuthContext] Error verificando estado de autorización en Firestore:", err);
+          }
+
+          // Escucha reactiva en tiempo real: si el Admin aprueba la cuenta, el usuario se desbloquea al instante
+          userDocUnsub = onSnapshot(userDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+              const data = docSnap.data();
+              const approved = isSuperAdmin || data.isApproved === true;
+              setUser(prev => {
+                if (!prev) return null;
+                const updated: UserProfile = {
+                  ...prev,
+                  displayName: data.displayName || prev.displayName,
+                  isApproved: approved,
+                  role: isSuperAdmin ? 'admin' : (data.role || 'user')
+                };
+                localStorage.setItem('goals_local_user', JSON.stringify(updated));
+                return updated;
+              });
+            }
+          });
         }
       } else {
-        setIsCloud(false);
-        try {
-          const local = localStorage.getItem('goals_local_user') || localStorage.getItem('astrolingo_local_user');
-          if (local) setUser(JSON.parse(local));
-          else setUser({ uid: 'guest', displayName: 'Invitado GOALS', email: null, photoURL: null, isAnonymous: true, providerId: 'guest' });
-        } catch {
-          setUser({ uid: 'guest', displayName: 'Invitado GOALS', email: null, photoURL: null, isAnonymous: true, providerId: 'guest' });
+        const explicitLogout = localStorage.getItem('goals_explicit_logout') === 'true';
+        if (explicitLogout) {
+          setUser(null);
+          localStorage.removeItem('goals_local_user');
+          setIsCloud(false);
+          setLoading(false);
+          return;
         }
+
+        // Sin sesión en Firebase: revisar si hay sesión local de invitado o admin dev
+        const stored = localStorage.getItem('goals_local_user');
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored);
+            if (parsed) {
+              setUser(parsed);
+              setIsCloud(false);
+              setLoading(false);
+              return;
+            }
+          } catch {}
+        }
+        
+        if (isLocalDev) {
+          setUser(LOCAL_DEV_ADMIN_USER);
+          localStorage.setItem('goals_local_user', JSON.stringify(LOCAL_DEV_ADMIN_USER));
+        } else {
+          setUser(null);
+          localStorage.removeItem('goals_local_user');
+        }
+        setIsCloud(false);
       }
       setLoading(false);
     });
 
-    return () => unsubscribe();
+    return () => {
+      if (userDocUnsub) userDocUnsub();
+      unsubscribe();
+    };
   }, []);
   const signInWithGoogle = async () => {
     setAuthError(null);
@@ -212,6 +324,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInGuest = async () => {
     setAuthError(null);
+    localStorage.removeItem('goals_explicit_logout');
     if (isFirebaseReady() && auth) {
       try {
         await signInAnonymously(auth);
@@ -256,21 +369,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const signInAsLocalDevAdmin = async () => {
+    setAuthError(null);
+    localStorage.removeItem('goals_explicit_logout');
+    setUser(LOCAL_DEV_ADMIN_USER);
+    localStorage.setItem('goals_local_user', JSON.stringify(LOCAL_DEV_ADMIN_USER));
+    setIsCloud(false);
+  };
+
   const signOut = async () => {
     setAuthError(null);
     if (auth && isCloud) {
-      await fbSignOut(auth);
+      try {
+        await fbSignOut(auth);
+      } catch (e) {
+        console.warn("Error signing out from Firebase:", e);
+      }
     }
-    const guestUser: UserProfile = {
-      uid: 'guest',
-      displayName: 'Invitado GOALS',
-      email: null,
-      photoURL: null,
-      isAnonymous: true,
-      providerId: 'guest'
-    };
-    setUser(guestUser);
-    localStorage.setItem('goals_local_user', JSON.stringify(guestUser));
+    localStorage.setItem('goals_explicit_logout', 'true');
+    setUser(null);
+    localStorage.removeItem('goals_local_user');
+    localStorage.removeItem('astrolingo_local_user');
     setIsCloud(false);
   };
 
@@ -287,7 +406,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       signInWithEmail,
       signUpWithEmail,
       signInGuest,
+      signInAsLocalDevAdmin,
       signOut,
+      logout: signOut,
       updateUserProfileData
     }}>
       {children}

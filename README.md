@@ -179,9 +179,9 @@ const signInWithGoogle = async () => {
          ┌──────────────────┬──────────┴──────────┬──────────────────┐
          ▼                  ▼                     ▼                  ▼
 ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│  📚 Escuela IA  │ │ 🌐 Idiomas Voz  │ │🪐 AstroLingo 3D │ │   🛡️ Verifica   │
-│ Tutor OCR &     │ │ Voz IA &        │ │ Simulador NASA  │ │ Rigor Fuentes   │
-│ Apuntes Mano    │ │ Memoria B1/B2   │ │ 18 Lecciones 3D │ │ ESA / NASA      │
+│  📚 Escuela IA  │ │ 🌐 Idiomas Voz  │ │🪐 AstroLingo 3D │ │   🧭 Criterio   │
+│ Tutor OCR &     │ │ Voz IA &        │ │ Simulador NASA  │ │ Algoritmos, IA, │
+│ Apuntes Mano    │ │ Memoria B1/B2   │ │ 18 Lecciones 3D │ │ Fuentes, MATIZA │
 └─────────────────┘ └─────────────────┘ └─────────────────┘ └─────────────────┘
 ```
 
@@ -198,8 +198,28 @@ const signInWithGoogle = async () => {
 - **18 Lecciones Interactivas**: Artemis II, Starship Raptor 3, Telescopio James Webb, física orbital y tests de ordenación cronológica espacial.
 - **54 Estrellas ⭐**: Sistema de puntuación estelar (0 a 3 estrellas por lección).
 
-### 4. 🛡️ Verifica
-- **Auditoría de Información Científica**: Herramienta de investigación que contrasta titulares y noticias en tiempo real contra bases de datos oficiales de la NASA y la ESA.
+### 4. 🧭 Criterio (Aprender a Informarse)
+- **Alfabetización Informativa, Algoritmos & Seguridad en IA**: 12 módulos pedagógicos por franjas de edad (8–18 años) bajo la pregunta «¿Y tú cómo lo sabes?».
+- **Simulador de Feed de Redes Sociales**: Demostración interactiva de cómo los clics y el tiempo de pantalla entrenan al algoritmo de recomendación y crean cámaras de eco.
+- **Laboratorio Forense de IA**: Detección práctica de alucinaciones de LLMs, deepfakes e imágenes generadas, y prevención de estafas por clonación de voz.
+- **Método PAUSA & 60 Misiones Gamificadas**: Protocolo de desaceleración conductual (30s) y situaciones cotidianas con dificultad adaptativa.
+- **Estación Integrada MATIZA**: Herramienta de descomposición y contraste de afirmaciones en 4 capas de rigor frente a fuentes primarias (BOE, NASA, ESA, CSIC).
+
+---
+
+## 🎯 Arquitectura Adaptativa & Cosmos 3D (5 Tramos LOMLOE: 6–15 Años)
+
+GOALS cuenta con un **Motor Adaptativo Multidimensional** que calibra de forma estricta qué contenidos, vocabulario, densidad visual y evaluaciones recibe cada alumno según su edad:
+
+- **5 Tramos de Edad y Etapas LOMLOE**:
+  - `6-7 años`: Primaria 1º ciclo (Lenguaje sensorial, mantita protectora de aire, peonza día/noche, IA `cosmic_pet`).
+  - `8-9 años`: Primaria 2º ciclo (Línea de Kármán a 100 km, gran eclipse de España 2026, traslación, IA `friendly_tutor`).
+  - `10-11 años`: Primaria 3º ciclo (Mecánica Kepleriana, gravedad comparada, Nube de Oort, Voyager 1, IA `socratic_mentor`).
+  - `12-13 años`: ESO 1º ciclo (Estrellas vecinas, Vía Láctea, agujero negro supermasivo Sagitario A*, IA `socratic_mentor`).
+  - `14-15 años`: ESO 2º ciclo (Cosmología relativista, Fondo Cósmico CMB a 2,725 K, energía oscura y modelo $\Lambda$-CDM, IA `science_colleague`).
+- **Separación Arquitectónica de 4 Capas**: Base de Conocimiento (SSOT Markdown) $\to$ Currículo Pedagógico (`CurriculumUnit`) $\to$ Estado del Alumno (`LearnerProfile` & `StudentLearningState`) $\to$ Presentación e IA (`PresentationProfile` & `PresentationEngine`).
+- **Simulador en Tiempo Real para Super Admin**: Conmutador en cabecera para auditar instantáneamente la experiencia de cualquier tramo de edad.
+- **Filtro de Alumnos en Admin**: Panel de control con filtrado por edad, curso, estado de autorización y visor de expedientes formativos.
 
 ---
 
@@ -233,7 +253,10 @@ npm install
 # 2. Servidor de desarrollo local
 npm run dev
 
-# 3. Compilación web para producción
+# 3. Ejecutar Suite de Tests Adaptativos Automatizados
+npm test
+
+# 4. Compilación web para producción
 npm run build
 
 # 4. Sincronización nativa con Android

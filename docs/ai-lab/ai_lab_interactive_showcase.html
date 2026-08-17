@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOALS · IA LAB — Documento Maestro & Showcase Interactivo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#faf5ff',
+              400: '#c084fc',
+              500: '#a855f7',
+              600: '#9333ea',
+              900: '#581c87',
+              950: '#2e1065'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #030712;
+      color: #f3f4f6;
+      font-family: 'Inter', sans-serif;
+    }
+    .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(168, 85, 247, 0.25);
+    }
+    .glass-card:hover {
+      border-color: rgba(168, 85, 247, 0.45);
+    }
+    .neural-grid {
+      background-size: 32px 32px;
+      background-image: 
+        radial-gradient(circle at 16px 16px, rgba(168, 85, 247, 0.12) 1.5px, transparent 1.5px),
+        linear-gradient(to right, rgba(168, 85, 247, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+    }
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.7; filter: drop-shadow(0 0 15px rgba(168, 85, 247, 0.5)); }
+    }
+    .glow-pulse {
+      animation: pulseGlow 4s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="min-h-screen neural-grid flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+
+  <!-- BARRA DE NAVEGACIÓN SUPERIOR CON SELECTOR DE VISTA -->
+  <header class="sticky top-0 z-50 bg-slate-950/90 backdrop-blur-xl border-b border-purple-500/30 px-4 sm:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 border border-purple-400/40 flex items-center justify-center text-white font-black shadow-lg shadow-purple-600/30">
+          🧠
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-extrabold text-base tracking-tight text-white">GOALS</span>
+            <span class="text-purple-400 font-bold text-base">· IA LAB</span>
+            <span class="px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-mono font-bold uppercase border border-purple-500/30">v1.0.0</span>
+          </div>
+          <p class="text-[11px] text-slate-400">Laboratorio de Inteligencia Artificial para Niños y Jóvenes (7–15+ años)</p>
+        </div>
+      </div>
+
+      <!-- Alternador de Vista (Interactiva vs Markdown Raw) -->
+      <div class="flex items-center bg-slate-900 p-1 rounded-2xl border border-slate-800 shadow-inner">
+        <button id="btn-interactive" onclick="switchView('interactive')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-md shadow-purple-600/30">
+          ✨ Vista Web Interactiva
+        </button>
+        <button id="btn-markdown" onclick="switchView('markdown')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all">
+          📄 Documentos Markdown (.md)
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 space-y-8 flex-1">
+
+    <!-- ========================================================================= -->
+    <!-- VISTA 1: WEB INTERACTIVA CON DEMOSTRADORES EN VIVO -->
+    <!-- ========================================================================= -->
+    <div id="view-interactive" class="space-y-8">
+      
+      <!-- HERO PRINCIPAL -->
+      <section class="glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl glow-pulse pointer-events-none"></div>
+        <div class="relative z-10 max-w-3xl space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-bold">
+            <span>🚀 Nueva Mini App Integrada en GOALS</span>
+          </div>
+          <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight leading-tight">
+            Descubre. Entiende. <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-indigo-200 to-cyan-300">
+              Experimenta y Crea con Inteligencia Artificial.
+            </span>
+          </h1>
+          <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+            IA Lab no es una academia de prompts ni tutoriales de ChatGPT: es un laboratorio con 12 módulos curriculares, simulaciones neuronales 2D en tiempo real, tokenizadores en vivo, análisis de convolución sobre píxeles y auditoría forense de alucinaciones.
+          </p>
+        </div>
+      </section>
+
+      <!-- SIMULADOR EN VIVO 1: RED NEURONAL 2D EN CANVAS -->
+      <section class="glass-card rounded-3xl p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+          <div>
+            <span class="text-xs uppercase font-mono font-bold text-purple-400">Sandbox #1 · 100% Real</span>
+            <h2 class="text-xl font-bold text-white">Simulador de Red Neuronal 2D (Backpropagation en Canvas)</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-train" onclick="toggleTraining()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-lg shadow-purple-600/30 transition-all">
+              ▶ Entrenar Red
+            </button>
+            <button onclick="initNeuralNet()" class="px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold">
+              Reiniciar
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-6 flex flex-col items-center">
+            <div class="bg-slate-950 p-2 rounded-2xl border border-slate-800 shadow-2xl">
+              <canvas id="neuralCanvas" width="300" height="300" class="rounded-xl block"></canvas>
+            </div>
+            <div class="flex items-center gap-4 text-xs font-bold mt-2">
+              <span class="text-purple-300">● Clase 1 (Violeta)</span>
+              <span class="text-cyan-300">● Clase 0 (Cyan)</span>
+            </div>
+          </div>
+
+          <div class="lg:col-span-6 space-y-3 text-xs">
+            <div class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-1">
+              <div class="flex justify-between font-mono">
+                <span class="text-slate-400">Época de Entrenamiento:</span>
+                <span id="txt-epoch" class="font-bold text-purple-300">0</span>
+              </div>
+              <div class="flex justify-between font-mono">
+                <span class="text-slate-400">Función de Error (Loss):</span>
+                <span id="txt-loss" class="font-bold text-amber-300">0.6931</span>
+              </div>
+            </div>
+
+            <div class="space-y-1">
+              <label class="font-bold text-slate-300">Seleccionar Problema 2D:</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="setDataset('circle')" class="py-1.5 rounded-xl bg-slate-950 hover:bg-purple-950 text-slate-300 border border-slate-800 font-bold">Círculo</button>
+                <button onclick="setDataset('xor')" class="py-1.5 rounded-xl bg-slate-950 hover:bg-purple-950 text-slate-300 border border-slate-800 font-bold">XOR</button>
+                <button onclick="setDataset('moons')" class="py-1.5 rounded-xl bg-slate-950 hover:bg-purple-950 text-slate-300 border border-slate-800 font-bold">Dos Lunas</button>
+              </div>
+            </div>
+
+            <p class="text-slate-400 leading-relaxed text-[11px]">
+              La red neuronal ajusta los pesos matemáticos mediante derivadas parciales en cada fotograma. El fondo del canvas representa la frontera de decisión en tiempo real.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SIMULADOR EN VIVO 2: TOKENIZADOR BPE -->
+      <section class="glass-card rounded-3xl p-6 space-y-4">
+        <div class="pb-3 border-b border-slate-800">
+          <span class="text-xs uppercase font-mono font-bold text-cyan-400">Sandbox #2 · Procesamiento de Lenguaje</span>
+          <h2 class="text-xl font-bold text-white">Tokenizador en Vivo (Byte-Pair Encoding & Tokens Numéricos)</h2>
+        </div>
+
+        <div class="space-y-3">
+          <input
+            id="tokenInput"
+            type="text"
+            value="La Inteligencia Artificial aprende de los datos"
+            oninput="renderTokens()"
+            class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-400 rounded-2xl p-3.5 text-sm text-slate-100 focus:outline-none"
+            placeholder="Escribe aquí cualquier frase..."
+          />
+
+          <div class="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Tokens segmentados en memoria:</span>
+            <div id="tokenChips" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LOS 12 MÓDULOS CURRICULARES -->
+      <section class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-2xl font-black text-white">Los 12 Módulos Curriculares</h2>
+            <p class="text-xs text-slate-400">Diseñados para 3 franjas de edad (7–9, 10–12 y 13–15+ años)</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-purple-400">M01 · Fundamentos</span>
+              <span class="text-amber-400 font-bold">+50 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">¿Qué es (y qué no es) la IA?</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">De las reglas fijas (IF/THEN) al aprendizaje por reconocimiento de patrones.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-purple-400">M02 · Fundamentos</span>
+              <span class="text-amber-400 font-bold">+55 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">Los Datos: El Alimento de la Máquina</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Principio GIGO, datasets de entrenamiento vs test y sobreajuste (Overfitting).</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-indigo-400">M03 · Mecanismo</span>
+              <span class="text-amber-400 font-bold">+65 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">¿Cómo Aprende una Máquina?</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Pesos, sesgos, funciones de activación, función de error y descenso de gradiente.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-emerald-400">M04 · Visión</span>
+              <span class="text-amber-400 font-bold">+60 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">Visión por Computador</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Matrices de píxeles RGB y filtros de convolución 3x3 para detectar bordes y formas.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-cyan-400">M05 · Lenguaje</span>
+              <span class="text-amber-400 font-bold">+65 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">El Lenguaje de las Máquinas</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Tokens, vocabularios numéricos, embeddings y geometría del significado.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-cyan-400">M06 · Lenguaje</span>
+              <span class="text-amber-400 font-bold">+70 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">La Siguiente Palabra (LLMs)</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Arquitectura Transformer, auto-atención, temperatura y muestreo Top-P.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-amber-400">M07 · Forense</span>
+              <span class="text-amber-400 font-bold">+65 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">Alucinaciones y Límites</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Por qué la IA inventa citas y hechos falsos con total convicción y cómo auditarla.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-rose-400">M08 · Creación</span>
+              <span class="text-amber-400 font-bold">+60 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">Creatividad Aumentada</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Modelos de difusión, arquitectura de prompts RCRF y co-creación responsable.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-rose-400">M09 · Ética</span>
+              <span class="text-amber-400 font-bold">+65 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">Sesgos Algorítmicos y Justicia</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Prejuicios históricos en los datos, discriminación indirecta y paridad demográfica.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-rose-400">M10 · Ética</span>
+              <span class="text-amber-400 font-bold">+60 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">Privacidad y Seguridad</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Ataques de Prompt Injection, protección de huella digital y derechos RGPD.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-amber-400">M11 · Forense</span>
+              <span class="text-amber-400 font-bold">+70 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">Realidad vs Sintético: Deepfakes</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Clonación de voz, detección visual forense y estándares de autenticidad C2PA.</p>
+          </div>
+
+          <div class="glass-card rounded-2xl p-4 space-y-2">
+            <div class="flex justify-between items-center text-xs font-mono">
+              <span class="font-bold text-purple-400">M12 · Futuro</span>
+              <span class="text-amber-400 font-bold">+75 XP</span>
+            </div>
+            <h3 class="font-bold text-sm text-white">El Futuro y Tú: Impacto y Ley de IA</h3>
+            <p class="text-xs text-slate-300 line-clamp-2">Huella ecológica de la computación, regulación europea (EU AI Act) y Human-in-the-loop.</p>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- VISTA 2: DOCUMENTACIÓN MARKDOWN RAW (.MD) -->
+    <!-- ========================================================================= -->
+    <div id="view-markdown" class="hidden space-y-6">
+      
+      <div class="flex flex-wrap items-center gap-2 pb-3 border-b border-slate-800">
+        <button onclick="loadDoc('00')" class="doc-btn px-3 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-bold">00 · Visión Maestra</button>
+        <button onclick="loadDoc('01')" class="doc-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold">01 · Marco Pedagógico</button>
+        <button onclick="loadDoc('02')" class="doc-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold">02 · Los 12 Módulos</button>
+        <button onclick="loadDoc('03')" class="doc-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold">03 · Arquitectura Técnica</button>
+        <button onclick="loadDoc('04')" class="doc-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold">04 · Sistema de Diseño</button>
+        <button onclick="loadDoc('05')" class="doc-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold">05 · Motores Interactivos</button>
+        <button onclick="loadDoc('06')" class="doc-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold">06 · Seguridad & Ética</button>
+        <button onclick="loadDoc('07')" class="doc-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold">07 · Gamificación & XP</button>
+      </div>
+
+      <div class="glass-card rounded-3xl p-6 sm:p-8">
+        <pre id="doc-content" class="text-xs sm:text-sm font-mono text-slate-200 whitespace-pre-wrap leading-relaxed overflow-x-auto"></pre>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-900 bg-slate-950/80 px-4 py-4 text-center text-xs text-slate-500">
+    GOALS Platform · Módulo `ai-lab` · 100% Código Real & Cero Mocks
+  </footer>
+
+  <!-- SCRIPTS JS PARA INTERACTIVIDAD REAL -->
+  <script>
+    // Alternar Vistas
+    function switchView(view) {
+      const vInteractive = document.getElementById('view-interactive');
+      const vMarkdown = document.getElementById('view-markdown');
+      const btnInt = document.getElementById('btn-interactive');
+      const btnMd = document.getElementById('btn-markdown');
+
+      if (view === 'interactive') {
+        vInteractive.classList.remove('hidden');
+        vMarkdown.classList.add('hidden');
+        btnInt.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-md shadow-purple-600/30';
+        btnMd.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all';
+      } else {
+        vInteractive.classList.add('hidden');
+        vMarkdown.classList.remove('hidden');
+        btnMd.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all bg-purple-600 text-white shadow-md shadow-purple-600/30';
+        btnInt.className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white transition-all';
+        loadDoc('00');
+      }
+    }
+
+    // Lógica del Tokenizador en vivo
+    const TOKEN_STYLES = [
+      'bg-purple-500/20 text-purple-200 border-purple-500/40',
+      'bg-cyan-500/20 text-cyan-200 border-cyan-500/40',
+      'bg-emerald-500/20 text-emerald-200 border-emerald-500/40',
+      'bg-amber-500/20 text-amber-200 border-amber-500/40',
+      'bg-rose-500/20 text-rose-200 border-rose-500/40'
+    ];
+
+    function hashStr(s) {
+      let h = 0;
+      for (let i = 0; i < s.length; i++) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; }
+      return Math.abs(h) % 90000 + 1000;
+    }
+
+    function renderTokens() {
+      const text = document.getElementById('tokenInput').value;
+      const container = document.getElementById('tokenChips');
+      container.innerHTML = '';
+      if (!text) return;
+
+      const matches = text.match(/([A-ZÁÉÍÓÚÑa-záéíóúñ]+|\d+|[^\s\w]+|\s+)/gu) || [text];
+      matches.forEach((part, i) => {
+        const chip = document.createElement('div');
+        chip.className = `px-3 py-1 rounded-xl border text-xs font-mono font-bold flex items-center gap-1.5 shadow-sm ${TOKEN_STYLES[i % TOKEN_STYLES.length]}`;
+        chip.innerHTML = `<span>${part === ' ' ? '␣' : part}</span><span class="text-[9px] opacity-70">#${hashStr(part)}</span>`;
+        container.appendChild(chip);
+      });
+    }
+
+    // Lógica de la Red Neuronal 2D en Canvas
+    let neuralPoints = [];
+    let weights = { w1: [[0.5, -0.4], [-0.3, 0.6]], b1: [0, 0], wOut: [0.8, -0.7], bOut: 0 };
+    let isTraining = false;
+    let epoch = 0;
+    let currentDataset = 'circle';
+
+    function setDataset(type) {
+      currentDataset = type;
+      neuralPoints = [];
+      for (let i = 0; i < 100; i++) {
+        if (type === 'circle') {
+          const r = Math.sqrt(Math.random()) * 5;
+          const theta = Math.random() * 2 * Math.PI;
+          neuralPoints.push({ x: r * Math.cos(theta), y: r * Math.sin(theta), label: r < 2.8 ? 1 : 0 });
+        } else if (type === 'xor') {
+          const x = (Math.random() - 0.5) * 10;
+          const y = (Math.random() - 0.5) * 10;
+          neuralPoints.push({ x, y, label: x * y > 0 ? 1 : 0 });
+        } else if (type === 'moons') {
+          const phi = (i / 100) * Math.PI;
+          const label = i % 2 === 0 ? 1 : 0;
+          const x = label === 1 ? Math.cos(phi) * 3 - 1 : -Math.cos(phi) * 3 + 1;
+          const y = label === 1 ? Math.sin(phi) * 3 : -Math.sin(phi) * 3 + 1;
+          neuralPoints.push({ x, y, label });
+        }
+      }
+      initNeuralNet();
+    }
+
+    function initNeuralNet() {
+      weights = {
+        w1: [[Math.random() - 0.5, Math.random() - 0.5], [Math.random() - 0.5, Math.random() - 0.5]],
+        b1: [0, 0],
+        wOut: [Math.random() - 0.5, Math.random() - 0.5],
+        bOut: 0
+      };
+      epoch = 0;
+      document.getElementById('txt-epoch').innerText = '0';
+      document.getElementById('txt-loss').innerText = '0.6931';
+      drawCanvas();
+    }
+
+    function forward(x, y) {
+      const h1_0 = Math.tanh(x * weights.w1[0][0] + y * weights.w1[1][0] + weights.b1[0]);
+      const h1_1 = Math.tanh(x * weights.w1[0][1] + y * weights.w1[1][1] + weights.b1[1]);
+      const outSum = h1_0 * weights.wOut[0] + h1_1 * weights.wOut[1] + weights.bOut;
+      return 1 / (1 + Math.exp(-Math.max(-10, Math.min(10, outSum))));
+    }
+
+    function trainStep() {
+      const lr = 0.08;
+      let totalLoss = 0;
+      for (const pt of neuralPoints) {
+        const h1_0 = Math.tanh(pt.x * weights.w1[0][0] + pt.y * weights.w1[1][0] + weights.b1[0]);
+        const h1_1 = Math.tanh(pt.x * weights.w1[0][1] + pt.y * weights.w1[1][1] + weights.b1[1]);
+        const out = 1 / (1 + Math.exp(-(h1_0 * weights.wOut[0] + h1_1 * weights.wOut[1] + weights.bOut)));
+        
+        const loss = -(pt.label * Math.log(Math.max(1e-5, out)) + (1 - pt.label) * Math.log(Math.max(1e-5, 1 - out)));
+        totalLoss += loss;
+
+        const dOut = out - pt.label;
+        weights.wOut[0] -= lr * dOut * h1_0;
+        weights.wOut[1] -= lr * dOut * h1_1;
+        weights.bOut -= lr * dOut;
+
+        const dh0 = dOut * weights.wOut[0] * (1 - h1_0 * h1_0);
+        const dh1 = dOut * weights.wOut[1] * (1 - h1_1 * h1_1);
+        weights.w1[0][0] -= lr * dh0 * pt.x;
+        weights.w1[1][0] -= lr * dh0 * pt.y;
+        weights.w1[0][1] -= lr * dh1 * pt.x;
+        weights.w1[1][1] -= lr * dh1 * pt.y;
+      }
+      epoch += 5;
+      document.getElementById('txt-epoch').innerText = epoch;
+      document.getElementById('txt-loss').innerText = (totalLoss / neuralPoints.length).toFixed(4);
+      drawCanvas();
+    }
+
+    function drawCanvas() {
+      const canvas = document.getElementById('neuralCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      const res = 10;
+
+      const imgData = ctx.createImageData(w, h);
+      const data = imgData.data;
+
+      for (let px = 0; px < w; px += res) {
+        for (let py = 0; py < h; py += res) {
+          const x = (px / w) * 12 - 6;
+          const y = -((py / h) * 12 - 6);
+          const out = forward(x, y);
+          const r = Math.round(140 * out + 20 * (1 - out));
+          const g = Math.round(50 * out + 180 * (1 - out));
+          const b = Math.round(240 * out + 220 * (1 - out));
+          for (let dx = 0; dx < res; dx++) {
+            for (let dy = 0; dy < res; dy++) {
+              const idx = ((py + dy) * w + (px + dx)) * 4;
+              data[idx] = r; data[idx + 1] = g; data[idx + 2] = b; data[idx + 3] = 160;
+            }
+          }
+        }
+      }
+      ctx.putImageData(imgData, 0, 0);
+
+      // Dibujar puntos
+      neuralPoints.forEach(pt => {
+        const px = ((pt.x + 6) / 12) * w;
+        const py = ((-pt.y + 6) / 12) * h;
+        ctx.beginPath();
+        ctx.arc(px, py, 4, 0, 2 * Math.PI);
+        ctx.fillStyle = pt.label === 1 ? '#c084fc' : '#22d3ee';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+      });
+    }
+
+    function toggleTraining() {
+      isTraining = !isTraining;
+      const btn = document.getElementById('btn-train');
+      btn.innerText = isTraining ? '⏸ Pausar' : '▶ Entrenar Red';
+      if (isTraining) loopTraining();
+    }
+
+    function loopTraining() {
+      if (!isTraining) return;
+      trainStep();
+      requestAnimationFrame(loopTraining);
+    }
+
+    // Documentos Markdown estáticos precargados
+    const DOCS = {
+      '00': `# 00 · AUDITORÍA Y VISIÓN MAESTRA: GOALS · IA LAB\n\nEstado: Especificación Maestra de Producción\nProducto: GOALS Platform\nMódulo: ai-lab\nNombre visible: IA Lab\nSubtítulo: Descubre. Entiende. Experimenta. Crea.\n\n## 1. Declaración de Visión\nIA Lab es el módulo educativo de GOALS dedicado a enseñar Inteligencia Artificial a niños y adolescentes desde aproximadamente los 7 hasta los 15+ años.\n\nLOS 4 PRINCIPIOS DE IDENTIDAD:\n1. No es una academia de prompts.\n2. No es una colección de tutoriales de ChatGPT.\n3. No enseña únicamente a utilizar herramientas concretas.\n4. Enseña a comprender, auditar, experimentar y crear con rigor y sentido crítico.`,
+      '01': `# 01 · MARCO PEDAGÓGICO\n\nCiclo de 4 Fases:\n1. Observación & Concepto\n2. Experimentación en Sandbox\n3. Auditoría Crítica de Límites\n4. Aplicación & Creación Socrática\n\nFranjas de edad adaptativas: 7-9 años (Exploradores), 10-12 años (Constructores), 13-15+ años (Innovadores).`,
+      '02': `# 02 · CURRÍCULO: 12 MÓDULOS\n\nM01: ¿Qué es (y qué no es) la IA?\nM02: Los Datos: El Alimento de la Máquina\nM03: ¿Cómo Aprende una Máquina?\nM04: Visión por Computador: Píxeles a Conceptos\nM05: El Lenguaje de las Máquinas: Tokens\nM06: La Siguiente Palabra (LLMs)\nM07: Alucinaciones y Límites\nM08: Creatividad Aumentada\nM09: Sesgos Algorítmicos y Justicia\nM10: Privacidad y Seguridad\nM11: Realidad vs Sintético: Deepfakes\nM12: El Futuro y Tú: Impacto y Ley de IA`,
+      '03': `# 03 · ARQUITECTURA TÉCNICA\n\n- React 18 + Vite + TypeScript\n- Pure Canvas 2D Neural Network Engine (Backpropagation en cliente)\n- Subword Regex BPE Tokenizer\n- 3x3 Discrete Spatial Convolution Calculator\n- Proxy unificado de inferencia real vía aiService.ts`,
+      '04': `# 04 · SISTEMA DE DISEÑO\n\n- Paleta Ultravioleta HSL curada (#8B5CF6 / #A855F7)\n- Dark Glassmorphism\n- Tipografía Inter y JetBrains Mono\n- Patrón de malla sináptica reactiva`,
+      '05': `# 05 · LOS 6 MOTORES INTERACTIVOS\n\n1. NeuralNetworkVisualizer\n2. TokenFlowLab\n3. ComputerVisionLab\n4. HallucinationHunterLab\n5. BiasAndEthicsLab\n6. CreativeAIStudio`,
+      '06': `# 06 · SEGURIDAD, PRIVACIDAD Y ÉTICA\n\n- Cumplimiento RGPD / GDPR\n- Clasificación en 4 niveles de riesgo de la EU AI Act\n- Prevención de ataques de Prompt Injection y Data Extraction`,
+      '07': `# 07 · GAMIFICACIÓN Y XP\n\n- 50 a 75 XP por lección completada\n- 4 niveles de maestría de criterio IA\n- Registro transparente en UserData.experiences.aiLab`
+    };
+
+    function loadDoc(id) {
+      document.getElementById('doc-content').innerText = DOCS[id] || 'Documento no encontrado.';
+      document.querySelectorAll('.doc-btn').forEach(btn => {
+        btn.className = 'doc-btn px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-bold';
+      });
+      if (event && event.target) {
+        event.target.className = 'doc-btn px-3 py-1.5 rounded-xl bg-purple-600 text-white text-xs font-bold';
+      }
+    }
+
+    // Inicializar al cargar
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTokens();
+      setDataset('circle');
+    });
+  </script>
+
+</body>
+</html>

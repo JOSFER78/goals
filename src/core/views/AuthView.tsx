@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ArrowLeft, Lock, Mail, User, Sparkles, KeyRound, X } from 'lucide-react';
+import { useProgress } from '../context/ProgressContext';
+import { PresentationEngine } from '../services/PresentationEngine';
+import { ArrowLeft, Lock, Mail, User, Sparkles, KeyRound, X, GraduationCap } from 'lucide-react';
 
 interface AuthViewProps {
   initialMode?: 'login' | 'signup';
@@ -10,40 +12,21 @@ interface AuthViewProps {
 }
 
 export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBackToLanding, onSuccess, onOpenDownloadGuide }) => {
-  const { signInWithGoogle, signInWithEmail, signUpWithEmail, authError, setAuthError } = useAuth();
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, signInGuest, signInAsLocalDevAdmin, authError, setAuthError } = useAuth();
+  const { saveChildProfileData, showToast } = useProgress();
   
   const [mode, setMode] = useState<'login' | 'signup'>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [selectedAge, setSelectedAge] = useState<number>(9);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Filtro estricto de invitación (código 3333 requerido)
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
-    return sessionStorage.getItem('goals_invite_unlocked') === 'true';
-  });
-  const [enteredCode, setEnteredCode] = useState('');
-  const [codeError, setCodeError] = useState<string | null>(null);
-
-  const handleVerifyCode = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (enteredCode.trim() === '3333') {
-      sessionStorage.setItem('goals_invite_unlocked', 'true');
-      setIsUnlocked(true);
-      setCodeError(null);
-    } else {
-      setCodeError('🔑 Código de invitación incorrecto. Introduce 3333 para acceder.');
-    }
-  };
+  const activeLevelBadge = PresentationEngine.getLevelBadge(selectedAge);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
-
-    if (!isUnlocked && enteredCode.trim() !== '3333') {
-      setCodeError('🔑 Debes verificar primero el código de acceso.');
-      return;
-    }
 
     setIsSubmitting(true);
     const cleanEmail = email.trim().toLowerCase();
@@ -53,6 +36,18 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
         await signInWithEmail(cleanEmail, password);
       } else {
         await signUpWithEmail(cleanName, cleanEmail, password);
+        saveChildProfileData({
+          childName: cleanName || 'Estudiante',
+          age: selectedAge,
+          grade: activeLevelBadge.label.split(' (')[0],
+          schoolName: '',
+          favoriteSubjects: ['Ciencias Naturales', 'Inglés'],
+          weakSubjects: [],
+          extracurriculars: ['Robótica y Código 🤖'],
+          interests: ['Espacio y Astronomía 🚀', 'Ciencia Ficción y Robots 🛸'],
+          learningStyle: selectedAge <= 9 ? 'visual' : 'practico'
+        });
+        showToast(`✨ ¡Bienvenido/a ${cleanName}! Experiencia adaptada a ${selectedAge} años (${activeLevelBadge.label}).`);
       }
       onSuccess();
     } catch (err) {
@@ -64,10 +59,6 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
 
   const handleGoogleAuth = async () => {
     setAuthError(null);
-    if (!isUnlocked && enteredCode.trim() !== '3333') {
-      setCodeError('🔑 Debes introducir primero el código de acceso antes de continuar con Google.');
-      return;
-    }
 
     setIsSubmitting(true);
     try {
@@ -79,88 +70,6 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
       setIsSubmitting(false);
     }
   };
-
-  // 🔒 PANTALLA PREVIA OBLIGATORIA: CÓDIGO DE INVITACIÓN SECRETO
-  if (!isUnlocked) {
-    return (
-      <div className="pt-2 pb-12 max-w-md mx-auto px-4 w-full animate-fadeIn font-display">
-        <button
-          onClick={onBackToLanding}
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-all mb-4"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Volver a la Presentación GOALS</span>
-        </button>
-
-        <div className="bg-slate-900 border border-amber-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(245,158,11,0.15)] space-y-6 text-center relative overflow-hidden">
-          
-          <button
-            type="button"
-            onClick={onBackToLanding}
-            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-all cursor-pointer z-20"
-            title="Cerrar y volver a GOALS"
-          >
-            <X className="w-5 h-5" />
-          </button>
-
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 mx-auto shadow-inner animate-pulse">
-            <KeyRound className="w-7 h-7" />
-          </div>
-
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] font-black uppercase tracking-widest">
-              <Lock className="w-3 h-3" />
-              <span>Control de Acceso Secreto</span>
-            </div>
-
-            <h2 className="text-2xl font-black text-white leading-tight">
-              Introduce el Código de Invitación
-            </h2>
-
-            <p className="text-xs text-slate-300 leading-relaxed max-w-xs mx-auto">
-              Para poder registrarte o iniciar sesión (vía Email o con Google), debes introducir tu clave secreta de acceso de 4 dígitos.
-            </p>
-          </div>
-
-          {codeError && (
-            <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold animate-fadeIn">
-              {codeError}
-            </div>
-          )}
-
-          <form onSubmit={handleVerifyCode} className="space-y-4">
-            <div>
-              <input
-                type="password"
-                maxLength={4}
-                required
-                autoFocus
-                value={enteredCode}
-                onChange={(e) => { setEnteredCode(e.target.value); setCodeError(null); }}
-                placeholder="••••"
-                className="w-full text-center tracking-[0.4em] text-2xl font-black py-3.5 rounded-2xl bg-slate-950 border-2 border-amber-500/50 text-amber-300 placeholder-slate-600 focus:border-amber-400 transition-all outline-none shadow-inner"
-              />
-              <p className="text-[10px] text-slate-500 mt-2 font-semibold">Introduce la clave secreta de 4 dígitos proporcionada por el administrador.</p>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 hover:from-amber-400 hover:to-orange-300 text-slate-950 font-black text-xs uppercase tracking-wider transition-all shadow-lg shadow-amber-500/25 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <KeyRound className="w-4 h-4" />
-              <span>Verificar Código y Desbloquear</span>
-            </button>
-          </form>
-
-          <p className="text-[10px] text-slate-500 font-medium">
-            🔒 Acceso protegido por código de invitación.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="pt-2 pb-12 max-w-md mx-auto px-4 w-full animate-fadeIn">
@@ -206,20 +115,68 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {mode === 'signup' && (
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-300 mb-1">Nombre Completo</label>
-              <div className="relative">
-                <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-                <input
-                  type="text"
-                  required
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Tu nombre completo"
-                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-indigo-500 transition-all"
-                />
+            <>
+              <div>
+                <label className="block text-[11px] font-semibold text-slate-300 mb-1">Nombre del Estudiante</label>
+                <div className="relative">
+                  <User className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+                  <input
+                    type="text"
+                    required
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    placeholder="Tu nombre o apodo"
+                    className="w-full pl-9 pr-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-xs text-white placeholder-slate-500 focus:border-indigo-500 transition-all"
+                  />
+                </div>
               </div>
-            </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+                    <GraduationCap className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>Edad y Nivel Educativo</span>
+                  </label>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${activeLevelBadge.color}`}>
+                    {activeLevelBadge.label}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-5 gap-1.5 pt-1">
+                  {[
+                    { age: 7, label: '6-7', stage: '1º-2º Pri' },
+                    { age: 9, label: '8-9', stage: '3º-4º Pri' },
+                    { age: 11, label: '10-11', stage: '5º-6º Pri' },
+                    { age: 13, label: '12-13', stage: '1º-2º ESO' },
+                    { age: 15, label: '14-15', stage: '3º-4º ESO' }
+                  ].map(item => {
+                    const isSelected = (selectedAge <= 7 && item.age === 7) ||
+                                       (selectedAge >= 8 && selectedAge <= 9 && item.age === 9) ||
+                                       (selectedAge >= 10 && selectedAge <= 11 && item.age === 11) ||
+                                       (selectedAge >= 12 && selectedAge <= 13 && item.age === 13) ||
+                                       (selectedAge >= 14 && item.age === 15);
+                    return (
+                      <button
+                        key={item.age}
+                        type="button"
+                        onClick={() => setSelectedAge(item.age)}
+                        className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-indigo-600/30 border-indigo-400 text-white shadow-[0_0_15px_rgba(99,102,241,0.25)]'
+                            : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                        }`}
+                      >
+                        <div className="text-xs font-bold font-mono">{item.label}</div>
+                        <div className="text-[9px] text-slate-400 truncate">{item.stage}</div>
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-slate-500 mt-1.5 font-medium">
+                  🎯 Adaptaremos los textos, modelos 3D, tests y la IA a tu nivel.
+                </p>
+              </div>
+            </>
           )}
 
           <div>
@@ -279,6 +236,36 @@ export const AuthView: React.FC<AuthViewProps> = ({ initialMode = 'login', onBac
           </svg>
           <span>{mode === 'login' ? 'Iniciar sesión con Google' : 'Registrarse con Google'}</span>
         </button>
+
+        {/* Acceso Rápido Desarrollador e Invitado */}
+        <div className="grid grid-cols-2 gap-2 pt-1">
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await signInGuest();
+                onSuccess();
+              } catch (e) {}
+            }}
+            className="py-2 px-3 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-white text-[11px] font-bold transition-all text-center cursor-pointer active:scale-95"
+            title="Explorar como Invitado"
+          >
+            👤 Modo Invitado
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                await signInAsLocalDevAdmin();
+                onSuccess();
+              } catch (e) {}
+            }}
+            className="py-2 px-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 hover:text-amber-200 text-[11px] font-bold transition-all text-center cursor-pointer active:scale-95"
+            title="Entrar como Super Admin"
+          >
+            ⚡ Super Admin (Dev)
+          </button>
+        </div>
 
         <div className="text-center pt-2 border-t border-slate-800/60">
           <button

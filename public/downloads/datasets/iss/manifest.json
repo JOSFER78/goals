@@ -1,0 +1,35 @@
+{
+  "slug": "iss",
+  "name": "Estación Espacial Internacional (ISS)",
+  "category": "Aeroespacial",
+  "description": "Fotografías reales multi-ángulo capturadas durante sobrevuelos (Flyaround) de transbordadores espaciales STS-132, STS-114 y STS-110.",
+  "modelUrl": "/models_3d/iss_station.glb",
+  "downloadDate": "2026-08-14T15:30:11.844Z",
+  "imagesCount": 3,
+  "images": [
+    {
+      "id": "view_01_sts132",
+      "title": "ISS Vista Frontal Completa (STS-132)",
+      "url": "https://images-assets.nasa.gov/image/s132e013215/s132e013215~medium.jpg",
+      "source": "NASA Johnson Space Center",
+      "localPath": "/downloads/datasets/iss/images/view_01_sts132.jpg",
+      "sizeBytes": 129068
+    },
+    {
+      "id": "view_02_sts110",
+      "title": "ISS Vista Posterior y Módulos Zvezda/Zarya (STS-110)",
+      "url": "https://images-assets.nasa.gov/image/s110e5918/s110e5918~medium.jpg",
+      "source": "NASA Johnson Space Center",
+      "localPath": "/downloads/datasets/iss/images/view_02_sts110.jpg",
+      "sizeBytes": 73867
+    },
+    {
+      "id": "view_03_sts114",
+      "title": "ISS Ángulo Oblicuo y Alas Solares (STS-114)",
+      "url": "https://images-assets.nasa.gov/image/s114e7235/s114e7235~medium.jpg",
+      "source": "NASA Johnson Space Center",
+      "localPath": "/downloads/datasets/iss/images/view_03_sts114.jpg",
+      "sizeBytes": 151943
+    }
+  ]
+}
