@@ -17,12 +17,12 @@ import {
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, onSnapshot, Firestore } from 'firebase/firestore';
 
 export const defaultFirebaseConfig = {
-  apiKey: "AIzaSyBsaRLUUFG1QdSjMMzxzOVmzW4aqrN0TbM",
-  authDomain: "goalskid-app-4c276.firebaseapp.com",
-  projectId: "goalskid-app",
-  storageBucket: "goalskid-app.firebasestorage.app",
-  messagingSenderId: "828956321348",
-  appId: "1:828956321348:web:babec7f340ae5c7f823e11"
+  apiKey: "AIzaSyCucHoxxH6GXuEf_Gls397E98v4R2IXl-U",
+  authDomain: "desinformacion-app.firebaseapp.com",
+  projectId: "desinformacion-app",
+  storageBucket: "desinformacion-app.firebasestorage.app",
+  messagingSenderId: "607853319788",
+  appId: "1:607853319788:web:0d2187ead98e5a99deaa49"
 };
 
 export function getStoredFirebaseConfig() {

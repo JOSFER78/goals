@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "828956321348",
-    "project_id": "goalskid-app",
-    "storage_bucket": "goalskid-app.firebasestorage.app"
+    "project_number": "607853319788",
+    "project_id": "desinformacion-app",
+    "storage_bucket": "desinformacion-app.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:828956321348:android:34eb9b83f3e609b0823e11",
+        "mobilesdk_app_id": "1:607853319788:android:c886d18f1699bf8adeaa49",
         "android_client_info": {
           "package_name": "app.goalskids.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBsaRLUUFG1QdSjMMzxzOVmzW4aqrN0TbM"
+          "current_key": "AIzaSyB-ZBcR2tOJA7EXYcGKwElZC18wqAWqXp0"
         }
       ],
       "services": {

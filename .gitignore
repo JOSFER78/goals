@@ -21,3 +21,5 @@ dist/downloads/*.zip
 
 # Gemini / Antigravity local files
 .gemini
+.playwright-mcp
+scratch/
