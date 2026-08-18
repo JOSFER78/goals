@@ -8,13 +8,16 @@ import {
 } from 'lucide-react';
 import { ApkDownloadGuideModal } from './ApkDownloadGuideModal';
 import { checkForApkUpdate, UpdateInfo } from '../services/updateService';
-import { MASCOT_SKINS } from '../config/mascotSkins';
+import { MASCOT_SKINS, getAllAvailableVoicesList, resolveMascotVoice } from '../config/mascotSkins';
 import { MascotSkinId } from '../types/mascot';
 import { MascotPet } from './mascot/MascotPet';
 import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
 import { getChildAge, setChildAge, getChildProfile, setChildProfile, getCustomMascotName, setCustomMascotName } from '../services/aiService';
 import { ChildLearningProfile, AVAILABLE_GRADES, AVAILABLE_SUBJECTS, AVAILABLE_EXTRACURRICULARS, AVAILABLE_INTERESTS } from '../types/childProfile';
 import { PresentationEngine } from '../services/PresentationEngine';
+import { VoiceConnectionsCenter } from './voice/VoiceConnectionsCenter';
+import { VOICE_PROVIDERS_METADATA, VoiceProviderService } from '../services/VoiceProviderService';
+import { speechVoiceService } from '../services/SpeechVoiceService';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -71,7 +74,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     return userData.mascotConfig?.customName || getCustomMascotName();
   });
   const [mascotSkinId, setMascotSkinId] = useState<MascotSkinId>(() => {
-    return (userData.mascotConfig?.skinId as MascotSkinId) || (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'astrobot';
+    return (userData.mascotConfig?.skinId as MascotSkinId) || (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'sparky';
   });
   const [mascotScale, setMascotScale] = useState<number>(() => {
     return userData.mascotConfig?.scale || parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
@@ -88,18 +91,88 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     return userData.mascotConfig?.rate || parseFloat(localStorage.getItem('goals_mascot_rate') || '1.0');
   });
 
+  const [mascotAssignedVoice, setMascotAssignedVoice] = useState<string>(() => {
+    const currentSkinKey = (userData.mascotConfig?.skinId as MascotSkinId) || (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'sparky';
+    const localVal = typeof window !== 'undefined' ? (localStorage.getItem(`goals_mascot_voice_${currentSkinKey}`) || localStorage.getItem('goals_mascot_assigned_voice')) : null;
+    return (userData.mascotConfig as any)?.assignedVoice || (userData as any).mascot?.assignedVoice || localVal || `${MASCOT_SKINS[currentSkinKey].defaultProvider}::${MASCOT_SKINS[currentSkinKey].defaultVoice}`;
+  });
+
+  const handleVoiceSelectForMascot = (voiceKey: string) => {
+    setMascotAssignedVoice(voiceKey);
+    const [providerId, voiceId] = voiceKey.includes('::') ? voiceKey.split('::') : ['webspeech', voiceKey];
+    
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(`goals_mascot_voice_${mascotSkinId}`, voiceKey);
+      localStorage.setItem('goals_mascot_assigned_voice', voiceKey);
+      localStorage.setItem('goals_mascot_assigned_provider', providerId);
+    }
+
+    if (providerId) {
+      VoiceProviderService.updateProviderConfig(providerId as any, { selectedVoice: voiceId });
+    }
+
+    const currentAssignedBySkin = (userData.mascotConfig?.assignedVoicesBySkin) || {};
+    const updatedVoicesBySkin = {
+      ...currentAssignedBySkin,
+      [mascotSkinId]: voiceKey
+    };
+
+    saveMascotData({
+      skinId: mascotSkinId,
+      customName: customMascotName,
+      soulPrompt: mascotSoulPrompt,
+      scale: mascotScale,
+      pitch: mascotPitch,
+      rate: mascotRate,
+      assignedVoice: voiceKey,
+      assignedProvider: providerId,
+      assignedVoicesBySkin: updatedVoicesBySkin,
+      skinVoices: {
+        ...((userData.mascotConfig as any)?.skinVoices || {}),
+        [mascotSkinId]: { providerId, voiceId, voiceKey }
+      }
+    });
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('goals_mascot_updated', { 
+        detail: { 
+          skinId: mascotSkinId, 
+          assignedVoice: voiceKey, 
+          providerId,
+          voiceId,
+          assignedVoicesBySkin: updatedVoicesBySkin
+        } 
+      }));
+    }
+
+    const voiceItem = getAllAvailableVoicesList(false).find(v => v.key === voiceKey);
+    showToast(`Voz asignada a ${MASCOT_SKINS[mascotSkinId].name}: ${voiceItem ? voiceItem.voiceName : voiceId}`);
+  };
+
   const handleSelectMascotSkin = (skinId: MascotSkinId) => {
     setMascotSkinId(skinId);
     localStorage.setItem('goals_mascot_skin', skinId);
+    const resolved = resolveMascotVoice(skinId, userData.mascotConfig);
+    setMascotAssignedVoice(resolved.voiceKey);
     saveMascotData({
       skinId,
       customName: customMascotName,
       soulPrompt: mascotSoulPrompt,
       scale: mascotScale,
       pitch: mascotPitch,
-      rate: mascotRate
+      rate: mascotRate,
+      assignedVoice: resolved.voiceKey,
+      assignedProvider: resolved.providerId
     });
-    window.dispatchEvent(new CustomEvent('goals_mascot_updated', { detail: { skinId, scale: mascotScale } }));
+    window.dispatchEvent(new CustomEvent('goals_mascot_updated', { 
+      detail: { 
+        skinId, 
+        scale: mascotScale,
+        assignedVoice: resolved.voiceKey,
+        providerId: resolved.providerId,
+        voiceId: resolved.voiceId
+      } 
+    }));
     showToast(`Mascota cambiada a ${MASCOT_SKINS[skinId].name}`);
   };
 
@@ -145,10 +218,27 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     showToast(`Edad adaptativa ajustada a ${newAge} años`);
   };
 
+  const [voiceConfigRevision, setVoiceConfigRevision] = useState<number>(0);
+
   useEffect(() => {
     if (user?.displayName) setNewDisplayName(user.displayName);
     if (user?.photoURL) setSelectedAvatar(user.photoURL);
   }, [user]);
+
+  useEffect(() => {
+    const handleVoiceConfigChange = () => {
+      setVoiceConfigRevision((prev) => prev + 1);
+      const resolved = resolveMascotVoice(mascotSkinId, userData.mascotConfig);
+      setMascotAssignedVoice(`${resolved.providerId}::${resolved.voiceId}`);
+    };
+
+    window.addEventListener('goals_voice_config_updated', handleVoiceConfigChange);
+    window.addEventListener('goals_voice_provider_swapped', handleVoiceConfigChange);
+    return () => {
+      window.removeEventListener('goals_voice_config_updated', handleVoiceConfigChange);
+      window.removeEventListener('goals_voice_provider_swapped', handleVoiceConfigChange);
+    };
+  }, [mascotSkinId, userData.mascotConfig]);
 
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('signup');
   const [email, setEmail] = useState('');
@@ -262,7 +352,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
           <div className="p-4 flex-1 overflow-y-auto space-y-4">
             
-            <div className="grid grid-cols-4 sm:grid-cols-7 gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-bold shrink-0">
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-bold shrink-0">
               <button 
                 onClick={() => setActiveTab('retos')}
                 className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'retos' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
@@ -304,6 +394,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               >
                 <Brain className="w-3.5 h-3.5 text-pink-300 shrink-0" />
                 <span className="text-[11px] truncate">Ficha</span>
+              </button>
+              <button 
+                onClick={() => setActiveTab('voz')}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'voz' ? 'bg-gradient-to-r from-indigo-600 to-cyan-600 text-white shadow-sm' : 'text-cyan-300 hover:text-white'}`}
+              >
+                <Volume2 className="w-3.5 h-3.5 text-cyan-300 shrink-0" />
+                <span className="text-[11px] truncate">Voz</span>
               </button>
               <button 
                 onClick={() => setActiveTab('cuenta')}
@@ -705,44 +802,120 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                       />
                     </div>
 
-                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5 space-y-2.5">
-                      <div className="flex items-center justify-between">
-                        <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
-                          <Volume2 className="w-3.5 h-3.5 text-purple-400" />
-                          <span>Sintetizador de Voz</span>
-                        </h4>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            if ('speechSynthesis' in window) {
-                              window.speechSynthesis.cancel();
+                    {/* VINCULACIÓN DE VOCES POR MASCOTA (Todos los Proveedores BYOK) */}
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                          <h4 className="text-xs font-bold text-white flex items-center gap-1.5">
+                            <Volume2 className="w-4 h-4 text-cyan-400" />
+                            <span>Voz Asignada para {MASCOT_SKINS[mascotSkinId]?.name}</span>
+                          </h4>
+                          <p className="text-[10px] text-slate-400 mt-0.5">
+                            Elige la voz y el motor de IA que utilizará esta mascota al hablar y guiarte en vivo.
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
                               const skin = MASCOT_SKINS[mascotSkinId];
                               const nameToSay = customMascotName || skin.name;
                               const greetingName = childProfile.childName ? ` ${childProfile.childName}` : '';
-                              const utt = new SpeechSynthesisUtterance(`Hola${greetingName}. Soy ${nameToSay}.`);
-                              utt.lang = 'es-ES';
-                              utt.pitch = mascotPitch;
-                              utt.rate = mascotRate;
                               setMascotAnimState('speaking');
-                              utt.onend = () => setMascotAnimState('idle');
-                              window.speechSynthesis.speak(utt);
-                            }
-                          }}
-                          className="px-2.5 py-1 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all active:scale-95 flex items-center gap-1 cursor-pointer"
-                        >
-                          <Volume2 className="w-3 h-3" />
-                          <span>Probar Voz</span>
-                        </button>
+
+                              const [provId, voiceId] = mascotAssignedVoice.includes('::')
+                                ? mascotAssignedVoice.split('::')
+                                : [undefined, mascotAssignedVoice];
+
+                              speechVoiceService.speak(`¡Hola${greetingName}! Soy ${nameToSay}, tu compañero en GOALS. Conexión de voz activa y lista.`, {
+                                pitch: mascotPitch,
+                                rate: mascotRate,
+                                lang: 'es-ES',
+                                providerOverride: provId as any,
+                                voiceOverride: voiceId,
+                                onEnd: () => setMascotAnimState('idle'),
+                                onError: () => setMascotAnimState('idle')
+                              });
+                            }}
+                            className="px-2.5 py-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer shadow-md shadow-purple-600/20"
+                            title="Escuchar muestra de audio"
+                          >
+                            <Volume2 className="w-3.5 h-3.5" />
+                            <span>Probar Voz</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('voz')}
+                            className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-bold text-xs transition-all flex items-center gap-1 cursor-pointer border border-slate-700"
+                            title="Abrir Centro de Conexiones BYOK"
+                          >
+                            <Sliders className="w-3 h-3" />
+                            <span>Configurar Claves</span>
+                          </button>
+                        </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      {/* Selector Dropdown de Voces — SOLO Proveedores Habilitados/Configurados con Voces TTS */}
+                      <div className="space-y-1.5">
+                        <div className="flex items-center justify-between">
+                          <label className="block text-[11px] font-bold text-slate-300">
+                            Voces Habilitadas ({VoiceProviderService.getConfiguredProviders().filter(p => p.voices && p.voices.length > 0).length} proveedores activos):
+                          </label>
+                          <span className="text-[10px] text-indigo-300">
+                            Solo muestra lo configurado en tu perfil
+                          </span>
+                        </div>
+
+                        <select
+                          value={mascotAssignedVoice}
+                          onChange={(e) => handleVoiceSelectForMascot(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-700/90 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-purple-400 font-medium cursor-pointer"
+                        >
+                          {VoiceProviderService.getConfiguredProviders().filter(p => p.voices && p.voices.length > 0).map((prov) => (
+                            <optgroup key={prov.id} label={`─── ${prov.name} (${prov.badge}) ───`} className="bg-slate-900 text-indigo-300 font-bold">
+                              {prov.voices.map((v) => {
+                                const key = `${prov.id}::${v.id}`;
+                                return (
+                                  <option key={key} value={key} className="bg-slate-950 text-white font-normal">
+                                    {v.name} {v.recommended ? '⭐ (Recomendada)' : ''}
+                                  </option>
+                                );
+                              })}
+                            </optgroup>
+                          ))}
+                        </select>
+
+                        {/* Banner Informativo si faltan proveedores por configurar */}
+                        {VoiceProviderService.getConfiguredProviders().length < Object.keys(VOICE_PROVIDERS_METADATA).length && (
+                          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-slate-950/80 border border-slate-800 text-[10px] text-slate-400 mt-1">
+                            <span>
+                              💡 ¿Quieres desbloquear más voces de OpenAI, Gemini Live, ElevenLabs o Cartesia?
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setActiveTab('voz')}
+                              className="text-cyan-400 hover:text-cyan-300 font-bold underline shrink-0 cursor-pointer"
+                            >
+                              Configurar en pestaña Voz →
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Sliders de Modulación Fina (Pitch y Rate) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800/80">
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Tono: {mascotPitch.toFixed(2)}</label>
+                          <div className="flex items-center justify-between text-[10px] font-bold text-slate-300 mb-1">
+                            <span>Tono Acústico:</span>
+                            <span className="font-mono text-purple-400">{mascotPitch.toFixed(2)} (Natural)</span>
+                          </div>
                           <input
                             type="range"
-                            min={0.5}
-                            max={1.6}
-                            step={0.05}
+                            min={0.90}
+                            max={1.10}
+                            step={0.02}
                             value={mascotPitch}
                             onChange={(e) => {
                               const val = parseFloat(e.target.value);
@@ -752,12 +925,16 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                             className="w-full h-1.5 accent-purple-500 cursor-pointer"
                           />
                         </div>
+
                         <div>
-                          <label className="block text-[10px] font-bold text-slate-300 mb-1">Velocidad: {mascotRate.toFixed(2)}x</label>
+                          <div className="flex items-center justify-between text-[10px] font-bold text-slate-300 mb-1">
+                            <span>Velocidad de Habla:</span>
+                            <span className="font-mono text-purple-400">{mascotRate.toFixed(2)}x</span>
+                          </div>
                           <input
                             type="range"
-                            min={0.7}
-                            max={1.5}
+                            min={0.80}
+                            max={1.30}
                             step={0.05}
                             value={mascotRate}
                             onChange={(e) => {
@@ -1082,6 +1259,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         </button>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* TAB: CENTRO DE CONEXIONES Y VOZ BYOK */}
+                {activeTab === 'voz' && (
+                  <div className="animate-fadeIn">
+                    <VoiceConnectionsCenter onToast={(msg) => showToast(msg)} />
                   </div>
                 )}
               </div>

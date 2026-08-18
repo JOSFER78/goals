@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Volume2, Sparkles, CheckCircle2, ChevronDown, ChevronRight, BookOpen, Lightbulb, Award, ArrowRight, Image as ImageIcon, Maximize2, X } from 'lucide-react';
-import { sanitizeTextForSpeech, getBestSpanishVoice } from '../services/aiService';
+import { speechVoiceService } from '../services/SpeechVoiceService';
 
 interface DidacticResponseRendererProps {
   content: string;
@@ -15,17 +15,11 @@ export const DidacticResponseRenderer: React.FC<DidacticResponseRendererProps> =
   };
 
   const speakText = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      const clean = sanitizeTextForSpeech(text);
-      if (!clean) return;
-      const utterance = new SpeechSynthesisUtterance(clean);
-      utterance.lang = 'es-ES';
-      const bestVoice = getBestSpanishVoice();
-      if (bestVoice) utterance.voice = bestVoice;
-      utterance.rate = 0.95;
-      window.speechSynthesis.speak(utterance);
-    }
+    speechVoiceService.speak(text, {
+      pitch: 1.0,
+      rate: 0.98,
+      lang: 'es-ES'
+    });
   };
 
   const rawText = (content || '').trim();

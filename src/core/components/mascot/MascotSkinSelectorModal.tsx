@@ -1,7 +1,8 @@
 import React from 'react';
-import { MASCOT_SKINS } from '../../config/mascotSkins';
+import { MASCOT_SKINS, resolveMascotVoice } from '../../config/mascotSkins';
 import { MascotSkinId } from '../../types/mascot';
 import { Check, Sparkles, X, Volume2 } from 'lucide-react';
+import { MascotPet } from './MascotPet';
 
 interface MascotSkinSelectorModalProps {
   currentSkinId: MascotSkinId;
@@ -16,7 +17,7 @@ export const MascotSkinSelectorModal: React.FC<MascotSkinSelectorModalProps> = (
 }) => {
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="w-full max-w-xl bg-slate-950 border border-indigo-500/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(99,102,241,0.3)] space-y-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="w-full max-w-2xl bg-slate-950 border border-indigo-500/40 rounded-3xl p-6 shadow-[0_0_50px_rgba(99,102,241,0.3)] space-y-6 animate-in fade-in zoom-in-95 duration-200">
         
         {/* Cabecera del Modal */}
         <div className="flex items-center justify-between border-b border-slate-800 pb-4">
@@ -25,8 +26,8 @@ export const MascotSkinSelectorModal: React.FC<MascotSkinSelectorModalProps> = (
               <Sparkles className="w-6 h-6 animate-pulse" />
             </div>
             <div>
-              <h2 className="font-display font-extrabold text-lg text-white">Personalizar Mascota Copilot</h2>
-              <p className="text-xs text-slate-400">Selecciona el compañero didáctico que te acompañará en GOALS</p>
+              <h2 className="font-display font-extrabold text-lg text-white">Compañeros Pixel Art Didácticos</h2>
+              <p className="text-xs text-slate-400">Selecciona el avatar asistente que te acompañará y conversará contigo</p>
             </div>
           </div>
           <button 
@@ -38,51 +39,55 @@ export const MascotSkinSelectorModal: React.FC<MascotSkinSelectorModalProps> = (
         </div>
 
         {/* Grid de Skins Seleccionables */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[60vh] overflow-y-auto pr-1">
           {Object.values(MASCOT_SKINS).map((skin) => {
             const isSelected = currentSkinId === skin.id;
+            const voiceInfo = resolveMascotVoice(skin.id as MascotSkinId);
             return (
               <button
                 key={skin.id}
                 onClick={() => onSelectSkin(skin.id as MascotSkinId)}
-                className={`group relative p-4 rounded-2xl border text-left transition-all duration-300 flex flex-col justify-between cursor-pointer ${
+                className={`group relative p-3.5 rounded-2xl border text-left transition-all duration-300 flex flex-col justify-between cursor-pointer ${
                   isSelected 
-                    ? 'bg-gradient-to-b from-indigo-950/80 to-slate-900 border-indigo-500 shadow-[0_0_25px_rgba(99,102,241,0.4)] scale-[1.02]' 
+                    ? 'bg-gradient-to-b from-indigo-950/90 to-slate-900 border-indigo-500 shadow-[0_0_25px_rgba(99,102,241,0.4)] scale-[1.02]' 
                     : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900'
                 }`}
               >
                 {isSelected && (
-                  <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-indigo-500 text-white flex items-center justify-center shadow-lg">
-                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                  <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full bg-indigo-500 text-white flex items-center justify-center shadow-lg">
+                    <Check className="w-3 h-3 stroke-[3]" />
                   </div>
                 )}
 
-                <div className="flex items-center gap-3.5 mb-3">
+                <div className="flex items-center gap-2.5 mb-2">
                   <div 
-                    className="w-12 h-12 rounded-2xl border flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
-                    style={{ 
-                      backgroundColor: `${skin.primaryColor}15`, 
-                      borderColor: `${skin.primaryColor}30`,
-                      color: skin.primaryColor 
-                    }}
+                    className="w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 bg-slate-950 overflow-hidden"
+                    style={{ borderColor: `${skin.primaryColor}50` }}
                   >
-                    <Sparkles className="w-6 h-6" />
+                    <MascotPet skinId={skin.id as MascotSkinId} animState="idle" scale={0.7} />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-white">{skin.name}</h3>
-                    <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-md border mt-1 ${skin.badgeBg}`}>
+                    <h3 className="font-bold text-xs text-white flex items-center gap-1">
+                      <span>{skin.avatarIcon}</span>
+                      <span>{skin.name}</span>
+                    </h3>
+                    <span className={`inline-block text-[9px] font-semibold px-1.5 py-0.5 rounded-md border mt-0.5 ${skin.badgeBg}`}>
                       {skin.subtitle}
                     </span>
                   </div>
                 </div>
 
-                <div className="text-[11px] text-slate-400 mt-2 flex items-center justify-between border-t border-slate-800/80 pt-2.5">
-                  <span className="flex items-center gap-1 text-slate-400">
-                    <Volume2 className="w-3.5 h-3.5 text-indigo-400" />
-                    Tono de voz: {skin.speechPitch}x
+                <p className="text-[10px] text-slate-400 line-clamp-2 leading-tight mb-2">
+                  {skin.personality}
+                </p>
+
+                <div className="text-[10px] text-slate-400 flex items-center justify-between border-t border-slate-800/80 pt-2 gap-2">
+                  <span className="flex items-center gap-1 text-slate-400 truncate max-w-[140px]" title={`Voz: ${voiceInfo.voiceLabel}`}>
+                    <Volume2 className="w-3 h-3 text-indigo-400 shrink-0" />
+                    <span className="truncate">{voiceInfo.voiceLabel}</span>
                   </span>
-                  <span className="text-indigo-400 font-bold">
-                    {isSelected ? 'Activo' : 'Seleccionar'}
+                  <span className="text-indigo-400 font-bold shrink-0">
+                    {isSelected ? 'Activo' : 'Elegir'}
                   </span>
                 </div>
               </button>
@@ -90,7 +95,7 @@ export const MascotSkinSelectorModal: React.FC<MascotSkinSelectorModalProps> = (
           })}
         </div>
 
-        {/* Cierre */}
+        {/* Botón de Confirmación */}
         <div className="flex justify-end pt-2">
           <button
             onClick={onClose}

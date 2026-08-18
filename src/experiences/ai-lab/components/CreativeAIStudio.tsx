@@ -14,7 +14,8 @@ import {
   MessageSquare,
   Bot
 } from 'lucide-react';
-import { askAI, sanitizeTextForSpeech, getBestSpanishVoice } from '../../../core/services/aiService';
+import { askAI, sanitizeTextForSpeech } from '../../../core/services/aiService';
+import { speechVoiceService } from '../../../core/services/SpeechVoiceService';
 
 interface CreativeAIStudioProps {
   onAddXP?: (amount: number, reason: string) => void;
@@ -79,25 +80,21 @@ export const CreativeAIStudio: React.FC<CreativeAIStudioProps> = ({ onAddXP }) =
   };
 
   const handleSpeak = () => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
+      speechVoiceService.cancel();
       setIsSpeaking(false);
       return;
     }
 
     if (!aiResponse) return;
-    const clean = sanitizeTextForSpeech(aiResponse);
-    const utter = new SpeechSynthesisUtterance(clean);
-    const voice = getBestSpanishVoice();
-    if (voice) utter.voice = voice;
-
-    utter.onend = () => setIsSpeaking(false);
-    utter.onerror = () => setIsSpeaking(false);
-
     setIsSpeaking(true);
-    window.speechSynthesis.speak(utter);
+    speechVoiceService.speak(aiResponse, {
+      pitch: 1.0,
+      rate: 1.0,
+      lang: 'es-ES',
+      onEnd: () => setIsSpeaking(false),
+      onError: () => setIsSpeaking(false)
+    });
   };
 
   return (

@@ -1,4 +1,5 @@
 import { sanitizeTextForSpeech } from '../../../core/services/aiService';
+import { speechVoiceService } from '../../../core/services/SpeechVoiceService';
 
 export class VoiceEngine {
   private static recognitionInstance: any = null;
@@ -109,28 +110,11 @@ export class VoiceEngine {
    * Obtiene la mejor voz neuronal disponible para el idioma seleccionado
    */
   public static getBestVoiceForLanguage(langCode: string): SpeechSynthesisVoice | null {
-    if (!this.isSpeechSynthesisSupported()) return null;
-    const voices = window.speechSynthesis.getVoices();
-    const prefix = langCode.slice(0, 2).toLowerCase();
-    const matching = voices.filter(v => v.lang.toLowerCase().startsWith(prefix));
-    if (matching.length === 0) return null;
-
-    // Prioridad 1: Voces Naturales de Google o Microsoft
-    const neural = matching.find(v => 
-      v.name.includes('Natural') || 
-      v.name.includes('Neural') || 
-      v.name.includes('Google') || 
-      v.name.includes('Online')
-    );
-    if (neural) return neural;
-
-    // Prioridad 2: Match exacto del dialecto
-    const exact = matching.find(v => v.lang.toLowerCase() === langCode.toLowerCase());
-    return exact || matching[0];
+    return speechVoiceService.getBestVoiceForLanguage(langCode);
   }
 
   /**
-   * Reproduce el texto mediante la Web Speech Synthesis
+   * Reproduce el texto mediante el servicio unificado SpeechVoiceService
    */
   public static speakText(
     text: string,
@@ -139,34 +123,18 @@ export class VoiceEngine {
     onStart?: () => void,
     onEnd?: () => void
   ): void {
-    if (!this.isSpeechSynthesisSupported() || !text) return;
-
-    this.stopSpeaking();
-    const cleanText = sanitizeTextForSpeech(text);
-    if (!cleanText) return;
-
     const langCode = this.getLangCode(targetLanguage);
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = langCode;
-    utterance.rate = rate;
-
-    const voice = this.getBestVoiceForLanguage(langCode);
-    if (voice) {
-      utterance.voice = voice;
-    }
-
-    if (onStart) utterance.onstart = onStart;
-    if (onEnd) utterance.onend = onEnd;
-    utterance.onerror = () => {
-      if (onEnd) onEnd();
-    };
-
-    window.speechSynthesis.speak(utterance);
+    speechVoiceService.speak(text, {
+      lang: langCode,
+      rate,
+      pitch: 1.0,
+      onStart,
+      onEnd,
+      onError: onEnd
+    });
   }
 
   public static stopSpeaking(): void {
-    if (this.isSpeechSynthesisSupported()) {
-      window.speechSynthesis.cancel();
-    }
+    speechVoiceService.cancel();
   }
 }

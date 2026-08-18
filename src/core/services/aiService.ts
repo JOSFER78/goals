@@ -22,57 +22,15 @@ export function setAdminAiApiKey(key: string): void {
   }
 }
 
-export function sanitizeTextForSpeech(rawText: string): string {
-  if (!rawText) return '';
+import { sanitizeForSpeech } from './SpeechSanitizer';
+import { speechVoiceService } from './SpeechVoiceService';
 
-  return rawText
-    // 1. Purga COMPLETA de imágenes Markdown ![alt](url) y enlaces a imágenes/URLs
-    .replace(/!\[([^\]]*)\]\([^)]+\)/g, '')
-    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/gi, (match, text, url) => {
-      if (/\.(jpeg|jpg|gif|png|svg|webp)/i.test(url) || url.includes('pollinations.ai') || url.includes('wikimedia.org')) {
-        return '';
-      }
-      return text;
-    })
-    // 2. Eliminar URLs http/https crudas
-    .replace(/https?:\/\/\S+/gi, '')
-    // 3. Eliminar etiquetas HTML/SVG
-    .replace(/<[^>]*>/g, '')
-    // 4. Eliminar bloques de código
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/`([^`]+)`/g, '$1')
-    // 5. Eliminar símbolos de formato Markdown ruidosos (*, #, _, ~, >, |, `)
-    .replace(/[*#_~>|]/g, ' ')
-    // 6. Eliminar corchetes, llaves, barras diagonales y caracteres extraños
-    .replace(/[\[\]{}\\/]/g, ' ')
-    // 7. Normalizar espacios
-    .replace(/\s+/g, ' ')
-    .trim();
+export function sanitizeTextForSpeech(rawText: string): string {
+  return sanitizeForSpeech(rawText);
 }
 
 export function getBestSpanishVoice(): SpeechSynthesisVoice | null {
-  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return null;
-
-  const voices = window.speechSynthesis.getVoices();
-  const spanishVoices = voices.filter(v => v.lang.toLowerCase().startsWith('es'));
-  if (spanishVoices.length === 0) return null;
-
-  // Clasificación por prioridad estricta de naturalidad neuronal humana
-  // 1ª Prioridad: Voces Neuronales de Microsoft (Elvira / Álvaro Natural)
-  const elviraOrAlvaro = spanishVoices.find(v => v.name.includes('Elvira') || v.name.includes('Alvaro'));
-  if (elviraOrAlvaro) return elviraOrAlvaro;
-
-  // 2ª Prioridad: Voces etiquetadas como Natural o Neural en español (España/Latam)
-  const neuralVoice = spanishVoices.find(v => v.name.includes('Natural') || v.name.includes('Neural'));
-  if (neuralVoice) return neuralVoice;
-
-  // 3ª Prioridad: Voces Neuronales de Google en Español (Google Assistant)
-  const googleVoice = spanishVoices.find(v => v.name.includes('Google') && v.lang.startsWith('es'));
-  if (googleVoice) return googleVoice;
-
-  // 4ª Prioridad: Voz en español de España (es-ES) o cualquier español
-  const esEsVoice = spanishVoices.find(v => v.lang.toLowerCase() === 'es-es');
-  return esEsVoice || spanishVoices[0];
+  return speechVoiceService.getBestSpanishBoyVoice();
 }
 
 import { ChildLearningProfile, DEFAULT_CHILD_PROFILE } from '../types/childProfile';

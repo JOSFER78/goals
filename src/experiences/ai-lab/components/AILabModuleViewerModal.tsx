@@ -23,7 +23,8 @@ import {
   Check,
   RotateCcw
 } from 'lucide-react';
-import { sanitizeTextForSpeech, getBestSpanishVoice } from '../../../core/services/aiService';
+import { sanitizeTextForSpeech } from '../../../core/services/aiService';
+import { speechVoiceService } from '../../../core/services/SpeechVoiceService';
 
 interface AILabModuleViewerModalProps {
   module: AILabModule | null;
@@ -59,33 +60,25 @@ export const AILabModuleViewerModal: React.FC<AILabModuleViewerModalProps> = ({
   const totalSteps = module.steps.length;
 
   const handleSpeakText = (text: string) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
-
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
+      speechVoiceService.cancel();
       setIsSpeaking(false);
       return;
     }
 
-    const clean = sanitizeTextForSpeech(text);
-    if (!clean) return;
-
-    const utter = new SpeechSynthesisUtterance(clean);
-    const voice = getBestSpanishVoice();
-    if (voice) utter.voice = voice;
-    utter.rate = 1.0;
-    utter.pitch = 1.0;
-
-    utter.onend = () => setIsSpeaking(false);
-    utter.onerror = () => setIsSpeaking(false);
-
     setIsSpeaking(true);
-    window.speechSynthesis.speak(utter);
+    speechVoiceService.speak(text, {
+      pitch: 1.0,
+      rate: 1.0,
+      lang: 'es-ES',
+      onEnd: () => setIsSpeaking(false),
+      onError: () => setIsSpeaking(false)
+    });
   };
 
   const handleNextStep = () => {
     if (isSpeaking) {
-      window.speechSynthesis.cancel();
+      speechVoiceService.cancel();
       setIsSpeaking(false);
     }
     if (currentStepIndex < totalSteps - 1) {

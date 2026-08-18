@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   BookOpen, Camera, CheckCircle, Sparkles, ArrowRight, Calculator, 
   FlaskConical, Landmark, Leaf, AlertCircle, Loader2, Lock, Check,
-  Cpu, Scan, HelpCircle, Layers, Lightbulb, Compass, Trophy, Brain
+  Cpu, Scan, HelpCircle, Layers, Lightbulb, Compass, Trophy, Brain, Zap, Star, X
 } from 'lucide-react';
 import { useProgress } from '../../core/context/ProgressContext';
 import { useAuth } from '../../core/context/AuthContext';
@@ -11,6 +11,12 @@ import { MiniAppSubHeader } from '../../core/components/navigation/MiniAppSubHea
 import { MiniAppBottomNav, MiniAppPillar } from '../../core/components/navigation/MiniAppBottomNav';
 import { MiniAppSubmenuSheet, SubmenuSection } from '../../core/components/navigation/MiniAppSubmenuSheet';
 import { ExperienceId } from '../../core/types';
+import { DynamicExerciseEngine } from '../../core/services/DynamicExerciseEngine';
+import { DynamicExerciseBatch } from '../../core/types/dynamicExercise';
+import { DynamicExercisePlayer } from '../../core/components/exercises/DynamicExercisePlayer';
+import { InfographicAgentService } from '../../core/services/InfographicAgentService';
+import { EducationalInfographicPayload } from '../../core/types/visualInfographic';
+import { VisualKnowledgeBoard } from '../../core/components/infographics/VisualKnowledgeBoard';
 
 interface SchoolViewProps {
   onBackToGoals?: () => void;
@@ -33,7 +39,58 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onBackToGoals, onOpenAut
     'Ecuación cuadrática: 2x^2 + 5x - 3 = 0. Calcular las raíces x1 y x2 usando la fórmula general.'
   );
 
+  // Estados de Ejercicios Dinámicos de IA
+  const [dynamicBatch, setDynamicBatch] = useState<DynamicExerciseBatch | null>(null);
+  const [isGeneratingExercises, setIsGeneratingExercises] = useState<boolean>(false);
+
+  // Estados de Infografía Agéntica IA
+  const [infographicData, setInfographicData] = useState<EducationalInfographicPayload | null>(null);
+  const [isGeneratingInfographic, setIsGeneratingInfographic] = useState<boolean>(false);
+
   const schoolXP = userData?.experiences?.school?.xp || 0;
+
+  const handleGenerateExercises = async (customTopic?: string) => {
+    if (!isAuthenticated) {
+      onOpenAuth?.('signup');
+      return;
+    }
+    const topicToUse = customTopic || userQuery || selectedSubject;
+    setIsGeneratingExercises(true);
+    try {
+      const batch = await DynamicExerciseEngine.generateExerciseBatch({
+        topic: `${selectedSubject}: ${topicToUse}`,
+        discipline: 'school',
+        questionCount: 3
+      });
+      setDynamicBatch(batch);
+      setActiveTab('tutor');
+    } catch (err: any) {
+      console.error('Error generando ejercicios:', err);
+    } finally {
+      setIsGeneratingExercises(false);
+    }
+  };
+
+  const handleGenerateInfographic = async (customTopic?: string) => {
+    if (!isAuthenticated) {
+      onOpenAuth?.('signup');
+      return;
+    }
+    const topicToUse = customTopic || userQuery || `Fundamentos y conceptos clave de ${selectedSubject}`;
+    setIsGeneratingInfographic(true);
+    try {
+      const data = await InfographicAgentService.generateConceptualInfographic(
+        selectedSubject,
+        topicToUse
+      );
+      setInfographicData(data);
+      setActiveTab('tutor');
+    } catch (err: any) {
+      console.error('Error generando infografía:', err);
+    } finally {
+      setIsGeneratingInfographic(false);
+    }
+  };
 
   const SUBJECTS = [
     { id: 'math', name: 'Matemáticas', icon: Calculator, progress: '85%', color: 'from-emerald-500 to-teal-500', iconColor: 'text-emerald-400', samplePrompt: 'Demostración paso a paso del Teorema de Pitágoras' },
@@ -171,7 +228,12 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onBackToGoals, onOpenAut
       )}
 
       {/* Asignaturas Principales con Micro-Elevación Esmeralda */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+      <div 
+        data-mascot-target="curriculum-map"
+        data-mascot-anchor="top-right"
+        data-mascot-label="Mapa Curricular y Asignaturas"
+        className="grid grid-cols-2 sm:grid-cols-4 gap-2.5"
+      >
         {SUBJECTS.map((sub) => {
           const SubIcon = sub.icon;
           const isSel = selectedSubject === sub.name && activeTab === 'tutor';
@@ -207,20 +269,75 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onBackToGoals, onOpenAut
         })}
       </div>
 
-      {/* Pestaña: Tutor Socrático */}
-      {activeTab === 'tutor' && (
-        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl animate-fadeIn">
+      {/* Renderizado de Batería de Ejercicios Dinámicos de IA */}
+      {dynamicBatch && (
+        <div 
+          data-mascot-target="exercises"
+          data-mascot-anchor="top-right"
+          data-mascot-label="Panel de Ejercicios Dinámicos IA"
+          className="space-y-4 animate-fadeIn"
+        >
+          <DynamicExercisePlayer
+            batch={dynamicBatch}
+            onClose={() => setDynamicBatch(null)}
+            onGenerateMore={() => handleGenerateExercises()}
+          />
+        </div>
+      )}
+
+      {/* Renderizado de Infografía Agéntica IA */}
+      {infographicData && (
+        <div 
+          data-mascot-target="infographics"
+          data-mascot-anchor="top-left"
+          data-mascot-label="Pizarrón de Infografía Visual"
+          className="space-y-4 animate-fadeIn"
+        >
+          <VisualKnowledgeBoard
+            infographic={infographicData}
+            onClose={() => setInfographicData(null)}
+            onSelectSubject={(sub) => setSelectedSubject(sub)}
+          />
+        </div>
+      )}
+
+      {/* Pestaña: Tutor Socrático y Centro Agéntico */}
+      {activeTab === 'tutor' && !dynamicBatch && !infographicData && (
+        <div 
+          data-mascot-target="exercises"
+          data-mascot-anchor="top-right"
+          data-mascot-label="Tutoría Socrática y Práctica"
+          className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl animate-fadeIn"
+        >
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
             <div className="space-y-0.5">
               <h3 className="font-extrabold text-sm text-white flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-emerald-400" />
                 <span>Consulta al Tutor Socrático de {selectedSubject}</span>
               </h3>
-              <p className="text-xs text-slate-400">Guía paso a paso con preguntas reflexivas y razonamiento conceptual guiado.</p>
+              <p className="text-xs text-slate-400">Genera explicaciones visuales, ejercicios dinámicos por IA o consulta dudas socráticas.</p>
             </div>
-            <span className="text-[11px] font-mono text-emerald-400 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
-              +20 XP por consulta
-            </span>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => handleGenerateExercises()}
+                disabled={isGeneratingExercises}
+                className="px-3 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-50"
+              >
+                {isGeneratingExercises ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-amber-400" />}
+                <span>{isGeneratingExercises ? 'Generando...' : '🎯 Ejercicios IA'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleGenerateInfographic()}
+                disabled={isGeneratingInfographic}
+                className="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/40 text-indigo-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-50"
+              >
+                {isGeneratingInfographic ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5 text-amber-400" />}
+                <span>{isGeneratingInfographic ? 'Generando...' : '📊 Infografía IA'}</span>
+              </button>
+            </div>
           </div>
 
           <form onSubmit={(e) => { e.preventDefault(); handleAskTutor(); }} className="space-y-3">
@@ -259,21 +376,21 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onBackToGoals, onOpenAut
               <button
                 type="button"
                 onClick={() => handleAskTutor('¿Cómo resolver ecuaciones de segundo grado paso a paso?')}
-                className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-300 transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-300 transition-colors cursor-pointer"
               >
                 Ecuaciones 2º Grado
               </button>
               <button
                 type="button"
                 onClick={() => handleAskTutor('Explica la ley de conservación de la energía mecánica')}
-                className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-300 transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-300 transition-colors cursor-pointer"
               >
                 Conservación Energía
               </button>
               <button
                 type="button"
                 onClick={() => handleAskTutor('¿Por qué el ADN tiene estructura de doble hélice?')}
-                className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-300 transition-colors"
+                className="px-2.5 py-1 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 hover:text-emerald-300 transition-colors cursor-pointer"
               >
                 Estructura ADN
               </button>
@@ -301,7 +418,12 @@ export const SchoolView: React.FC<SchoolViewProps> = ({ onBackToGoals, onOpenAut
 
       {/* Pestaña: Escáner OCR con Visor Láser Holográfico */}
       {activeTab === 'ocr' && (
-        <div className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl animate-fadeIn">
+        <div 
+          data-mascot-target="ocr-scanner"
+          data-mascot-anchor="top-left"
+          data-mascot-label="Visor Holográfico OCR de Apuntes"
+          className="bg-slate-900/90 border border-emerald-500/20 rounded-3xl p-5 space-y-4 shadow-xl backdrop-blur-xl animate-fadeIn"
+        >
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
             <div className="space-y-0.5">
               <h3 className="font-extrabold text-sm text-white flex items-center gap-2">

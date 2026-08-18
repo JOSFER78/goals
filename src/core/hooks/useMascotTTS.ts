@@ -1,59 +1,41 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { MascotSkinConfig } from '../types/mascot';
-import { sanitizeTextForSpeech, getBestSpanishVoice } from '../services/aiService';
+import { speechVoiceService } from '../services/SpeechVoiceService';
 
 export const useMascotTTS = (skin: MascotSkinConfig) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(() => speechVoiceService.getMuted());
   const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
-  const synthRef = useRef<SpeechSynthesis | null>(null);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      synthRef.current = window.speechSynthesis;
-    }
+    const unsub = speechVoiceService.subscribeStatus((status) => {
+      setIsSpeaking(status === 'speaking');
+    });
+    return unsub;
   }, []);
 
-  const speak = (text: string) => {
-    if (!synthRef.current || isMuted) return;
+  const speak = useCallback((text: string) => {
+    if (isMuted) return;
 
-    // Detener cualquier lectura previa
-    synthRef.current.cancel();
+    speechVoiceService.speak(text, {
+      pitch: skin.speechPitch,
+      rate: skin.speechRate * playbackSpeed,
+      lang: 'es-ES',
+      onStart: () => setIsSpeaking(true),
+      onEnd: () => setIsSpeaking(false),
+      onError: () => setIsSpeaking(false)
+    });
+  }, [isMuted, skin.speechPitch, skin.speechRate, playbackSpeed]);
 
-    // Sanitización 100% libre de Markdown, URLs, corchetes y símbolos
-    const cleanText = sanitizeTextForSpeech(text);
-    if (!cleanText) return;
+  const stop = useCallback(() => {
+    speechVoiceService.cancel();
+    setIsSpeaking(false);
+  }, []);
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'es-ES';
-
-    // Asignar voz neural/natural si está disponible
-    const bestVoice = getBestSpanishVoice();
-    if (bestVoice) {
-      utterance.voice = bestVoice;
-    }
-
-    utterance.pitch = skin.speechPitch;
-    utterance.rate = skin.speechRate * playbackSpeed;
-
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-
-    synthRef.current.speak(utterance);
-  };
-
-  const stop = () => {
-    if (synthRef.current) {
-      synthRef.current.cancel();
-      setIsSpeaking(false);
-    }
-  };
-
-  const toggleMute = () => {
-    if (isSpeaking) stop();
-    setIsMuted(!isMuted);
-  };
+  const toggleMute = useCallback(() => {
+    const nextMuted = speechVoiceService.toggleMute();
+    setIsMuted(nextMuted);
+  }, []);
 
   const FILLER_PHRASES = [
     "¡Oído! Dame un segundito...",
@@ -62,20 +44,19 @@ export const useMascotTTS = (skin: MascotSkinConfig) => {
     "¡Buena pregunta! Voy a ver..."
   ];
 
-  const speakFiller = () => {
-    if (!synthRef.current || isMuted) return;
-    const randomFiller = FILLER_PHRASES[Math.floor(Math.random() * FILLER_PHRASES.length)];
-    speak(randomFiller);
-  };
+  const speakFiller = useCallback(() => {
+    const randomPhrase = FILLER_PHRASES[Math.floor(Math.random() * FILLER_PHRASES.length)];
+    speak(randomPhrase);
+  }, [speak]);
 
   return {
-    speak,
-    speakFiller,
-    stop,
     isSpeaking,
     isMuted,
-    toggleMute,
     playbackSpeed,
-    setPlaybackSpeed
+    setPlaybackSpeed,
+    speak,
+    stop,
+    toggleMute,
+    speakFiller,
   };
 };

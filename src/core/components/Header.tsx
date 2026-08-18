@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../context/AuthContext';
 import { useProgress } from '../context/ProgressContext';
 import { useTheme } from '../context/ThemeContext';
 import { db, collection, onSnapshot } from '../config/firebase';
-import { Zap, Flame, Star, ArrowLeft, Shield, LogIn, User, Sparkles, LogOut, Sun, Moon, Menu } from 'lucide-react';
+import { Zap, Flame, Star, Shield, LogIn, LogOut, Sun, Moon, ChevronDown, Sparkles, Check, X } from 'lucide-react';
 import { ExperienceId, AppViewMode } from '../types';
 import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
 
@@ -17,6 +17,69 @@ interface HeaderProps {
   onOpenMiniApps?: () => void;
   onSelectExperience?: (expId: ExperienceId) => void;
 }
+
+const ALL_MINIAPPS = [
+  {
+    id: 'school' as ExperienceId,
+    name: 'Escuela IA',
+    shortName: 'Escuela',
+    badge: 'Tutor OCR',
+    tagline: 'Tutor Multimodal de Cuadernos',
+    logoUrl: GOALS_EXPERIENCES.school?.logoUrl || '/assets/miniapps/school_logo.png',
+    color: 'text-emerald-400',
+    border: 'border-emerald-500/40',
+    badgeBg: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+    activeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-emerald-950/40'
+  },
+  {
+    id: 'languages' as ExperienceId,
+    name: 'Idiomas Voz',
+    shortName: 'Idiomas',
+    badge: 'Voz IA',
+    tagline: 'Profesor Particular en Directo',
+    logoUrl: GOALS_EXPERIENCES.languages?.logoUrl || '/assets/miniapps/languages_logo.png',
+    color: 'text-cyan-400',
+    border: 'border-cyan-500/40',
+    badgeBg: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
+    activeBg: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-cyan-950/40'
+  },
+  {
+    id: 'astro' as ExperienceId,
+    name: 'Cosmos 3D',
+    shortName: 'Cosmos 3D',
+    badge: '3D NASA',
+    tagline: 'Astrofísica & Simulador Espacial',
+    logoUrl: GOALS_EXPERIENCES.astro?.logoUrl || '/assets/miniapps/cosmos_logo.png',
+    color: 'text-indigo-400',
+    border: 'border-indigo-500/40',
+    badgeBg: 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30',
+    activeBg: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/50 shadow-indigo-950/40'
+  },
+  {
+    id: 'verify' as ExperienceId,
+    name: 'Criterio',
+    shortName: 'Criterio',
+    badge: 'Rigor IA',
+    tagline: 'Pensamiento Crítico & Medios',
+    logoUrl: GOALS_EXPERIENCES.verify?.logoUrl || '/assets/miniapps/verify_logo.png',
+    color: 'text-amber-400',
+    border: 'border-amber-500/40',
+    badgeBg: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+    activeBg: 'bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-amber-950/40'
+  },
+  {
+    id: 'ai-lab' as ExperienceId,
+    name: 'IA Lab',
+    shortName: 'IA Lab',
+    badge: 'Lab IA',
+    tagline: 'Laboratorio Forense de IA',
+    logoUrl: GOALS_EXPERIENCES['ai-lab']?.logoUrl || '/assets/miniapps/ailab_logo.png',
+    color: 'text-purple-400',
+    border: 'border-purple-500/40',
+    badgeBg: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+    activeBg: 'bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-purple-950/40'
+  }
+];
 
 export const Header: React.FC<HeaderProps> = ({
   activeExperience,
@@ -32,30 +95,21 @@ export const Header: React.FC<HeaderProps> = ({
   const { theme, toggleTheme, isDark } = useTheme();
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState<boolean>(false);
-  const [isDropdownHovered, setIsDropdownHovered] = useState<boolean>(false);
-  const hoverTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  const dropdownRef = React.useRef<HTMLDivElement | null>(null);
+  const [isAppMenuOpen, setIsAppMenuOpen] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const handleMouseEnter = () => {
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    setIsDropdownHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    hoverTimeoutRef.current = setTimeout(() => {
-      setIsDropdownHovered(false);
-    }, 250);
-  };
+  const isAdmin = user?.email === 'josferestudio@gmail.com';
+  const isAuthenticated = !!(user && !user.isAnonymous);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownHovered(false);
+        setIsAppMenuOpen(false);
       }
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        setIsDropdownHovered(false);
+        setIsAppMenuOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -65,19 +119,6 @@ export const Header: React.FC<HeaderProps> = ({
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
-  const handleSelectMiniApp = (id: ExperienceId) => {
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    setIsDropdownHovered(false);
-    if (onSelectExperience) {
-      onSelectExperience(id);
-    } else if (onOpenMiniApps) {
-      onOpenMiniApps();
-    }
-  };
-
-  const isAdmin = user?.email === 'josferestudio@gmail.com';
-  const isAuthenticated = !!(user && !user.isAnonymous);
 
   useEffect(() => {
     if (!isAdmin || !db) return;
@@ -98,9 +139,20 @@ export const Header: React.FC<HeaderProps> = ({
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
-    setIsDropdownHovered(false);
+    setIsAppMenuOpen(false);
     onNavigateHome();
+    const mainEl = document.querySelector('main');
+    if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleSelectMiniApp = (id: ExperienceId) => {
+    setIsAppMenuOpen(false);
+    if (onSelectExperience) {
+      onSelectExperience(id);
+    } else if (onOpenMiniApps) {
+      onOpenMiniApps();
+    }
     const mainEl = document.querySelector('main');
     if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -111,64 +163,6 @@ export const Header: React.FC<HeaderProps> = ({
 
   const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
-  const ALL_MINIAPPS = [
-    {
-      id: 'school' as ExperienceId,
-      name: 'Escuela IA',
-      badge: 'Tutor OCR',
-      tagline: 'Tutor Multimodal de Cuadernos',
-      logoUrl: GOALS_EXPERIENCES.school.logoUrl,
-      icon: GOALS_EXPERIENCES.school.icon,
-      color: 'text-emerald-400',
-      bg: 'bg-emerald-500/10 border-emerald-500/30',
-      badgeBg: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-    },
-    {
-      id: 'languages' as ExperienceId,
-      name: 'Idiomas Voz',
-      badge: 'Voz IA',
-      tagline: 'Profesor Particular en Directo',
-      logoUrl: GOALS_EXPERIENCES.languages.logoUrl,
-      icon: GOALS_EXPERIENCES.languages.icon,
-      color: 'text-cyan-400',
-      bg: 'bg-cyan-500/10 border-cyan-500/30',
-      badgeBg: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
-    },
-    {
-      id: 'astro' as ExperienceId,
-      name: 'Cosmos 3D',
-      badge: '3D NASA',
-      tagline: 'Astrofísica & Simulador Espacial',
-      logoUrl: GOALS_EXPERIENCES.astro.logoUrl,
-      icon: GOALS_EXPERIENCES.astro.icon,
-      color: 'text-indigo-400',
-      bg: 'bg-indigo-500/10 border-indigo-500/30',
-      badgeBg: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
-    },
-    {
-      id: 'verify' as ExperienceId,
-      name: 'Criterio',
-      badge: 'Rigor IA',
-      tagline: 'Pensamiento Crítico & Medios',
-      logoUrl: GOALS_EXPERIENCES.verify.logoUrl,
-      icon: GOALS_EXPERIENCES.verify.icon,
-      color: 'text-amber-400',
-      bg: 'bg-amber-500/10 border-amber-500/30',
-      badgeBg: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
-    },
-    {
-      id: 'ai-lab' as ExperienceId,
-      name: 'IA Lab',
-      badge: 'Lab IA',
-      tagline: 'Laboratorio Forense de IA',
-      logoUrl: GOALS_EXPERIENCES['ai-lab'].logoUrl,
-      icon: GOALS_EXPERIENCES['ai-lab'].icon,
-      color: 'text-purple-400',
-      bg: 'bg-purple-500/10 border-purple-500/30',
-      badgeBg: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
-    }
-  ];
-
   return (
     <header className={`px-2.5 sm:px-6 py-2.5 flex justify-between items-center border-b z-50 sticky top-0 select-none transition-all w-full max-w-full backdrop-blur-xl ${
       isDark 
@@ -176,19 +170,19 @@ export const Header: React.FC<HeaderProps> = ({
         : 'border-slate-200 bg-white/95 text-slate-900 shadow-sm'
     }`}>
       
-      {/* Sección Izquierda: Logotipo Adaptativo (Sustitución directa de GOALS por la MiniApp activa) */}
-      <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-        <div 
-          ref={dropdownRef}
-          className="relative group/cornerlogo py-1"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
+      {/* Sección Izquierda: Logotipo Adaptativo + Selector de Experiencias por Click */}
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0" ref={dropdownRef}>
+        <div className="relative">
           <button 
             type="button"
-            onClick={handleLogoClick}
-            className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group shrink-0 text-left bg-transparent border-0 p-0 focus:outline-none transition-transform active:scale-95"
-            title={activeExpConfig ? `${activeExpConfig.name} • Pincha para ir al inicio de Goals o pasa el ratón para cambiar de app` : "Goalskid Platform • Pasa el ratón para ver las MiniApps"}
+            onClick={() => setIsAppMenuOpen((prev) => !prev)}
+            className={`flex items-center gap-2 sm:gap-2.5 cursor-pointer group shrink-0 text-left p-1.5 -m-1.5 rounded-2xl transition-all border ${
+              isAppMenuOpen
+                ? isDark ? 'bg-slate-800/90 border-slate-700' : 'bg-slate-100 border-slate-300'
+                : 'border-transparent hover:bg-slate-800/30'
+            }`}
+            title="Haz clic para cambiar de experiencia o ir al inicio"
+            aria-expanded={isAppMenuOpen}
           >
             <div className="relative">
               <img 
@@ -210,6 +204,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {activeExpConfig.badge}
                   </span>
                 ) : null}
+                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isAppMenuOpen ? 'rotate-180 text-indigo-400' : 'group-hover:text-slate-200'}`} />
               </div>
               <span className={`hidden md:inline text-[9px] font-medium tracking-tight -mt-0.5 ${
                 isDark ? 'text-slate-400' : 'text-slate-500'
@@ -219,37 +214,28 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </button>
 
-          {isDropdownHovered && (
-            <div 
-              className="fixed inset-0 z-40 bg-transparent cursor-default" 
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsDropdownHovered(false);
-              }} 
-            />
-          )}
-
-          {isDropdownHovered && (
-            <div className="absolute top-full left-0 pt-2 w-72 sm:w-84 z-50 animate-fadeIn">
-              <div className={`backdrop-blur-2xl border rounded-2xl p-2.5 shadow-2xl space-y-1.5 ${
-                isDark ? 'bg-[#0c101c]/95 border-slate-800 shadow-black/80' : 'bg-white/95 border-slate-200 shadow-slate-300/60'
-              }`}>
-                {/* Encabezado del Dropdown */}
+          {/* Menú Desplegable de MiniApps (Abre por Click de forma controlada) */}
+          {isAppMenuOpen && (
+            <>
+              {/* Overlay invisible para cerrar al tocar fuera en móvil y desktop */}
+              <div 
+                className="fixed inset-0 z-40 bg-transparent" 
+                onClick={() => setIsAppMenuOpen(false)} 
+              />
+              <div className="absolute top-full left-0 mt-2.5 w-[calc(100vw-2rem)] max-w-xs sm:w-80 z-50 animate-fadeIn">
+                <div className={`backdrop-blur-2xl border rounded-2xl p-2 sm:p-2.5 shadow-2xl space-y-1.5 max-h-[80vh] overflow-y-auto scrollbar-thin ${
+                  isDark ? 'bg-[#0c101c]/98 border-slate-800 shadow-black/80' : 'bg-white/98 border-slate-200 shadow-slate-300/80'
+                }`}>
+                
+                {/* Cabecera del Menú */}
                 <div className={`px-2 py-1.5 border-b flex items-center justify-between ${
                   isDark ? 'border-slate-800/80' : 'border-slate-100'
                 }`}>
-                  <button
-                    type="button"
-                    onClick={handleLogoClick}
-                    className="flex items-center gap-2 hover:opacity-80 transition-opacity text-left cursor-pointer"
-                  >
-                    <img src="/goalskid_logo.png" alt="GOALS" className="w-5 h-5 rounded-md object-cover" />
-                    <span className={`text-[11px] font-bold uppercase tracking-wider ${
-                      isDark ? 'text-slate-200' : 'text-slate-800'
-                    }`}>
-                      {activeExperience ? 'Cambiar Módulo' : 'GOALS • Módulos'}
-                    </span>
-                  </button>
+                  <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                    isDark ? 'text-slate-300' : 'text-slate-700'
+                  }`}>
+                    {activeExperience ? 'Cambiar Experiencia' : 'Experiencias GOALS'}
+                  </span>
                   <span className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded-full border ${
                     isDark ? 'text-slate-400 bg-slate-900 border-slate-800' : 'text-slate-600 bg-slate-100 border-slate-200'
                   }`}>
@@ -263,32 +249,33 @@ export const Header: React.FC<HeaderProps> = ({
                     <button
                       type="button"
                       onClick={handleLogoClick}
-                      className={`w-full p-2 rounded-xl flex items-center gap-3 transition-all text-left group cursor-pointer ${
+                      className={`w-full p-2 rounded-xl flex items-center gap-2.5 sm:gap-3 transition-all text-left group cursor-pointer border ${
                         isDark 
-                          ? 'bg-slate-900/60 hover:bg-slate-800/90 border border-slate-800 text-slate-200 hover:text-white' 
-                          : 'bg-indigo-50/50 hover:bg-indigo-50 border border-indigo-200/60 text-indigo-900'
+                          ? 'bg-slate-900/60 hover:bg-slate-800/90 border-slate-800 text-slate-200 hover:text-white' 
+                          : 'bg-indigo-50/60 hover:bg-indigo-100/80 border-indigo-200 text-indigo-900'
                       }`}
                     >
-                      <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-slate-700/80 shadow-sm flex items-center justify-center bg-slate-950">
-                        <img src="/goalskid_logo.png" alt="GOALS" className="w-6 h-6 object-contain" />
+                      <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-slate-700/80 shadow-sm flex items-center justify-center bg-slate-950">
+                        <img src="/goalskid_logo.png" alt="GOALS" className="w-5 h-5 object-contain" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-1">
-                          <span className="font-bold text-xs text-white group-hover:text-amber-300 transition-colors">
+                          <span className="font-bold text-xs group-hover:text-amber-300 transition-colors">
                             ⭐ GOALS • Portal Principal
                           </span>
                           <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-md border bg-amber-500/20 text-amber-300 border-amber-500/30">
                             HUB
                           </span>
                         </div>
-                        <p className="text-[10px] text-slate-400 truncate mt-0.5">Volver al panel central de experiencias</p>
+                        <p className="text-[10px] text-slate-400 truncate mt-0.5">Volver al panel central</p>
                       </div>
                     </button>
-                    <div className="h-px bg-slate-800/80 my-1"></div>
+
+                    <div className="h-px bg-slate-800/60 my-1"></div>
                   </>
                 )}
 
-                {/* Lista de MiniApps disponibles (excluyendo la que está activa actualmente arriba) */}
+                {/* Lista de MiniApps (Si estamos en una MiniApp, muestra las otras 4; si estamos en GOALS, muestra las 5) */}
                 <div className="space-y-1">
                   {ALL_MINIAPPS
                     .filter((app) => !activeExperience || app.id !== activeExperience)
@@ -297,13 +284,13 @@ export const Header: React.FC<HeaderProps> = ({
                         key={app.id}
                         type="button"
                         onClick={() => handleSelectMiniApp(app.id)}
-                        className={`w-full p-2 rounded-xl flex items-center gap-3 transition-all text-left group cursor-pointer ${
+                        className={`w-full p-2 rounded-xl flex items-center gap-2.5 sm:gap-3 transition-all text-left group cursor-pointer border ${
                           isDark 
-                            ? 'hover:bg-slate-900/80 hover:border-slate-800 border border-transparent text-slate-300 hover:text-white' 
-                            : 'hover:bg-slate-50 hover:border-slate-200 border border-transparent text-slate-700 hover:text-slate-900'
+                            ? 'hover:bg-slate-900/80 hover:border-slate-800 border-transparent text-slate-300 hover:text-white' 
+                            : 'hover:bg-slate-50 hover:border-slate-200 border-transparent text-slate-700 hover:text-slate-900'
                         }`}
                       >
-                        <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 border border-slate-700/80 shadow-sm group-hover:scale-105 group-hover:border-slate-600 transition-all">
+                        <div className="w-8 h-8 rounded-xl overflow-hidden shrink-0 border border-slate-700/80 shadow-sm group-hover:scale-105 group-hover:border-slate-600 transition-all">
                           <img 
                             src={app.logoUrl} 
                             alt={app.name} 
@@ -328,7 +315,8 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
               </div>
             </div>
-          )}
+          </>
+        )}
         </div>
       </div>
 
@@ -435,23 +423,6 @@ export const Header: React.FC<HeaderProps> = ({
           </>
         ) : (
           <div className="flex items-center gap-1.5 shrink-0">
-            {/* Botón Explorar MiniApps (Siempre visible para invitados) */}
-            {onOpenMiniApps && (
-              <button
-                type="button"
-                onClick={onOpenMiniApps}
-                className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer shrink-0 ${
-                  isDark 
-                    ? 'bg-slate-900/90 border-slate-700/80 text-slate-300 hover:text-white hover:border-slate-600' 
-                    : 'bg-slate-100 border-slate-300 text-slate-700 hover:text-slate-900 hover:border-slate-400'
-                }`}
-                title="Explorar las 5 MiniApps de GOALS"
-              >
-                <Menu className="w-3.5 h-3.5 text-indigo-400" />
-                <span className="hidden sm:inline">Módulos</span>
-              </button>
-            )}
-
             {/* Botón de Acceso / Registro */}
             <button
               type="button"

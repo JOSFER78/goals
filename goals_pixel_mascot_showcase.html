@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GOALS — Showcase Asistente Flotante & Mascotas Pixel Art (ChatGPT Style)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    .pixelated {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    @keyframes floatBob {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    .animate-float {
+      animation: floatBob 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-[#070b14] text-slate-100 min-h-screen font-sans flex flex-col selection:bg-orange-500 selection:text-black">
+
+  <!-- Header Showcase -->
+  <header class="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-orange-500 to-amber-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-orange-500/20">
+        🔥
+      </div>
+      <div>
+        <h1 class="text-base font-extrabold tracking-tight text-white flex items-center gap-2">
+          GOALS Pixel Companion & Agentic Hub
+          <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
+            ChatGPT Style 60 FPS
+          </span>
+        </h1>
+        <p class="text-xs text-slate-400">Pizarra de Dibujo Bézier • Ejercicios Dinámicos IA • Infografías • Vuelo Espacial Stardust</p>
+      </div>
+    </div>
+
+    <!-- Selector de Modo Vista -->
+    <div class="flex items-center gap-2 bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs">
+      <button id="btnViewUI" onclick="switchView('ui')" class="px-3 py-1.5 rounded-lg bg-orange-500 text-slate-950 font-bold transition-all">
+        🎮 Vista Interactiva
+      </button>
+      <button id="btnViewMD" onclick="switchView('md')" class="px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all">
+        📄 Especificación .MD
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENEDOR PRINCIPAL: VISTA INTERACTIVA -->
+  <main id="viewUI" class="flex-1 p-6 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- COLUMNA 1 & 2: ESCENARIO INTERACTIVO & CANVAS EN VIVO -->
+    <div class="lg:col-span-2 space-y-6">
+      
+      <!-- Escenario de la Mascota -->
+      <div id="targetMainStage" data-mascot-target="main-stage" class="relative bg-slate-950/60 border border-slate-800 rounded-3xl p-8 min-h-[400px] flex flex-col items-center justify-center overflow-hidden shadow-2xl backdrop-blur-md">
+        
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
+        
+        <div id="haloAura" class="absolute w-64 h-64 rounded-full blur-3xl opacity-30 bg-orange-500 transition-all duration-500 pointer-events-none"></div>
+
+        <!-- Bocadillo de Cómic Reactivo con botón de Lápiz y Expansión -->
+        <div id="speechBubble" class="relative z-20 mb-6 max-w-sm bg-slate-950/95 border border-orange-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-xl transition-all duration-300 transform scale-100 cursor-pointer" onclick="openDrawingDemo()">
+          <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-orange-400 border-b border-slate-800 pb-1.5 mb-2">
+            <span id="bubbleAuthor">🔥 Sparky Fueguito</span>
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs text-amber-400">✏️ Pizarra</span>
+              <span id="bubbleStatus" class="text-slate-500 text-[9px]">IDLE</span>
+            </div>
+          </div>
+          <p id="bubbleText" class="text-xs text-slate-200 leading-relaxed font-medium min-h-[36px]">
+            ¡Hola! Soy Sparky, tu compañero didáctico en GOALS. Haz clic en este bocadillo o en los botones para abrir la pizarra de dibujo o volar por la página.
+          </p>
+          <div class="flex flex-wrap gap-1.5 mt-3 pt-2 border-t border-slate-800/80" onclick="event.stopPropagation()">
+            <button onclick="triggerDialogue('explain')" class="px-2 py-1 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[10px] font-semibold transition-all">
+              💡 Explícamelo fácil
+            </button>
+            <button onclick="triggerDialogue('trivia')" class="px-2 py-1 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[10px] font-semibold transition-all">
+              ✨ Dato curioso
+            </button>
+            <button onclick="openDrawingDemo()" class="px-2 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 text-[10px] font-bold transition-all">
+              ✍️ Pizarra / Dibujo
+            </button>
+          </div>
+        </div>
+
+        <!-- Canvas Pixel Art 60 FPS -->
+        <div class="relative z-10 cursor-pointer animate-float" onclick="petSparky()">
+          <canvas id="mascotCanvas" width="128" height="128" class="pixelated w-32 h-32 drop-shadow-[0_10px_20px_rgba(249,115,22,0.4)]"></canvas>
+        </div>
+
+        <span class="text-[11px] text-slate-500 mt-4 z-10">
+          💡 Haz clic sobre Sparky para acariciarlo o pulsa en el bocadillo para abrir la pizarra
+        </span>
+      </div>
+
+      <!-- Pizarrón de Escritura y Dibujo a Mano (Bézier Smoothing) -->
+      <div id="targetDrawingBoard" data-mascot-target="whiteboard" class="bg-slate-950/90 border border-indigo-500/30 rounded-3xl p-6 shadow-xl backdrop-blur-xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2">
+            <span class="p-2 rounded-xl bg-indigo-500/20 text-indigo-400 font-bold">✏️</span>
+            <div>
+              <h3 class="text-sm font-extrabold text-white">Pizarra de Escritura & Apuntes Escolares (Bézier)</h3>
+              <p class="text-xs text-slate-400">Trazo continuo orgánico con ratón o pantalla táctil</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="clearCanvas()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-rose-500/20 text-slate-300 hover:text-rose-300 text-xs font-bold transition-all">
+              Limpiar
+            </button>
+            <button onclick="simulateAIAnalyzeDrawing()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-xs shadow-md active:scale-95 transition-all">
+              ✨ Consultar IA
+            </button>
+          </div>
+        </div>
+
+        <!-- Paleta Neón de la Pizarra -->
+        <div class="flex items-center gap-2 pb-1">
+          <span class="text-xs text-slate-400 font-bold">Color:</span>
+          <div class="flex gap-1.5">
+            <button onclick="setDrawColor('#FDE047')" class="w-6 h-6 rounded-full bg-[#FDE047] ring-2 ring-white"></button>
+            <button onclick="setDrawColor('#38BDF8')" class="w-6 h-6 rounded-full bg-[#38BDF8]"></button>
+            <button onclick="setDrawColor('#4ADE80')" class="w-6 h-6 rounded-full bg-[#4ADE80]"></button>
+            <button onclick="setDrawColor('#F472B6')" class="w-6 h-6 rounded-full bg-[#F472B6]"></button>
+            <button onclick="setDrawColor('#F8FAFC')" class="w-6 h-6 rounded-full bg-[#F8FAFC]"></button>
+          </div>
+        </div>
+
+        <!-- Canvas de Dibujo Suave -->
+        <div class="relative bg-slate-950 rounded-2xl border border-slate-800 h-64 overflow-hidden">
+          <canvas id="drawingCanvas" class="w-full h-full cursor-crosshair"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- COLUMNA 3: CONTROLES DE ESTADO, VOCES, Y NAVEGACIÓN ESPACIAL -->
+    <div class="space-y-6">
+
+      <!-- Navegación Espacial & Teletransporte Agéntico -->
+      <div class="bg-slate-950/60 border border-slate-800 rounded-3xl p-5 shadow-xl backdrop-blur-md space-y-4">
+        <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-2">
+          <span>🚀 Vuelo Espacial & Teletransporte</span>
+        </h3>
+        <p class="text-xs text-slate-300">Haz que Sparky vuele con estela de partículas hacia cualquier elemento:</p>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="flyToTarget('targetMainStage', '¡Aterricé en el escenario principal!')" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 transition-all text-left">
+            🎯 Escenario
+          </button>
+          <button onclick="flyToTarget('targetDrawingBoard', '¡Aquí tienes la pizarra de dibujo!')" class="p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-bold text-slate-200 transition-all text-left">
+            ✏️ Pizarra
+          </button>
+        </div>
+      </div>
+
+      <!-- Selector de Skins de Mascota -->
+      <div class="bg-slate-950/60 border border-slate-800 rounded-3xl p-5 shadow-xl backdrop-blur-md space-y-4">
+        <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-2">
+          <span>🎨 Selector de Skins (6 Especies)</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-2" id="skinSelectorGrid">
+          <!-- Generado dinámicamente en JS -->
+        </div>
+      </div>
+
+      <!-- Selector de Estados FSM -->
+      <div class="bg-slate-950/60 border border-slate-800 rounded-3xl p-5 shadow-xl backdrop-blur-md space-y-4">
+        <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2 border-b border-slate-800 pb-2">
+          <span>🎭 Estados FSM de Animación</span>
+        </h3>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="setAnimState('idle')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-200 text-left">
+            🫁 Idle (Respirar)
+          </button>
+          <button onclick="setAnimState('walk_roam')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-200 text-left">
+            🚶 Walk / Roam
+          </button>
+          <button onclick="setAnimState('sleeping')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-200 text-left">
+            💤 Sleep / Zzz
+          </button>
+          <button onclick="setAnimState('working_ai')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-200 text-left">
+            💻 Working / IA
+          </button>
+          <button onclick="setAnimState('speaking')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-200 text-left">
+            🗣️ Speaking
+          </button>
+          <button onclick="setAnimState('pet_happy')" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-200 text-left">
+            💖 Pet / Salto
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- CONTENEDOR VISTA MARKDOWN RAW -->
+  <main id="viewMD" class="flex-1 p-6 max-w-5xl mx-auto w-full hidden">
+    <div class="bg-slate-950/80 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-xl space-y-6 text-sm leading-relaxed">
+      <h2 class="text-xl font-black text-orange-400">Arquitectura de Asistente Agéntico & Mascotas Pixel Art</h2>
+      <p class="text-slate-300">
+        El sistema implementa una arquitectura desacoplada de 4 capas:
+      </p>
+      <ul class="list-disc pl-6 space-y-2 text-slate-300">
+        <li><strong>Motor de Sprites 60 FPS Canvas 2D:</strong> Renderizado con <code>image-rendering: pixelated;</code> a escala entera (24x24 escalado a 72x72 o 96x96).</li>
+        <li><strong>FSM Determinista:</strong> Gestión de inactividad (45s -> Sleep), paseo autónomo (Wander) e interrupciones por interacción y voz.</li>
+        <li><strong>Pizarra de Escritura Bézier:</strong> Interpolación por curvas cuadráticas suaves, paleta neón y exportación/análisis multimodal.</li>
+        <li><strong>Navegación Espacial & Vuelo:</strong> Trayectorias Bézier cinemáticas con estela de partículas Stardust y anclaje directo a elementos del DOM.</li>
+      </ul>
+    </div>
+  </main>
+
+  <script>
+    // Configuración de Skins
+    const SKINS = {
+      sparky: { name: 'Sparky Fueguito', emoji: '🔥', primary: '#F97316', bg: '#EA580C' },
+      astrobot: { name: 'AstroBot', emoji: '🤖', primary: '#38BDF8', bg: '#0284C7' },
+      buho: { name: 'Búho Sabio', emoji: '🦉', primary: '#A855F7', bg: '#9333EA' },
+      dragon: { name: 'Dragón Galáctico', emoji: '🐲', primary: '#10B981', bg: '#059669' },
+      cat: { name: 'Gatito Cósmico', emoji: '🐱', primary: '#EC4899', bg: '#DB2777' },
+      slime: { name: 'Slime Cuántico', emoji: '🟢', primary: '#22C55E', bg: '#16A34A' }
+    };
+
+    let currentSkin = 'sparky';
+    let currentAnim = 'idle';
+    let drawColor = '#FDE047';
+
+    // Inicializar Selector de Skins
+    const grid = document.getElementById('skinSelectorGrid');
+    Object.entries(SKINS).forEach(([id, s]) => {
+      const btn = document.createElement('button');
+      btn.className = `p-2.5 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all ${id === currentSkin ? 'bg-orange-500/20 border-orange-500 text-orange-300' : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'}`;
+      btn.innerHTML = `<span>${s.emoji}</span><span>${s.name}</span>`;
+      btn.onclick = () => selectSkin(id);
+      grid.appendChild(btn);
+    });
+
+    function selectSkin(skinId) {
+      currentSkin = skinId;
+      document.getElementById('bubbleAuthor').innerText = `${SKINS[skinId].emoji} ${SKINS[skinId].name}`;
+      document.getElementById('haloAura').style.backgroundColor = SKINS[skinId].primary;
+      petSparky();
+    }
+
+    function setAnimState(anim) {
+      currentAnim = anim;
+      document.getElementById('bubbleStatus').innerText = anim.toUpperCase();
+      if (anim === 'sleeping') {
+        document.getElementById('bubbleText').innerText = 'Zzz... Roncando pacíficamente tras un rato de descanso... (Haz clic para despertarme)';
+      } else if (anim === 'working_ai') {
+        document.getElementById('bubbleText').innerText = '⚡ Procesando con mi motor de razonamiento pedagógico...';
+      } else if (anim === 'pet_happy') {
+        document.getElementById('bubbleText').innerText = '💖 ¡Ronroneo y salto de felicidad! ¡Gracias por el cariño!';
+      }
+    }
+
+    function triggerDialogue(type) {
+      if (type === 'explain') {
+        document.getElementById('bubbleText').innerText = '💡 La fotosíntesis es como una fábrica verde: las plantas toman luz solar y agua para crear comida deliciosa y oxígeno para respirar.';
+      } else {
+        document.getElementById('bubbleText').innerText = '✨ ¿Sabías que un día en Venus dura más que un año entero en Venus? ¡Gira súper despacio!';
+      }
+      setAnimState('speaking');
+      setTimeout(() => setAnimState('idle'), 4000);
+    }
+
+    function petSparky() {
+      setAnimState('pet_happy');
+      setTimeout(() => setAnimState('idle'), 2500);
+    }
+
+    function switchView(view) {
+      if (view === 'ui') {
+        document.getElementById('viewUI').classList.remove('hidden');
+        document.getElementById('viewMD').classList.add('hidden');
+        document.getElementById('btnViewUI').className = 'px-3 py-1.5 rounded-lg bg-orange-500 text-slate-950 font-bold transition-all';
+        document.getElementById('btnViewMD').className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all';
+      } else {
+        document.getElementById('viewUI').classList.add('hidden');
+        document.getElementById('viewMD').classList.remove('hidden');
+        document.getElementById('btnViewMD').className = 'px-3 py-1.5 rounded-lg bg-orange-500 text-slate-950 font-bold transition-all';
+        document.getElementById('btnViewUI').className = 'px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition-all';
+      }
+    }
+
+    // Render Loop de Pixel Art en Canvas
+    const mCanvas = document.getElementById('mascotCanvas');
+    const mCtx = mCanvas.getContext('2d');
+    let frame = 0;
+
+    function renderMascot() {
+      frame++;
+      mCtx.clearRect(0, 0, 128, 128);
+
+      const color = SKINS[currentSkin].primary;
+      const bob = Math.sin(frame * 0.08) * 3;
+
+      mCtx.fillStyle = color;
+      mCtx.beginPath();
+      mCtx.arc(64, 64 + bob, 32, 0, Math.PI * 2);
+      mCtx.fill();
+
+      // Ojos
+      mCtx.fillStyle = '#0F172A';
+      if (currentAnim === 'sleeping') {
+        mCtx.fillRect(52, 60 + bob, 8, 2);
+        mCtx.fillRect(68, 60 + bob, 8, 2);
+      } else {
+        mCtx.beginPath();
+        mCtx.arc(54, 60 + bob, 4, 0, Math.PI * 2);
+        mCtx.arc(74, 60 + bob, 4, 0, Math.PI * 2);
+        mCtx.fill();
+      }
+
+      // Sonrisa
+      mCtx.strokeStyle = '#0F172A';
+      mCtx.lineWidth = 3;
+      mCtx.beginPath();
+      mCtx.arc(64, 68 + bob, 8, 0, Math.PI);
+      mCtx.stroke();
+
+      requestAnimationFrame(renderMascot);
+    }
+    renderMascot();
+
+    // Pizarra de Dibujo con Interpolación Bézier
+    const dCanvas = document.getElementById('drawingCanvas');
+    const dCtx = dCanvas.getContext('2d');
+    let isDrawing = false;
+    let strokePts = [];
+
+    function resizeDrawCanvas() {
+      dCanvas.width = dCanvas.offsetWidth;
+      dCanvas.height = dCanvas.offsetHeight;
+      dCtx.lineCap = 'round';
+      dCtx.lineJoin = 'round';
+    }
+    window.addEventListener('resize', resizeDrawCanvas);
+    setTimeout(resizeDrawCanvas, 100);
+
+    function setDrawColor(col) {
+      drawColor = col;
+    }
+
+    function clearCanvas() {
+      dCtx.clearRect(0, 0, dCanvas.width, dCanvas.height);
+    }
+
+    function openDrawingDemo() {
+      document.getElementById('targetDrawingBoard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function simulateAIAnalyzeDrawing() {
+      document.getElementById('bubbleText').innerText = '✨ ¡He analizado tu dibujo en la pizarra! Representa un excelente esquema conceptual. ¡Gran precisión gráfica!';
+      setAnimState('speaking');
+    }
+
+    function flyToTarget(elementId, speech) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('bubbleText').innerText = speech;
+      setAnimState('walk_roam');
+      setTimeout(() => setAnimState('idle'), 2000);
+    }
+
+    dCanvas.addEventListener('pointerdown', (e) => {
+      isDrawing = true;
+      const rect = dCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      strokePts = [{ x, y }];
+
+      dCtx.strokeStyle = drawColor;
+      dCtx.lineWidth = 4;
+      dCtx.beginPath();
+      dCtx.arc(x, y, 2, 0, Math.PI * 2);
+      dCtx.fillStyle = drawColor;
+      dCtx.fill();
+    });
+
+    dCanvas.addEventListener('pointermove', (e) => {
+      if (!isDrawing) return;
+      const rect = dCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      strokePts.push({ x, y });
+
+      if (strokePts.length < 3) return;
+
+      const pPrev = strokePts[strokePts.length - 2];
+      const mid = { x: (pPrev.x + x) / 2, y: (pPrev.y + y) / 2 };
+
+      dCtx.strokeStyle = drawColor;
+      dCtx.lineWidth = 4;
+      dCtx.beginPath();
+      dCtx.moveTo(strokePts[strokePts.length - 3].x, strokePts[strokePts.length - 3].y);
+      dCtx.quadraticCurveTo(pPrev.x, pPrev.y, mid.x, mid.y);
+      dCtx.stroke();
+    });
+
+    dCanvas.addEventListener('pointerup', () => { isDrawing = false; strokePts = []; });
+  </script>
+</body>
+</html>
