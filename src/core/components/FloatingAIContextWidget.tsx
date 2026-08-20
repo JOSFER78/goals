@@ -79,6 +79,27 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     }
   });
 
+  // Sincronizar estado del motor de voz con el FSM de la mascota
+  useEffect(() => {
+    if (voiceCompanion.companionState === 'listening') {
+      mascotBrain.notifyVoiceListening(true);
+      mascotBrain.notifyAISpeaking(false);
+      mascotBrain.notifyAIGenerating(false);
+    } else if (voiceCompanion.companionState === 'thinking') {
+      mascotBrain.notifyAIGenerating(true);
+      mascotBrain.notifyVoiceListening(false);
+      mascotBrain.notifyAISpeaking(false);
+    } else if (voiceCompanion.companionState === 'speaking') {
+      mascotBrain.notifyAISpeaking(true);
+      mascotBrain.notifyVoiceListening(false);
+      mascotBrain.notifyAIGenerating(false);
+    } else if (voiceCompanion.companionState === 'idle') {
+      mascotBrain.notifyAISpeaking(false);
+      mascotBrain.notifyVoiceListening(false);
+      mascotBrain.notifyAIGenerating(false);
+    }
+  }, [voiceCompanion.companionState]);
+
   // Hook de Navegación Espacial Agéntica y Teletransporte
   const spatialNavigator = useSpatialAgenticNavigator({
     mascotScale: parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2'),
@@ -224,9 +245,6 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
     // Comprobar si es una intención de navegación espacial directa
     if (!attachedImage && spatialNavigator.parseAndExecuteIntent(query)) {
       const navFeedback = '¡De acuerdo! Guiándote hacia esa sección interactiva.';
-      if (voiceCompanion.isDictating || voiceCompanion.isV2VActive) {
-        voiceCompanion.speak(navFeedback);
-      }
       return navFeedback;
     }
 
@@ -241,7 +259,6 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
     const screenContext = captureScreenContext();
     const spatialContext = MascotSpatialRegistry.generateSpatialContextPrompt();
-    mascotBrain.notifyAISpeaking(true);
 
     try {
       let promptToUse = buildChildSystemPrompt(currentSkin.name);
@@ -251,7 +268,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
         promptToUse += `\nNOTA: El usuario te ha adjuntado una foto de su cuaderno escolar.`;
       }
 
-      let responseText = await askAI({
+      const responseText = await askAI({
         messages: [
           { role: 'system', content: promptToUse },
           ...newMessages
@@ -260,17 +277,11 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
       });
 
       setMessages([...newMessages, { role: 'assistant', content: responseText }]);
-      mascotBrain.notifyAISpeaking(false);
       mascotBrain.notifyAIGenerating(false);
 
       // Si la ventana de chat está cerrada, mostrar la respuesta en el bocadillo de cómic
       if (!isOpen) {
         mascotBrain.showCustomBubble(responseText.slice(0, 280), 8000);
-      }
-
-      // Hablar la respuesta en voz alta si la consulta provino de voz o modo conversacional
-      if (voiceCompanion.isDictating || voiceCompanion.isV2VActive) {
-        voiceCompanion.speak(responseText);
       }
 
       return responseText;
@@ -547,7 +558,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
             </div>
 
             <div className="flex items-center gap-1.5 shrink-0">
-              {/* Botón 1: 🎙️ Dictado / Transcripción STT (Groq Whisper / Deepgram) */}
+              {/* Botón 1: 🎙️ Transcripción de Voz / Dictado STT */}
               <button
                 type="button"
                 onClick={() => voiceCompanion.toggleDictation()}
@@ -556,23 +567,37 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                     ? 'bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/30'
                     : 'bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 hover:text-white border border-indigo-500/30'
                 }`}
-                title={voiceCompanion.isDictating ? 'Detener Transcripción (Groq Whisper)' : 'Dictado y Transcripción STT (Groq Whisper Large)'}
+                title={voiceCompanion.isDictating ? 'Detener Transcripción de Voz' : 'Transcripción de Voz (Dictado STT)'}
               >
                 <Mic className="w-3.5 h-3.5" />
               </button>
 
-              {/* Botón 2: ⚡ Voz a Voz Agéntica en Vivo (Live V2V Duplex) */}
+              {/* Botón 2: 💬 Agente de Voz en Directo (Live V2V) */}
               <button
                 type="button"
                 onClick={() => voiceCompanion.toggleLiveV2V()}
                 className={`p-2 rounded-xl transition-all cursor-pointer flex items-center justify-center ${
                   voiceCompanion.isV2VActive
-                    ? 'bg-cyan-500 text-slate-950 font-black animate-pulse shadow-md shadow-cyan-500/40'
+                    ? 'bg-gradient-to-tr from-cyan-400 to-indigo-500 text-slate-950 font-black animate-pulse shadow-md shadow-cyan-500/40 ring-2 ring-cyan-400/30'
                     : 'bg-cyan-950/40 hover:bg-cyan-900/60 text-cyan-300 hover:text-white border border-cyan-500/30'
                 }`}
-                title={voiceCompanion.isV2VActive ? 'Detener Voz a Voz en Vivo' : 'Voz a Voz Agéntica en Vivo (Live V2V)'}
+                title={voiceCompanion.isV2VActive ? 'Detener Agente de Voz en Directo' : 'Agente de Voz en Directo (Live V2V)'}
               >
-                <Zap className="w-3.5 h-3.5" />
+                {voiceCompanion.isV2VActive ? (
+                  <div className="flex items-center gap-0.5 h-3.5">
+                    <span className="w-0.5 h-2 bg-slate-950 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-0.5 h-3.5 bg-slate-950 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-0.5 h-2.5 bg-slate-950 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <span className="w-0.5 h-1.5 bg-slate-950 rounded-full animate-bounce" style={{ animationDelay: '450ms' }} />
+                  </div>
+                ) : (
+                  <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <rect x="3" y="9" width="2.4" height="6" rx="1.2" />
+                    <rect x="8" y="4" width="2.4" height="16" rx="1.2" />
+                    <rect x="13" y="2" width="2.4" height="20" rx="1.2" />
+                    <rect x="18" y="7" width="2.4" height="10" rx="1.2" />
+                  </svg>
+                )}
               </button>
 
               {/* Botón 3: 🛑 Callar / Detener Inmediato en 0ms (Visible cuando hay actividad de audio) */}
@@ -581,7 +606,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                   type="button"
                   onClick={() => voiceCompanion.stopAllNow()}
                   className="p-2 rounded-xl bg-rose-600/80 hover:bg-rose-600 text-white transition-all cursor-pointer border border-rose-500 shadow-md shadow-rose-600/30 active:scale-90"
-                  title="🛑 Detener audio y callar a la mascota (0ms)"
+                  title="🛑 Callar a la mascota inmediatamente (0ms)"
                 >
                   <VolumeX className="w-3.5 h-3.5" />
                 </button>
@@ -747,6 +772,19 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                       }`}
                     >
                       <DidacticResponseRenderer content={msg.content} />
+                      {msg.role === 'assistant' && (
+                        <div className="mt-2 pt-1 border-t border-slate-800/60 flex items-center justify-end">
+                          <button
+                            type="button"
+                            onClick={() => voiceCompanion.speak(msg.content)}
+                            className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-indigo-300 transition-colors cursor-pointer"
+                            title="Escuchar respuesta de viva voz"
+                          >
+                            <Volume2 className="w-3 h-3" />
+                            <span>Escuchar</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))
@@ -909,9 +947,13 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
                   {/* Botón 1: 🎙️ Icono de Micrófono para Dictado STT (Voz a Texto) */}
                   <button
                     type="button"
-                    onClick={() => voiceCompanion.startDictation()}
-                    className="w-7 h-7 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer shrink-0"
-                    title="Dictado por voz STT (Groq Whisper / Deepgram)"
+                    onClick={() => voiceCompanion.toggleDictation()}
+                    className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer shrink-0 ${
+                      voiceCompanion.isDictating
+                        ? 'bg-rose-500 text-white animate-pulse shadow-md shadow-rose-500/30'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    }`}
+                    title={voiceCompanion.isDictating ? 'Detener Transcripción de Voz' : 'Transcripción de Voz (Dictado STT)'}
                   >
                     <Mic className="w-3.5 h-3.5" />
                   </button>
@@ -1035,8 +1077,12 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
               animState={
                 spatialNavigator.flightState.isFlying 
                   ? 'walk_roam' 
-                  : voiceCompanion.isSpeaking 
+                  : voiceCompanion.companionState === 'speaking' 
                   ? 'speaking' 
+                  : voiceCompanion.companionState === 'thinking' || isLoading
+                  ? 'thinking'
+                  : voiceCompanion.companionState === 'listening'
+                  ? 'idle'
                   : mascotBrain.animState
               }
               scale={mascotScale}

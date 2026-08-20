@@ -68,8 +68,10 @@ export const useLiveVoiceCompanion = ({
   const isExplicitlyStoppedRef = useRef<boolean>(false);
   const isDictatingRef = useRef<boolean>(false);
   const isV2VActiveRef = useRef<boolean>(false);
+  const isProcessingRef = useRef<boolean>(false);
   const visemeDecayRafRef = useRef<number | null>(null);
   const hasDetectedSpeechInDictationRef = useRef<boolean>(false);
+  const consecutiveVoiceFramesRef = useRef<number>(0);
 
   const accumulatedDictationFinalRef = useRef<string>('');
   const accumulatedDictationInterimRef = useRef<string>('');
@@ -107,11 +109,12 @@ export const useLiveVoiceCompanion = ({
     };
   }, []);
 
+  // Animación suave de visemas (Interpolación lineal hacia el visema objetivo)
   useEffect(() => {
     const loop = () => {
       setViseme((prev) => {
         const target = targetVisemeRef.current;
-        const lerpFactor = 0.20;
+        const lerpFactor = 0.22;
         const newAperture = prev.aperture + (target.aperture - prev.aperture) * lerpFactor;
         const newWidth = prev.width + (target.width - prev.width) * lerpFactor;
         const newIntensity = prev.intensity + (target.intensity - prev.intensity) * lerpFactor;
@@ -210,8 +213,24 @@ export const useLiveVoiceCompanion = ({
         setAudioLevel(currentLvl);
         setFrequencyData(new Uint8Array(dataArray));
 
+        // 🛑 BARGE-IN INTELIGENTE (Estilo ChatGPT Voice Agent)
+        // Si la mascota está hablando y el usuario empieza a hablar por encima, se interrumpe a 0ms
+        if (companionState === 'speaking' && currentLvl > 0.10) {
+          consecutiveVoiceFramesRef.current += 1;
+          if (consecutiveVoiceFramesRef.current >= 4) {
+            consecutiveVoiceFramesRef.current = 0;
+            // Cortar inmediatamente la locución
+            speechVoiceService.cancel();
+            if (synthRef.current) synthRef.current.cancel();
+            targetVisemeRef.current = { aperture: 0, width: 1, shape: 'rest', intensity: 0 };
+            updateCompanionState('listening');
+          }
+        } else {
+          consecutiveVoiceFramesRef.current = Math.max(0, consecutiveVoiceFramesRef.current - 1);
+        }
+
         // VAD Inteligente en modo dictado
-        if (isDictatingRef.current) {
+        if (isDictatingRef.current && !isProcessingRef.current) {
           if (currentLvl > 0.05) {
             hasDetectedSpeechInDictationRef.current = true;
             if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
@@ -219,7 +238,9 @@ export const useLiveVoiceCompanion = ({
           } else if (hasDetectedSpeechInDictationRef.current) {
             if (!silenceTimerRef.current) {
               silenceTimerRef.current = setTimeout(() => {
-                if (isDictatingRef.current) stopDictation();
+                if (isDictatingRef.current && !isProcessingRef.current) {
+                  stopDictation();
+                }
               }, silenceTimeoutMs);
             }
           }
@@ -256,31 +277,39 @@ export const useLiveVoiceCompanion = ({
     if (isMuted) return;
     updateCompanionState('speaking');
     const cleanText = sanitizeTextForSpeech(text);
-    if (!cleanText) { updateCompanionState('idle'); return; }
+    if (!cleanText) { 
+      updateCompanionState(isV2VActiveRef.current ? 'listening' : 'idle'); 
+      return; 
+    }
 
     const assigned = resolveMascotVoice(skinConfig.id);
 
-    await speechVoiceService.speak(cleanText, {
-      pitch: skinConfig.speechPitch,
-      rate: skinConfig.speechRate * playbackSpeed,
-      lang: 'es-ES',
-      providerOverride: assigned.providerId as any,
-      voiceOverride: assigned.voiceId,
-      onStart: () => updateCompanionState('speaking'),
-      onBoundary: (word) => mapWordToViseme(word),
-      onEnd: () => {
-        targetVisemeRef.current = { aperture: 0, width: 1, shape: 'rest', intensity: 0 };
-        updateCompanionState(isV2VActiveRef.current ? 'listening' : 'idle');
-      },
-      onError: (err) => {
-        targetVisemeRef.current = { aperture: 0, width: 1, shape: 'rest', intensity: 0 };
-        updateCompanionState(isV2VActiveRef.current ? 'listening' : 'idle');
-      }
-    });
+    try {
+      await speechVoiceService.speak(cleanText, {
+        pitch: skinConfig.speechPitch,
+        rate: skinConfig.speechRate * playbackSpeed,
+        lang: 'es-ES',
+        providerOverride: assigned.providerId as any,
+        voiceOverride: assigned.voiceId,
+        onStart: () => updateCompanionState('speaking'),
+        onBoundary: (word) => mapWordToViseme(word),
+        onEnd: () => {
+          targetVisemeRef.current = { aperture: 0, width: 1, shape: 'rest', intensity: 0 };
+          updateCompanionState(isV2VActiveRef.current ? 'listening' : 'idle');
+        },
+        onError: (_err) => {
+          targetVisemeRef.current = { aperture: 0, width: 1, shape: 'rest', intensity: 0 };
+          updateCompanionState(isV2VActiveRef.current ? 'listening' : 'idle');
+        }
+      });
+    } catch (e) {
+      targetVisemeRef.current = { aperture: 0, width: 1, shape: 'rest', intensity: 0 };
+      updateCompanionState(isV2VActiveRef.current ? 'listening' : 'idle');
+    }
   }, [skinConfig, playbackSpeed, isMuted, updateCompanionState]);
 
   const speakFiller = useCallback(() => {
-    const FILLERS = ['¡Oído! Dame un segundito...', '¡Te escucho! Pensando...', '¡Buena pregunta!', '¡Entendido!'];
+    const FILLERS = ['¡Oído! Dame un segundito...', '¡Te escucho! Pensando...', '¡Buena pregunta! Voy a ver...', '¡Entendido!'];
     speak(FILLERS[Math.floor(Math.random() * FILLERS.length)]);
   }, [speak]);
 
@@ -289,6 +318,7 @@ export const useLiveVoiceCompanion = ({
     isListeningActiveRef.current = false;
     isDictatingRef.current = false;
     isV2VActiveRef.current = false;
+    isProcessingRef.current = false;
     hasDetectedSpeechInDictationRef.current = false;
 
     // 1. Abortar reproducción TTS y motores V2V en 0ms
@@ -315,53 +345,93 @@ export const useLiveVoiceCompanion = ({
     stopAllNow();
     isExplicitlyStoppedRef.current = false;
     isDictatingRef.current = true;
+    isProcessingRef.current = false;
     hasDetectedSpeechInDictationRef.current = false;
     setActiveEngine('stt_dictation');
     setDictationDurationSec(0);
+    setInterimTranscript('');
+    setFinalTranscript('');
     accumulatedDictationFinalRef.current = '';
     accumulatedDictationInterimRef.current = '';
+
     const stream = await initAudioAnalyser();
     if (!stream) { updateCompanionState('error'); return; }
+
     try {
-      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      const mime = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+        ? 'audio/webm;codecs=opus'
+        : MediaRecorder.isTypeSupported('audio/webm')
+        ? 'audio/webm'
+        : 'audio/mp4';
+
+      const recorder = new MediaRecorder(stream, { mimeType: mime });
       audioChunksRef.current = [];
-      recorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
+      recorder.ondataavailable = (e) => { 
+        if (e.data && e.data.size > 0) audioChunksRef.current.push(e.data); 
+      };
       recorder.start(100);
       mediaRecorderRef.current = recorder;
-    } catch (e) {}
+    } catch (e) {
+      console.warn('[useLiveVoiceCompanion] MediaRecorder warning:', e);
+    }
+
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
-      const rec = new SpeechRecognition();
-      rec.continuous = true; rec.interimResults = true;
-      rec.onresult = (e: any) => {
-        let final = '', interim = '';
-        for (let i = e.resultIndex; i < e.results.length; ++i) {
-          if (e.results[i].isFinal) final += e.results[i][0].transcript;
-          else interim += e.results[i][0].transcript;
-        }
-        if (final.trim() || interim.trim()) {
-          hasDetectedSpeechInDictationRef.current = true;
-          if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
-          silenceTimerRef.current = setTimeout(() => {
-            if (isDictatingRef.current) stopDictation();
-          }, silenceTimeoutMs);
-        }
-        if (final.trim()) { 
-          accumulatedDictationFinalRef.current += ' ' + final; 
-          setFinalTranscript(accumulatedDictationFinalRef.current.trim()); 
-        }
-        setInterimTranscript(interim);
-      };
-      rec.start();
-      recognitionRef.current = rec;
+      try {
+        const rec = new SpeechRecognition();
+        rec.continuous = true; 
+        rec.interimResults = true;
+        rec.lang = 'es-ES';
+
+        rec.onresult = (e: any) => {
+          let final = '', interim = '';
+          for (let i = e.resultIndex; i < e.results.length; ++i) {
+            if (e.results[i].isFinal) final += e.results[i][0].transcript;
+            else interim += e.results[i][0].transcript;
+          }
+
+          if (final.trim() || interim.trim()) {
+            hasDetectedSpeechInDictationRef.current = true;
+            if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = setTimeout(() => {
+              if (isDictatingRef.current && !isProcessingRef.current) {
+                stopDictation();
+              }
+            }, silenceTimeoutMs);
+          }
+
+          if (final.trim()) { 
+            accumulatedDictationFinalRef.current += ' ' + final; 
+            setFinalTranscript(accumulatedDictationFinalRef.current.trim()); 
+          }
+          setInterimTranscript(interim);
+        };
+
+        rec.onerror = (e: any) => {
+          if (e.error !== 'no-speech') {
+            console.warn('[useLiveVoiceCompanion] SpeechRecognition error:', e.error);
+          }
+        };
+
+        rec.start();
+        recognitionRef.current = rec;
+      } catch (err) {
+        console.warn('[useLiveVoiceCompanion] SpeechRecognition init failed:', err);
+      }
     }
+
     dictationIntervalRef.current = setInterval(() => setDictationDurationSec(p => p + 1), 1000);
-    watchdogTimerRef.current = setTimeout(() => stopDictation(), 30000);
+    watchdogTimerRef.current = setTimeout(() => {
+      if (isDictatingRef.current && !isProcessingRef.current) {
+        stopDictation();
+      }
+    }, 45000);
     updateCompanionState('listening');
   };
 
   const stopDictation = async (): Promise<string> => {
-    if (!isDictatingRef.current) return '';
+    if (!isDictatingRef.current || isProcessingRef.current) return '';
+    isProcessingRef.current = true;
     isDictatingRef.current = false;
     isExplicitlyStoppedRef.current = true;
     hasDetectedSpeechInDictationRef.current = false;
@@ -406,7 +476,8 @@ export const useLiveVoiceCompanion = ({
     let text = '';
     let engine: STTEngineType = 'webspeech';
 
-    if (audioBlob && audioBlob.size > 1000) {
+    // 1. Intentar transcripción neuronal precisa con Deepgram Nova-2 / Groq Whisper
+    if (audioBlob && audioBlob.size > 800) {
       try {
         const res = await unifiedTranscriptionService.transcribeAudio(audioBlob);
         if (res.text && res.text.trim()) {
@@ -418,10 +489,11 @@ export const useLiveVoiceCompanion = ({
             : 'webspeech';
         }
       } catch (e) {
-        console.warn('[useLiveVoiceCompanion] Error con UnifiedSTT:', e);
+        console.warn('[useLiveVoiceCompanion] Fallback de STT tras error:', e);
       }
     }
 
+    // 2. Fallback al texto acumulado por Web Speech API si el audio HTTP falló
     if (!text) {
       const fallback = (accumulatedDictationFinalRef.current + ' ' + interimTranscript).trim();
       if (fallback) {
@@ -439,7 +511,6 @@ export const useLiveVoiceCompanion = ({
     setActiveEngine('none');
 
     if (text && onTranscriptComplete) {
-      speakFiller();
       try {
         const aiResponse = await onTranscriptComplete(text);
         if (aiResponse && typeof aiResponse === 'string' && autoSpeakResponse) {
@@ -451,6 +522,7 @@ export const useLiveVoiceCompanion = ({
       }
     }
 
+    isProcessingRef.current = false;
     updateCompanionState('idle');
     return text;
   };
@@ -523,7 +595,7 @@ export const useLiveVoiceCompanion = ({
         if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
 
         const currentFull = (accumulatedFinal || currentInterim).trim();
-        if (currentFull.length > 2 && isV2VActiveRef.current) {
+        if (currentFull.length > 2 && isV2VActiveRef.current && !isProcessingRef.current) {
           silenceTimerRef.current = setTimeout(async () => {
             const queryToSend = accumulatedFinal.trim() || currentInterim.trim();
             if (queryToSend) {
@@ -556,9 +628,9 @@ export const useLiveVoiceCompanion = ({
   };
 
   const handleAutoDispatch = async (transcript: string) => {
-    if (!transcript.trim()) return;
+    if (!transcript.trim() || isProcessingRef.current) return;
+    isProcessingRef.current = true;
     updateCompanionState('thinking');
-    speakFiller();
 
     try {
       if (onTranscriptComplete) {
@@ -573,8 +645,9 @@ export const useLiveVoiceCompanion = ({
     } finally {
       setInterimTranscript('');
       setFinalTranscript('');
+      isProcessingRef.current = false;
     }
-    updateCompanionState('idle');
+    updateCompanionState(isV2VActiveRef.current ? 'listening' : 'idle');
   };
 
   return {

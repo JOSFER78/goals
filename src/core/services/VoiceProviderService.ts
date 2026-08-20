@@ -65,15 +65,14 @@ export const VOICE_PROVIDERS_METADATA: Record<VoiceProviderId, VoiceProviderMeta
       { id: 'nova-2-general', name: 'Nova-2 General Domain', description: 'Reconocimiento avanzado multilingüe' }
     ],
     voices: [
-      // Voces en Español / Multilingüe
-      { id: 'aura-orpheus-en', name: 'Aura Orpheus (Chico Joven) — Español / English', lang: 'es-ES', gender: 'male', qualityScore: 99 },
-      { id: 'aura-helios-en', name: 'Aura Helios (Chico Dinámico) — Español / English', lang: 'es-ES', gender: 'male', qualityScore: 98 },
-      { id: 'aura-arcas-en', name: 'Aura Arcas (Chico Juvenil y Claro) — Español / English', lang: 'es-ES', gender: 'male', qualityScore: 97 },
-      { id: 'aura-zeus-en', name: 'Aura Zeus (Masculino Sabio y Firme) — Español / English', lang: 'es-ES', gender: 'male', qualityScore: 96 },
-      { id: 'aura-perseus-en', name: 'Aura Perseus (Masculino Didáctico) — Español / English', lang: 'es-ES', gender: 'male', qualityScore: 95 },
-      { id: 'aura-luna-en', name: 'Aura Luna (Femenino Amable) — Español / English', lang: 'es-ES', gender: 'female', qualityScore: 97 },
-      { id: 'aura-asteria-en', name: 'Aura Asteria (Femenino Conversacional) — Español / English', lang: 'es-ES', gender: 'female', qualityScore: 96 },
-      // Voces en English Nativo
+      // Voces Aura de Deepgram (Modelos en Inglés Nativo)
+      { id: 'aura-orpheus-en', name: 'Aura Orpheus (Chico Joven) — English', lang: 'en-US', gender: 'male', qualityScore: 99 },
+      { id: 'aura-helios-en', name: 'Aura Helios (Chico Dinámico) — English', lang: 'en-US', gender: 'male', qualityScore: 98 },
+      { id: 'aura-arcas-en', name: 'Aura Arcas (Chico Juvenil) — English', lang: 'en-US', gender: 'male', qualityScore: 97 },
+      { id: 'aura-zeus-en', name: 'Aura Zeus (Masculino Firme) — English', lang: 'en-US', gender: 'male', qualityScore: 96 },
+      { id: 'aura-perseus-en', name: 'Aura Perseus (Masculino Didáctico) — English', lang: 'en-US', gender: 'male', qualityScore: 95 },
+      { id: 'aura-luna-en', name: 'Aura Luna (Femenino Amable) — English', lang: 'en-US', gender: 'female', qualityScore: 97 },
+      { id: 'aura-asteria-en', name: 'Aura Asteria (Femenino Conversacional) — English', lang: 'en-US', gender: 'female', qualityScore: 96 },
       { id: 'aura-angus-en', name: 'Aura Angus (Energetic Irish Boy) — English (UK/IE)', lang: 'en-GB', gender: 'male', qualityScore: 98 },
       { id: 'aura-orion-en', name: 'Aura Orion (Calm Storyteller) — English (US)', lang: 'en-US', gender: 'male', qualityScore: 97 },
       { id: 'aura-stella-en', name: 'Aura Stella (Cheerful Academic) — English (US)', lang: 'en-US', gender: 'female', qualityScore: 97 },
@@ -236,9 +235,9 @@ export const VOICE_PROVIDERS_METADATA: Record<VoiceProviderId, VoiceProviderMeta
 };
 
 export const DEFAULT_VOICE_CONFIG: VoiceConnectionsState = {
-  activeProviderId: 'deepgram',
+  activeProviderId: 'webspeech',
   enableSmartFallback: true,
-  fallbackChain: ['deepgram', 'gemini_live', 'openai_realtime', 'cartesia', 'groq_edge', 'elevenlabs', 'webspeech'],
+  fallbackChain: ['webspeech', 'cartesia', 'openai_realtime', 'gemini_live', 'elevenlabs', 'deepgram', 'groq_edge'],
   providers: {
     gemini_live: {
       providerId: 'gemini_live',
@@ -262,7 +261,7 @@ export const DEFAULT_VOICE_CONFIG: VoiceConnectionsState = {
       providerId: 'cartesia',
       apiKey: '',
       selectedModel: 'sonic-multilingual',
-      selectedVoice: '8488e0a7-54be-45c8-888a-21143f6f143d'
+      selectedVoice: '156fb8d2-335b-4950-9cb3-a2d33befec77'
     },
     groq_edge: {
       providerId: 'groq_edge',
@@ -273,14 +272,14 @@ export const DEFAULT_VOICE_CONFIG: VoiceConnectionsState = {
     elevenlabs: {
       providerId: 'elevenlabs',
       apiKey: '',
-      selectedModel: 'eleven_turbo_v2_5',
-      selectedVoice: 'Adam'
+      selectedModel: 'eleven_multilingual_v2',
+      selectedVoice: 'ErXwobaYiN019PkySvjV'
     },
     webspeech: {
       providerId: 'webspeech',
       apiKey: 'LOCAL_BROWSER_KEY',
       selectedModel: 'browser-native',
-      selectedVoice: 'auto-spanish-boy'
+      selectedVoice: 'webspeech_alvaro'
     }
   }
 };

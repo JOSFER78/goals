@@ -223,8 +223,8 @@ export function resolveMascotVoice(
   }
 
   // 2. Si no hay voz explícita para este skin, usar el default individual del skin
-  const defaultProvider = skin.defaultProvider || 'deepgram';
-  const defaultVoice = skin.defaultVoice || 'aura-orpheus-en';
+  const defaultProvider = skin.defaultProvider || 'webspeech';
+  const defaultVoice = skin.defaultVoice || 'webspeech_alvaro';
 
   if (VoiceProviderService.isProviderConfigured(defaultProvider)) {
     const meta = VOICE_PROVIDERS_METADATA[defaultProvider];
@@ -254,12 +254,12 @@ export function resolveMascotVoice(
     }
   }
 
-  // 4. WebSpeech nativo de respaldo
+  // 4. WebSpeech nativo de respaldo en Español
   const webMeta = VOICE_PROVIDERS_METADATA.webspeech;
   return {
     providerId: 'webspeech',
     voiceId: 'webspeech_alvaro',
     voiceKey: 'webspeech::webspeech_alvaro',
-    voiceLabel: `${webMeta.voices[0].name} (Nativo)`
+    voiceLabel: `${webMeta.voices[0].name} (Nativo Español)`
   };
 }

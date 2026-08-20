@@ -195,6 +195,11 @@ class SpeechVoiceServiceImpl {
     try {
       if (providerId === 'deepgram') {
         const voiceModel = selectedVoice || 'aura-orpheus-en';
+        // Los modelos públicos Deepgram Aura (aura-*-en) son exclusivamente en inglés.
+        // Si el texto es en español, evitamos el acento inglés forzado retornando null para usar el motor nativo en español (WebSpeech Álvaro/Jorge/Nil/Pablo o Cartesia/OpenAI).
+        if (voiceModel.endsWith('-en') || voiceModel.includes('-en-') || voiceModel.startsWith('aura-')) {
+          return null;
+        }
         const url = `https://api.deepgram.com/v1/speak?model=${encodeURIComponent(voiceModel)}`;
         const res = await fetch(url, {
           method: 'POST',
