@@ -52,14 +52,14 @@ export const isLocalDev = typeof window !== 'undefined' && (
 );
 
 export const LOCAL_DEV_ADMIN_USER: UserProfile = {
-  uid: 'admin_local_dev_uid',
-  displayName: 'Admin GOALS',
+  uid: 'fhU5GVRzdqNhxKBs87MBwPet4Y02',
+  displayName: 'José Fernández',
   email: 'josferestudio@gmail.com',
-  photoURL: undefined,
+  photoURL: 'https://lh3.googleusercontent.com/a/ACg8ocJaqYt0GdVkc44Ee-ZqsB6IzBica6mdZprmCIFlXU7V3QNenXo=s96-c',
   role: 'admin',
   isApproved: true,
   isAnonymous: false,
-  providerId: 'local_admin'
+  providerId: 'google.com'
 };
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return null;
     }
   });
-  const [isCloud, setIsCloud] = useState<boolean>(false);
+  const [isCloud, setIsCloud] = useState<boolean>(() => isLocalDev);
   const [loading, setLoading] = useState<boolean>(true);
   const [authError, setAuthError] = useState<string | null>(null);
 
@@ -208,11 +208,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (isLocalDev) {
           setUser(LOCAL_DEV_ADMIN_USER);
           localStorage.setItem('goals_local_user', JSON.stringify(LOCAL_DEV_ADMIN_USER));
+          setIsCloud(true);
         } else {
           setUser(null);
           localStorage.removeItem('goals_local_user');
+          setIsCloud(false);
         }
-        setIsCloud(false);
       }
       setLoading(false);
     });
@@ -394,7 +395,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('goals_explicit_logout');
     setUser(LOCAL_DEV_ADMIN_USER);
     localStorage.setItem('goals_local_user', JSON.stringify(LOCAL_DEV_ADMIN_USER));
-    setIsCloud(false);
+    setIsCloud(true);
   };
 
   const signOut = async () => {
