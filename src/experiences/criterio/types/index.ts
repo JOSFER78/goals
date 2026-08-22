@@ -1,4 +1,8 @@
-export type CriterioAgeBracket = '8-10' | '10-12' | '12-14' | '14-16' | '16-18' | '8-18' | '14-18';
+export type CriterioAgeBracket =
+  // Tramos LOMLOE canónicos (SSOT docs/criterio/00_MASTER_PLAN_CURRICULAR.md)
+  | '6-7' | '8-9' | '10-11' | '12-13' | '14-15'
+  // Legacy (módulos antiguos)
+  | '8-10' | '10-12' | '12-14' | '14-16' | '16-18' | '8-18' | '14-18';
 
 export type CriterioCompetencyId = 
   | 'sources'        // C1: Rastreo de fuentes primarias

@@ -1,7 +1,8 @@
 import React from 'react';
 import { 
   Compass, Eye, Brain, GitMerge, Cpu, Scale, Search, Bot, 
-  Sparkles, ShieldAlert, Award, FileText, ArrowRight, CheckCircle2, Clock, Zap, Lock
+  Sparkles, ShieldAlert, Award, FileText, ArrowRight, CheckCircle2, Clock, Zap, Lock,
+  Heart, Users, MessageCircle, Lightbulb, Puzzle, Camera, Newspaper, Gavel, Landmark, PhoneCall
 } from 'lucide-react';
 import { CriterioModule } from '../types';
 
@@ -24,7 +25,17 @@ const ICON_MAP: Record<string, React.ElementType> = {
   Sparkles,
   ShieldAlert,
   Award,
-  FileText
+  FileText,
+  Heart,
+  Users,
+  MessageCircle,
+  Lightbulb,
+  Puzzle,
+  Camera,
+  Newspaper,
+  Gavel,
+  Landmark,
+  PhoneCall
 };
 
 export const ModuleCard: React.FC<ModuleCardProps> = ({

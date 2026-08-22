@@ -68,11 +68,11 @@ export const CriterioHeader: React.FC<CriterioHeaderProps> = ({
   ];
 
   const AGE_BRACKETS: { id: CriterioAgeBracket; label: string }[] = [
-    { id: '8-10', label: '8–10 años' },
-    { id: '10-12', label: '10–12 años' },
-    { id: '12-14', label: '12–14 años' },
-    { id: '14-16', label: '14–16 años' },
-    { id: '16-18', label: '16–18 años' }
+    { id: '6-7', label: '6–7 años' },
+    { id: '8-9', label: '8–9 años' },
+    { id: '10-11', label: '10–11 años' },
+    { id: '12-13', label: '12–13 años' },
+    { id: '14-15', label: '14–15 años' }
   ];
 
   return (

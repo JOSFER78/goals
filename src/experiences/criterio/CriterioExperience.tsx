@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useProgress } from '../../core/context/ProgressContext';
 import { useAuth } from '../../core/context/AuthContext';
 import { CRITERIO_MODULES } from './data/modulesData';
+import { ALL_CRITERIO_MODULES } from './data/curriculum';
 import { CriterioModule, CriterioAgeBracket, CriterioCompetencyId } from './types';
 import { CriterioHeader } from './components/CriterioHeader';
 import { CriterioHero } from './components/CriterioHero';
@@ -211,12 +212,13 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
 
   // ── SISTEMA DE NIVEL DEL ALUMNO ──
   // El alumno entra en SU nivel según su edad real del perfil (Firebase).
-  // Solo ve los módulos de su franja; avanza uno a uno (desbloqueo progresivo).
+  // Solo ve los módulos de su tramo LOMLOE; avanza uno a uno (desbloqueo progresivo).
   const bracketForAge = (age: number): CriterioAgeBracket => {
-    if (age <= 9) return '8-10';
-    if (age <= 11) return '10-12';
-    if (age <= 13) return '12-14';
-    return '14-16';
+    if (age <= 7) return '6-7';
+    if (age <= 9) return '8-9';
+    if (age <= 11) return '10-11';
+    if (age <= 13) return '12-13';
+    return '14-15';
   };
 
   const [activeTab, setActiveTab] = useState<CriterioTab>('modules');
@@ -375,15 +377,15 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
     }
   };
 
-  // ── NIVEL DEL ALUMNO: solo módulos de SU franja de edad, con desbloqueo progresivo ──
-  // Un módulo es compatible si su ageBracket incluye la edad del alumno o es universal (8-18).
+  // ── NIVEL DEL ALUMNO: solo módulos de SU tramo LOMLOE, con desbloqueo progresivo ──
+  // Un módulo es compatible si su ageBracket incluye la edad del alumno o es universal (8-18/14-18).
   const bracketMatches = (bracket: CriterioAgeBracket): boolean => {
-    if (bracket === '8-18') return true;
+    if (bracket === '8-18' || bracket === '14-18') return effectiveAge >= 8;
     const [lo, hi] = bracket.split('-').map(Number);
     return effectiveAge >= lo && effectiveAge <= hi;
   };
 
-  const levelModules = CRITERIO_MODULES.filter((m) => bracketMatches(m.ageBracket));
+  const levelModules = ALL_CRITERIO_MODULES.filter((m) => bracketMatches(m.ageBracket));
 
   // Desbloqueo progresivo: el módulo N se abre al completar el N-1 (el 1º siempre abierto)
   const isModuleUnlocked = (module: CriterioModule): boolean => {
