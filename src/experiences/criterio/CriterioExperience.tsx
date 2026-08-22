@@ -3,6 +3,7 @@ import { useProgress } from '../../core/context/ProgressContext';
 import { useAuth } from '../../core/context/AuthContext';
 import { CRITERIO_MODULES } from './data/modulesData';
 import { CriterioModule, CriterioAgeBracket, CriterioCompetencyId } from './types';
+import { CriterioHeader } from './components/CriterioHeader';
 import { CriterioHero } from './components/CriterioHero';
 import { ModuleCard } from './components/ModuleCard';
 import { ModuleViewerModal } from './components/ModuleViewerModal';
@@ -10,11 +11,12 @@ import { FeedSimulatorLab } from './components/FeedSimulatorLab';
 import { TrainingMissionsModal } from './components/TrainingMissionsModal';
 import { AIFilterLabModal } from './components/AIFilterLabModal';
 import { MatizaToolModal } from './components/MatizaToolModal';
+import { EcosystemShowcase } from './components/EcosystemShowcase';
 import { 
   Lock, BookOpen, FlaskConical, Trophy, Sparkles, 
   Radio, Layers, Scale, Brain, 
   MessageSquare, AlertTriangle, Zap, 
-  Loader2, Eye, Send
+  Loader2, Eye, Send, Shield
 } from 'lucide-react';
 
 // Servicios Agénticos y Componentes de Generación en Tiempo Real (Cero Mocks)
@@ -28,7 +30,7 @@ import { askAI } from '../../core/services/aiService';
 
 // Componentes del Sistema de Navegación Universal
 import { MiniAppBottomNav } from '../../core/components/navigation/MiniAppBottomNav';
-import { MiniAppSubmenuSheet, SubmenuSection } from '../../core/components/navigation/MiniAppSubmenuSheet';
+import { MiniAppSubmenuSheet, DiscreteMenuItem } from '../../core/components/navigation/MiniAppSubmenuSheet';
 import { ExperienceId } from '../../core/types';
 
 export type CriterioTab = 
@@ -40,7 +42,8 @@ export type CriterioTab =
   | 'feed_lab' 
   | 'missions' 
   | 'ai_lab' 
-  | 'matiza';
+  | 'matiza'
+  | 'ecosystem';
 
 interface CriterioExperienceProps {
   onBackToGoals?: () => void;
@@ -200,7 +203,7 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
   onOpenAuth, 
   onNavigateExperience 
 }) => {
-  const { userData, addXP } = useProgress();
+  const { userData, addXP, currencies } = useProgress();
   const { user } = useAuth();
   const isAuthenticated = !!(user && !user.isAnonymous);
 
@@ -238,18 +241,20 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
     }
   ]);
 
+  // Completar Módulo Curricular con Gamificación Unificada en Criterio
   const handleCompleteModule = (moduleId: number, xpReward: number) => {
     if (!completedModuleIds.includes(moduleId)) {
       const next = [...completedModuleIds, moduleId];
       setCompletedModuleIds(next);
       localStorage.setItem('goals_criterio_completed_modules', JSON.stringify(next));
     }
-    addXP(xpReward, 'verify', `Completado Módulo de Criterio #${moduleId}`);
+    addXP(xpReward, 'criterio', `Completado Módulo de Criterio #${moduleId}`);
     setActiveViewingModule(null);
   };
 
+  // Recompensa de XP con Gamificación Unificada en Criterio
   const handleAddXP = (amount: number, reason: string) => {
-    addXP(amount, 'verify', reason);
+    addXP(amount, 'criterio', reason);
   };
 
   // Generador Dinámico de Ejercicios de Lógica y Criterio
@@ -263,7 +268,7 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
     try {
       const batch = await DynamicExerciseEngine.generateExerciseBatch({
         topic: `Pensamiento Crítico y Lógica: ${topicToUse}`,
-        discipline: 'ai-lab',
+        discipline: 'criterio' as any,
         questionCount: 3,
         allowedTypes: ['choice', 'boolean', 'fill_gap']
       });
@@ -315,7 +320,7 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
         ]
       });
       setDebateMessages(prev => [...prev, { role: 'tutor', content: tutorReply }]);
-      addXP(15, 'verify', 'Réplica dialéctica en Debate Socrático');
+      addXP(15, 'criterio', 'Réplica dialéctica en Debate Socrático');
     } catch (err) {
       console.error('Error en debate socrático:', err);
       setDebateMessages(prev => [
@@ -337,8 +342,8 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
 
   const criterioScore = Math.min(100, Math.round((completedModuleIds.length / CRITERIO_MODULES.length) * 100) + 40);
 
-  // Submenú Desplegable con 4 Nuevos Módulos Críticos
-  const submenuSections: SubmenuSection[] = [
+  // Submenú Desplegable con Módulos, Laboratorios y Ecosistema
+  const submenuSections: DiscreteMenuItem[] = [
     {
       title: 'Módulos Curriculares & Rigor',
       icon: BookOpen,
@@ -437,77 +442,44 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
           onClick: () => setActiveTab('missions')
         }
       ]
+    },
+    {
+      title: 'Ecosistema GOALS Family',
+      icon: Sparkles,
+      items: [
+        {
+          id: 'tab-ecosystem',
+          label: 'Descubre el Ecosistema GOALS',
+          description: 'Escuela IA, Cosmos 3D, IA Lab e Idiomas con tutoría PRO',
+          icon: Sparkles,
+          badge: 'PRO Family',
+          isActive: activeTab === 'ecosystem',
+          onClick: () => setActiveTab('ecosystem')
+        }
+      ]
     }
   ];
 
   return (
     <div className="w-full space-y-5 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 pb-28 font-display text-slate-100">
       
-      {/* Banner de Navegación Libre si no está autenticado */}
-      {!isAuthenticated && (
-        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-wrap items-center justify-between gap-3 text-amber-300 text-xs shadow-lg backdrop-blur-md">
-          <div className="flex items-center gap-2 font-medium">
-            <Lock className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Modo Libre: Explora CRITERIO. Inicia sesión para guardar tu racha, XP y certificados de rigor.</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => onOpenAuth?.('signup')}
-            className="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shrink-0 transition-all text-xs flex items-center gap-1.5 shadow-sm active:scale-95 cursor-pointer"
-          >
-            <Lock className="w-3.5 h-3.5" />
-            <span>Desbloquear Todo</span>
-          </button>
-        </div>
-      )}
-
-      {/* Selector Compacto de Tramo de Edad y Sala de Rigor */}
-      <div 
-        data-mascot-target="criterio-radar"
-        data-mascot-anchor="top-right"
-        data-mascot-label="Índice de Rigor y Radar de Competencias"
-        data-mascot-hint="Monitorea tus 8 dimensiones de pensamiento crítico y alfabetización informativa"
-        className="flex items-center justify-between gap-2 p-2 rounded-2xl bg-slate-900/80 border border-slate-800/80 backdrop-blur-xl shadow-md"
-      >
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-slate-300">Tramo:</span>
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
-            {(['8-10', '10-12', '13-16'] as CriterioAgeBracket[]).map((bracket) => {
-              const isSel = ageBracket === bracket;
-              return (
-                <button
-                  key={bracket}
-                  type="button"
-                  onClick={() => setAgeBracket(bracket)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    isSel
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  {bracket} años
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => handleGenerateDynamicExercises()}
-            disabled={isGeneratingExercises}
-            className="px-3 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95 disabled:opacity-50"
-          >
-            {isGeneratingExercises ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5 text-amber-400" />}
-            <span>{isGeneratingExercises ? 'Generando...' : '🎯 Desafío IA'}</span>
-          </button>
-
-          <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase bg-amber-500/10 border border-amber-500/30 text-amber-300">
-            SALA DE RIGOR
-          </span>
-        </div>
-      </div>
+      {/* ── Cabecera Principal de Criterio con Banner Permanente y Telemetría Synapse ── */}
+      <CriterioHeader
+        activeTab={activeTab}
+        onSelectTab={(tab) => {
+          setActiveTab(tab as CriterioTab);
+          setDynamicBatch(null);
+          setInfographicData(null);
+        }}
+        ageBracket={ageBracket}
+        onChangeAgeBracket={setAgeBracket}
+        criterioXP={userData?.experiences?.criterio?.xp || userData?.experiences?.verify?.xp || 0}
+        completedModulesCount={completedModuleIds.length}
+        totalModulesCount={CRITERIO_MODULES.length}
+        synapseBalance={currencies?.synapse || 0}
+        onOpenDynamicChallenge={() => handleGenerateDynamicExercises()}
+        isGeneratingExercises={isGeneratingExercises}
+      />
 
       {/* Renderizado de Batería de Ejercicios Dinámicos de IA */}
       {dynamicBatch && (
@@ -541,38 +513,6 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
           />
         </div>
       )}
-
-      {/* Barra Rápida de Secciones Principales */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-        {[
-          { id: 'modules', label: '12 Módulos', icon: BookOpen },
-          { id: 'fallacies', label: 'Detector Falacias', icon: AlertTriangle },
-          { id: 'biases', label: 'Matriz Sesgos', icon: Brain },
-          { id: 'ethics', label: 'Dilemas Éticos', icon: Scale },
-          { id: 'debate', label: 'Debate Socrático', icon: MessageSquare },
-          { id: 'feed_lab', label: 'Simulador Feed', icon: Radio },
-          { id: 'missions', label: '60 Misiones', icon: Trophy },
-          { id: 'ai_lab', label: 'IA Forense', icon: Sparkles },
-          { id: 'matiza', label: 'MATIZA', icon: Layers }
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isAct = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as CriterioTab)}
-              className={`px-3.5 py-2 rounded-2xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap transition-all cursor-pointer ${
-                isAct
-                  ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 font-black scale-102'
-                  : 'bg-slate-900/80 text-slate-400 hover:text-amber-300 border border-slate-800'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
 
       {/* ========================================================================= */}
       {/* 1. TAB: 12 MÓDULOS CURRICULARES */}
@@ -609,6 +549,13 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
               ))}
             </div>
           </div>
+
+          {/* Escaparate del Ecosistema al final de la página de Módulos */}
+          <EcosystemShowcase 
+            onNavigateExperience={onNavigateExperience}
+            onOpenAuth={onOpenAuth}
+            className="mt-8"
+          />
         </div>
       )}
 
@@ -979,6 +926,18 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
         </div>
       )}
 
+      {/* ========================================================================= */}
+      {/* 7. TAB: ESCAPARATE DEL ECOSISTEMA GOALS FAMILY */}
+      {/* ========================================================================= */}
+      {activeTab === 'ecosystem' && !dynamicBatch && !infographicData && (
+        <div className="space-y-6 animate-fadeIn">
+          <EcosystemShowcase 
+            onNavigateExperience={onNavigateExperience}
+            onOpenAuth={onOpenAuth}
+          />
+        </div>
+      )}
+
       {/* Modales Existentes */}
       <ModuleViewerModal
         module={activeViewingModule}
@@ -1055,13 +1014,18 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
         onClose={() => setIsSubmenuOpen(false)}
         experienceId="criterio"
         onNavigateExperience={onNavigateExperience}
-        submenuSections={submenuSections}
+        customItems={submenuSections}
         onSelectAction={(actionId) => {
-          if (actionId === 'learn') setActiveTab('modules');
-          if (actionId === 'feed') setActiveTab('feed_lab');
-          if (actionId === 'ai-detect') setActiveTab('ai_lab');
-          if (actionId === 'matiza') setActiveTab('matiza');
-          if (actionId === 'missions') setActiveTab('missions');
+          if (actionId === 'learn' || actionId === 'modules-all') setActiveTab('modules');
+          if (actionId === 'tab-fallacies') setActiveTab('fallacies');
+          if (actionId === 'tab-biases') setActiveTab('biases');
+          if (actionId === 'tab-ethics') setActiveTab('ethics');
+          if (actionId === 'tab-debate') setActiveTab('debate');
+          if (actionId === 'feed' || actionId === 'tab-feed-lab') setActiveTab('feed_lab');
+          if (actionId === 'ai-detect' || actionId === 'tab-ai-lab') setActiveTab('ai_lab');
+          if (actionId === 'matiza' || actionId === 'tab-matiza') setActiveTab('matiza');
+          if (actionId === 'missions' || actionId === 'tab-missions') setActiveTab('missions');
+          if (actionId === 'tab-ecosystem') setActiveTab('ecosystem');
         }}
       />
 

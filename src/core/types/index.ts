@@ -72,6 +72,11 @@ export interface UserData {
     pitch?: number;
     rate?: number;
   };
+  // ── Sistema de Gamificación Unificado GOALS (docs/gamificacion/03) ──
+  currencies?: import('./gamification').DomainCurrencies;
+  masterKey?: import('./gamification').MasterKeyStatus;
+  entitlements?: import('./gamification').GoalsEntitlements;
+  synergyBadges?: Record<string, number>; // badgeId → timestamp de desbloqueo
 }
 
 export interface RetoItem {

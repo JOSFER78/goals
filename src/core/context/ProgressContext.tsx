@@ -5,6 +5,26 @@ import { UserData, LessonProgress, EvolutionEntry, RetoItem, RankInfo, Experienc
 import { LESSONS } from '../../experiences/astro/data/lessonsData';
 import { checkStreak } from '../../experiences/astro/utils/streak';
 import { PresentationEngine } from '../services/PresentationEngine';
+import {
+  GamificationEngine,
+  getCosmicRank,
+  getHarmonyFactor,
+  isMasterKeyActiveToday,
+  getMasterKeyMultiplier
+} from '../services/GamificationEngine';
+import { entitlementService } from '../services/EntitlementService';
+import {
+  DomainCurrencies,
+  MasterKeyStatus,
+  CosmicRankInfo,
+  GoalsEntitlements,
+  GoalsPlanId,
+  DEFAULT_CURRENCIES,
+  DEFAULT_MASTER_KEY,
+  DEFAULT_ENTITLEMENTS,
+  EXPERIENCE_CURRENCY,
+  DomainCurrencyId
+} from '../types/gamification';
 
 interface ProgressContextType {
   userData: UserData;
@@ -33,6 +53,17 @@ interface ProgressContextType {
   showToast: (msg: string) => void;
   hideToast: () => void;
   resetProgress: () => void;
+  // ── Gamificación Unificada GOALS ──
+  currencies: DomainCurrencies;
+  masterKey: MasterKeyStatus;
+  cosmicRank: CosmicRankInfo;
+  harmonyFactor: number;
+  masterKeyActive: boolean;
+  entitlements: GoalsEntitlements;
+  synergyBadges: Record<string, number>;
+  canAccessExperience: (expId: ExperienceId | string) => boolean;
+  activatePlan: (plan: GoalsPlanId) => void;
+  registerSchoolSession: (session: { minutes: number; honestyScore: number; guessRate: number }) => void;
 }
 
 const getInitialWeeklyActivity = (): boolean[] => {
@@ -442,26 +473,51 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }));
   };
 
-  // addXP MULTI-EXPERIENCIA REAL CON REPARTO DE XP Y EVOLUCIONES DINÁMICAS
+  // addXP MULTI-EXPERIENCIA CON MOTOR UNIFICADO:
+  // XP final = base × Φ_harmony × M_streak × M_school (Master Key)
+  // + acreditación automática de la moneda de dominio correspondiente
   const addXP = useCallback((amount: number, expId: ExperienceId | string = 'astro', reason?: string) => {
     const cleanExpId = sanitizeExperienceKey(expId) as ExperienceId;
 
     setUserData((prev) => {
-      const newXp = prev.xp + amount;
+      const currencies: DomainCurrencies = { ...DEFAULT_CURRENCIES, ...(prev.currencies || {}) };
+      const masterKey: MasterKeyStatus = { ...DEFAULT_MASTER_KEY, ...(prev.masterKey || {}) };
+
+      // Ecuación de Fusión Universal (Φ se calcula sobre la distribución previa)
+      const { finalXp, harmony, streakMult, schoolMult } = GamificationEngine.computeUniversalXp({
+        baseXp: amount,
+        currencies,
+        masterKey,
+        streak: prev.streak || 1
+      });
+
+      // Acreditar moneda de dominio
+      const currencyId: DomainCurrencyId | undefined = EXPERIENCE_CURRENCY[cleanExpId];
+      if (currencyId) {
+        currencies[currencyId] = (currencies[currencyId] || 0) + amount;
+      }
+
+      const newXp = prev.xp + finalXp;
       const currentExperiences = prev.experiences || {};
       const expData = currentExperiences[cleanExpId] || { xp: 0, lessons: {} };
-      const updatedExpXp = (expData.xp || 0) + amount;
+      const updatedExpXp = (expData.xp || 0) + finalXp;
 
       const EXP_NAMES: Record<string, string> = {
         astro: 'Cosmos 3D',
         school: 'Escuela IA',
         languages: 'Idiomas',
         verify: 'Criterio',
+        criterio: 'Criterio',
         'ai-lab': 'IA Lab'
       };
 
       const expLabel = EXP_NAMES[cleanExpId] || cleanExpId;
-      const evoTitle = reason ? `✨ [${expLabel}] ${reason} (+${amount} XP)` : `✨ [${expLabel}] Progreso completado (+${amount} XP)`;
+      const multLabel = harmony > 1.01 || schoolMult > 1 || streakMult > 1
+        ? ` (×${(harmony * streakMult * schoolMult).toFixed(2)})`
+        : '';
+      const evoTitle = reason
+        ? `✨ [${expLabel}] ${reason} (+${finalXp} XP${multLabel})`
+        : `✨ [${expLabel}] Progreso completado (+${finalXp} XP${multLabel})`;
 
       const newEvolutions: EvolutionEntry[] = [
         {
@@ -470,17 +526,39 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           dateStr: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
           type: 'experience_activity',
           title: evoTitle,
-          xpEarned: amount,
+          xpEarned: finalXp,
           experienceId: cleanExpId,
           details: reason || 'Actividad formativa'
         },
         ...(prev.evolutions || [])
       ];
 
+      // Evaluar logros cruzados multi-app
+      const earned = GamificationEngine.evaluateCrossAppBadges(currencies, prev.synergyBadges || {});
+      const synergyBadges = { ...(prev.synergyBadges || {}) };
+      for (const badge of earned) {
+        synergyBadges[badge.id] = Date.now();
+        newEvolutions.unshift({
+          id: 'evo_badge_' + Date.now() + '_' + badge.id,
+          timestamp: Date.now(),
+          dateStr: new Date().toLocaleDateString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }),
+          type: 'streak_level',
+          title: `${badge.icon} ¡Insignia desbloqueada: ${badge.name}!`,
+          xpEarned: 0,
+          experienceId: cleanExpId,
+          details: badge.description
+        });
+      }
+      if (earned.length > 0) {
+        setTimeout(() => showToast(`${earned[0].icon} ¡Nueva insignia: ${earned[0].name}!`), 600);
+      }
+
       const updated: UserData = {
         ...prev,
         xp: newXp,
         weeklyActivity: updateWeeklyActivityToday(prev.weeklyActivity),
+        currencies,
+        synergyBadges,
         experiences: {
           ...currentExperiences,
           [cleanExpId]: {
@@ -492,10 +570,43 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       };
 
       persistData(updated);
-      if (reason) showToast(`+${amount} XP: ${reason}`);
+      if (reason) showToast(`+${finalXp} XP${multLabel}: ${reason}`);
       return updated;
     });
   }, [persistData, showToast]);
+
+  // ── MASTER KEY: registrar sesión de School (reactor de 15 min) ──
+  const registerSchoolSession = useCallback((session: { minutes: number; honestyScore: number; guessRate: number }) => {
+    setUserData((prev) => {
+      const mk: MasterKeyStatus = { ...DEFAULT_MASTER_KEY, ...(prev.masterKey || {}) };
+      const next = GamificationEngine.evaluateMasterKeyActivation(mk, session, prev.streak || 1);
+      const wasActive = isMasterKeyActiveToday(mk);
+      const updated: UserData = { ...prev, masterKey: next };
+      persistData(updated);
+      if (next.isActive && !wasActive) {
+        showToast(`🔑 ¡Llave Maestra activada! XP ×${next.multiplier} en todo el ecosistema.`);
+      }
+      return updated;
+    });
+  }, [persistData, showToast]);
+
+  // ── ENTITLEMENTS / FREEMIUM ──
+  const activatePlan = useCallback((plan: GoalsPlanId) => {
+    setUserData((prev) => {
+      const next = entitlementService.activatePlanSimulated(prev.entitlements, plan);
+      const updated: UserData = { ...prev, entitlements: next };
+      persistData(updated);
+      if (plan !== 'free') {
+        entitlementService.saveLocal(user?.uid || 'guest', next);
+        showToast('🚀 ¡Plan GOALS activado! Todas las miniapps desbloqueadas.');
+      }
+      return updated;
+    });
+  }, [persistData, showToast, user]);
+
+  const canAccessExperience = useCallback((expId: ExperienceId | string): boolean => {
+    return entitlementService.canAccess(expId, userData.entitlements, isUserAdmin);
+  }, [userData.entitlements, isUserAdmin]);
 
   const addCustomEvolution = useCallback((entry: Omit<EvolutionEntry, 'id' | 'timestamp' | 'dateStr'>) => {
     setUserData((prev) => {
@@ -537,6 +648,15 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     showToast("Progreso reiniciado");
   };
 
+  // ── Valores derivados del Sistema de Gamificación Unificado ──
+  const currencies: DomainCurrencies = { ...DEFAULT_CURRENCIES, ...(userData.currencies || {}) };
+  const masterKey: MasterKeyStatus = { ...DEFAULT_MASTER_KEY, ...(userData.masterKey || {}) };
+  const cosmicRank: CosmicRankInfo = getCosmicRank(userData.xp || 0);
+  const harmonyFactor: number = getHarmonyFactor(currencies);
+  const masterKeyActive: boolean = isMasterKeyActiveToday(masterKey);
+  const entitlements: GoalsEntitlements = { ...DEFAULT_ENTITLEMENTS, ...(userData.entitlements || {}) };
+  const synergyBadges: Record<string, number> = userData.synergyBadges || {};
+
   return (
     <ProgressContext.Provider value={{
       userData,
@@ -564,7 +684,17 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       toastMsg,
       showToast,
       hideToast,
-      resetProgress
+      resetProgress,
+      currencies,
+      masterKey,
+      cosmicRank,
+      harmonyFactor,
+      masterKeyActive,
+      entitlements,
+      synergyBadges,
+      canAccessExperience,
+      activatePlan,
+      registerSchoolSession
     }}>
       {children}
     </ProgressContext.Provider>

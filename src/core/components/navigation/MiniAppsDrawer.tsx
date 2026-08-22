@@ -66,7 +66,7 @@ export const MiniAppsDrawer: React.FC<MiniAppsDrawerProps> = ({
   onSelectExperience,
   activeExperience
 }) => {
-  const { userData } = useProgress();
+  const { userData, canAccessExperience } = useProgress();
   const [expandedApp, setExpandedApp] = useState<ExperienceId | null>(
     (activeExperience as ExperienceId) || 'school'
   );
@@ -127,6 +127,8 @@ export const MiniAppsDrawer: React.FC<MiniAppsDrawerProps> = ({
             const IconComp = app.icon;
             const isActive = activeExperience === app.id;
             const isExpanded = expandedApp === app.id;
+            const isFree = app.id === 'criterio' || app.id === 'verify';
+            const hasAccess = canAccessExperience(app.id as ExperienceId);
             const variants = MINIAPP_VARIANTS_SUMMARY[app.id as ExperienceId] || [];
             const expProgress = userData?.experiences?.[app.id as ExperienceId];
             const xpEarned = expProgress?.xp || 0;
@@ -154,16 +156,35 @@ export const MiniAppsDrawer: React.FC<MiniAppsDrawerProps> = ({
                   className="p-3.5 flex items-center justify-between gap-3 cursor-pointer select-none group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className={`p-2 rounded-xl bg-slate-950 border border-slate-800/80 ${app.iconColorClass} group-hover:scale-105 transition-transform shrink-0`}>
+                    <div className={`relative p-2 rounded-xl bg-slate-950 border border-slate-800/80 ${app.iconColorClass} group-hover:scale-105 transition-transform shrink-0`}>
                       <IconComp className="w-4 h-4" />
+                      {!isFree && !hasAccess && (
+                        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-[8px] font-black shadow-sm">
+                          🔒
+                        </div>
+                      )}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-slate-100 truncate">
                           {app.name}
                         </h3>
+                        {isFree ? (
+                          <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[8px] font-mono font-bold uppercase">
+                            GRATIS
+                          </span>
+                        ) : (
+                          <span className={`px-1.5 py-0.2 rounded-full border text-[8px] font-mono font-bold uppercase flex items-center gap-0.5 ${
+                            hasAccess 
+                              ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' 
+                              : 'bg-gradient-to-r from-amber-500/20 to-indigo-500/20 text-amber-300 border-amber-500/30'
+                          }`}>
+                            {!hasAccess && <span className="text-[7px]">🔒</span>}
+                            PRO
+                          </span>
+                        )}
                         {isActive && (
-                          <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-400 text-[8px] font-mono font-bold uppercase">
+                          <span className="px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-400 text-[8px] font-mono font-bold uppercase">
                             Activo
                           </span>
                         )}
@@ -184,9 +205,13 @@ export const MiniAppsDrawer: React.FC<MiniAppsDrawerProps> = ({
                         e.stopPropagation();
                         handleSelect(app.id as ExperienceId);
                       }}
-                      className="px-2.5 py-1 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 text-[10px] font-semibold cursor-pointer transition-colors"
+                      className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold cursor-pointer transition-colors flex items-center gap-1 ${
+                        !isFree && !hasAccess
+                          ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                          : 'bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30'
+                      }`}
                     >
-                      Abrir
+                      {!isFree && !hasAccess ? <span>🔒 Abrir</span> : <span>Abrir</span>}
                     </button>
                   </div>
                 </div>

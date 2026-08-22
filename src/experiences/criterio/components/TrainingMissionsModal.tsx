@@ -8,14 +8,19 @@ import { CriterioMission } from '../types';
 import { PauseTimerWidget } from './PauseTimerWidget';
 
 interface TrainingMissionsModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
   onAddXP?: (amount: number, reason: string) => void;
   initialCategory?: string;
 }
 
 export const TrainingMissionsModal: React.FC<TrainingMissionsModalProps> = ({
+  isOpen,
+  onClose,
   onAddXP,
   initialCategory
 }) => {
+  if (isOpen === false) return null;
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'all');
   const [currentMissionIndex, setCurrentMissionIndex] = useState<number>(0);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);

@@ -13,6 +13,7 @@ import { DiagnosticEngine } from '../../services/DiagnosticEngine';
 import { studentStateService } from '../../services/StudentStateService';
 import { PresentationEngine } from '../../services/PresentationEngine';
 import { DiagnosticItem, StudentLearningState } from '../../types/adaptiveCurriculum';
+import { PremiumGate } from '../premium/PremiumGate';
 import { 
   Sparkles, CheckCircle2, XCircle, ArrowRight, ArrowLeft, Trophy,
   Zap, Star, Shield, HelpCircle, Loader2, Check, Play
@@ -30,7 +31,7 @@ export const MiniAppPortalGate: React.FC<MiniAppPortalGateProps> = ({
   onBackToGoals
 }) => {
   const { user } = useAuth();
-  const { effectiveAge, addXP, isUserAdmin, userData } = useProgress();
+  const { effectiveAge, addXP, isUserAdmin, userData, canAccessExperience } = useProgress();
 
   const isAdminAccess = Boolean(
     isUserAdmin || 
@@ -42,6 +43,16 @@ export const MiniAppPortalGate: React.FC<MiniAppPortalGateProps> = ({
   // El super admin josferestudio@gmail.com no tiene prueba de nivel ni portada de bloqueo en ninguna miniapp: accede directamente a todo
   if (isAdminAccess) {
     return <>{children}</>;
+  }
+
+  // Comprobar acceso premium antes del flujo cover/diagnostic
+  if (!canAccessExperience(experienceId)) {
+    return (
+      <PremiumGate
+        experienceId={experienceId}
+        onBack={onBackToGoals}
+      />
+    );
   }
 
   const [loading, setLoading] = useState<boolean>(true);

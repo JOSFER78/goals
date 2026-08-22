@@ -7,6 +7,7 @@ import { db, collection, onSnapshot } from '../config/firebase';
 import { Zap, Flame, Star, Shield, LogIn, LogOut, Sun, Moon, ChevronDown, Sparkles, Check, X } from 'lucide-react';
 import { ExperienceId, AppViewMode } from '../types';
 import { GOALS_EXPERIENCES } from '../config/experiencesConfig';
+import { MasterKeyHUD } from './gamification/MasterKeyHUD';
 
 interface HeaderProps {
   activeExperience: AppViewMode;
@@ -91,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
   onSelectExperience
 }) => {
   const { user, logout } = useAuth();
-  const { userData, totalStars, adminSimulatedAge, setAdminSimulatedAge, effectiveAge } = useProgress();
+  const { userData, totalStars, adminSimulatedAge, setAdminSimulatedAge, effectiveAge, cosmicRank } = useProgress();
   const { theme, toggleTheme, isDark } = useTheme();
   const [pendingCount, setPendingCount] = useState<number>(0);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState<boolean>(false);
@@ -364,9 +365,40 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Métricas de Usuario Autenticado */}
+        {/* Métricas de Usuario Autenticado & Gamificación GOALS */}
         {isAuthenticated ? (
           <>
+            {/* Widget Compacto Llave Maestra (Master Key) */}
+            <MasterKeyHUD
+              compact
+              onOpenSchool={() => handleSelectMiniApp('school')}
+            />
+
+            {/* Chip de Nivel Cósmico con Halo */}
+            {cosmicRank && (
+              <button
+                type="button"
+                onClick={onOpenProfile}
+                className="flex items-center gap-1.5 px-2 py-1 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border transition-all active:scale-95 cursor-pointer shrink-0 text-xs font-bold shadow-sm"
+                style={{
+                  borderColor: `${cosmicRank.haloHex}60`,
+                  boxShadow: `0 0 8px ${cosmicRank.haloHex}25`
+                }}
+                title={`Rango Cósmico: Tier ${cosmicRank.tier} • ${cosmicRank.tierName} — Nivel ${cosmicRank.level}/100 (${cosmicRank.progressPct}% al siguiente nivel)`}
+              >
+                <span
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{
+                    backgroundColor: cosmicRank.haloHex,
+                    boxShadow: `0 0 6px ${cosmicRank.haloHex}`
+                  }}
+                />
+                <span className="font-mono text-[11px]" style={{ color: cosmicRank.haloHex }}>
+                  Nv.{cosmicRank.level}
+                </span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={onOpenProfile}

@@ -5,7 +5,7 @@ import { useTheme } from '../context/ThemeContext';
 import { 
   Zap, Flame, Star, Sparkles, Send, Loader2, Check, ArrowRight, User,
   GraduationCap, Globe, Orbit, ShieldCheck, Target, Award, BookOpen, 
-  Compass, CheckCircle2, ChevronRight, HelpCircle
+  Compass, CheckCircle2, ChevronRight, HelpCircle, Lock
 } from 'lucide-react';
 import { ExperienceId } from '../types';
 import { askAI } from '../services/aiService';
@@ -34,7 +34,7 @@ export const GoalsHome: React.FC<GoalsHomeProps> = ({
   onOpenMiniApps
 }) => {
   const { user } = useAuth();
-  const { userData, totalStars, maxStars, getRankInfo, addXP, effectiveAge } = useProgress();
+  const { userData, totalStars, maxStars, getRankInfo, addXP, effectiveAge, canAccessExperience } = useProgress();
   const { isDark } = useTheme();
 
   const [quickQuery, setQuickQuery] = useState('');
@@ -114,7 +114,7 @@ export const GoalsHome: React.FC<GoalsHomeProps> = ({
     }
   };
 
-  const MINI_APPS = (['school', 'languages', 'astro', 'verify', 'criterio', 'ai-lab'] as ExperienceId[])
+  const MINI_APPS = (['school', 'languages', 'astro', 'criterio', 'ai-lab'] as ExperienceId[])
     .map((id) => GOALS_EXPERIENCES[id])
     .filter(Boolean);
   const initial = user?.displayName ? user.displayName[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : 'E');
@@ -355,6 +355,9 @@ export const GoalsHome: React.FC<GoalsHomeProps> = ({
           <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
             {MINI_APPS.map((app) => {
               const IconComp = app.icon;
+              const isFree = app.id === 'criterio' || app.id === 'verify';
+              const hasAccess = canAccessExperience(app.id as ExperienceId);
+
               return (
                 <button
                   key={app.id}
@@ -366,13 +369,34 @@ export const GoalsHome: React.FC<GoalsHomeProps> = ({
                       : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
                   }`}
                 >
-                  <div className={`p-1.5 rounded-xl border ${
+                  <div className={`relative p-1.5 rounded-xl border ${
                     isDark ? 'bg-slate-950 border-slate-800' : 'bg-white border-slate-200'
                   } ${app.iconColorClass}`}>
                     <IconComp className="w-4 h-4" />
+                    {!isFree && !hasAccess && (
+                      <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-[8px] font-black shadow-sm">
+                        🔒
+                      </div>
+                    )}
                   </div>
                   <div className="text-left">
-                    <span className="font-bold text-xs block leading-tight">{app.name}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-bold text-xs block leading-tight">{app.name}</span>
+                      {isFree ? (
+                        <span className="px-1.5 py-0.2 rounded text-[8px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
+                          GRATIS
+                        </span>
+                      ) : (
+                        <span className={`px-1.5 py-0.2 rounded text-[8px] font-mono font-bold border uppercase flex items-center gap-0.5 ${
+                          hasAccess 
+                            ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' 
+                            : 'bg-gradient-to-r from-amber-500/20 to-indigo-500/20 text-amber-300 border-amber-500/30'
+                        }`}>
+                          {!hasAccess && <span className="text-[7px]">🔒</span>}
+                          PRO
+                        </span>
+                      )}
+                    </div>
                     <span className="text-[9px] text-slate-500 dark:text-slate-400 font-mono block">{app.themeKeyword || app.badge}</span>
                   </div>
                 </button>

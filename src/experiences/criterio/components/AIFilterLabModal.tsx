@@ -7,10 +7,13 @@ import { AI_FORENSIC_CASES } from '../data/aiScenariosData';
 import { AIForensicCase } from '../types';
 
 interface AIFilterLabModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
   onAddXP?: (amount: number, reason: string) => void;
 }
 
-export const AIFilterLabModal: React.FC<AIFilterLabModalProps> = ({ onAddXP }) => {
+export const AIFilterLabModal: React.FC<AIFilterLabModalProps> = ({ isOpen, onClose, onAddXP }) => {
+  if (isOpen === false) return null;
   const [selectedCaseId, setSelectedCaseId] = useState<string>(AI_FORENSIC_CASES[0].id);
   const [inspectedClues, setInspectedClues] = useState<string[]>([]);
   const [isSolved, setIsSolved] = useState<boolean>(false);

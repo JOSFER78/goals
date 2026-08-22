@@ -8,16 +8,24 @@ import { askCriterioSocraticTutor } from '../services/criterioAIService';
 
 interface ModuleViewerModalProps {
   module: CriterioModule | null;
+  ageBracket?: string;
+  isOpen?: boolean;
   onClose: () => void;
-  onCompleteModule: (moduleId: number, xpReward: number) => void;
+  onComplete?: (moduleId: number, xpReward: number) => void;
+  onCompleteModule?: (moduleId: number, xpReward: number) => void;
 }
 
 export const ModuleViewerModal: React.FC<ModuleViewerModalProps> = ({
   module,
+  ageBracket,
+  isOpen,
   onClose,
+  onComplete,
   onCompleteModule
 }) => {
-  if (!module) return null;
+  if (isOpen === false || !module) return null;
+
+  const handleComplete = onComplete || onCompleteModule;
 
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
   const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
@@ -41,7 +49,7 @@ export const ModuleViewerModal: React.FC<ModuleViewerModalProps> = ({
   const handleNextStep = () => {
     if (isLastStep) {
       setIsCompleted(true);
-      onCompleteModule(module.id, module.xpReward);
+      handleComplete?.(module.id, module.xpReward);
     } else {
       setCurrentStepIndex((prev) => prev + 1);
       setSelectedOptionId(null);

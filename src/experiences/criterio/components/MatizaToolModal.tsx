@@ -7,6 +7,8 @@ import { analyzeWithMatizaAI } from '../services/criterioAIService';
 import { MatizaAnalysisResult } from '../types';
 
 interface MatizaToolModalProps {
+  isOpen?: boolean;
+  onClose?: () => void;
   onAddXP?: (amount: number, reason: string) => void;
 }
 
@@ -17,7 +19,8 @@ const SAMPLE_CLAIMS = [
   '¿La ignición por fusión nuclear en el laboratorio NIF generó más energía que toda la red eléctrica?'
 ];
 
-export const MatizaToolModal: React.FC<MatizaToolModalProps> = ({ onAddXP }) => {
+export const MatizaToolModal: React.FC<MatizaToolModalProps> = ({ isOpen, onClose, onAddXP }) => {
+  if (isOpen === false) return null;
   const [claimText, setClaimText] = useState<string>('');
   const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
   const [result, setResult] = useState<MatizaAnalysisResult | null>(null);

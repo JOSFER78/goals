@@ -182,6 +182,40 @@ const MainContent: React.FC = () => {
               }}
             />
           ) : !isAuthenticated && activeExperience ? (
+            /* Modo Invitado: solo CRITERIO (gratis) es accesible; las premium requieren cuenta */
+            (activeExperience !== 'verify' && activeExperience !== 'criterio') ? (
+              <div className="w-full flex-1 flex flex-col items-center justify-center p-6 text-center">
+                <div className="max-w-md w-full bg-slate-900/90 border border-indigo-500/30 rounded-3xl p-8 space-y-4 shadow-2xl">
+                  <div className="text-5xl">🔒</div>
+                  <h2 className="text-xl font-extrabold text-white font-display">
+                    {GOALS_EXPERIENCES[activeExperience]?.name || 'Esta MiniApp'} es GOALS PRO
+                  </h2>
+                  <p className="text-sm text-slate-400">
+                    Crea tu cuenta gratuita para explorar el ecosistema. <span className="text-amber-300 font-bold">Criterio es gratis para siempre</span> — aprende a informarte y detectar mentiras de la IA.
+                  </p>
+                  <div className="flex flex-col gap-2 pt-2">
+                    <button
+                      onClick={() => { setAuthViewMode('signup'); setIsAuthViewOpen(true); }}
+                      className="w-full py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:opacity-95 active:scale-95 text-white font-bold text-sm transition-all cursor-pointer"
+                    >
+                      Crear Cuenta Gratis
+                    </button>
+                    <button
+                      onClick={() => setActiveExperience('criterio')}
+                      className="w-full py-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 active:scale-95 text-amber-300 font-bold text-sm transition-all cursor-pointer"
+                    >
+                      🧭 Entrar a Criterio (GRATIS)
+                    </button>
+                    <button
+                      onClick={handleNavigateHome}
+                      className="w-full py-2 rounded-xl text-slate-400 hover:text-slate-200 text-xs font-semibold transition-all cursor-pointer"
+                    >
+                      Volver al inicio
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
             /* Modo Invitado / Visita: Puede ver toda la interfaz y 3D pero en modo Solo Lectura */
             <div className="w-full flex-1 flex flex-col relative">
               <div className="w-full bg-slate-900/95 border-b border-indigo-500/30 px-3 sm:px-6 py-2 flex items-center justify-between z-40 shadow-lg backdrop-blur-md sticky top-0">
@@ -208,26 +242,13 @@ const MainContent: React.FC = () => {
                   </button>
                 </div>
               </div>
-
               <div className="flex-1 w-full relative">
-                {activeExperience === 'school' ? (
-                  <SchoolView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
-                ) : activeExperience === 'languages' ? (
-                  <LanguagesView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
-                ) : activeExperience === 'verify' ? (
+                {activeExperience === 'verify' || activeExperience === 'criterio' ? (
                   <VerifyView onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
-                ) : activeExperience === 'ai-lab' ? (
-                  <AILabExperience onBackToGoals={handleNavigateHome} onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }} onNavigateExperience={(expId) => setActiveExperience(expId)} />
-                ) : activeExperience === 'astro' ? (
-                  <AstroExperience
-                    onBackToGoals={handleNavigateHome}
-                    onOpenProfile={() => setActiveExperience('profile')}
-                    onOpenAuth={(mode) => { setAuthViewMode(mode); setIsAuthViewOpen(true); }}
-                    onNavigateExperience={(expId) => setActiveExperience(expId)}
-                  />
                 ) : null}
               </div>
             </div>
+            )
           ) : !isApproved ? (
             /* Compuerta de Autorización: Cuenta pendiente de aprobación por el Administrador */
             <PendingApprovalGate />

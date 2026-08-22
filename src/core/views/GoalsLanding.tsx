@@ -473,6 +473,7 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
               {DISCIPLINES.map((disc, idx) => {
                 const isSelected = selectedDisciplineIndex === idx;
                 const IconComponent = disc.icon;
+                const isFree = disc.id === 'verify' || disc.id === 'criterio';
                 return (
                   <button
                     key={disc.id}
@@ -492,6 +493,16 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
                   >
                     <IconComponent className={`w-4 h-4 ${isSelected ? disc.colorTheme.accent : 'text-slate-400'}`} />
                     <span>{disc.name}</span>
+                    {isFree ? (
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        GRATIS
+                      </span>
+                    ) : (
+                      <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-md bg-gradient-to-r from-amber-500/20 to-indigo-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-0.5">
+                        <span className="text-[7px]">🔒</span>
+                        PRO
+                      </span>
+                    )}
                     <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded-md border ${
                       isSelected ? 'bg-slate-950/60 border-slate-700 text-white' : 'bg-slate-950/30 border-slate-800/50 text-slate-500'
                     }`}>
@@ -549,7 +560,16 @@ export const GoalsLanding: React.FC<GoalsLandingProps> = ({ onOpenAuth, onSelect
               <div className="lg:col-span-5 flex flex-col justify-between gap-4 text-left">
                 
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {currentDiscipline.id === 'verify' || currentDiscipline.id === 'criterio' ? (
+                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        GRATIS PARA SIEMPRE
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-lg text-[10px] font-mono font-bold uppercase bg-gradient-to-r from-amber-500/20 to-indigo-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                        🔒 MÓDULO GOALS PRO
+                      </span>
+                    )}
                     <span className={`px-2.5 py-0.5 rounded-lg text-[10px] font-mono font-bold uppercase border ${currentDiscipline.colorTheme.badgeBg}`}>
                       {activeFeature.tag}
                     </span>

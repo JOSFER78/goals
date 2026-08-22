@@ -18,6 +18,7 @@ import { PresentationEngine } from '../services/PresentationEngine';
 import { VoiceConnectionsCenter } from './voice/VoiceConnectionsCenter';
 import { VOICE_PROVIDERS_METADATA, VoiceProviderService } from '../services/VoiceProviderService';
 import { speechVoiceService } from '../services/SpeechVoiceService';
+import { CosmicRankCard, CurrencyBar, MasterKeyHUD, SynergyBadgesGrid } from './gamification';
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -50,7 +51,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const { user, isCloud, signInWithEmail, signUpWithEmail, signInWithGoogle, signOut, updateUserProfileData, authError, setAuthError } = useAuth();
   const { userData, totalStars, maxStars, claimReto, getRankInfo, getRetosList, showToast, saveChildProfileData, saveMascotData } = useProgress();
 
-  const [activeTab, setActiveTab] = useState<'retos' | 'evoluciones' | 'racha' | 'stats' | 'ficha_niño' | 'mascota' | 'cuenta' | 'about' | 'admin'>('retos');
+  const [activeTab, setActiveTab] = useState<'retos' | 'evoluciones' | 'racha' | 'stats' | 'gamificacion' | 'ficha_niño' | 'mascota' | 'cuenta' | 'about' | 'admin' | 'voz'>('retos');
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const [childProfile, setChildProfileState] = useState<ChildLearningProfile>(() => {
@@ -352,7 +353,15 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
 
           <div className="p-4 flex-1 overflow-y-auto space-y-4">
             
-            <div className="grid grid-cols-4 sm:grid-cols-8 gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-bold shrink-0">
+            <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-1.5 bg-slate-900/60 p-1.5 rounded-2xl border border-slate-800 text-xs font-bold shrink-0">
+              <button 
+                onClick={() => setActiveTab('gamificacion')}
+                className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'gamificacion' ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-sm' : 'text-indigo-300 hover:text-white'}`}
+                title="Rango Cósmico y Gamificación Unificada"
+              >
+                <Orbit className="w-3.5 h-3.5 text-indigo-300 shrink-0" />
+                <span className="text-[11px] truncate">Rango</span>
+              </button>
               <button 
                 onClick={() => setActiveTab('retos')}
                 className={`py-2 px-1 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer text-center ${activeTab === 'retos' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
@@ -410,6 +419,16 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 <span className="text-[11px] truncate">Perfil</span>
               </button>
             </div>
+
+            {/* PESTAÑA GAMIFICACIÓN CÓSMICA UNIFICADA */}
+            {activeTab === 'gamificacion' && (
+              <div className="space-y-4 animate-fadeIn">
+                <CosmicRankCard />
+                <MasterKeyHUD />
+                <CurrencyBar />
+                <SynergyBadgesGrid />
+              </div>
+            )}
 
             {/* PESTAÑA HITOS Y EVOLUCIÓN EN VIVO */}
             {activeTab === 'evoluciones' && (
@@ -673,6 +692,11 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           </div>
                         );
                       })}
+                    </div>
+
+                    {/* Fila de Monedas de Dominio */}
+                    <div className="pt-2 border-t border-slate-800">
+                      <CurrencyBar />
                     </div>
                   </div>
                 )}
