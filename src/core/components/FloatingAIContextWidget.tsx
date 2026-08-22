@@ -48,7 +48,11 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
   const isAuthenticated = isCloud && user && !user.isAnonymous;
 
   const [currentSkinId, setCurrentSkinId] = useState<MascotSkinId>(() => {
-    return (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'sparky';
+    try {
+      return (localStorage.getItem('goals_mascot_skin') as MascotSkinId) || 'sparky';
+    } catch {
+      return 'sparky';
+    }
   });
   const currentSkin = MASCOT_SKINS[currentSkinId] || MASCOT_SKINS.sparky;
 
@@ -102,7 +106,7 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
   // Hook de Navegación Espacial Agéntica y Teletransporte
   const spatialNavigator = useSpatialAgenticNavigator({
-    mascotScale: parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2'),
+    mascotScale: (() => { try { return parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2'); } catch { return 1.2; } })(),
     glowColor: currentSkin.glowColor,
     onShowBubble: (bubble) => mascotBrain.showCustomBubble(bubble.text, bubble.durationMs),
     onDismissBubble: () => mascotBrain.dismissBubble(),
@@ -111,9 +115,13 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
 
   // Tamaño de la ventana de chat extendida
   const [windowSize, setWindowSize] = useState<{ width: number; height: number }>(() => {
-    const savedW = parseInt(localStorage.getItem('goals_chat_w') || '380', 10);
-    const savedH = parseInt(localStorage.getItem('goals_chat_h') || '480', 10);
-    return { width: savedW, height: savedH };
+    try {
+      const savedW = parseInt(localStorage.getItem('goals_chat_w') || '380', 10);
+      const savedH = parseInt(localStorage.getItem('goals_chat_h') || '480', 10);
+      return { width: isNaN(savedW) ? 380 : savedW, height: isNaN(savedH) ? 480 : savedH };
+    } catch {
+      return { width: 380, height: 480 };
+    }
   });
 
   const [isResizingTL, setIsResizingTL] = useState(false);
@@ -123,7 +131,11 @@ export const FloatingAIContextWidget: React.FC<FloatingAIContextWidgetProps> = (
   const [contextMenu, setContextMenu] = useState<ContextMenuState>({ visible: false, x: 0, y: 0 });
 
   const [mascotScale, setMascotScale] = useState(() => {
-    return parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
+    try {
+      return parseFloat(localStorage.getItem('goals_mascot_scale') || '1.2');
+    } catch {
+      return 1.2;
+    }
   });
 
   const [position, setPosition] = useState<{ x?: number; y?: number }>({});

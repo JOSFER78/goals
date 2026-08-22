@@ -150,7 +150,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
 
     // 2. Persistencia en la nube con Firestore Merge
-    if (isCloud && db && user?.uid && !user.isAnonymous) {
+    // GOALS: TODO se sincroniza en Firebase, incluidos usuarios anónimos (invitados con uid real)
+    if (isCloud && db && user?.uid && user.uid !== 'guest') {
       try {
         await setDoc(doc(db, 'users', user.uid), data, { merge: true });
       } catch (err) {
@@ -172,7 +173,7 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     } catch (e) {}
 
-    if (isCloud && db && user?.uid && !user.isAnonymous) {
+    if (isCloud && db && user?.uid && user.uid !== 'guest') {
       const userDocRef = doc(db, 'users', user.uid);
       unsubscribeSnapshot = onSnapshot(userDocRef, (docSnap) => {
         if (docSnap.exists()) {

@@ -191,7 +191,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return;
         }
 
-        // Sin sesión en Firebase: revisar si hay sesión local de invitado o admin dev
+        // Sin sesión en Firebase: GOALS sincroniza TODO en Firebase.
+        // Auto-login anónimo para que cada visitante tenga uid real y persista en Firestore.
+        if (!explicitLogout && isFirebaseReady() && auth) {
+          try {
+            await signInAnonymously(auth);
+            setIsCloud(true);
+            setLoading(false);
+            return; // onAuthStateChanged procesará la sesión anónima
+          } catch (anonErr) {
+            console.warn("Auto anonymous sign-in failed, falling back to local:", anonErr);
+          }
+        }
+
+        // Fallback local solo si Firebase no está disponible
         const stored = localStorage.getItem('goals_local_user');
         if (stored) {
           try {
