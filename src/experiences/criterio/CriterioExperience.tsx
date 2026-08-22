@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useProgress } from '../../core/context/ProgressContext';
 import { useAuth } from '../../core/context/AuthContext';
 import { CRITERIO_MODULES } from './data/modulesData';
@@ -12,6 +12,7 @@ import { TrainingMissionsModal } from './components/TrainingMissionsModal';
 import { AIFilterLabModal } from './components/AIFilterLabModal';
 import { MatizaToolModal } from './components/MatizaToolModal';
 import { EcosystemShowcase } from './components/EcosystemShowcase';
+import { studentStateService } from '../../core/services/StudentStateService';
 import { 
   Lock, BookOpen, FlaskConical, Trophy, Sparkles, 
   Radio, Layers, Scale, Brain, 
@@ -203,24 +204,56 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
   onOpenAuth, 
   onNavigateExperience 
 }) => {
-  const { userData, addXP, currencies } = useProgress();
+  const { userData, addXP, currencies, effectiveAge } = useProgress();
   const { user } = useAuth();
   const isAuthenticated = !!(user && !user.isAnonymous);
+  const uid = user?.uid || 'guest';
+
+  // ── SISTEMA DE NIVEL DEL ALUMNO ──
+  // El alumno entra en SU nivel según su edad real del perfil (Firebase).
+  // Solo ve los módulos de su franja; avanza uno a uno (desbloqueo progresivo).
+  const bracketForAge = (age: number): CriterioAgeBracket => {
+    if (age <= 9) return '8-10';
+    if (age <= 11) return '10-12';
+    if (age <= 13) return '12-14';
+    return '14-16';
+  };
 
   const [activeTab, setActiveTab] = useState<CriterioTab>('modules');
-  const [ageBracket, setAgeBracket] = useState<CriterioAgeBracket>('10-12');
+  const [ageBracket, setAgeBracket] = useState<CriterioAgeBracket>(() => bracketForAge(effectiveAge));
   const [selectedCompetency, setSelectedCompetency] = useState<CriterioCompetencyId | null>(null);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState<boolean>(false);
 
+  // Si el perfil de edad cambia (onboarding/edición), recalibrar el nivel automáticamente
+  useEffect(() => {
+    setAgeBracket(bracketForAge(effectiveAge));
+  }, [effectiveAge]);
+
   const [activeViewingModule, setActiveViewingModule] = useState<CriterioModule | null>(null);
-  const [completedModuleIds, setCompletedModuleIds] = useState<number[]>(() => {
-    try {
-      const saved = localStorage.getItem('goals_criterio_completed_modules');
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [completedModuleIds, setCompletedModuleIds] = useState<number[]>([]);
+  const [isLoadingProgress, setIsLoadingProgress] = useState<boolean>(true);
+
+  // Carga del progreso desde FIRESTORE (users/{uid}/learningStates/criterio) — nada de localStorage
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const state = await studentStateService.getStudentState(uid, 'criterio');
+        if (mounted && state?.completedUnitIds) {
+          setCompletedModuleIds(
+            state.completedUnitIds
+              .map((id) => parseInt(String(id).replace(/\D/g, ''), 10))
+              .filter((n) => !isNaN(n))
+          );
+        }
+      } catch (e) {
+        console.warn('[Criterio] Error cargando progreso desde Firebase:', e);
+      } finally {
+        if (mounted) setIsLoadingProgress(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [uid]);
 
   // Estados del Motor Agéntico de Ejercicios Dinámicos
   const [dynamicBatch, setDynamicBatch] = useState<DynamicExerciseBatch | null>(null);
@@ -241,16 +274,23 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
     }
   ]);
 
-  // Completar Módulo Curricular con Gamificación Unificada en Criterio
-  const handleCompleteModule = (moduleId: number, xpReward: number) => {
+  // Completar Módulo Curricular: gamificación unificada + persistencia FIRESTORE (cero localStorage)
+  const handleCompleteModule = useCallback((moduleId: number, xpReward: number) => {
     if (!completedModuleIds.includes(moduleId)) {
       const next = [...completedModuleIds, moduleId];
       setCompletedModuleIds(next);
-      localStorage.setItem('goals_criterio_completed_modules', JSON.stringify(next));
+      // Sincronizar con Firestore: users/{uid}/learningStates/criterio
+      studentStateService.completeUnit(
+        uid,
+        'criterio',
+        `criterio_m${String(moduleId).padStart(2, '0')}`,
+        100,
+        xpReward
+      ).catch((e) => console.warn('[Criterio] Error guardando progreso en Firebase:', e));
     }
     addXP(xpReward, 'criterio', `Completado Módulo de Criterio #${moduleId}`);
     setActiveViewingModule(null);
-  };
+  }, [completedModuleIds, uid, addXP]);
 
   // Recompensa de XP con Gamificación Unificada en Criterio
   const handleAddXP = (amount: number, reason: string) => {
@@ -335,12 +375,30 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
     }
   };
 
-  // Filtrado de Módulos según la competencia seleccionada
-  const displayedModules = selectedCompetency
-    ? CRITERIO_MODULES.filter((m) => m.competency === selectedCompetency)
-    : CRITERIO_MODULES;
+  // ── NIVEL DEL ALUMNO: solo módulos de SU franja de edad, con desbloqueo progresivo ──
+  // Un módulo es compatible si su ageBracket incluye la edad del alumno o es universal (8-18).
+  const bracketMatches = (bracket: CriterioAgeBracket): boolean => {
+    if (bracket === '8-18') return true;
+    const [lo, hi] = bracket.split('-').map(Number);
+    return effectiveAge >= lo && effectiveAge <= hi;
+  };
 
-  const criterioScore = Math.min(100, Math.round((completedModuleIds.length / CRITERIO_MODULES.length) * 100) + 40);
+  const levelModules = CRITERIO_MODULES.filter((m) => bracketMatches(m.ageBracket));
+
+  // Desbloqueo progresivo: el módulo N se abre al completar el N-1 (el 1º siempre abierto)
+  const isModuleUnlocked = (module: CriterioModule): boolean => {
+    const idx = levelModules.findIndex((m) => m.id === module.id);
+    if (idx <= 0) return true;
+    const prev = levelModules[idx - 1];
+    return completedModuleIds.includes(prev.id);
+  };
+
+  // Filtrado adicional por competencia seleccionada
+  const displayedModules = selectedCompetency
+    ? levelModules.filter((m) => m.competency === selectedCompetency)
+    : levelModules;
+
+  const criterioScore = Math.min(100, Math.round((completedModuleIds.length / Math.max(1, levelModules.length)) * 100) + 40);
 
   // Submenú Desplegable con Módulos, Laboratorios y Ecosistema
   const submenuSections: DiscreteMenuItem[] = [
@@ -531,23 +589,36 @@ export const CriterioExperience: React.FC<CriterioExperienceProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="font-black text-base sm:text-lg text-white">
-                Módulos de Alfabetización Informativa
+                Tu Nivel · Módulos de {ageBracket} años
               </h3>
               <span className="text-xs font-mono text-slate-400">
-                Mostrando {displayedModules.length} de {CRITERIO_MODULES.length} lecciones
+                {completedModuleIds.filter((id) => levelModules.some((m) => m.id === id)).length} de {levelModules.length} completados
               </span>
             </div>
+            <p className="text-[11px] text-slate-500 -mt-2">
+              Avanza a tu ritmo: cada módulo se desbloquea al completar el anterior. Tu progreso se guarda en tu cuenta.
+            </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-              {displayedModules.map((module) => (
-                <ModuleCard
-                  key={module.id}
-                  module={module}
-                  isCompleted={completedModuleIds.includes(module.id)}
-                  onOpenModule={(mod) => setActiveViewingModule(mod)}
-                />
-              ))}
-            </div>
+            {isLoadingProgress ? (
+              <div className="flex items-center justify-center py-12 text-slate-400">
+                <Loader2 className="w-6 h-6 animate-spin text-amber-400" />
+                <span className="ml-2 text-xs font-mono">Cargando tu progreso...</span>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+                {displayedModules.map((module) => (
+                  <ModuleCard
+                    key={module.id}
+                    module={module}
+                    isCompleted={completedModuleIds.includes(module.id)}
+                    isLocked={!isModuleUnlocked(module)}
+                    onOpenModule={(mod) => {
+                      if (isModuleUnlocked(mod)) setActiveViewingModule(mod);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Escaparate del Ecosistema al final de la página de Módulos */}

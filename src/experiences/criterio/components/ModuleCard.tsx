@@ -1,13 +1,14 @@
 import React from 'react';
 import { 
   Compass, Eye, Brain, GitMerge, Cpu, Scale, Search, Bot, 
-  Sparkles, ShieldAlert, Award, FileText, ArrowRight, CheckCircle2, Clock, Zap
+  Sparkles, ShieldAlert, Award, FileText, ArrowRight, CheckCircle2, Clock, Zap, Lock
 } from 'lucide-react';
 import { CriterioModule } from '../types';
 
 interface ModuleCardProps {
   module: CriterioModule;
   isCompleted?: boolean;
+  isLocked?: boolean;
   onOpenModule: (module: CriterioModule) => void;
 }
 
@@ -29,6 +30,7 @@ const ICON_MAP: Record<string, React.ElementType> = {
 export const ModuleCard: React.FC<ModuleCardProps> = ({
   module,
   isCompleted = false,
+  isLocked = false,
   onOpenModule
 }) => {
   const IconComponent = ICON_MAP[module.iconName] || Compass;
@@ -36,9 +38,11 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({
   return (
     <div 
       className={`group rounded-3xl border p-4 sm:p-5 transition-all duration-300 flex flex-col justify-between relative overflow-hidden backdrop-blur-xl hover:shadow-2xl hover:scale-[1.01] ${
-        isCompleted 
-          ? 'bg-slate-950/85 border-emerald-500/40 hover:border-emerald-400' 
-          : 'bg-slate-950/80 border-slate-800/90 hover:border-amber-500/50'
+        isLocked
+          ? 'bg-slate-950/60 border-slate-800/60 opacity-60'
+          : isCompleted 
+            ? 'bg-slate-950/85 border-emerald-500/40 hover:border-emerald-400' 
+            : 'bg-slate-950/80 border-slate-800/90 hover:border-amber-500/50'
       }`}
     >
       {/* Resplandor ambiental de acento */}
@@ -68,7 +72,11 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({
           </div>
 
           <div className="flex items-center gap-1.5">
-            {isCompleted ? (
+            {isLocked ? (
+              <span className="flex items-center gap-1 text-[11px] font-bold text-slate-400 bg-slate-900/80 border border-slate-700 px-2 py-0.5 rounded-full font-mono">
+                <Lock className="w-3 h-3" /> BLOQUEADO
+              </span>
+            ) : isCompleted ? (
               <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono">
                 <CheckCircle2 className="w-3 h-3" /> COMPLETADO
               </span>
@@ -117,14 +125,20 @@ export const ModuleCard: React.FC<ModuleCardProps> = ({
         <button
           type="button"
           onClick={() => onOpenModule(module)}
-          className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all cursor-pointer ${
-            isCompleted
-              ? 'bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200'
-              : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/20 active:scale-95'
+          disabled={isLocked}
+          className={`px-3.5 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all ${
+            isLocked
+              ? 'bg-slate-900 border border-slate-800 text-slate-500 cursor-not-allowed'
+              : isCompleted
+                ? 'bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 cursor-pointer'
+                : 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md shadow-amber-500/20 active:scale-95 cursor-pointer'
           }`}
         >
-          <span>{isCompleted ? 'Repasar' : 'Explorar Módulo'}</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          {isLocked ? (
+            <><Lock className="w-3.5 h-3.5" /><span>Completa el anterior</span></>
+          ) : (
+            <><span>{isCompleted ? 'Repasar' : 'Explorar Módulo'}</span><ArrowRight className="w-3.5 h-3.5" /></>
+          )}
         </button>
       </div>
     </div>
